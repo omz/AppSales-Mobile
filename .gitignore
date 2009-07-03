@@ -1,0 +1,3 @@
+build
+*.xcodeproj/*.pbxuser
+*.xcodeproj/*.perspectivev3
