@@ -1,3 +1,10 @@
 build
 *.xcodeproj/*.pbxuser
 *.xcodeproj/*.perspectivev3
+.DS_Store
+.swp
+~.nib
+.pbxuser
+.perspective
+*.perspectivev3
+*.mode1v3

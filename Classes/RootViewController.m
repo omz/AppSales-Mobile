@@ -73,7 +73,7 @@
 			continue;
 		
 		Day *loadedDay = [Day dayFromFile:filename atPath:docPath];
-
+		
 		if (loadedDay != nil) {
 			if (loadedDay.isWeek)
 				[self.weeks setObject:loadedDay forKey:[loadedDay name]];
@@ -85,7 +85,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveData) name:UIApplicationWillTerminateNotification object:nil];
 	
 	[self importExistingDayData];
-
+	
 	/* Note the date of the most recent day for which we have data */
 	BOOL checkAutomaticallyPref = [[NSUserDefaults standardUserDefaults] boolForKey:@"DownloadReportsAutomatically"];
 	if (checkAutomaticallyPref == YES) {
@@ -106,7 +106,7 @@
 			[self downloadReports:nil];	
 		}
 	}
-
+	
 	return self;
 }
 
@@ -185,12 +185,12 @@
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	float max = 0.1;
 	int checkedSinceUpdate = 0;
-
+	
 	for (Day *d in sortedDays) {
 		float r = [d totalRevenueInBaseCurrency];
 		if (r > max)
 			max = r;
-
+		
 		checkedSinceUpdate++;
 		if (checkedSinceUpdate == LIVE_DAY_MAX_REVENUE_UPDATE_REFRESH_INTERVAL) {
 			if (daysController.maxRevenue != max) {
@@ -201,7 +201,7 @@
 			checkedSinceUpdate = 0;
 		}		
 	}
-
+	
 	if (daysController.maxRevenue != max) {
 		daysController.maxRevenue = max;
 		[daysController.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
@@ -213,9 +213,9 @@
 {
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 	NSArray *sortedDays = [[days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-
+	
 	[self performSelectorInBackground:@selector(refreshMaxDayRevenue:) withObject:sortedDays];
-
+	
 	NSMutableArray *daysByMonth = [NSMutableArray array];
 	int lastMonth = -1;
 	for (Day *d in sortedDays) {
@@ -237,16 +237,16 @@
 - (void)refreshMaxWeekRevenue:(NSArray *)sortedWeeks
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
+	
 	float max = 0.1;
 	int checkedSinceUpdate = 0;
-
+	
 	for (Day *w in sortedWeeks) {
 		float r = [w totalRevenueInBaseCurrency];
-
+		
 		if (r > max)
 			max = r;
-			
+		
 		checkedSinceUpdate++;
 		if (checkedSinceUpdate == LIVE_WEEK_MAX_REVENUE_UPDATE_REFRESH_INTERVAL) {
 			if (weeksController.maxRevenue != max) {
@@ -256,12 +256,12 @@
 			checkedSinceUpdate = 0;
 		}
 	}
-
+	
 	if (weeksController.maxRevenue != max) {
 		weeksController.maxRevenue = max;
 		[weeksController.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];				
 	}
-
+	
 	[pool release];
 }
 
@@ -269,7 +269,7 @@
 {
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 	NSArray *sortedDays = [[weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-
+	
 	[self performSelectorInBackground:@selector(refreshMaxWeekRevenue:) withObject:sortedDays];
 	
 	NSMutableArray *daysByMonth = [NSMutableArray array];
@@ -303,7 +303,7 @@
 {
 	[days addEntriesFromDictionary:newDays];
 	[self refreshDayList];
-
+	
 	if (daysController.daysByMonth.count) {
 		NSArray *mostRecentMonth = [daysController.daysByMonth objectAtIndex:0];
 		if (mostRecentMonth.count) {
@@ -386,14 +386,14 @@ Day *ImportDayData(NSData *dayData, BOOL compressed) {
 	
 	NSScanner *scanner = [NSScanner scannerWithString:loginPage];
 	NSString *loginAction = nil;
-	[scanner scanUpToString:@"name=\"appleConnectForm\" action=\"" intoString:NULL];
-	[scanner scanString:@"name=\"appleConnectForm\" action=\"" intoString:NULL];
+	[scanner scanUpToString:@"method=\"post\" action=\"" intoString:NULL];
+	[scanner scanString:@"method=\"post\" action=\"" intoString:NULL];
 	[scanner scanUpToString:@"\"" intoString:&loginAction];
 	NSString *dateTypeSelectionPage;
 	if (loginAction) { //not logged in yet
 		NSString *loginURLString = [ittsBaseURL stringByAppendingString:loginAction];
 		NSURL *loginURL = [NSURL URLWithString:loginURLString];
-		NSDictionary *loginDict = [NSDictionary dictionaryWithObjectsAndKeys:username, @"theAccountName", password, @"theAccountPW", nil];
+		NSDictionary *loginDict = [NSDictionary dictionaryWithObjectsAndKeys:username, @"theAccountName", password, @"theAccountPW", @"0", @"1.Continue.x", @"0", @"1.Continue.y", nil];
 		NSString *encodedLoginDict = [loginDict formatForHTTP];
 		NSData *httpBody = [encodedLoginDict dataUsingEncoding:NSASCIIStringEncoding];
 		NSMutableURLRequest *loginRequest = [NSMutableURLRequest requestWithURL:loginURL];
@@ -518,18 +518,18 @@ Day *ImportDayData(NSData *dayData, BOOL compressed) {
 		NSString *downloadActionName;
 		if (i==0) {
 			downloadType = @"Daily";
-			downloadActionName = @"9.11.1";
+			downloadActionName = @"11.11.1";
 		}
 		else {
 			downloadType = @"Weekly";
-			downloadActionName = @"9.13.1";
+			downloadActionName = @"11.13.1";
 		}
 		
 		NSString *dateTypeSelectionURLString = [ittsBaseURL stringByAppendingString:dateTypeAction]; 
 		NSDictionary *dateTypeDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  downloadType, @"9.9", 
+									  downloadType, @"11.9", 
 									  downloadType, @"hiddenDayOrWeekSelection", 
-									  @"Summary", @"9.7", 
+									  @"Summary", @"11.7", 
 									  @"ShowDropDown", @"hiddenSubmitTypeName", nil];
 		NSString *encodedDateTypeDict = [dateTypeDict formatForHTTP];
 		NSData *httpBody = [encodedDateTypeDict dataUsingEncoding:NSASCIIStringEncoding];
@@ -585,10 +585,10 @@ Day *ImportDayData(NSData *dayData, BOOL compressed) {
 		NSString *dayDownloadActionURLString = [ittsBaseURL stringByAppendingString:dayDownloadAction];
 		for (NSString *dayString in availableDays) {
 			NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
-											 downloadType, @"9.9", 
+											 downloadType, @"11.9", 
 											 downloadType, @"hiddenDayOrWeekSelection",
 											 @"Download", @"hiddenSubmitTypeName",
-											 @"Summary", @"9.7",
+											 @"Summary", @"11.7",
 											 dayString, downloadActionName, 
 											 @"Download", @"download", nil];
 			NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
@@ -622,7 +622,7 @@ Day *ImportDayData(NSData *dayData, BOOL compressed) {
 		else
 			[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays waitUntilDone:YES];
 	}
-
+	
 	[pool release];
 }
 
