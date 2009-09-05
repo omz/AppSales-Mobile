@@ -125,6 +125,7 @@
 	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"JP"];
 	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"US"];
 	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"WW"];
+	NSMutableDictionary *unitsByRegion = [[revenueByRegion mutableCopyWithZone: NULL] autorelease];
 	
 	for (Day *d in self.days) {
 		for (Country *c in [d.countries allValues]) {
@@ -134,13 +135,22 @@
 			float revenueOfCurrentRegion = [[revenueByRegion objectForKey:region] floatValue];
 			revenueOfCurrentRegion += [c totalRevenueInBaseCurrency];
 			[revenueByRegion setObject:[NSNumber numberWithFloat:revenueOfCurrentRegion] forKey:region];
+			int unitsOfCurrentRegion = [[unitsByRegion objectForKey:region] intValue];
+			unitsOfCurrentRegion += [c totalUnits];
+			[unitsByRegion setObject:[NSNumber numberWithInt:unitsOfCurrentRegion] forKey:region];
 		}
 	}
 	
+
 	NSArray *sortedRegions = [revenueByRegion keysSortedByValueUsingSelector:@selector(compare:)];
 	float totalRevenue = 0.0;
 	for (NSString *region in sortedRegions) {
 		totalRevenue += [[revenueByRegion objectForKey:region] floatValue];
+	}
+	sortedRegions = [unitsByRegion keysSortedByValueUsingSelector:@selector(compare:)];
+	int totalUnits = 0;
+	for (NSString *region in sortedRegions) {
+		totalUnits += [[unitsByRegion objectForKey:region] intValue];
 	}
 	
 	//draw title:
@@ -178,8 +188,8 @@
 		colorIndex--;
 		if (colorIndex < 0) colorIndex = [colors count] - 1;
 		
-		float revenue = [[revenueByRegion objectForKey:region] floatValue];
-		float percentage = revenue / totalRevenue;
+		float units = [[unitsByRegion objectForKey:region] floatValue];
+		float percentage = units / totalUnits;
 		CGContextBeginPath(c);
 		CGContextMoveToPoint(c, center.x, center.y);
 		float angle = lastAngle + (percentage * -M_PI * 2);
@@ -201,7 +211,8 @@
 	for (int j = [sortedRegions count] - 1; j >= 0; j--) {
 		NSString *region = [sortedRegions objectAtIndex:j];
 		float revenue = [[revenueByRegion objectForKey:region] floatValue];
-		float percentage = revenue / totalRevenue;
+		float units = [[unitsByRegion objectForKey:region] floatValue];
+		float percentage = units / totalUnits;
 		UIColor *color = [colors objectAtIndex:colorIndex];
 		colorIndex--;
 		if (colorIndex < 0) colorIndex = [colors count] - 1;
@@ -224,6 +235,7 @@
 	}
 	
 	NSLog(@"%@", revenueByRegion);
+	NSLog(@"%@", unitsByRegion);
 }
 
 
