@@ -234,8 +234,8 @@
 		i++;
 	}
 	
-	NSLog(@"%@", revenueByRegion);
-	NSLog(@"%@", unitsByRegion);
+	//NSLog(@"%@", revenueByRegion);
+	//NSLog(@"%@", unitsByRegion);
 }
 
 
