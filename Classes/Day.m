@@ -262,6 +262,15 @@ static BOOL shouldLoadCountries = YES;
 	return sum;
 }
 
+- (int)totalUnits
+{
+	int sum = 0;
+	for (Country *c in [self.countries allValues]) {
+		sum += [c totalUnits];
+	}
+	return sum;
+}
+
 - (NSArray *)allProductNames
 {
 	NSMutableSet *names = [NSMutableSet set];
@@ -337,7 +346,7 @@ static BOOL shouldLoadCountries = YES;
 
 - (NSArray *)children
 {
-	NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"totalRevenueInBaseCurrency" ascending:NO] autorelease];
+	NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"totalUnits" ascending:NO] autorelease];
 	NSArray *sortedChildren = [[self.countries allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 	return sortedChildren;
 }

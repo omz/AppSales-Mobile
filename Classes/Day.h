@@ -63,6 +63,7 @@
 - (void)setDateString:(NSString *)dateString;
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
+- (int)totalUnits;
 - (NSArray *)allProductNames;
 - (NSString *)dayString;
 - (NSString *)weekdayString;

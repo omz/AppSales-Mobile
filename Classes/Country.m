@@ -113,6 +113,15 @@
 	return sum;
 }
 
+- (int)totalUnits
+{
+	int sum = 0;
+	for (Entry *e in self.entries) {
+		sum += [e units];
+	}
+	return sum;
+}
+
 - (NSArray *)allProductNames
 {
 	NSMutableSet *names = [NSMutableSet set];
