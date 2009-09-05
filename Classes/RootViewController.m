@@ -500,6 +500,7 @@ Day *ImportDayData(NSData *dayData, BOOL compressed) {
 		}
 	}
 	
+	NSLog(@"%@", dateTypeSelectionPage);
 	scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
 	NSString *dateTypeAction = nil;
 	[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
@@ -792,7 +793,7 @@ NSString *importDayDataDayName(NSString *file) {
 	NSArray *components = [file componentsSeparatedByString:@"_"];
 	if ([components count] == 6) {
 		NSString *date = [components objectAtIndex:4];
-		if ([date length] == 8) {
+		if ([date length] >= 8) {
 			return [NSString stringWithFormat:@"%@/%@/%@", [date substringWithRange:NSMakeRange(4, 2)],
 					[date substringWithRange:NSMakeRange(6, 2)], [date substringWithRange:NSMakeRange(0, 4)]];
 		} else {
@@ -818,7 +819,7 @@ NSString *importDayDataDayName(NSString *file) {
 			NSString *dayString = importDayDataDayName(file);
 			if (![daysToSkip containsObject:dayString]) {
 				Day *day = ImportDayData([NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]], [file hasSuffix:@".gz"]);
-				if (day != nil) {
+				if (day && dayString) {
 					NSLog(@"IMPORTED DAY %@", day);
 					[downloadedDays setObject:day forKey:dayString];
 					day.name = dayString;
@@ -833,7 +834,7 @@ NSString *importDayDataDayName(NSString *file) {
 			NSString *weekString = importDayDataDayName(file);
 			if (![weeksToSkip containsObject:weekString]) {
 				Day *week = ImportDayData([NSData dataWithContentsOfFile:[NSString stringWithFormat:@"%@/%@", path, file]], [file hasSuffix:@".gz"]);
-				if (week != nil) {
+				if (week && weekString) {
 					NSLog(@"IMPORTED WEEK %@", week);
 					[downloadedWeeks setObject:week forKey:weekString];
 					week.name = weekString;
