@@ -104,6 +104,8 @@
 {
 	[super drawRect:rect];
 	
+	BOOL showUnits = [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowUnitsInGraphs"];
+	
 	CGPoint center = CGPointMake(90, 110);
 	float radius = 75.0;
 	
@@ -112,8 +114,7 @@
 	CGContextFillEllipseInRect(c, CGRectMake(center.x - radius - 1, center.y - radius - 1, radius * 2 + 4, radius * 2 + 4));
 	[[UIColor whiteColor] set];
 	CGContextFillEllipseInRect(c, CGRectMake(center.x - radius - 2, center.y - radius - 2, radius * 2 + 4, radius * 2 + 4));
-	
-	
+		
 	if (!self.days || [self.days count] == 0)
 		return;
 	
@@ -127,6 +128,7 @@
 	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"WW"];
 	NSMutableDictionary *unitsByRegion = [[revenueByRegion mutableCopyWithZone: NULL] autorelease];
 	
+	int totalUnits = 0;
 	for (Day *d in self.days) {
 		for (Country *c in [d.countries allValues]) {
 			NSString *region = [regionsByCountryCode objectForKey:c.name];
@@ -136,26 +138,27 @@
 			revenueOfCurrentRegion += [c totalRevenueInBaseCurrency];
 			[revenueByRegion setObject:[NSNumber numberWithFloat:revenueOfCurrentRegion] forKey:region];
 			int unitsOfCurrentRegion = [[unitsByRegion objectForKey:region] intValue];
-			unitsOfCurrentRegion += [c totalUnits];
+			int units = [c totalUnits];
+			unitsOfCurrentRegion += units;
+			totalUnits += units;
 			[unitsByRegion setObject:[NSNumber numberWithInt:unitsOfCurrentRegion] forKey:region];
 		}
 	}
 	
-
 	NSArray *sortedRegions = [revenueByRegion keysSortedByValueUsingSelector:@selector(compare:)];
 	float totalRevenue = 0.0;
 	for (NSString *region in sortedRegions) {
 		totalRevenue += [[revenueByRegion objectForKey:region] floatValue];
 	}
 	sortedRegions = [unitsByRegion keysSortedByValueUsingSelector:@selector(compare:)];
-	int totalUnits = 0;
-	for (NSString *region in sortedRegions) {
-		totalUnits += [[unitsByRegion objectForKey:region] intValue];
-	}
 	
 	//draw title:
 	[[UIColor darkGrayColor] set];
-	NSString *caption = [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %@)",nil), [self.days count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+	NSString *caption;
+	if (showUnits)
+		caption = [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %i sales)",nil), [self.days count], totalUnits];
+	else
+		caption = [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %@)",nil), [self.days count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
 	[caption drawInRect:CGRectMake(10, 10, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 	float maxX = 305.0;
 	float minX = 15.0;
@@ -183,7 +186,6 @@
 	float lastAngle = 0.0;
 	for (int i = [sortedRegions count] - 1; i >= 0; i--) {
 		NSString *region = [sortedRegions objectAtIndex:i];
-	//for (NSString *region in sortedRegions) {
 		[[colors objectAtIndex:colorIndex] set];
 		colorIndex--;
 		if (colorIndex < 0) colorIndex = [colors count] - 1;
@@ -227,15 +229,14 @@
 		[[UIColor whiteColor] set];
 		[region drawInRect:CGRectMake(legendFrame.origin.x, legendFrame.origin.y + 4, legendFrame.size.width, legendFrame.size.height) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
 		[[UIColor darkGrayColor] set];
-
-
-		NSString *legendString = [NSString stringWithFormat:@"%@%%  (%@)", percentString, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:revenue] withFraction:NO]];
+		NSString *legendString;
+		if (showUnits)
+			legendString = [NSString stringWithFormat:@"%@%% (%i)", percentString, (int)units];
+		else
+			legendString = [NSString stringWithFormat:@"%@%%  (%@)", percentString, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:revenue] withFraction:NO]];
 		[legendString drawInRect:CGRectMake(205, y + 3, 110, 10) withFont:[UIFont boldSystemFontOfSize:11.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
 		i++;
 	}
-	
-	//NSLog(@"%@", revenueByRegion);
-	//NSLog(@"%@", unitsByRegion);
 }
 
 

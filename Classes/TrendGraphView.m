@@ -27,6 +27,8 @@
 	
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	
+	BOOL showUnits = [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowUnitsInGraphs"];
+		
 	//draw background:
 	float maxX = 305.0;
 	float minX = 40.0;
@@ -40,7 +42,7 @@
 	float maxRevenue = 0.0;
 	float totalRevenue = 0.0;
 	for (Day *d in self.days) {
-		float revenue = [d totalRevenueInBaseCurrencyForApp:self.app];
+		float revenue = (showUnits) ? (float)[d totalUnitsForApp:self.app] : [d totalRevenueInBaseCurrencyForApp:self.app];
 		[revenues addObject:[NSNumber numberWithFloat:revenue]];
 		totalRevenue += revenue;
 		if (revenue > maxRevenue) maxRevenue = revenue;
@@ -49,11 +51,7 @@
 		return;
 	}
 	
-	UIColor *graphColor = nil;
-	if (self.app == nil)
-		graphColor = /*[UIColor colorWithRed:0.34 green:0.65 blue:0.02 alpha:1.0]; */ [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0];
-	else
-		graphColor = [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0];
+	UIColor *graphColor = (self.app) ? [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0] : [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0];
 	
 	//draw grid and captions:
 	CGContextBeginPath(c);
@@ -77,9 +75,20 @@
 		[averageString drawInRect:CGRectMake(0, averageY - 6, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	}
 	[[UIColor darkGrayColor] set];
-	NSString *caption = [NSString stringWithFormat:NSLocalizedString(@"Revenue (in %@)",nil), [[CurrencyManager sharedManager] baseCurrencyDescription]];
+	
+	NSString *caption;
+	if (showUnits)
+		caption = NSLocalizedString(@"Sales",nil);
+	else
+		caption = [NSString stringWithFormat:NSLocalizedString(@"Revenue (in %@)",nil), [[CurrencyManager sharedManager] baseCurrencyDescription]];
+	
 	[caption drawInRect:CGRectMake(10, 10, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
-	NSString *subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %@",nil), [revenues count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+	NSString *subtitle;
+	if (showUnits)
+		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %i sales",nil), [revenues count], (int)totalRevenue];
+	else
+		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %@",nil), [revenues count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+	
 	[subtitle drawInRect:CGRectMake(10, maxY + 5, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 	
 	NSString *appName = (self.app != nil) ? (self.app) : NSLocalizedString(@"All Apps",nil);
@@ -91,8 +100,7 @@
 	if (averageY > 100)
 		appNameRect = CGRectMake(minX, minY, maxX - minX, actualSize.height);
 	[appName drawInRect:appNameRect withFont:[UIFont boldSystemFontOfSize:actualFontSize] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
-	
-	
+		
 	//draw weekend background:
 	if ([days count] <= 31) {
 		CGContextSetAllowsAntialiasing(c, NO);

@@ -262,6 +262,17 @@ static BOOL shouldLoadCountries = YES;
 	return sum;
 }
 
+- (int)totalUnitsForApp:(NSString *)app
+{
+	if (app == nil)
+		return [self totalUnits];
+	int sum = 0;
+	for (Country *c in [self.countries allValues]) {
+		sum += [c totalUnitsForApp:app];
+	}
+	return sum;
+}
+
 - (int)totalUnits
 {
 	int sum = 0;

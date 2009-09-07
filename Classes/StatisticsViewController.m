@@ -11,6 +11,8 @@
 #import "RegionsGraphView.h"
 #import "Day.h"
 
+#define GRAPH_MODE_ALERT_TAG	123
+
 @implementation StatisticsViewController
 
 @synthesize allAppsTrendView, regionsGraphView, trendViewsForApps, scrollView, datePicker, days, selectedDays, dateFormatter;
@@ -59,6 +61,9 @@
 	[dateButton setImage:[UIImage imageNamed:@"DateButtonHighlight.png"] forState:UIControlStateHighlighted];
 	[self.view addSubview:dateButton];
 	[dateButton addTarget:self action:@selector(selectDate:) forControlEvents:UIControlEventTouchUpInside];
+	
+	UIBarButtonItem *graphModeButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mode...",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectGraphMode)] autorelease];
+	self.navigationItem.rightBarButtonItem = graphModeButton;
 }
 
 - (void)viewDidLoad
@@ -72,6 +77,13 @@
 	[datePicker selectRow:toRow inComponent:1 animated:NO];
 	
 	[self reload];
+}
+
+- (void)selectGraphMode
+{
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:NSLocalizedString(@"Sales",nil), NSLocalizedString(@"Revenue",nil), nil] autorelease];
+	alert.tag = GRAPH_MODE_ALERT_TAG;
+	[alert show];
 }
 
 - (void)reload
@@ -173,11 +185,11 @@
 			[months addObject:[monthFormatter stringFromDate:d.date]];
 			lastMonth = month;
 		}
-		if ([months count] >= 3)
+		if ([months count] >= 4)
 			break;
 	}
 	
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Quick Selection",nil) message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 7 Days",nil)];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 30 Days",nil)];
 	for (NSString *monthButton in months) {
@@ -189,8 +201,22 @@
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-	//TODO: This is really messy, got to clean it up sometime...
+	if (alertView.tag == GRAPH_MODE_ALERT_TAG) {
+		if (buttonIndex == 1) { //sales
+			[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"ShowUnitsInGraphs"];
+		}
+		else if (buttonIndex == 2) { //revenue
+			[[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"ShowUnitsInGraphs"];
+		}
+		[allAppsTrendView setNeedsDisplay];
+		[regionsGraphView setNeedsDisplay];
+		for (UIView *v in trendViewsForApps) {
+			[v setNeedsDisplay];
+		}
+		return;
+	}
 	
+	//TODO: This is really messy, got to clean it up sometime...
 	int fromIndex;
 	int toIndex;
 	//NSLog(@"%i", buttonIndex);
