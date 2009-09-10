@@ -29,35 +29,23 @@ AppSalesMobile
 */
 
 #import <UIKit/UIKit.h>
-@class Day;
-@class DaysController;
-@class WeeksController;
-@class SettingsViewController;
+@class Day, DaysController, WeeksController, SettingsViewController, StatisticsViewController;
 
-@interface RootViewController : UIViewController {
+@interface RootViewController : UITableViewController {
 	
-	NSMutableDictionary *days;
-	NSMutableDictionary *weeks;
-	
-	BOOL isRefreshing;
-	IBOutlet UIProgressView *progressView;
-	IBOutlet DaysController *daysController;
-	IBOutlet WeeksController *weeksController;
-	IBOutlet SettingsViewController *settingsController;
-	IBOutlet UITableView *tableView;
-	
-	BOOL changeDone;
+	UIActivityIndicatorView *activityIndicator;
+	DaysController *daysController;
+	WeeksController *weeksController;
+	SettingsViewController *settingsController;
+	StatisticsViewController *statisticsController;
 }
 
-@property (retain) NSMutableDictionary *days;
-@property (retain) NSMutableDictionary *weeks;
+@property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, retain) DaysController *daysController;
+@property (nonatomic, retain) WeeksController *weeksController;
+@property (nonatomic, retain) SettingsViewController *settingsController;
+@property (nonatomic, retain) StatisticsViewController *statisticsController;
 
-- (IBAction)downloadReports:(id)sender;
-- (void)setProgress:(NSNumber *)progress;
-- (void)deleteDay:(Day *)dayToDelete;
-- (void)refreshDayList;
-- (void)refreshWeekList;
-- (void)saveData;
-- (NSString *)docPath;
+- (void)updateProgress;
 
 @end

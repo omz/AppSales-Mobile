@@ -35,6 +35,7 @@
 @interface Entry : NSObject {
 	Country *country;
 	NSString *productName;
+	NSString *productIdentifier;
 	int transactionType;
 	int units;
 	float royalties;
@@ -43,6 +44,7 @@
 
 @property (retain) Country *country;
 @property (retain) NSString *productName;
+@property (retain) NSString *productIdentifier;
 @property (retain) NSString *currency;
 @property (assign) int transactionType;
 @property (assign) float royalties;

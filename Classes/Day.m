@@ -99,12 +99,13 @@
 			NSString *royaltyCurrency = [columns objectAtIndex:15];
 			
 			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
-			[[[Entry alloc] initWithProductName:productName 
+			Entry *entry = [[[Entry alloc] initWithProductName:productName 
 								transactionType:[transactionType intValue] 
 										  units:[units intValue] 
 									  royalties:[royalties floatValue] 
 									   currency:royaltyCurrency
 										country:country] autorelease]; //gets added to the countries entry list automatically
+			entry.productIdentifier = appId;
 		}
 	}
 	

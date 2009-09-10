@@ -12,12 +12,10 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
-		28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD735F0D9D9599002E5188 /* MainWindow.xib */; };
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
 		345D1A480F3174DC002AB336 /* AbstractDayOrWeekController.m in Sources */ = {isa = PBXBuildFile; fileRef = 345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */; };
 		34DCF08F0F0461A2009F9929 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */; };
 		7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */; };
-		7F1345A10EC6DAE00050D5F2 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1345A00EC6DAE00050D5F2 /* RootViewController.xib */; };
 		7F17E0570ED4F21E0005D8AF /* CurrencySelectionDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */; };
 		7F29EA420ED861B20018C18A /* help in Resources */ = {isa = PBXBuildFile; fileRef = 7F29EA340ED861B20018C18A /* help */; };
 		7F29EA630ED861CE0018C18A /* HelpBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F29EA620ED861CE0018C18A /* HelpBrowser.m */; };
@@ -279,7 +277,8 @@
 		7FB0CCC90EBBD7D0005E2C45 /* EntryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0CCC80EBBD7D0005E2C45 /* EntryCell.m */; };
 		7FB391990EE7991D00AC30D5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FB391980EE7991D00AC30D5 /* SystemConfiguration.framework */; };
 		7FBC1E5B0FFEA5CC0067F3DA /* AppIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FBC1E5A0FFEA5CC0067F3DA /* AppIconManager.m */; };
-		7FF70C620F7C69AD003F64DD /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7FF70C610F7C69AD003F64DD /* Settings.bundle */; };
+		7FD9B3A210587C2500FE74C3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FD9B3A110587C2500FE74C3 /* Reviews.png */; };
+		7FD9B3F410591EFF00FE74C3 /* ReportManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FD9B3F310591EFF00FE74C3 /* ReportManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -289,9 +288,7 @@
 		1D6058910D05DD3D006BFB54 /* AppSalesMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppSalesMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		2899E55F0DE3E45000AC0155 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/RootViewController.xib; sourceTree = "<group>"; };
 		28A0AAE50D9B0CCF005BE974 /* AppSalesMobile_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSalesMobile_Prefix.pch; sourceTree = "<group>"; };
-		28AD735F0D9D9599002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
 		28C286DF0D94DF7D0034E888 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -300,7 +297,6 @@
 		34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFHFKeychainUtils.m; sourceTree = "<group>"; };
 		34DCF08E0F0461A2009F9929 /* SFHFKeychainUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFHFKeychainUtils.h; sourceTree = "<group>"; };
 		7F1345720EC6D7990050D5F2 /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/SettingsViewController.xib; sourceTree = "<group>"; };
-		7F1345A20EC6DAE50050D5F2 /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/RootViewController.xib; sourceTree = "<group>"; };
 		7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrencySelectionDialog.h; sourceTree = "<group>"; };
 		7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencySelectionDialog.m; sourceTree = "<group>"; };
 		7F29EA340ED861B20018C18A /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = help; sourceTree = "<group>"; };
@@ -586,7 +582,9 @@
 		7FB391980EE7991D00AC30D5 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		7FBC1E590FFEA5CC0067F3DA /* AppIconManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppIconManager.h; sourceTree = "<group>"; };
 		7FBC1E5A0FFEA5CC0067F3DA /* AppIconManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppIconManager.m; sourceTree = "<group>"; };
-		7FF70C610F7C69AD003F64DD /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		7FD9B3A110587C2500FE74C3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
+		7FD9B3F210591EFF00FE74C3 /* ReportManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportManager.h; sourceTree = "<group>"; };
+		7FD9B3F310591EFF00FE74C3 /* ReportManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportManager.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -653,12 +651,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				7FF70C610F7C69AD003F64DD /* Settings.bundle */,
 				7F29EA340ED861B20018C18A /* help */,
 				7F4C219A10230F1100F17F7D /* ImagesFlags */,
 				7F4C217510230EF200F17F7D /* Images */,
-				7F1345A00EC6DAE00050D5F2 /* RootViewController.xib */,
-				28AD735F0D9D9599002E5188 /* MainWindow.xib */,
 				7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				7FA7ECC10EE437C400C1954E /* Localizable.strings */,
@@ -693,6 +688,7 @@
 				7F4C218110230EF200F17F7D /* Purchase.png */,
 				7F4C218210230EF200F17F7D /* Return.png */,
 				7F4C218310230EF200F17F7D /* Settings.png */,
+				7FD9B3A110587C2500FE74C3 /* Reviews.png */,
 				7F4C218410230EF200F17F7D /* Statistics.png */,
 				7F4C218510230EF200F17F7D /* TB_Reload.png */,
 				7F4C218610230EF200F17F7D /* Thailand.png */,
@@ -927,6 +923,8 @@
 		7F6A39BF0ED318FF0037C36A /* View Controller */ = {
 			isa = PBXGroup;
 			children = (
+				7FD9B3F210591EFF00FE74C3 /* ReportManager.h */,
+				7FD9B3F310591EFF00FE74C3 /* ReportManager.m */,
 				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
 				28C286E00D94DF7D0034E888 /* RootViewController.m */,
 				7FB0C5990EBA3680005E2C45 /* SettingsViewController.h */,
@@ -1053,12 +1051,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */,
-				7F1345A10EC6DAE00050D5F2 /* RootViewController.xib in Resources */,
 				7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */,
 				7F29EA420ED861B20018C18A /* help in Resources */,
 				7FA7ECC20EE437C400C1954E /* Localizable.strings in Resources */,
-				7FF70C620F7C69AD003F64DD /* Settings.bundle in Resources */,
 				7F4C218810230EF300F17F7D /* About.png in Resources */,
 				7F4C218910230EF300F17F7D /* Daily.png in Resources */,
 				7F4C218A10230EF300F17F7D /* DateButtonHighlight.png in Resources */,
@@ -1293,6 +1288,7 @@
 				7F4C234810230F1100F17F7D /* za.png in Resources */,
 				7F4C234910230F1100F17F7D /* zm.png in Resources */,
 				7F4C234A10230F1100F17F7D /* zw.png in Resources */,
+				7FD9B3A210587C2500FE74C3 /* Reviews.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1330,6 +1326,7 @@
 				7F6BC8950F72869E004EB9EB /* TrendGraphView.m in Sources */,
 				7F6BC8960F72869E004EB9EB /* RegionsGraphView.m in Sources */,
 				7FBC1E5B0FFEA5CC0067F3DA /* AppIconManager.m in Sources */,
+				7FD9B3F410591EFF00FE74C3 /* ReportManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1343,15 +1340,6 @@
 				7F1345720EC6D7990050D5F2 /* German */,
 			);
 			name = SettingsViewController.xib;
-			sourceTree = "<group>";
-		};
-		7F1345A00EC6DAE00050D5F2 /* RootViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2899E55F0DE3E45000AC0155 /* English */,
-				7F1345A20EC6DAE50050D5F2 /* German */,
-			);
-			name = RootViewController.xib;
 			sourceTree = "<group>";
 		};
 		7FA7ECC10EE437C400C1954E /* Localizable.strings */ = {

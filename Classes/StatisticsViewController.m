@@ -10,6 +10,7 @@
 #import "TrendGraphView.h"
 #import "RegionsGraphView.h"
 #import "Day.h"
+#import "ReportManager.h"
 
 #define GRAPH_MODE_ALERT_TAG	123
 
@@ -64,6 +65,10 @@
 	
 	UIBarButtonItem *graphModeButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mode...",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectGraphMode)] autorelease];
 	self.navigationItem.rightBarButtonItem = graphModeButton;
+	
+	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
+	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	self.days = sortedDays;
 }
 
 - (void)viewDidLoad

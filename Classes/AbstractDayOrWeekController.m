@@ -12,14 +12,15 @@
 #import "CountriesController.h"
 #import "RootViewController.h"
 #import "CurrencyManager.h"
+#import "ReportManager.h"
 
 @implementation AbstractDayOrWeekController
 
 @synthesize daysByMonth, maxRevenue, sectionTitleFormatter;
 
-- (id)initWithCoder:(NSCoder *)coder
+- (id)init
 {
-	[super initWithCoder:coder];
+	[super init];
 	self.daysByMonth = [NSMutableArray array];
 	self.maxRevenue = 0;
 	self.sectionTitleFormatter = [[[NSDateFormatter alloc] init] autorelease];
@@ -63,18 +64,6 @@
 		return [[self.daysByMonth objectAtIndex:section] count];
 	}
     return 0;
-}
-
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 
-{ 
-	if (editingStyle == UITableViewCellEditingStyleDelete) {
-		//NSLog(@"%@", rootViewController);
-		int section = [indexPath section];
-		int row = [indexPath row];
-		NSArray *selectedMonth = [self.daysByMonth objectAtIndex:section];
-		Day *selectedDay = [selectedMonth objectAtIndex:row];
-		[rootViewController deleteDay:selectedDay];
-	}
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath 

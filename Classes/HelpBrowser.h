@@ -31,7 +31,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface HelpBrowser : UIViewController {
+@interface HelpBrowser : UIViewController <UIWebViewDelegate> {
 	UIWebView *webView;
 }
 

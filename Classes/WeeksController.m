@@ -34,17 +34,58 @@
 #import "CountriesController.h"
 #import "RootViewController.h"
 #import "CurrencyManager.h"
+#import "ReportManager.h"
 
 @implementation WeeksController
 
 
-- (id)initWithCoder:(NSCoder *)coder
+- (id)init
 {
-	[super initWithCoder:coder];
-	self.daysByMonth = [NSMutableArray array];
-	self.maxRevenue = 0;
+	[super init];
+	
+	[self reload];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	
 	return self;
 }
+
+- (void)reload
+{
+	self.daysByMonth = [NSMutableArray array];
+	
+	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
+	NSArray *sortedDays = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	int lastMonth = -1;
+	float max = 0;
+	for (Day *d in sortedDays) {
+		float revenue = [d totalRevenueInBaseCurrency];
+		if (revenue > max)
+			max = revenue;
+		NSDate *date = d.date;
+		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSMonthCalendarUnit fromDate:date];
+		int month = [components month];
+		if (month != lastMonth) {
+			[daysByMonth addObject:[NSMutableArray array]];
+			lastMonth = month;
+		}
+		[[daysByMonth lastObject] addObject:d];
+	}
+	self.maxRevenue = max;
+	[self.tableView reloadData];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 
+{ 
+	if (editingStyle == UITableViewCellEditingStyleDelete) {
+		int section = [indexPath section];
+		int row = [indexPath row];
+		NSArray *selectedMonth = [self.daysByMonth objectAtIndex:section];
+		Day *selectedDay = [selectedMonth objectAtIndex:row];
+		[[ReportManager sharedManager] deleteDay:selectedDay];
+		[self reload];
+	}
+}
+
 
 - (void)dealloc 
 {

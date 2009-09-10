@@ -36,6 +36,7 @@
 
 @synthesize country;
 @synthesize productName;
+@synthesize productIdentifier;
 @synthesize currency;
 @synthesize transactionType;
 @synthesize royalties;
@@ -65,6 +66,7 @@
 	self.transactionType = [coder decodeIntForKey:@"transactionType"];
 	self.units = [coder decodeIntForKey:@"units"];
 	self.royalties = [coder decodeFloatForKey:@"royalties"];
+	self.productIdentifier = [coder decodeObjectForKey:@"productIdentifier"];
 	
 	return self;
 }
@@ -77,6 +79,7 @@
 	[coder encodeInt:self.transactionType forKey:@"transactionType"];
 	[coder encodeInt:self.units forKey:@"units"];
 	[coder encodeFloat:self.royalties forKey:@"royalties"];
+	[coder encodeObject:self.productIdentifier forKey:@"productIdentifier"];
 }
 
 
@@ -115,6 +118,7 @@
 	self.country = nil;
 	self.productName = nil;
 	self.currency = nil;
+	self.productIdentifier = nil;
 	
 	[super dealloc];
 }
