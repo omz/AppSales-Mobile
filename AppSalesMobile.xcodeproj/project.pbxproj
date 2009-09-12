@@ -279,6 +279,16 @@
 		7FBC1E5B0FFEA5CC0067F3DA /* AppIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FBC1E5A0FFEA5CC0067F3DA /* AppIconManager.m */; };
 		7FD9B3A210587C2500FE74C3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FD9B3A110587C2500FE74C3 /* Reviews.png */; };
 		7FD9B3F410591EFF00FE74C3 /* ReportManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FD9B3F310591EFF00FE74C3 /* ReportManager.m */; };
+		7FEA5766105AFCF3000A12E6 /* App.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5765105AFCF3000A12E6 /* App.m */; };
+		7FEA5769105AFCFA000A12E6 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5768105AFCFA000A12E6 /* Review.m */; };
+		7FEA57A2105B06B6000A12E6 /* ReviewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA57A1105B06B6000A12E6 /* ReviewsController.m */; };
+		7FEA57EC105B0DAE000A12E6 /* AppCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA57EB105B0DAE000A12E6 /* AppCell.m */; };
+		7FEA5954105B3C20000A12E6 /* ReviewsListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5953105B3C20000A12E6 /* ReviewsListController.m */; };
+		7FEA595F105B3D65000A12E6 /* ReviewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA595E105B3D65000A12E6 /* ReviewCell.m */; };
+		7FEA5AA9105B61CD000A12E6 /* 5stars.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5AA8105B61CD000A12E6 /* 5stars.png */; };
+		7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5B3F105B6CD2000A12E6 /* ReviewTemplate.html */; };
+		7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */; };
+		7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -585,6 +595,23 @@
 		7FD9B3A110587C2500FE74C3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
 		7FD9B3F210591EFF00FE74C3 /* ReportManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportManager.h; sourceTree = "<group>"; };
 		7FD9B3F310591EFF00FE74C3 /* ReportManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportManager.m; sourceTree = "<group>"; };
+		7FEA5764105AFCF3000A12E6 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = App.h; sourceTree = "<group>"; };
+		7FEA5765105AFCF3000A12E6 /* App.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = App.m; sourceTree = "<group>"; };
+		7FEA5767105AFCFA000A12E6 /* Review.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Review.h; sourceTree = "<group>"; };
+		7FEA5768105AFCFA000A12E6 /* Review.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Review.m; sourceTree = "<group>"; };
+		7FEA57A0105B06B6000A12E6 /* ReviewsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsController.h; sourceTree = "<group>"; };
+		7FEA57A1105B06B6000A12E6 /* ReviewsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsController.m; sourceTree = "<group>"; };
+		7FEA57EA105B0DAE000A12E6 /* AppCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppCell.h; sourceTree = "<group>"; };
+		7FEA57EB105B0DAE000A12E6 /* AppCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppCell.m; sourceTree = "<group>"; };
+		7FEA5952105B3C20000A12E6 /* ReviewsListController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsListController.h; sourceTree = "<group>"; };
+		7FEA5953105B3C20000A12E6 /* ReviewsListController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsListController.m; sourceTree = "<group>"; };
+		7FEA595D105B3D65000A12E6 /* ReviewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewCell.h; sourceTree = "<group>"; };
+		7FEA595E105B3D65000A12E6 /* ReviewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewCell.m; sourceTree = "<group>"; };
+		7FEA5AA8105B61CD000A12E6 /* 5stars.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5stars.png; sourceTree = "<group>"; };
+		7FEA5B3F105B6CD2000A12E6 /* ReviewTemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ReviewTemplate.html; sourceTree = "<group>"; };
+		7FEA5B41105B6D38000A12E6 /* SingleReviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingleReviewController.h; sourceTree = "<group>"; };
+		7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleReviewController.m; sourceTree = "<group>"; };
+		7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5stars_gray.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -610,7 +637,9 @@
 			children = (
 				7FB0C5830EBA3431005E2C45 /* Helpers */,
 				7FB0C5840EBA343E005E2C45 /* Models */,
+				7FEA5BC1105BFF32000A12E6 /* Controller */,
 				7F6A39BF0ED318FF0037C36A /* View Controller */,
+				7FEA5BC2105BFF4B000A12E6 /* Graph Views */,
 				7F6A39C10ED319190037C36A /* Cells */,
 			);
 			path = Classes;
@@ -651,6 +680,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7FEA5B3F105B6CD2000A12E6 /* ReviewTemplate.html */,
 				7F29EA340ED861B20018C18A /* help */,
 				7F4C219A10230F1100F17F7D /* ImagesFlags */,
 				7F4C217510230EF200F17F7D /* Images */,
@@ -674,6 +704,8 @@
 		7F4C217510230EF200F17F7D /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				7FEA5AA8105B61CD000A12E6 /* 5stars.png */,
+				7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */,
 				7F4C217610230EF200F17F7D /* About.png */,
 				7F4C217710230EF200F17F7D /* Daily.png */,
 				7F4C217810230EF200F17F7D /* DateButtonHighlight.png */,
@@ -923,34 +955,12 @@
 		7F6A39BF0ED318FF0037C36A /* View Controller */ = {
 			isa = PBXGroup;
 			children = (
-				7FD9B3F210591EFF00FE74C3 /* ReportManager.h */,
-				7FD9B3F310591EFF00FE74C3 /* ReportManager.m */,
 				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
 				28C286E00D94DF7D0034E888 /* RootViewController.m */,
-				7FB0C5990EBA3680005E2C45 /* SettingsViewController.h */,
-				7FB0C59A0EBA3680005E2C45 /* SettingsViewController.m */,
-				345D1A460F3174DC002AB336 /* AbstractDayOrWeekController.h */,
-				345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */,
-				7FB0C62D0EBA43BC005E2C45 /* DaysController.h */,
-				7FB0C62E0EBA43BC005E2C45 /* DaysController.m */,
-				7FB0C7040EBA8348005E2C45 /* WeeksController.h */,
-				7FB0C7050EBA8348005E2C45 /* WeeksController.m */,
-				7FB0CB160EBBBAA8005E2C45 /* CountriesController.h */,
-				7FB0CB170EBBBAA8005E2C45 /* CountriesController.m */,
-				7FB0CC870EBBD2EB005E2C45 /* EntriesController.h */,
-				7FB0CC880EBBD2EB005E2C45 /* EntriesController.m */,
-				7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */,
-				7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */,
-				7F29EA610ED861CE0018C18A /* HelpBrowser.h */,
-				7F29EA620ED861CE0018C18A /* HelpBrowser.m */,
-				7F6BC88B0F72869E004EB9EB /* StatisticsViewController.h */,
-				7F6BC88C0F72869E004EB9EB /* StatisticsViewController.m */,
-				7F6BC88D0F72869E004EB9EB /* GraphView.h */,
-				7F6BC88E0F72869E004EB9EB /* GraphView.m */,
-				7F6BC88F0F72869E004EB9EB /* TrendGraphView.h */,
-				7F6BC8900F72869E004EB9EB /* TrendGraphView.m */,
-				7F6BC8910F72869E004EB9EB /* RegionsGraphView.h */,
-				7F6BC8920F72869E004EB9EB /* RegionsGraphView.m */,
+				7FEA5BC3105BFF87000A12E6 /* Reviews */,
+				7FEA5BC4105BFF96000A12E6 /* Settings & Info */,
+				7FEA5BC5105BFFA4000A12E6 /* Reports */,
+				7FEA5BC6105BFFC6000A12E6 /* Graphs */,
 			);
 			name = "View Controller";
 			sourceTree = "<group>";
@@ -958,6 +968,10 @@
 		7F6A39C10ED319190037C36A /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				7FEA57EA105B0DAE000A12E6 /* AppCell.h */,
+				7FEA57EB105B0DAE000A12E6 /* AppCell.m */,
+				7FEA595D105B3D65000A12E6 /* ReviewCell.h */,
+				7FEA595E105B3D65000A12E6 /* ReviewCell.m */,
 				7FB0C7B50EBA9A19005E2C45 /* DayCell.h */,
 				7FB0C7B60EBA9A19005E2C45 /* DayCell.m */,
 				7FB0C9320EBB988B005E2C45 /* WeekCell.h */,
@@ -979,8 +993,6 @@
 				7FB0C4410EB97BC1005E2C45 /* NSDictionary+HTTP.m */,
 				7FB0C4A90EB99D01005E2C45 /* CurrencyManager.h */,
 				7FB0C4AA0EB99D01005E2C45 /* CurrencyManager.m */,
-				1D3623240D0F684500981E51 /* AppSalesMobileAppDelegate.h */,
-				1D3623250D0F684500981E51 /* AppSalesMobileAppDelegate.m */,
 				34DCF08E0F0461A2009F9929 /* SFHFKeychainUtils.h */,
 				34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */,
 			);
@@ -998,8 +1010,96 @@
 				7FB0C3FA0EB97923005E2C45 /* Entry.m */,
 				7FBC1E590FFEA5CC0067F3DA /* AppIconManager.h */,
 				7FBC1E5A0FFEA5CC0067F3DA /* AppIconManager.m */,
+				7FEA576A105AFF91000A12E6 /* Reviews */,
 			);
 			name = Models;
+			sourceTree = "<group>";
+		};
+		7FEA576A105AFF91000A12E6 /* Reviews */ = {
+			isa = PBXGroup;
+			children = (
+				7FEA5764105AFCF3000A12E6 /* App.h */,
+				7FEA5765105AFCF3000A12E6 /* App.m */,
+				7FEA5767105AFCFA000A12E6 /* Review.h */,
+				7FEA5768105AFCFA000A12E6 /* Review.m */,
+			);
+			name = Reviews;
+			sourceTree = "<group>";
+		};
+		7FEA5BC1105BFF32000A12E6 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				1D3623240D0F684500981E51 /* AppSalesMobileAppDelegate.h */,
+				1D3623250D0F684500981E51 /* AppSalesMobileAppDelegate.m */,
+				7FD9B3F210591EFF00FE74C3 /* ReportManager.h */,
+				7FD9B3F310591EFF00FE74C3 /* ReportManager.m */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		7FEA5BC2105BFF4B000A12E6 /* Graph Views */ = {
+			isa = PBXGroup;
+			children = (
+				7F6BC88D0F72869E004EB9EB /* GraphView.h */,
+				7F6BC88E0F72869E004EB9EB /* GraphView.m */,
+				7F6BC88F0F72869E004EB9EB /* TrendGraphView.h */,
+				7F6BC8900F72869E004EB9EB /* TrendGraphView.m */,
+				7F6BC8910F72869E004EB9EB /* RegionsGraphView.h */,
+				7F6BC8920F72869E004EB9EB /* RegionsGraphView.m */,
+			);
+			name = "Graph Views";
+			sourceTree = "<group>";
+		};
+		7FEA5BC3105BFF87000A12E6 /* Reviews */ = {
+			isa = PBXGroup;
+			children = (
+				7FEA57A0105B06B6000A12E6 /* ReviewsController.h */,
+				7FEA57A1105B06B6000A12E6 /* ReviewsController.m */,
+				7FEA5952105B3C20000A12E6 /* ReviewsListController.h */,
+				7FEA5953105B3C20000A12E6 /* ReviewsListController.m */,
+				7FEA5B41105B6D38000A12E6 /* SingleReviewController.h */,
+				7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */,
+			);
+			name = Reviews;
+			sourceTree = "<group>";
+		};
+		7FEA5BC4105BFF96000A12E6 /* Settings & Info */ = {
+			isa = PBXGroup;
+			children = (
+				7FB0C5990EBA3680005E2C45 /* SettingsViewController.h */,
+				7FB0C59A0EBA3680005E2C45 /* SettingsViewController.m */,
+				7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */,
+				7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */,
+				7F29EA610ED861CE0018C18A /* HelpBrowser.h */,
+				7F29EA620ED861CE0018C18A /* HelpBrowser.m */,
+			);
+			name = "Settings & Info";
+			sourceTree = "<group>";
+		};
+		7FEA5BC5105BFFA4000A12E6 /* Reports */ = {
+			isa = PBXGroup;
+			children = (
+				345D1A460F3174DC002AB336 /* AbstractDayOrWeekController.h */,
+				345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */,
+				7FB0C62D0EBA43BC005E2C45 /* DaysController.h */,
+				7FB0C62E0EBA43BC005E2C45 /* DaysController.m */,
+				7FB0C7040EBA8348005E2C45 /* WeeksController.h */,
+				7FB0C7050EBA8348005E2C45 /* WeeksController.m */,
+				7FB0CB160EBBBAA8005E2C45 /* CountriesController.h */,
+				7FB0CB170EBBBAA8005E2C45 /* CountriesController.m */,
+				7FB0CC870EBBD2EB005E2C45 /* EntriesController.h */,
+				7FB0CC880EBBD2EB005E2C45 /* EntriesController.m */,
+			);
+			name = Reports;
+			sourceTree = "<group>";
+		};
+		7FEA5BC6105BFFC6000A12E6 /* Graphs */ = {
+			isa = PBXGroup;
+			children = (
+				7F6BC88B0F72869E004EB9EB /* StatisticsViewController.h */,
+				7F6BC88C0F72869E004EB9EB /* StatisticsViewController.m */,
+			);
+			name = Graphs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1289,6 +1389,9 @@
 				7F4C234910230F1100F17F7D /* zm.png in Resources */,
 				7F4C234A10230F1100F17F7D /* zw.png in Resources */,
 				7FD9B3A210587C2500FE74C3 /* Reviews.png in Resources */,
+				7FEA5AA9105B61CD000A12E6 /* 5stars.png in Resources */,
+				7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */,
+				7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1327,6 +1430,13 @@
 				7F6BC8960F72869E004EB9EB /* RegionsGraphView.m in Sources */,
 				7FBC1E5B0FFEA5CC0067F3DA /* AppIconManager.m in Sources */,
 				7FD9B3F410591EFF00FE74C3 /* ReportManager.m in Sources */,
+				7FEA5766105AFCF3000A12E6 /* App.m in Sources */,
+				7FEA5769105AFCFA000A12E6 /* Review.m in Sources */,
+				7FEA57A2105B06B6000A12E6 /* ReviewsController.m in Sources */,
+				7FEA57EC105B0DAE000A12E6 /* AppCell.m in Sources */,
+				7FEA5954105B3C20000A12E6 /* ReviewsListController.m in Sources */,
+				7FEA595F105B3D65000A12E6 /* ReviewCell.m in Sources */,
+				7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

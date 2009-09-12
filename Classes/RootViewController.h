@@ -29,23 +29,36 @@ AppSalesMobile
 */
 
 #import <UIKit/UIKit.h>
-@class Day, DaysController, WeeksController, SettingsViewController, StatisticsViewController;
+@class Day, DaysController, WeeksController, SettingsViewController, StatisticsViewController, ReviewsController;
 
 @interface RootViewController : UITableViewController {
 	
 	UIActivityIndicatorView *activityIndicator;
+	UILabel *statusLabel;
+	
 	DaysController *daysController;
 	WeeksController *weeksController;
 	SettingsViewController *settingsController;
 	StatisticsViewController *statisticsController;
+	ReviewsController *reviewsController;
+	
+	UIView *dailyTrendView;
+	UIView *weeklyTrendView;
 }
 
 @property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, retain) UILabel *statusLabel;
 @property (nonatomic, retain) DaysController *daysController;
 @property (nonatomic, retain) WeeksController *weeksController;
 @property (nonatomic, retain) SettingsViewController *settingsController;
 @property (nonatomic, retain) StatisticsViewController *statisticsController;
+@property (nonatomic, retain) ReviewsController *reviewsController;
+@property (nonatomic, retain) UIView *dailyTrendView;
+@property (nonatomic, retain) UIView *weeklyTrendView;
 
 - (void)updateProgress;
+- (void)refreshDailyTrend;
+- (void)refreshWeeklyTrend;
+- (UIImage *)sparklineForReports:(NSArray *)days;
 
 @end

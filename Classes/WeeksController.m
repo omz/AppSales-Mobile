@@ -44,7 +44,8 @@
 	[super init];
 	
 	[self reload];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
+	self.title = NSLocalizedString(@"Weekly",nil);
 	
 	return self;
 }

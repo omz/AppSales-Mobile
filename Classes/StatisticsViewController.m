@@ -22,7 +22,7 @@
 {
 	[super loadView];
 	
-	self.navigationItem.title = NSLocalizedString(@"Charts",nil);
+	self.navigationItem.title = NSLocalizedString(@"Graphs",nil);
 	
 	self.trendViewsForApps = [NSMutableArray array];
 	
@@ -190,11 +190,11 @@
 			[months addObject:[monthFormatter stringFromDate:d.date]];
 			lastMonth = month;
 		}
-		if ([months count] >= 4)
+		if ([months count] >= 3)
 			break;
 	}
 	
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Quick Selection",nil) message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 7 Days",nil)];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 30 Days",nil)];
 	for (NSString *monthButton in months) {

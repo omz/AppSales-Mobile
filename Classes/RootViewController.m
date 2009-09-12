@@ -43,10 +43,12 @@
 #import "SFHFKeychainUtils.h"
 #import "StatisticsViewController.h"
 #import "ReportManager.h"
+#import "ReviewsController.h"
 
 @implementation RootViewController
 
-@synthesize activityIndicator, daysController, weeksController, settingsController, statisticsController;
+@synthesize activityIndicator, statusLabel, daysController, weeksController, settingsController, statisticsController, reviewsController;
+@synthesize dailyTrendView, weeklyTrendView;
 
 - (void)loadView
 {
@@ -55,37 +57,36 @@
 	self.activityIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
 	UIBarButtonItem *progressItem = [[[UIBarButtonItem alloc] initWithCustomView:activityIndicator] autorelease];
 	
-	self.daysController = [[[DaysController alloc] init] autorelease];
-	daysController.hidesBottomBarWhenPushed = YES;
-	self.weeksController = [[[WeeksController alloc] init] autorelease];
-	weeksController.hidesBottomBarWhenPushed = YES;
 	self.settingsController = [[[SettingsViewController alloc] initWithNibName:@"SettingsViewController" bundle:nil] autorelease];
 	settingsController.hidesBottomBarWhenPushed = YES;
-	self.statisticsController = [[StatisticsViewController new] autorelease];
-	statisticsController.hidesBottomBarWhenPushed = YES;
 	
 	UIBarButtonItem *refreshItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReports)] autorelease];
 	UIBarButtonItem *flexSpaceItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
 	
-	self.toolbarItems = [NSArray arrayWithObjects:refreshItem, flexSpaceItem, progressItem, nil];
+	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 32)] autorelease];
+	statusLabel.textColor = [UIColor whiteColor];
+	statusLabel.shadowColor = [UIColor darkGrayColor];
+	statusLabel.shadowOffset = CGSizeMake(0, 1);
+	statusLabel.font = [UIFont systemFontOfSize:12.0];
+	statusLabel.numberOfLines = 2;
+	statusLabel.lineBreakMode = UILineBreakModeWordWrap;
+	statusLabel.backgroundColor = [UIColor clearColor];
+	statusLabel.textAlignment = UITextAlignmentCenter;
+	statusLabel.text = @"";
+	UIBarButtonItem *statusItem = [[[UIBarButtonItem alloc] initWithCustomView:statusLabel] autorelease];
+	
+	self.toolbarItems = [NSArray arrayWithObjects:refreshItem, flexSpaceItem, statusItem, flexSpaceItem, progressItem, nil];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) name:ReportManagerUpdatedDownloadProgressNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
 }
+
 
 - (void)viewDidLoad 
 {
 	[super viewDidLoad];
 	self.navigationItem.title = @"AppSales";
-	
-	/*
-	UIButton *footer = [UIButton buttonWithType:UIButtonTypeCustom];
-	[footer setFrame:CGRectMake(0,0,320,20)];
-	[footer.titleLabel setFont:[UIFont systemFontOfSize:14.0]];
-	[footer setTitleColor:[UIColor colorWithRed:0.3 green:0.34 blue:0.42 alpha:1.0] forState:UIControlStateNormal];
-	[footer addTarget:self action:@selector(visitIconDrawer) forControlEvents:UIControlEventTouchUpInside];
-	[footer setTitle:NSLocalizedString(@"Flag icons by icondrawer.com",nil) forState:UIControlStateNormal];
-	[self.tableView setTableFooterView:footer];
-	 */
 	
 	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
 	[infoButton addTarget:self action:@selector(showInfo) forControlEvents:UIControlEventTouchUpInside];
@@ -94,6 +95,77 @@
 	
 	self.tableView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0);
 	[self.tableView setScrollEnabled:NO];
+	
+	[self refreshDailyTrend];
+	[self refreshWeeklyTrend];
+}
+
+- (void)refreshDailyTrend
+{
+	UIImage *sparkline = [self sparklineForReports:[[ReportManager sharedManager].days allValues]];
+	self.dailyTrendView = [[[UIImageView alloc] initWithImage:sparkline] autorelease];
+	[self.tableView reloadData];
+}
+
+- (UIImage *)sparklineForReports:(NSArray *)days
+{
+	UIGraphicsBeginImageContext(CGSizeMake(100, 25));
+	CGContextRef c = UIGraphicsGetCurrentContext();
+	
+	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
+	NSArray *sortedDays = [days sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	if ([sortedDays count] > 7) {
+		sortedDays = [sortedDays subarrayWithRange:NSMakeRange(0, 7)];
+	}
+	int maxUnitSales = 0;
+	NSMutableArray *unitSales = [NSMutableArray array];
+	for (Day *d in [sortedDays reverseObjectEnumerator]) {
+		int units = [d totalUnits];
+		if (units > maxUnitSales)
+			maxUnitSales = units;
+		[unitSales addObject:[NSNumber numberWithInt:units]];
+	}
+	[[UIColor grayColor] set];
+	float maxY = 20.0;
+	float minY = 2.0;
+	float minX = 2.0;
+	float maxX = 95.0;
+	int i = 0;
+	float prevX = 0.0;
+	float prevY = 0.0;
+	CGContextBeginPath(c);
+	CGContextSetLineWidth(c, 2.0);
+	CGContextSetLineJoin(c, kCGLineJoinRound);
+	CGContextSetLineCap(c, kCGLineCapRound);
+	for (NSNumber *sales in unitSales) {
+		float r = [sales floatValue];
+		float y = maxY - ((r / maxUnitSales) * (maxY - minY));
+		float x = minX + ((maxX - minX) / ([unitSales count] - 1)) * i;
+		if (prevX == 0.0) {
+			CGContextMoveToPoint(c, x, y);
+		}
+		else {
+			CGContextAddLineToPoint(c, x, y);
+		}
+		prevX = x;
+		prevY = y;
+		i++;
+	}
+	CGContextDrawPath(c, kCGPathStroke);
+	
+	[[UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0] set];
+	CGContextFillEllipseInRect(c, CGRectMake(prevX-2, prevY-2, 4, 4));
+	
+	UIImage *trendImage = UIGraphicsGetImageFromCurrentImageContext();
+	UIGraphicsEndImageContext();
+	return trendImage;
+}
+
+- (void)refreshWeeklyTrend
+{
+	UIImage *sparkline = [self sparklineForReports:[[ReportManager sharedManager].weeks allValues]];
+	self.weeklyTrendView = [[[UIImageView alloc] initWithImage:sparkline] autorelease];
+	[self.tableView reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -121,14 +193,14 @@
 
 - (void)updateProgress
 {
-	float p = [[ReportManager sharedManager] downloadProgress];
-	if ((p != 0.0) && (p != 1.0)) {
+	BOOL isDownloading = [[ReportManager sharedManager] isDownloadingReports];
+	if (isDownloading) {
 		[activityIndicator startAnimating];
 	}
 	else {
 		[activityIndicator stopAnimating];
 	}
-	
+	statusLabel.text = [ReportManager sharedManager].reportDownloadStatus;
 }
 
 #pragma mark Table View methods
@@ -142,7 +214,7 @@
 	if (section == 0)
 		return 3; //daily + weekly + graphs
 	else
-		return 1; //settings
+		return 1; //reviews / settings
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -159,10 +231,12 @@
 	if ((row == 0) && (section == 0)) {
 		cell.imageView.image = [UIImage imageNamed:@"Daily.png"];
 		cell.textLabel.text = NSLocalizedString(@"Daily",nil);
+		cell.accessoryView = self.dailyTrendView;
 	}
 	else if ((row == 1) && (section == 0)) {
 		cell.imageView.image = [UIImage imageNamed:@"Weekly.png"];
 		cell.textLabel.text = NSLocalizedString(@"Weekly",nil);
+		cell.accessoryView = self.weeklyTrendView;
 	}
 	else if ((row == 2) && (section == 0)) {
 		cell.imageView.image = [UIImage imageNamed:@"Statistics.png"];
@@ -184,18 +258,41 @@
 	int row = [indexPath row];
 	int section = [indexPath section];
 	if ((row == 0) && (section == 0)) {
+		if (!self.daysController) {
+			self.daysController = [[[DaysController alloc] init] autorelease];
+			daysController.hidesBottomBarWhenPushed = YES;
+		}
 		[self.navigationController pushViewController:daysController animated:YES];
 	}
 	else if ((row == 1) && (section == 0)) {
+		if (!self.weeksController) {
+			self.weeksController = [[[WeeksController alloc] init] autorelease];
+			weeksController.hidesBottomBarWhenPushed = YES;		
+		}
 		[self.navigationController pushViewController:weeksController animated:YES];
 	}
 	else if ((row == 2) && (section == 0)) {
+		if (!self.statisticsController) {
+			self.statisticsController = [[StatisticsViewController new] autorelease];
+			statisticsController.hidesBottomBarWhenPushed = YES;
+		}
 		[self.navigationController pushViewController:statisticsController animated:YES];
+	}
+	else if ((row == 0) && (section == 1)) {
+		if ([[ReportManager sharedManager].appsByID count] == 0) {
+			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease] show];
+			return;
+		}
+		else {
+			if (!self.reviewsController) {
+				self.reviewsController = [[[ReviewsController alloc] initWithStyle:UITableViewStylePlain] autorelease];
+			}
+			[self.navigationController pushViewController:reviewsController animated:YES];
+		}
 	}
 	else if ((row == 0) && (section == 2)) {
 		[self.navigationController pushViewController:settingsController animated:YES];
 	}
-	
 	
 	[aTableView deselectRowAtIndexPath:indexPath animated:YES];
 }
