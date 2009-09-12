@@ -38,6 +38,8 @@
                 = (NSString *) CFURLCreateStringByAddingPercentEscapes(
                                                                        NULL, (CFStringRef) [aValue description], NULL, (CFStringRef) @";:@&=/+", cfStrEnc);
                 [s appendFormat:@"%@=%@&", escapedKey, escapedObject];
+				[escapedObject release];
+				escapedObject = 0;
             }
         }
         else
@@ -46,7 +48,11 @@
             = (NSString *) CFURLCreateStringByAddingPercentEscapes(
                                                                    NULL, (CFStringRef) [keyObject description], NULL, (CFStringRef) @";:@&=/+", cfStrEnc);
             [s appendFormat:@"%@=%@&", escapedKey, escapedObject];
+			[escapedObject release];
+			escapedObject = 0;
         }
+		[escapedKey release];
+		escapedKey = 0;
 	}
 	// Delete final & from the string
 	if (![s isEqualToString:@""])

@@ -132,7 +132,7 @@
 	[graphColor set];
 	int i = 0;
 	float prevX = 0.0;
-	float prevY = 0.0;
+	//float prevY = 0.0;
 	CGContextBeginPath(c);
 	CGContextSetLineWidth(c, 2.0);
 	CGContextSetLineJoin(c, kCGLineJoinRound);
@@ -147,7 +147,7 @@
 			CGContextAddLineToPoint(c, x, y);
 		}
 		prevX = x;
-		prevY = y;
+	//	prevY = y;
 		i++;
 	}
 	CGContextDrawPath(c, kCGPathStroke);

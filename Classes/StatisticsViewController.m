@@ -222,8 +222,8 @@
 	}
 	
 	//TODO: This is really messy, got to clean it up sometime...
-	int fromIndex;
-	int toIndex;
+	int fromIndex = 0;
+	int toIndex = 0;
 	//NSLog(@"%i", buttonIndex);
 	if (buttonIndex == 0) {
 		//NSLog(@"Cancel");

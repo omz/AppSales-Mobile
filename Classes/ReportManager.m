@@ -296,9 +296,9 @@
 		BOOL scannedDay = YES;
 		while (scannedDay) {
 			NSString *dayString = nil;
-			scannedDay = [scanner scanUpToString:@"<option value=\"" intoString:NULL];
-			scannedDay = [scanner scanString:@"<option value=\"" intoString:NULL];
-			scannedDay = [scanner scanUpToString:@"\"" intoString:&dayString];
+			/*scannedDay =*/ [scanner scanUpToString:@"<option value=\"" intoString:NULL];
+			/*scannedDay =*/ [scanner scanString:@"<option value=\"" intoString:NULL];
+			/*scannedDay =*/ [scanner scanUpToString:@"\"" intoString:&dayString];
 			if (dayString) {
 				if ([dayString rangeOfString:@"/"].location != NSNotFound)
 					[availableDays addObject:dayString];
