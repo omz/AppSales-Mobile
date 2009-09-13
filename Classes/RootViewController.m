@@ -109,7 +109,7 @@
 
 - (UIImage *)sparklineForReports:(NSArray *)days
 {
-	UIGraphicsBeginImageContext(CGSizeMake(100, 25));
+	UIGraphicsBeginImageContext(CGSizeMake(120, 30));
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
@@ -117,6 +117,18 @@
 	if ([sortedDays count] > 7) {
 		sortedDays = [sortedDays subarrayWithRange:NSMakeRange(0, 7)];
 	}
+	BOOL reportIsLatest = NO;
+	if ([sortedDays count] > 0) {
+		Day *lastDay = [sortedDays objectAtIndex:0];
+		NSTimeInterval reportAge = [[NSDate date] timeIntervalSince1970] - [lastDay.date timeIntervalSince1970];
+		if (!lastDay.isWeek && reportAge < 172800) { //48 hours
+			reportIsLatest = YES;
+		}
+		else if (lastDay.isWeek && reportAge < 1209600) { //14 days
+			reportIsLatest = YES;
+		}
+	}
+	
 	int maxUnitSales = 0;
 	NSMutableArray *unitSales = [NSMutableArray array];
 	for (Day *d in [sortedDays reverseObjectEnumerator]) {
@@ -126,35 +138,59 @@
 		[unitSales addObject:[NSNumber numberWithInt:units]];
 	}
 	[[UIColor grayColor] set];
-	float maxY = 20.0;
-	float minY = 2.0;
+	float maxY = 27.0;
+	float minY = 3.0;
 	float minX = 2.0;
-	float maxX = 95.0;
+	float maxX = 75.0;
 	int i = 0;
 	float prevX = 0.0;
 	float prevY = 0.0;
+	CGMutablePathRef path = CGPathCreateMutable();
+	
 	CGContextBeginPath(c);
-	CGContextSetLineWidth(c, 2.0);
-	CGContextSetLineJoin(c, kCGLineJoinRound);
-	CGContextSetLineCap(c, kCGLineCapRound);
 	for (NSNumber *sales in unitSales) {
 		float r = [sales floatValue];
 		float y = maxY - ((r / maxUnitSales) * (maxY - minY));
 		float x = minX + ((maxX - minX) / ([unitSales count] - 1)) * i;
 		if (prevX == 0.0) {
-			CGContextMoveToPoint(c, x, y);
+			CGPathMoveToPoint(path, NULL, x, y);
 		}
 		else {
-			CGContextAddLineToPoint(c, x, y);
+			CGPathAddLineToPoint(path, NULL, x, y);
 		}
 		prevX = x;
 		prevY = y;
 		i++;
 	}
-	CGContextDrawPath(c, kCGPathStroke);
-	
-	[[UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0] set];
-	CGContextFillEllipseInRect(c, CGRectMake(prevX-2, prevY-2, 4, 4));
+	if ([unitSales count] > 1) {
+		CGContextSetLineWidth(c, 1.0);
+		CGContextSetLineJoin(c, kCGLineJoinRound);
+		CGContextSetLineCap(c, kCGLineCapRound);
+		
+		CGMutablePathRef fillPath = CGPathCreateMutableCopy(path);
+		CGPathAddLineToPoint(fillPath, NULL, prevX, maxY);
+		CGPathAddLineToPoint(fillPath, NULL, minX, maxY);
+		[[UIColor colorWithWhite:0.95 alpha:1.0] set];
+		CGContextAddPath(c, fillPath);
+		CGContextFillPath(c);
+		CGPathRelease(fillPath);
+		
+		[[UIColor grayColor] set];
+		CGContextAddPath(c, path);
+		CGContextStrokePath(c);
+				
+		[[UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0] set];
+		CGContextFillEllipseInRect(c, CGRectMake(prevX-2.5, prevY-2.5, 5, 5));
+		
+		NSNumber *lastDayUnits = [unitSales lastObject];
+		NSNumber *lastButOneDayUnits = [unitSales objectAtIndex:[unitSales count]-2];
+		float percentage = ([lastDayUnits floatValue] - [lastButOneDayUnits floatValue]) / [lastButOneDayUnits floatValue];
+		int roundedPercent = (int)(percentage * 100.0);
+		NSString *percentString = (roundedPercent < 0) ? [NSString stringWithFormat:@"%i%%", roundedPercent] : [NSString stringWithFormat:@"+%i%%", roundedPercent];
+		[(reportIsLatest) ? ([UIColor blackColor]) : ([UIColor darkGrayColor]) set];
+		[percentString drawInRect:CGRectMake(80, 7, 40, 15) withFont:[UIFont boldSystemFontOfSize:12.0]];
+	}
+	CGPathRelease(path);
 	
 	UIImage *trendImage = UIGraphicsGetImageFromCurrentImageContext();
 	UIGraphicsEndImageContext();
