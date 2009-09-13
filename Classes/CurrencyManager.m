@@ -226,7 +226,7 @@
 	}
 	[urlString appendString:@"&f=nl1"];
 	
-	NSString *csv = [NSString stringWithContentsOfURL:[NSURL URLWithString:urlString]];
+	NSString *csv = [NSString stringWithContentsOfURL:[NSURL URLWithString:urlString] usedEncoding:NULL error:NULL];
 	if (!csv) {
 		//NSLog(@"URL could not be retrieved");
 		[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
