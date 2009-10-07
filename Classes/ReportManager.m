@@ -50,7 +50,16 @@
 			if (loadedDay.isWeek)
 				[self.weeks setObject:loadedDay forKey:[loadedDay name]];
 			else
-				[self.days setObject:loadedDay forKey:[loadedDay name]];
+			{
+				if (loadedDay.date)
+				{
+					NSDateFormatter * lFormat = [NSDateFormatter new];
+					[lFormat setDateFormat:@"MM/dd/yyyy"];
+					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
+					if ([lDate isEqual:loadedDay.date])
+						[self.days setObject:loadedDay forKey:[loadedDay name]];
+				}
+			}
 		}
 	}
 	
