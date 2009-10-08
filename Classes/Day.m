@@ -72,7 +72,7 @@
 	
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
-		if ([columns count] > 19) {
+		if ([columns count] >= 19) {
 			NSString *productName = [columns objectAtIndex:6];
 			NSString *transactionType = [columns objectAtIndex:8];
 			NSString *units = [columns objectAtIndex:9];
@@ -107,10 +107,6 @@
 									   currency:royaltyCurrency
 										country:country] autorelease]; //gets added to the countries entry list automatically
 			entry.productIdentifier = appId;
-		}
-		else {
-			[self release];
-			return nil;
 		}
 	}
 	return self;
