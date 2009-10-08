@@ -260,6 +260,14 @@
 		return;
 	}
 	
+	NSString *errorMessageString = nil;
+	[scanner setScanLocation:0];
+	BOOL errorMessagePresent = [scanner scanUpToString:@"<font color=\"red\">" intoString:NULL];
+	if (errorMessagePresent) {
+		[scanner scanString:@"<font color=\"red\">" intoString:NULL];
+		[scanner scanUpToString:@"</font>" intoString:&errorMessageString];
+	}
+	
 	for (int i=0; i<=1; i++) {
 		NSString *downloadType;
 		NSString *downloadActionName;
@@ -296,9 +304,9 @@
 		BOOL scannedDay = YES;
 		while (scannedDay) {
 			NSString *dayString = nil;
-			/*scannedDay =*/ [scanner scanUpToString:@"<option value=\"" intoString:NULL];
-			/*scannedDay =*/ [scanner scanString:@"<option value=\"" intoString:NULL];
-			/*scannedDay =*/ [scanner scanUpToString:@"\"" intoString:&dayString];
+			[scanner scanUpToString:@"<option value=\"" intoString:NULL];
+			[scanner scanString:@"<option value=\"" intoString:NULL];
+			[scanner scanUpToString:@"\"" intoString:&dayString];
 			if (dayString) {
 				if ([dayString rangeOfString:@"/"].location != NSNotFound)
 					[availableDays addObject:dayString];
@@ -377,6 +385,9 @@
 	}
 	[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
 	
+	if (errorMessageString) {
+		[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:YES];
+	}
 	[pool release];
 }
 
@@ -386,6 +397,12 @@
 	[self setProgress:@""];
 	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Download Failed",nil) message:NSLocalizedString(@"Sorry, an error occured when trying to download the report files. Please check your username, password and internet connection.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
 	[alert show];
+}
+
+- (void)presentErrorMessage:(NSString *)message
+{
+	UIAlertView *errorAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Note",nil) message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
+	[errorAlert show];
 }
 
 - (void)successfullyDownloadedDays:(NSDictionary *)newDays

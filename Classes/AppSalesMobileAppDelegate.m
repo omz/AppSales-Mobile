@@ -30,6 +30,7 @@
 
 #import "AppSalesMobileAppDelegate.h"
 #import "RootViewController.h"
+#import "Day.h"
 
 
 @implementation AppSalesMobileAppDelegate

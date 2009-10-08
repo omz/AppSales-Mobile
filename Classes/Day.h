@@ -32,7 +32,7 @@
 @class Country;
 
 @interface Day : NSObject {
-	NSLock *lock_countries;
+	//NSLock *lock_countries;
 	NSMutableDictionary *countries;
 	NSDate *date;
 	NSString *cachedWeekEndDateString;
@@ -45,16 +45,15 @@
 	NSString *name;
 }
 
-@property (retain) NSLock *lock_countries;
-@property (retain) NSDate *date;
-@property (retain) NSMutableDictionary *countries;
-@property (retain) NSString *cachedWeekEndDateString;
-@property (retain) UIColor *cachedWeekDayColor;
-@property (retain) NSString *cachedDayString;
-@property (assign) BOOL isWeek;
-@property (assign) BOOL wasLoadedFromDisk;
-@property (retain) NSString *name;
-@property (retain) NSString *pathOnDisk;
+@property (nonatomic, retain) NSDate *date;
+@property (nonatomic, retain) NSMutableDictionary *countries;
+@property (nonatomic, retain) NSString *cachedWeekEndDateString;
+@property (nonatomic, retain) UIColor *cachedWeekDayColor;
+@property (nonatomic, retain) NSString *cachedDayString;
+@property (nonatomic, assign) BOOL isWeek;
+@property (nonatomic, assign) BOOL wasLoadedFromDisk;
+@property (nonatomic, retain) NSString *name;
+@property (nonatomic, retain) NSString *pathOnDisk;
 
 + (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
 
