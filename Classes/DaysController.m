@@ -55,11 +55,8 @@
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	int lastMonth = -1;
-	float max = 0;
+
 	for (Day *d in sortedDays) {
-		float revenue = [d totalRevenueInBaseCurrency];
-		if (revenue > max)
-			max = revenue;
 		NSDate *date = d.date;
 		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSMonthCalendarUnit fromDate:date];
 		int month = [components month];
@@ -69,7 +66,6 @@
 		}
 		[[daysByMonth lastObject] addObject:d];
 	}
-	self.maxRevenue = max;
 	[self.tableView reloadData];
 }
 
@@ -93,8 +89,21 @@
     if (cell == nil) {
         cell = [[[DayCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
     }
+
+	Day *day = [[self.daysByMonth objectAtIndex:[indexPath section]] objectAtIndex:[indexPath row]];
+	float revenue = [day totalRevenueInBaseCurrency];
+	if (revenue > self.maxRevenue) {
+		/* Got a new max revenue; we need to reload to update all already-displayed cells */
+		self.maxRevenue = revenue;
+		[[tableView class] cancelPreviousPerformRequestsWithTarget:tableView
+														  selector:@selector(reloadData)
+															object:nil];
+		[tableView performSelector:@selector(reloadData)
+						withObject:nil
+						afterDelay:0];
+	}
 	cell.maxRevenue = self.maxRevenue;
-    cell.day = [[self.daysByMonth objectAtIndex:[indexPath section]] objectAtIndex:[indexPath row]];
+	cell.day = day;
 	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	
     return cell;
