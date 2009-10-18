@@ -56,7 +56,8 @@
 					NSDateFormatter * lFormat = [NSDateFormatter new];
 					[lFormat setDateFormat:@"MM/dd/yyyy"];
 					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
-					if ([lDate isEqual:loadedDay.date])
+					NSTimeInterval lInterval = [lDate timeIntervalSinceDate:loadedDay.date];
+					if (lInterval < 12*60*60 && lInterval > -12*60*60)
 						[self.days setObject:loadedDay forKey:[loadedDay name]];
 				}
 			}
