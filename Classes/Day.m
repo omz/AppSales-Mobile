@@ -45,16 +45,15 @@
 @synthesize wasLoadedFromDisk;
 @synthesize name;
 @synthesize pathOnDisk;
-@synthesize lock_countries;;
 
 - (id)init
 {
-	if ((self = [super init])) {
-		self.lock_countries = [[[NSLock alloc] init] autorelease];
+	if (self = [super init]) {
 	}
 	
 	return self;
 }
+
 - (id)initWithCSV:(NSString *)csv
 {
 	[self init];
@@ -66,12 +65,14 @@
 	NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
 	if ([lines count] > 0)
 		[lines removeObjectAtIndex:0];
-	if ([lines count] < 1)
+	if ([lines count] == 0) {
+		[self release];
 		return nil; //sanity check
+	}
 	
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
-		if ([columns count] > 19) {
+		if ([columns count] >= 19) {
 			NSString *productName = [columns objectAtIndex:6];
 			NSString *transactionType = [columns objectAtIndex:8];
 			NSString *units = [columns objectAtIndex:9];
@@ -98,6 +99,13 @@
 			}
 			NSString *royaltyCurrency = [columns objectAtIndex:15];
 			
+			/* Treat in-app purchases as regular purchases for our purposes.
+			 * IA1: In-App Purchase
+			 * Presumably, IA7: In-App Free Upgrade / Repurchase.
+			 */
+			if ([transactionType isEqualToString:@"IA1"])
+				transactionType = @"1";
+
 			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
 			Entry *entry = [[[Entry alloc] initWithProductName:productName 
 								transactionType:[transactionType intValue] 
@@ -108,7 +116,6 @@
 			entry.productIdentifier = appId;
 		}
 	}
-	
 	return self;
 }
 
@@ -143,8 +150,6 @@ static BOOL shouldLoadCountries = YES;
 	shouldLoadCountries = NO;
 	Day *loadedDay = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
 	shouldLoadCountries = YES;
-	
-	/* Will load the countries (and the entries they contain) lazily as necessary from fullPath */
 	loadedDay.pathOnDisk = fullPath;
 	
 	return loadedDay;
@@ -153,23 +158,11 @@ static BOOL shouldLoadCountries = YES;
 - (NSMutableDictionary *)countries
 {	
 	if (self.pathOnDisk && !countries) {
-		[lock_countries lock];
-		/* Countries may have been assigned while the lock was being acquired, on another thread.
-		 * Note that we can't depend upon the atomicity of properties here because we're assigning the property
-		 * being accessed from within the accessor (lazy assignment).
-		 */
-		if (!countries) {
+		if (!countries) {		
 			countries = [((Day *)[NSKeyedUnarchiver unarchiveObjectWithFile:self.pathOnDisk]).countries retain];
 			self.pathOnDisk = nil;
-			if (self.isWeek) {
-				//NSLog(@"Week %@: %@", self.name, [self totalRevenueString]);
-			} else {
-				//NSLog(@"Day %@: %@", self.name, [self totalRevenueString]);
-			}
 		}
-		[lock_countries unlock];
 	}
-	
 	return countries;
 }
 
@@ -381,7 +374,7 @@ static BOOL shouldLoadCountries = YES;
 	self.date = nil;
 	self.name = nil;
 	self.pathOnDisk = nil;
-	self.lock_countries = nil;
+	//self.lock_countries = nil;
 	
 	[super dealloc];
 }

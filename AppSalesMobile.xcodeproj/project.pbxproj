@@ -19,6 +19,7 @@
 		7F17E0570ED4F21E0005D8AF /* CurrencySelectionDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */; };
 		7F29EA420ED861B20018C18A /* help in Resources */ = {isa = PBXBuildFile; fileRef = 7F29EA340ED861B20018C18A /* help */; };
 		7F29EA630ED861CE0018C18A /* HelpBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F29EA620ED861CE0018C18A /* HelpBrowser.m */; };
+		7F47897810661CBD002415A2 /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F47897710661CBD002415A2 /* Entitlements.plist */; };
 		7F4C218810230EF300F17F7D /* About.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217610230EF200F17F7D /* About.png */; };
 		7F4C218910230EF300F17F7D /* Daily.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217710230EF200F17F7D /* Daily.png */; };
 		7F4C218A10230EF300F17F7D /* DateButtonHighlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217810230EF200F17F7D /* DateButtonHighlight.png */; };
@@ -312,6 +313,7 @@
 		7F29EA340ED861B20018C18A /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = help; sourceTree = "<group>"; };
 		7F29EA610ED861CE0018C18A /* HelpBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelpBrowser.h; sourceTree = "<group>"; };
 		7F29EA620ED861CE0018C18A /* HelpBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelpBrowser.m; sourceTree = "<group>"; };
+		7F47897710661CBD002415A2 /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
 		7F4C217610230EF200F17F7D /* About.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = About.png; sourceTree = "<group>"; };
 		7F4C217710230EF200F17F7D /* Daily.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Daily.png; sourceTree = "<group>"; };
 		7F4C217810230EF200F17F7D /* DateButtonHighlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButtonHighlight.png; sourceTree = "<group>"; };
@@ -664,6 +666,7 @@
 				7FB0C4430EB97BE8005E2C45 /* libz.dylib */,
 				7F87BC9B0ED9B588001C8BC8 /* Security.framework */,
 				7FB391980EE7991D00AC30D5 /* SystemConfiguration.framework */,
+				7F47897710661CBD002415A2 /* Entitlements.plist */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -1392,6 +1395,7 @@
 				7FEA5AA9105B61CD000A12E6 /* 5stars.png in Resources */,
 				7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */,
 				7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */,
+				7F47897810661CBD002415A2 /* Entitlements.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1468,6 +1472,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1475,6 +1480,7 @@
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = AppSalesMobile;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 			};
 			name = Debug;
 		};
@@ -1537,12 +1543,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Ole Zorn";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = AppSales;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "E93F46E8-449F-4589-BF04-18A8FC9714F2";
 				SDKROOT = iphoneos3.0;
 			};
 			name = Release;
