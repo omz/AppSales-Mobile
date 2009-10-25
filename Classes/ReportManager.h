@@ -52,4 +52,6 @@
 - (BOOL)isDownloadingReviews;
 - (NSString *)reviewDownloadStatus;
 
+- (NSMutableDictionary *) allAvailableDays;
+
 @end

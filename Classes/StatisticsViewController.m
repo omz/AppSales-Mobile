@@ -67,7 +67,7 @@
 	self.navigationItem.rightBarButtonItem = graphModeButton;
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
-	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	NSArray *sortedDays = [[[ReportManager sharedManager].allAvailableDays allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	self.days = sortedDays;
 }
 
