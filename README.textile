@@ -1,0 +1,16 @@
+h1. AppSales Mobile
+
+AppSales Mobile allows iPhone developers to download and analyze their daily and weekly sales reports from iTunes Connect.
+
+The current version is meant to be built for iPhone OS 3.0.
+
+Features:
+* Automatic download of daily and weekly sales reports from iTunes Connect
+* Convenient graphs for viewing trends and sales by region with selectable date range
+* Automatic conversion to your currency of choice
+* Download reviews of your apps
+
+Because there is no real API to access iTunes Connect trend reports, AppSales Mobile scrapes itts.apple.com. This means that even small changes on this website can break AppSales’s ability to download reports automatically. In most cases, this is easy to fix and I’ll try to make a new version available asap.
+
+You can follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
+If you like, check out my commercial iPhone apps at "omz-software.com":http://omz-software.com
