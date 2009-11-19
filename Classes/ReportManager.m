@@ -509,18 +509,6 @@
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
 }
 
-// this is used by StatisticsViewController in the Graphs view;
-// iTunnes Connect erases older days reports, but if you have 
-// week reports for older weeks, show the beginning of those weeks
-// in the graph so that the calculation expands for that period also.
-- (NSMutableDictionary *) allAvailableDays
-{
-	NSMutableDictionary * allDays = [NSMutableDictionary dictionary];
-	[allDays addEntriesFromDictionary:self.days];
-	[allDays addEntriesFromDictionary:self.weeks];
-	return allDays;
-}
-
 - (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly
 {
 	if (isDownloadingReviews)
