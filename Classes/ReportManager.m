@@ -282,18 +282,18 @@
 		NSString *downloadActionName;
 		if (i==0) {
 			downloadType = @"Daily";
-			downloadActionName = @"11.11.1";
+			downloadActionName = @"11.13.1";
 		}
 		else {
 			downloadType = @"Weekly";
-			downloadActionName = @"11.13.1";
+			downloadActionName = @"11.15.1";
 		}
 		
 		NSString *dateTypeSelectionURLString = [ittsBaseURL stringByAppendingString:dateTypeAction]; 
 		NSDictionary *dateTypeDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  downloadType, @"11.9", 
+									  downloadType, @"11.11", 
 									  downloadType, @"hiddenDayOrWeekSelection", 
-									  @"Summary", @"11.7", 
+									  @"Summary", @"11.9", 
 									  @"ShowDropDown", @"hiddenSubmitTypeName", nil];
 		NSString *encodedDateTypeDict = [dateTypeDict formatForHTTP];
 		NSData *httpBody = [encodedDateTypeDict dataUsingEncoding:NSASCIIStringEncoding];
@@ -349,10 +349,11 @@
 		int dayNumber = 1;
 		for (NSString *dayString in availableDays) {
 			NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
-											 downloadType, @"11.9", 
-											 downloadType, @"hiddenDayOrWeekSelection",
+											 downloadType, @"11.11", 
+											 dayString, @"hiddenDayOrWeekSelection",
 											 @"Download", @"hiddenSubmitTypeName",
-											 @"Summary", @"11.7",
+											 @"ShowDropDown", @"hiddenSubmitTypeName",
+											 @"Summary", @"11.9",
 											 dayString, downloadActionName, 
 											 @"Download", @"download", nil];
 			NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
