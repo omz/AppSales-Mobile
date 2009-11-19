@@ -24,7 +24,7 @@
 - (id)init
 {
 	[super init];
-		
+	
 	self.days = [NSMutableDictionary dictionary];
 	self.weeks = [NSMutableDictionary dictionary];
 
@@ -56,6 +56,7 @@
 					NSDateFormatter * lFormat = [NSDateFormatter new];
 					[lFormat setDateFormat:@"MM/dd/yyyy"];
 					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
+					[lFormat release];
 					if ([lDate isEqual:loadedDay.date])
 						[self.days setObject:loadedDay forKey:[loadedDay name]];
 				}
@@ -100,6 +101,8 @@
 {
 	if (isRefreshing)
 		return;
+	
+	[UIApplication sharedApplication].idleTimerDisabled = YES;
 	
 	NSError *error = nil;
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
@@ -403,6 +406,8 @@
 
 - (void)downloadFailed
 {
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	
 	isRefreshing = NO;
 	[self setProgress:@""];
 	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Download Failed",nil) message:NSLocalizedString(@"Sorry, an error occured when trying to download the report files. Please check your username, password and internet connection.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
@@ -441,6 +446,8 @@
 
 - (void)successfullyDownloadedWeeks:(NSDictionary *)newDays
 {
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	
 	isRefreshing = NO;
 	[weeks addEntriesFromDictionary:newDays];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
@@ -514,6 +521,8 @@
 {
 	if (isDownloadingReviews)
 		return;
+	
+	[UIApplication sharedApplication].idleTimerDisabled = YES;
 	
 	isDownloadingReviews = YES;
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
@@ -992,6 +1001,8 @@
 
 - (void)finishDownloadingReviews:(NSDictionary *)reviews
 {
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	
 	//NSLog(@"%@", reviews);
 	isDownloadingReviews = NO;
 	for (NSString *appID in [reviews allKeys]) {
