@@ -509,37 +509,16 @@
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
 }
 
-/*
- * this is used by StatisticsViewController in the Graphs view;
- * iTunnes Connect erases older days reports, but if you have 
- * week reports for older weeks, show the beginning of those weeks
- * in the graph so that the calculation expands for that period also.
-*/
-- (NSArray *) allAvailableDaysSorted
-{		
-	//sort the days array by date
-	NSSortDescriptor *daySorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
-	NSArray *sortedDays = [[self.days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:daySorter]];
-
-	// this will hold all the days to be returned
-	NSMutableArray *allDays = [NSMutableArray array];
-	[allDays addObjectsFromArray:sortedDays];
-	
-	Day *oldestDayReport = [sortedDays objectAtIndex:0];
-	// we don't want to calculate this each time in the following loop
-	NSTimeInterval oldestDayReportInterval = [oldestDayReport.date timeIntervalSince1970];
-	
-	//sort the weeks array by date, descending
-	NSSortDescriptor *weekSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
-	NSArray *sortedWeeks = [[self.weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:weekSorter]]; 
-
-	//insert only the weeks older than the oldest daily report
-	for (Day *w in sortedWeeks) {
-		if ([w.date timeIntervalSince1970] < oldestDayReportInterval) {
-			[allDays insertObject:w atIndex:0];
-		}
-	}	
-	return [NSArray arrayWithArray:allDays];
+// this is used by StatisticsViewController in the Graphs view;
+// iTunnes Connect erases older days reports, but if you have 
+// week reports for older weeks, show the beginning of those weeks
+// in the graph so that the calculation expands for that period also.
+- (NSMutableDictionary *) allAvailableDays
+{
+	NSMutableDictionary * allDays = [NSMutableDictionary dictionary];
+	[allDays addEntriesFromDictionary:self.days];
+	[allDays addEntriesFromDictionary:self.weeks];
+	return allDays;
 }
 
 - (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly

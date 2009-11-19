@@ -52,6 +52,6 @@
 - (BOOL)isDownloadingReviews;
 - (NSString *)reviewDownloadStatus;
 
-- (NSArray *) allAvailableDaysSorted;
+- (NSMutableDictionary *) allAvailableDays;
 
 @end
