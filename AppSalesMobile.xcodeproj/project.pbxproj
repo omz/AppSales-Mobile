@@ -290,6 +290,7 @@
 		7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5B3F105B6CD2000A12E6 /* ReviewTemplate.html */; };
 		7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */; };
 		7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */; };
+		B9A29C0A10B69B99003D90B5 /* TotalController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9A29C0910B69B99003D90B5 /* TotalController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -615,6 +616,8 @@
 		7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleReviewController.m; sourceTree = "<group>"; };
 		7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5stars_gray.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B9A29C0810B69B99003D90B5 /* TotalController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TotalController.h; sourceTree = "<group>"; };
+		B9A29C0910B69B99003D90B5 /* TotalController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TotalController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1088,6 +1091,8 @@
 				7FB0C62E0EBA43BC005E2C45 /* DaysController.m */,
 				7FB0C7040EBA8348005E2C45 /* WeeksController.h */,
 				7FB0C7050EBA8348005E2C45 /* WeeksController.m */,
+				B9A29C0810B69B99003D90B5 /* TotalController.h */,
+				B9A29C0910B69B99003D90B5 /* TotalController.m */,
 				7FB0CB160EBBBAA8005E2C45 /* CountriesController.h */,
 				7FB0CB170EBBBAA8005E2C45 /* CountriesController.m */,
 				7FB0CC870EBBD2EB005E2C45 /* EntriesController.h */,
@@ -1441,6 +1446,7 @@
 				7FEA5954105B3C20000A12E6 /* ReviewsListController.m in Sources */,
 				7FEA595F105B3D65000A12E6 /* ReviewCell.m in Sources */,
 				7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */,
+				B9A29C0A10B69B99003D90B5 /* TotalController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
