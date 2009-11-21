@@ -15,6 +15,7 @@
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
 		345D1A480F3174DC002AB336 /* AbstractDayOrWeekController.m in Sources */ = {isa = PBXBuildFile; fileRef = 345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */; };
 		34DCF08F0F0461A2009F9929 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */; };
+		3A41327D10B89DF300313F61 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FB0C4430EB97BE8005E2C45 /* libz.dylib */; };
 		3AD3315810B76D9F00A2670E /* Prefetched in Resources */ = {isa = PBXBuildFile; fileRef = 3AD3315610B76D9F00A2670E /* Prefetched */; };
 		3AD3335810B771B200A2670E /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3334B10B771B200A2670E /* Reachability.m */; };
 		3AD3335910B771B200A2670E /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3334D10B771B200A2670E /* ASIAuthenticationDialog.m */; };
@@ -24,7 +25,6 @@
 		3AD3335D10B771B200A2670E /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335510B771B200A2670E /* ASINetworkQueue.m */; };
 		3AD3335E10B771B200A2670E /* ASINSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335710B771B200A2670E /* ASINSStringAdditions.m */; };
 		3AD3336210B771CC00A2670E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AD3336110B771CC00A2670E /* CFNetwork.framework */; };
-		3AD334A210B7867D00A2670E /* libz.1.2.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AD334A110B7867D00A2670E /* libz.1.2.3.dylib */; };
 		7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */; };
 		7F17E0570ED4F21E0005D8AF /* CurrencySelectionDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */; };
 		7F29EA420ED861B20018C18A /* help in Resources */ = {isa = PBXBuildFile; fileRef = 7F29EA340ED861B20018C18A /* help */; };
@@ -333,7 +333,6 @@
 		3AD3335610B771B200A2670E /* ASINSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASINSStringAdditions.h; sourceTree = "<group>"; };
 		3AD3335710B771B200A2670E /* ASINSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASINSStringAdditions.m; sourceTree = "<group>"; };
 		3AD3336110B771CC00A2670E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		3AD334A110B7867D00A2670E /* libz.1.2.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.3.dylib; path = usr/lib/libz.1.2.3.dylib; sourceTree = SDKROOT; };
 		7F1345720EC6D7990050D5F2 /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/SettingsViewController.xib; sourceTree = "<group>"; };
 		7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrencySelectionDialog.h; sourceTree = "<group>"; };
 		7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencySelectionDialog.m; sourceTree = "<group>"; };
@@ -657,7 +656,7 @@
 				7F87BC9C0ED9B588001C8BC8 /* Security.framework in Frameworks */,
 				7FB391990EE7991D00AC30D5 /* SystemConfiguration.framework in Frameworks */,
 				3AD3336210B771CC00A2670E /* CFNetwork.framework in Frameworks */,
-				3AD334A210B7867D00A2670E /* libz.1.2.3.dylib in Frameworks */,
+				3A41327D10B89DF300313F61 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -726,7 +725,6 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3AD334A110B7867D00A2670E /* libz.1.2.3.dylib */,
 				7FB0C4430EB97BE8005E2C45 /* libz.dylib */,
 				7F87BC9B0ED9B588001C8BC8 /* Security.framework */,
 				7FB391980EE7991D00AC30D5 /* SystemConfiguration.framework */,
