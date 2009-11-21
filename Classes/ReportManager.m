@@ -18,9 +18,9 @@
 #import "Review.h"
 #import "ASIFormDataRequest.h"
 
-//#error BACKUP_HOSTNAME -- Set macro appropriate for your setup 
+#error BACKUP_HOSTNAME -- Set macro appropriate for your setup 
 #define BACKUP_HOSTNAME \
-	@"http://paradox.local/~epatel/upload_appsales.php"
+	@"http://<computer-name>.local/~<username>/upload_appsales.php"
 
 @implementation ReportManager
 
