@@ -32,6 +32,7 @@ AppSalesMobile
 #import "CurrencyManager.h"
 #import "CurrencySelectionDialog.h"
 #import "SFHFKeychainUtils.h"
+#import "ReportManager.h"
 
 @implementation SettingsViewController
 
@@ -125,6 +126,12 @@ AppSalesMobile
 - (IBAction)refreshExchangeRates:(id)sender
 {
 	[[CurrencyManager sharedManager] forceRefresh];
+}
+
+- (IBAction)uploadBackups:(id)sender
+{
+	backupButton.hidden = YES;
+	[[ReportManager sharedManager] backupData];
 }
 
 @end

@@ -15,6 +15,16 @@
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
 		345D1A480F3174DC002AB336 /* AbstractDayOrWeekController.m in Sources */ = {isa = PBXBuildFile; fileRef = 345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */; };
 		34DCF08F0F0461A2009F9929 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */; };
+		3AD3315810B76D9F00A2670E /* Prefetched in Resources */ = {isa = PBXBuildFile; fileRef = 3AD3315610B76D9F00A2670E /* Prefetched */; };
+		3AD3335810B771B200A2670E /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3334B10B771B200A2670E /* Reachability.m */; };
+		3AD3335910B771B200A2670E /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3334D10B771B200A2670E /* ASIAuthenticationDialog.m */; };
+		3AD3335A10B771B200A2670E /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3334F10B771B200A2670E /* ASIFormDataRequest.m */; };
+		3AD3335B10B771B200A2670E /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335110B771B200A2670E /* ASIHTTPRequest.m */; };
+		3AD3335C10B771B200A2670E /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335310B771B200A2670E /* ASIInputStream.m */; };
+		3AD3335D10B771B200A2670E /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335510B771B200A2670E /* ASINetworkQueue.m */; };
+		3AD3335E10B771B200A2670E /* ASINSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335710B771B200A2670E /* ASINSStringAdditions.m */; };
+		3AD3336210B771CC00A2670E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AD3336110B771CC00A2670E /* CFNetwork.framework */; };
+		3AD334A210B7867D00A2670E /* libz.1.2.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AD334A110B7867D00A2670E /* libz.1.2.3.dylib */; };
 		7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */; };
 		7F17E0570ED4F21E0005D8AF /* CurrencySelectionDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */; };
 		7F29EA420ED861B20018C18A /* help in Resources */ = {isa = PBXBuildFile; fileRef = 7F29EA340ED861B20018C18A /* help */; };
@@ -265,7 +275,6 @@
 		7FB0C3F80EB9791C005E2C45 /* Country.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0C3F70EB9791C005E2C45 /* Country.m */; };
 		7FB0C3FB0EB97923005E2C45 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0C3FA0EB97923005E2C45 /* Entry.m */; };
 		7FB0C4420EB97BC1005E2C45 /* NSDictionary+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0C4410EB97BC1005E2C45 /* NSDictionary+HTTP.m */; };
-		7FB0C4440EB97BE8005E2C45 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FB0C4430EB97BE8005E2C45 /* libz.dylib */; };
 		7FB0C4AB0EB99D01005E2C45 /* CurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0C4AA0EB99D01005E2C45 /* CurrencyManager.m */; };
 		7FB0C59B0EBA3680005E2C45 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0C59A0EBA3680005E2C45 /* SettingsViewController.m */; };
 		7FB0C62F0EBA43BC005E2C45 /* DaysController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0C62E0EBA43BC005E2C45 /* DaysController.m */; };
@@ -307,6 +316,23 @@
 		345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AbstractDayOrWeekController.m; sourceTree = "<group>"; };
 		34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFHFKeychainUtils.m; sourceTree = "<group>"; };
 		34DCF08E0F0461A2009F9929 /* SFHFKeychainUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFHFKeychainUtils.h; sourceTree = "<group>"; };
+		3AD3315610B76D9F00A2670E /* Prefetched */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Prefetched; sourceTree = "<group>"; };
+		3AD3334A10B771B200A2670E /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		3AD3334B10B771B200A2670E /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		3AD3334C10B771B200A2670E /* ASIAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIAuthenticationDialog.h; sourceTree = "<group>"; };
+		3AD3334D10B771B200A2670E /* ASIAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIAuthenticationDialog.m; sourceTree = "<group>"; };
+		3AD3334E10B771B200A2670E /* ASIFormDataRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIFormDataRequest.h; sourceTree = "<group>"; };
+		3AD3334F10B771B200A2670E /* ASIFormDataRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIFormDataRequest.m; sourceTree = "<group>"; };
+		3AD3335010B771B200A2670E /* ASIHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIHTTPRequest.h; sourceTree = "<group>"; };
+		3AD3335110B771B200A2670E /* ASIHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIHTTPRequest.m; sourceTree = "<group>"; };
+		3AD3335210B771B200A2670E /* ASIInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIInputStream.h; sourceTree = "<group>"; };
+		3AD3335310B771B200A2670E /* ASIInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIInputStream.m; sourceTree = "<group>"; };
+		3AD3335410B771B200A2670E /* ASINetworkQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASINetworkQueue.h; sourceTree = "<group>"; };
+		3AD3335510B771B200A2670E /* ASINetworkQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASINetworkQueue.m; sourceTree = "<group>"; };
+		3AD3335610B771B200A2670E /* ASINSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASINSStringAdditions.h; sourceTree = "<group>"; };
+		3AD3335710B771B200A2670E /* ASINSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASINSStringAdditions.m; sourceTree = "<group>"; };
+		3AD3336110B771CC00A2670E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		3AD334A110B7867D00A2670E /* libz.1.2.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.3.dylib; path = usr/lib/libz.1.2.3.dylib; sourceTree = SDKROOT; };
 		7F1345720EC6D7990050D5F2 /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/SettingsViewController.xib; sourceTree = "<group>"; };
 		7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrencySelectionDialog.h; sourceTree = "<group>"; };
 		7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencySelectionDialog.m; sourceTree = "<group>"; };
@@ -625,9 +651,10 @@
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
-				7FB0C4440EB97BE8005E2C45 /* libz.dylib in Frameworks */,
 				7F87BC9C0ED9B588001C8BC8 /* Security.framework in Frameworks */,
 				7FB391990EE7991D00AC30D5 /* SystemConfiguration.framework in Frameworks */,
+				3AD3336210B771CC00A2670E /* CFNetwork.framework in Frameworks */,
+				3AD334A210B7867D00A2670E /* libz.1.2.3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,6 +664,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				3AD3334910B771B200A2670E /* ASIHTTP */,
 				7FB0C5830EBA3431005E2C45 /* Helpers */,
 				7FB0C5840EBA343E005E2C45 /* Models */,
 				7FEA5BC1105BFF32000A12E6 /* Controller */,
@@ -658,14 +686,12 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				3AD3315610B76D9F00A2670E /* Prefetched */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				7FB0C4430EB97BE8005E2C45 /* libz.dylib */,
-				7F87BC9B0ED9B588001C8BC8 /* Security.framework */,
-				7FB391980EE7991D00AC30D5 /* SystemConfiguration.framework */,
 				7F47897710661CBD002415A2 /* Entitlements.plist */,
 			);
 			name = CustomTemplate;
@@ -697,11 +723,37 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3AD334A110B7867D00A2670E /* libz.1.2.3.dylib */,
+				7FB0C4430EB97BE8005E2C45 /* libz.dylib */,
+				7F87BC9B0ED9B588001C8BC8 /* Security.framework */,
+				7FB391980EE7991D00AC30D5 /* SystemConfiguration.framework */,
+				3AD3336110B771CC00A2670E /* CFNetwork.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3AD3334910B771B200A2670E /* ASIHTTP */ = {
+			isa = PBXGroup;
+			children = (
+				3AD3334A10B771B200A2670E /* Reachability.h */,
+				3AD3334B10B771B200A2670E /* Reachability.m */,
+				3AD3334C10B771B200A2670E /* ASIAuthenticationDialog.h */,
+				3AD3334D10B771B200A2670E /* ASIAuthenticationDialog.m */,
+				3AD3334E10B771B200A2670E /* ASIFormDataRequest.h */,
+				3AD3334F10B771B200A2670E /* ASIFormDataRequest.m */,
+				3AD3335010B771B200A2670E /* ASIHTTPRequest.h */,
+				3AD3335110B771B200A2670E /* ASIHTTPRequest.m */,
+				3AD3335210B771B200A2670E /* ASIInputStream.h */,
+				3AD3335310B771B200A2670E /* ASIInputStream.m */,
+				3AD3335410B771B200A2670E /* ASINetworkQueue.h */,
+				3AD3335510B771B200A2670E /* ASINetworkQueue.m */,
+				3AD3335610B771B200A2670E /* ASINSStringAdditions.h */,
+				3AD3335710B771B200A2670E /* ASINSStringAdditions.m */,
+			);
+			name = ASIHTTP;
 			sourceTree = "<group>";
 		};
 		7F4C217510230EF200F17F7D /* Images */ = {
@@ -1112,6 +1164,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "AppSalesMobile" */;
 			buildPhases = (
+				3AD3341B10B77EE900A2670E /* ShellScript */,
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
 				1D60588F0D05DD3D006BFB54 /* Frameworks */,
@@ -1396,10 +1449,27 @@
 				7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */,
 				7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */,
 				7F47897810661CBD002415A2 /* Entitlements.plist in Resources */,
+				3AD3315810B76D9F00A2670E /* Prefetched in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3AD3341B10B77EE900A2670E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# get the previous bundle version number without the date number\nexport VERSION=`/usr/libexec/PlistBuddy \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\" -c \"Print CFBundleVersion\" | sed -E 's/.[0-9]{12}//g'`\n\n# get current date and time number\nexport DATE=`date +%y%m%d%H%M%S`\n\n# update the bundle version number\n/usr/libexec/PlistBuddy \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\" -c \"Set CFBundleVersion $VERSION.$DATE\"\n\n# convert back to binary format\nplutil -convert binary1 \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1D60588E0D05DD3D006BFB54 /* Sources */ = {
@@ -1441,6 +1511,13 @@
 				7FEA5954105B3C20000A12E6 /* ReviewsListController.m in Sources */,
 				7FEA595F105B3D65000A12E6 /* ReviewCell.m in Sources */,
 				7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */,
+				3AD3335810B771B200A2670E /* Reachability.m in Sources */,
+				3AD3335910B771B200A2670E /* ASIAuthenticationDialog.m in Sources */,
+				3AD3335A10B771B200A2670E /* ASIFormDataRequest.m in Sources */,
+				3AD3335B10B771B200A2670E /* ASIHTTPRequest.m in Sources */,
+				3AD3335C10B771B200A2670E /* ASIInputStream.m in Sources */,
+				3AD3335D10B771B200A2670E /* ASINetworkQueue.m in Sources */,
+				3AD3335E10B771B200A2670E /* ASINSStringAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1500,12 +1577,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Edward Patel";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = AppSales;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "0F31FB20-EAD5-4BF3-AC21-566CF0B24E48";
 				SDKROOT = iphoneos3.0;
 			};
 			name = Distribution;
@@ -1514,13 +1593,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Ole Zorn";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = AppSalesMobile;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B62523D9-0D86-4FE2-9212-10D397E6472A";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 			};
 			name = Distribution;
 		};
