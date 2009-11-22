@@ -64,7 +64,11 @@
 {
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	Review *review = cell.review;
-	[[UIColor colorWithWhite:0.95 alpha:1.0] set];
+	if (review.newOrUpdatedReview) {
+		[[UIColor colorWithRed:0.85 green:0.85 blue:0.95 alpha:1.0] set];
+	} else {
+		[[UIColor colorWithWhite:0.95 alpha:1.0] set];
+	}
 	CGContextFillRect(c, CGRectMake(0,0,45,84));
 	
 	UIImage *flagImage = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", review.countryCode]];
@@ -86,10 +90,10 @@
 	[userAndDate drawInRect:CGRectMake(125, 2, 188, 14) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeMiddleTruncation alignment:UITextAlignmentRight];
 		
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor blackColor]) set];
-	[review.title drawInRect:CGRectMake(50, 16, 265, 18) withFont:[UIFont boldSystemFontOfSize:15.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
+	[review.presentedTitle drawInRect:CGRectMake(50, 16, 265, 18) withFont:[UIFont boldSystemFontOfSize:15.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
 		
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
-	[review.text drawInRect:CGRectMake(50, 36, 265, 45) withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
+	[review.presentedText drawInRect:CGRectMake(50, 36, 265, 45) withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
 	
 }	
 

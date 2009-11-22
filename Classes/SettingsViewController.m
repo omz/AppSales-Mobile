@@ -32,6 +32,7 @@ AppSalesMobile
 #import "CurrencyManager.h"
 #import "CurrencySelectionDialog.h"
 #import "SFHFKeychainUtils.h"
+#import "Review.h"
 
 @implementation SettingsViewController
 
@@ -51,6 +52,7 @@ AppSalesMobile
 	currencySectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	loginSectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	lastRefreshLabel.font = [UIFont systemFontOfSize:12.0];
+	translationLabel.text = NSLocalizedString(@"Translate foreign reviews",nil);
 	
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
 	if (username) {
@@ -61,6 +63,7 @@ AppSalesMobile
 																 error:&error];
 		if (password) passwordTextField.text = password;
 	}
+	translationSwitch.on = [Review showTranslatedReviews];
 	
 	[self baseCurrencyChanged]; //set proper currency button title
 	[self currencyRatesDidUpdate]; //set proper refresh date in label
@@ -83,6 +86,7 @@ AppSalesMobile
 							  updateExisting:YES
 									   error:&error];
 	}
+	[Review setShowTranslatedReviews:translationSwitch.on];
 }
 
 #pragma mark Text Field Delegate 
