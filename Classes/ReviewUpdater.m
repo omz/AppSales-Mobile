@@ -84,6 +84,7 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 			return; // up to date
 		}
 	}
+	review.newOrUpdatedReview = YES;
 	[review updateTranslations]; // network call, done outside of synchronized block
 
 	@synchronized (app) {
@@ -111,7 +112,7 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 			NSDateFormatter *dateFormatter = [storeInfo objectForKey:@"dateFormatter"];
 			if (!dateFormatter) {
 				@synchronized (defaultDateFormatter) {
-					dateFormatter = [[defaultDateFormatter copy] autorelease];
+					dateFormatter = [[defaultDateFormatter copy] autorelease]; // date formatters are not thread safe
 				}
 				if ([countryCode isEqual:@"it"]) {
 					NSLocale *currentLocale = [[[NSLocale alloc] initWithLocaleIdentifier:countryCode] autorelease];
@@ -207,13 +208,7 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 }
 
 - (void) updateReviews {
-//	NSAssert(resultsByAppID == nil, nil);
-//	resultsByAppID = [[NSMutableDictionary alloc] initWithCapacity:appsByID.count];
-//	for (NSString *appID in appsByID) {
-//		[resultsByAppID setObject:[NSMutableArray array] forKey:appID];
-//	}
-	
-	//setup store fronts, this should probably go into a plist...:
+	// setup store fronts, this should probably go into a plist...:
 	NSDateFormatter *frenchDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	NSLocale *frenchLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"fr"] autorelease];
 	[frenchDateFormatter setLocale:frenchLocale];

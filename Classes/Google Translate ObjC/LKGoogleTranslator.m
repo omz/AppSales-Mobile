@@ -16,7 +16,9 @@
 @synthesize markTranslationsWithDetectedOriginalLanguage;
 
 - (NSString*)translateText:(NSString*)sourceText fromLanguage:(NSString*)sourceLanguage toLanguage:(NSString*)targetLanguage {
+#if APPSALES_DEBUG
 	NSLog(@"translating into %@: %@", targetLanguage, sourceText);
+#endif
 	NSMutableString* urlString = [NSMutableString string];
 	[urlString appendString: URL_STRING];
 	[urlString appendString: sourceLanguage];

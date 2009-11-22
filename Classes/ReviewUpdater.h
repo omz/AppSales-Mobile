@@ -1,19 +1,11 @@
 #import <Foundation/Foundation.h>
 
-// results of using an iPhone 3G S, on 3G network, with 3 app store applications
-// update reviews from all countries:
-// 1 thread  - 88 sec
-// 2 thread  - 45 sec
-// 3 threads - 28 sec
-// 4 threads - 17 sec
-// 5 threads - 16 sec
-// 7 threads - 16 sec
-#define NUMBER_OF_FETCHING_THREADS 5
+#define NUMBER_OF_FETCHING_THREADS 5  // also the max number of concurrent network connections.
 
 @interface ReviewUpdater : NSObject {
 	NSDictionary *appsByID;
 	
-	id callback; // FIXME
+	id callback; // FIXME.  Ugly hack, used to update the GUI status
 	
 	// used by worker threads
 	NSCondition *condition;
