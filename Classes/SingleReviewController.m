@@ -26,7 +26,7 @@
 	NSString *templatePath = [[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"];
 	NSString *template = [[[NSString alloc] initWithContentsOfFile:templatePath usedEncoding:NULL error:NULL] autorelease];
 	
-	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.translatedTitle];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.presentedTitle];
 	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
@@ -37,7 +37,7 @@
 	}
 	NSString *variousInfo = [NSString stringWithFormat:@"%@<br/>(%@) – %@ – %@", starsString, review.version, review.user, dateString];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[DATE]]]" withString:variousInfo];
-	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.translatedText];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.presentedText];
 	
 	[self.webView loadHTMLString:template baseURL:nil];
 }

@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#define NUMBER_OF_FETCHING_THREADS 5  // also the max number of concurrent network connections.
+#define NUMBER_OF_FETCHING_THREADS 10  // also the max number of concurrent network connections.
 
 @interface ReviewUpdater : NSObject {
 	NSDictionary *appsByID;
