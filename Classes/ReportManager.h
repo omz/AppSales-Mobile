@@ -54,7 +54,7 @@
 
 - (void)deleteDay:(Day *)dayToDelete;
 
-- (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly;
+- (void)downloadReviews;
 - (void)updateReviewDownloadProgress:(NSString *)status;
 - (BOOL)isDownloadingReviews;
 - (NSString *)reviewDownloadStatus;

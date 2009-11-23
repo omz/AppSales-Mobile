@@ -33,6 +33,7 @@ AppSalesMobile
 #import "CurrencySelectionDialog.h"
 #import "SFHFKeychainUtils.h"
 #import "ReportManager.h"
+#import "Review.h"
 
 @implementation SettingsViewController
 
@@ -47,11 +48,12 @@ AppSalesMobile
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	explanationsLabel.font = [UIFont systemFontOfSize:12.0];
-	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours.\n\nAll information is presented without any warranties.\n\nThe presented market trend reports should not be considered to be your monthly royalty reports.",nil);
+	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours. All information is presented without any warranties. The presented market trend reports should not be considered to be your monthly royalty reports.",nil);
 	copyrightLabel.font = [UIFont systemFontOfSize:12.0];
 	currencySectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	loginSectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	lastRefreshLabel.font = [UIFont systemFontOfSize:12.0];
+	translationLabel.text = NSLocalizedString(@"Translate foreign reviews",nil);
 	
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
 	if (username) {
@@ -62,6 +64,7 @@ AppSalesMobile
 																 error:&error];
 		if (password) passwordTextField.text = password;
 	}
+	translationSwitch.on = [Review showTranslatedReviews];
 	
 	[self baseCurrencyChanged]; //set proper currency button title
 	[self currencyRatesDidUpdate]; //set proper refresh date in label
@@ -84,6 +87,7 @@ AppSalesMobile
 							  updateExisting:YES
 									   error:&error];
 	}
+	[Review setShowTranslatedReviews:translationSwitch.on];
 }
 
 #pragma mark Text Field Delegate 

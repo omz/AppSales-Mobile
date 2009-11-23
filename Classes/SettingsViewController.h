@@ -37,6 +37,8 @@ AppSalesMobile
 	IBOutlet UILabel *copyrightLabel;
 	IBOutlet UITextField *usernameTextField;
 	IBOutlet UITextField *passwordTextField;
+	IBOutlet UILabel *translationLabel;
+	IBOutlet UISwitch *translationSwitch;
 	IBOutlet UISegmentedControl *currencySelectionControl;
 	IBOutlet UILabel *loginSectionLabel;
 	IBOutlet UILabel *currencySectionLabel;

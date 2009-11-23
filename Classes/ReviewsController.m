@@ -80,18 +80,7 @@
 	if ([[ReportManager sharedManager] isDownloadingReviews])
 		return;
 	
-	UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Download Reviews",nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) destructiveButtonTitle:nil otherButtonTitles:NSLocalizedString(@"Top Countries",nil), NSLocalizedString(@"All Countries",nil), nil] autorelease];
-	[sheet showFromToolbar:self.navigationController.toolbar];
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-	if (buttonIndex == 2)
-		return;
-	if (buttonIndex == 0)
-		[[ReportManager sharedManager] downloadReviewsForTopCountriesOnly:YES];
-	else
-		[[ReportManager sharedManager] downloadReviewsForTopCountriesOnly:NO];
+	[[ReportManager sharedManager] downloadReviews];
 }
 
 #pragma mark Table view methods

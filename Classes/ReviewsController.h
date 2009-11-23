@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface ReviewsController : UITableViewController <UIActionSheetDelegate> {
+@interface ReviewsController : UITableViewController {
 
 	NSArray *sortedApps;
 	UILabel *statusLabel;
