@@ -15,7 +15,7 @@
 
 @property (assign) BOOL markTranslationsWithDetectedOriginalLanguage;
 
+- (NSString*)translateText:(NSString*)sourceText toLanguage:(NSString*)targetLanguage;
 - (NSString*)translateText:(NSString*)sourceText fromLanguage:(NSString*)sourceLanguage toLanguage:(NSString*)targetLanguage;
-- (NSString*)translateCharacters:(NSString*)text;
 
 @end

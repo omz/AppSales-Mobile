@@ -1,11 +1,13 @@
 #import <Foundation/Foundation.h>
 
-#define NUMBER_OF_FETCHING_THREADS 5  // also the max number of concurrent network connections.
+#define NUMBER_OF_FETCHING_THREADS 10  // also the max number of concurrent network connections.
 
 @interface ReviewUpdater : NSObject {
+	@private
 	NSDictionary *appsByID;
+	float percentComplete, progressIncrement; // for presentation
 	
-	id callback; // FIXME.  Ugly hack, used to update the GUI status
+	id callback; // FIXME  Ugly hack, used to update the GUI status
 	
 	// used by worker threads
 	NSCondition *condition;

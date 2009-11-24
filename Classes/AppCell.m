@@ -91,7 +91,11 @@
 	
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
 	int numberOfReviews = [app.reviewsByUser count];
-	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i Reviews (%i new)",nil), numberOfReviews, app.newReviewsCount];
+	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i Reviews",nil), numberOfReviews];
+	if (app.newReviewsCount) {
+		numberOfReviewsDescription = [numberOfReviewsDescription stringByAppendingFormat:
+									  NSLocalizedString(@" (%i new)",nil), app.newReviewsCount];
+	}
 	[numberOfReviewsDescription drawInRect:CGRectMake(50, 25, 140, 15) withFont:[UIFont systemFontOfSize:12.0]];
 }	
 
