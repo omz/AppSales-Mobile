@@ -11,6 +11,30 @@
 #define URL_STRING @"http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&langpair="
 #define TEXT_VAR @"&q="
 
+//
+// see http://stackoverflow.com/questions/705448/iphone-sdk-problem-with-ampersand-in-the-url-string
+//
+NSString* correctlyEncodeStringToURL(NSString *string) {
+	NSMutableString *escaped = [NSMutableString stringWithString: [string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];       
+	[escaped replaceOccurrencesOfString:@"&" withString:@"%26" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"+" withString:@"%2B" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"," withString:@"%2C" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"/" withString:@"%2F" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@":" withString:@"%3A" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@";" withString:@"%3B" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"=" withString:@"%3D" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"?" withString:@"%3F" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"@" withString:@"%40" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@" " withString:@"%20" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"\t" withString:@"%09" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"#" withString:@"%23" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"<" withString:@"%3C" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@">" withString:@"%3E" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"\"" withString:@"%22" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	[escaped replaceOccurrencesOfString:@"\n" withString:@"%0A" options:NSCaseInsensitiveSearch range:NSMakeRange(0, escaped.length)];
+	return escaped;
+}
+
 @implementation LKGoogleTranslator
 
 @synthesize markTranslationsWithDetectedOriginalLanguage;
@@ -25,7 +49,7 @@
 	[urlString appendString: @"%7C"];
 	[urlString appendString: targetLanguage];
 	[urlString appendString: TEXT_VAR];
-	[urlString appendString: [sourceText stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+	[urlString appendString: correctlyEncodeStringToURL(sourceText)];
 	NSURL* url = [NSURL URLWithString: urlString];
 	NSURLRequest* request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:60];
 	NSURLResponse* response = nil; NSError* error = nil;
