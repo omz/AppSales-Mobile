@@ -1,40 +1,7 @@
-#import <zlib.h>
-
 #import "ReviewUpdater.h"
 #import "App.h"
 #import "Review.h"
-
-NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString itself
-	// not a complete list of replacements
-	NSMutableString *temp = [NSMutableString stringWithString:string];
-	[temp replaceOccurrencesOfString:@"&#39;" withString:@"'" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&apos;" withString:@"'" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&#34;" withString:@"\"" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&quot;" withString:@"\"" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&#38;" withString:@"&" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&amp;" withString:@"&" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&#60;" withString:@"<" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&lt;" withString:@"<" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&#62;" withString:@">" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&gt;" withString:@">" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	
-	[temp replaceOccurrencesOfString:@"<br/>" withString:@"\n" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)];
-	[temp replaceOccurrencesOfString:@"&#169;" withString:@"\u00A9" options:NSCaseInsensitiveSearch 
-							   range:NSMakeRange(0, temp.length)]; // copyright
-	return temp;
-}
-
+#import "NSString+UnescapeHtml.h"
 
 @implementation ReviewUpdater
 
@@ -189,8 +156,8 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 				[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];
 				
 				if (reviewUser && reviewTitle && reviewText && reviewStars) {
-					reviewTitle = unescapeHtmlCrap(reviewTitle);
-					reviewText = unescapeHtmlCrap(reviewText);
+					reviewTitle = [reviewTitle removeHtmlEscaping];
+					reviewText = [reviewText removeHtmlEscaping];
 					Review *review = [[Review new] autorelease];
 					review.downloadDate = [NSDate dateWithTimeIntervalSince1970:t - i];
 					review.reviewDate = reviewDate;
