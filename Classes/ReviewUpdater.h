@@ -4,8 +4,9 @@
 
 @interface ReviewUpdater : NSObject {
 	NSDictionary *appsByID;
+	NSUInteger numberOfStores; // for presentation
 	
-	id callback; // FIXME.  Ugly hack, used to update the GUI status
+	id callback; // FIXME  Ugly hack, used to update the GUI status
 	
 	// used by worker threads
 	NSCondition *condition;

@@ -527,7 +527,6 @@
 	[UIApplication sharedApplication].idleTimerDisabled = YES;
 	
 	isDownloadingReviews = YES;
-	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
 	NSMutableDictionary *appIDs = [NSMutableDictionary dictionary];
 	for (NSString *appID in [self.appsByID allKeys]) {

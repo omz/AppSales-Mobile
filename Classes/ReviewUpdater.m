@@ -54,13 +54,19 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 
 - (NSDictionary*) getNextStoreToFetch {
 	NSDictionary *storeInfo;
+	NSString *status = nil;
 	@synchronized (storeInfos) {
 		storeInfo = [storeInfos lastObject];
 		if (storeInfo) {
+			const NSUInteger percentComplete = 100 * (1 - (storeInfos.count / (float)numberOfStores));
+			status = [NSString stringWithFormat:@"%2d complete", percentComplete];
 			[storeInfos removeLastObject];
 		}
 	}
-	return storeInfo; // gcc is retarded and warns if returning inside synchronized block
+	if (status) {
+		[callback performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO]; // FIXME
+	}
+	return storeInfo;
 }
 
 - (void) workerDone {
@@ -101,10 +107,7 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 	
 	while ((storeInfo = [self getNextStoreToFetch]) != nil) {
 		NSAutoreleasePool *innerPool = [NSAutoreleasePool new];
-		NSString *countryName = [storeInfo objectForKey:@"countryName"];
 		NSString *countryCode = [storeInfo objectForKey:@"countryCode"];
-		NSString *status = [NSString stringWithFormat:@"%@", countryName];
-		[callback performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO]; // FIXME
 		
 		for (NSString *appID in [appsByID keyEnumerator]) {
 			//NSLog(@"Downloading reviews for app %@ in %@", [appIDs objectForKey:appID], countryName);
@@ -536,6 +539,8 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 						   @"143462", @"storeFrontID", 
 						   nil]];
 	
+	numberOfStores = storeInfos.count;
+	
 	condition = [[NSCondition alloc] init];
 	numThreadsActive = NUMBER_OF_FETCHING_THREADS;
 	
@@ -543,9 +548,11 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 		[self performSelectorInBackground:@selector(workerThreadFetch) withObject:nil];
 	}
 	
+	NSDate *start = [NSDate date];
 	[condition lock];
 	[condition wait]; // wait for workers to finish
 	[condition unlock];
+	NSLog(@"update took %f sec", -1*[start timeIntervalSinceNow]);
 			
 	[condition release];
 	condition = nil;
