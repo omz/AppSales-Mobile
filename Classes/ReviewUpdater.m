@@ -31,11 +31,12 @@
 }
 
 - (void) incrementStatusPercentage {
-	float percentComplete;
-	@synchronized (storeInfos) {
-		percentComplete = 100 * (1 - (storeInfos.count / (float)numberOfStores));
+	float currentPercentComplete;
+	@synchronized (self) {
+		percentComplete += progressIncrement;
+		currentPercentComplete = percentComplete;
 	}
-	NSString *status = [NSString stringWithFormat:@"%2.0f%% complete", percentComplete];
+	NSString *status = [NSString stringWithFormat:@"%2.0f%% complete", currentPercentComplete];
 	[callback performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO]; // FIXME
 }
 
@@ -72,43 +73,43 @@
 
 - (void) workerThreadFetch { // called by worker threads
 	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];
+	
 	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
+	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
+	NSMutableDictionary *headers = [NSMutableDictionary dictionary];
+	
 	NSDictionary *storeInfo;
 	
 	while ((storeInfo = [self getNextStoreToFetch]) != nil) {
 		NSAutoreleasePool *innerPool = [NSAutoreleasePool new];
-		NSString *countryCode = [storeInfo objectForKey:@"countryCode"];
 		
-		for (NSString *appID in [appsByID keyEnumerator]) {
-			//NSLog(@"Downloading reviews for app %@ in %@", [appIDs objectForKey:appID], countryName);
-			
-			NSDateFormatter *dateFormatter = [storeInfo objectForKey:@"dateFormatter"];
-			if (!dateFormatter) {
-				@synchronized (defaultDateFormatter) {
-					dateFormatter = [[defaultDateFormatter copy] autorelease]; // date formatters are not thread safe
-				}
-				if ([countryCode isEqual:@"it"]) {
-					NSLocale *currentLocale = [[[NSLocale alloc] initWithLocaleIdentifier:countryCode] autorelease];
-					[dateFormatter setLocale:currentLocale];
-				}
-				else {
-					[dateFormatter setLocale:defaultLocale];
-				}
+		NSString *countryCode = [storeInfo objectForKey:@"countryCode"];
+		NSDateFormatter *dateFormatter = [storeInfo objectForKey:@"dateFormatter"];
+		if (!dateFormatter) {
+			@synchronized (defaultDateFormatter) {
+				dateFormatter = [[defaultDateFormatter copy] autorelease]; // date formatters are not thread safe
 			}
-			
-			NSString *storeFrontID = [storeInfo objectForKey:@"storeFrontID"];
-			NSString *storeFront = [NSString stringWithFormat:@"%@-1", storeFrontID];
+			if ([countryCode isEqual:@"it"]) {
+				NSLocale *currentLocale = [[[NSLocale alloc] initWithLocaleIdentifier:countryCode] autorelease];
+				[dateFormatter setLocale:currentLocale];
+			} else {
+				[dateFormatter setLocale:defaultLocale];
+			}
+		}
+		
+		NSString *storeFrontID = [storeInfo objectForKey:@"storeFrontID"];
+		NSString *storeFront = [storeFrontID stringByAppendingFormat:@"-1"];
+		[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
+		[headers setObject:storeFront forKey:@"X-Apple-Store-Front"];
+		[request setAllHTTPHeaderFields:headers];
+				
+		for (NSString *appID in [appsByID keyEnumerator]) {
 			NSString *reviewsURLString = [NSString stringWithFormat:@"http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=4&type=Purple+Software", appID];
-			NSURL *reviewsURL = [NSURL URLWithString:reviewsURLString];
-			NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:reviewsURL];
-			NSMutableDictionary *headers = [NSMutableDictionary dictionary];
-			[headers setObject:storeFront forKey:@"X-Apple-Store-Front"];
-			[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
-			[request setAllHTTPHeaderFields:headers];
+			[request setURL:[NSURL URLWithString:reviewsURLString]];
 			
 			NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
 			NSString *xml = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-			
+						
 			NSScanner *scanner = [NSScanner scannerWithString:xml];
 			int i = 0;
 			do {
@@ -156,15 +157,13 @@
 				[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];
 				
 				if (reviewUser && reviewTitle && reviewText && reviewStars) {
-					reviewTitle = [reviewTitle removeHtmlEscaping];
-					reviewText = [reviewText removeHtmlEscaping];
 					Review *review = [[Review new] autorelease];
 					review.downloadDate = [NSDate dateWithTimeIntervalSince1970:t - i];
 					review.reviewDate = reviewDate;
-					review.user = reviewUser;
+					review.user = [reviewUser removeHtmlEscaping];
 					review.stars = [reviewStars intValue];
-					review.title = reviewTitle;
-					review.text = reviewText;
+					review.title = [reviewTitle removeHtmlEscaping];
+					review.text = [reviewText removeHtmlEscaping];
 					review.version = reviewVersion;
 					review.countryCode = countryCode;
 					[self addOrUpdatedReviewIfNeeded:review appID:appID];
@@ -467,12 +466,6 @@
 						   @"143455", @"storeFrontID", 
 						   nil]];
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"United States", @"countryName", 
-						   @"us", @"countryCode",
-						   @"143441", @"storeFrontID",
-						   usDateFormatter, @"dateFormatter",
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 						   @"Germany", @"countryName", 
 						   @"de", @"countryCode",
 						   @"143443", @"storeFrontID",
@@ -509,17 +502,23 @@
 						   @"jp", @"countryCode",
 						   @"143462", @"storeFrontID", 
 						   nil]];
+	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+						   @"United States", @"countryName", 
+						   @"us", @"countryCode",
+						   @"143441", @"storeFrontID",
+						   usDateFormatter, @"dateFormatter",
+						   nil]];
 	
-	numberOfStores = storeInfos.count;
+	progressIncrement = 100.0f / storeInfos.count;
 	
 	condition = [[NSCondition alloc] init];
 	numThreadsActive = NUMBER_OF_FETCHING_THREADS;
 	
+	NSDate *start = [NSDate date];
 	for (int i=0; i < NUMBER_OF_FETCHING_THREADS; i++) {
 		[self performSelectorInBackground:@selector(workerThreadFetch) withObject:nil];
 	}
 	
-	NSDate *start = [NSDate date];
 	[condition lock];
 	[condition wait]; // wait for workers to finish
 	[condition unlock];

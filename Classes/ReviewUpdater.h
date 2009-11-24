@@ -3,8 +3,9 @@
 #define NUMBER_OF_FETCHING_THREADS 10  // also the max number of concurrent network connections.
 
 @interface ReviewUpdater : NSObject {
+	@private
 	NSDictionary *appsByID;
-	NSUInteger numberOfStores; // for presentation
+	float percentComplete, progressIncrement; // for presentation
 	
 	id callback; // FIXME  Ugly hack, used to update the GUI status
 	

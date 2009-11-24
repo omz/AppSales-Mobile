@@ -523,17 +523,11 @@
 {
 	if (isDownloadingReviews)
 		return;
-	
-	[UIApplication sharedApplication].idleTimerDisabled = YES;
-	
+
 	isDownloadingReviews = YES;
+	[UIApplication sharedApplication].idleTimerDisabled = YES;	
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
-	NSMutableDictionary *appIDs = [NSMutableDictionary dictionary];
-	for (NSString *appID in [self.appsByID allKeys]) {
-		App *a = [appsByID objectForKey:appID];
-		[appIDs setObject:a.appName forKey:appID];
-	}
 	[self performSelectorInBackground:@selector(fetchReviewsWithInfo) withObject:nil];
 }
 
@@ -558,16 +552,16 @@
 	[updater updateReviews]; // blocking call
 	//NSLog(@"%@", reviews);
 
-	[self performSelectorOnMainThread:@selector(finishDownloadingReviews) withObject:nil waitUntilDone:YES];
+	[self performSelectorOnMainThread:@selector(finishDownloadingReviews) withObject:nil waitUntilDone:NO];
 	[pool release];
 }
 
 - (void)finishDownloadingReviews
 {
-	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	isDownloadingReviews = NO;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedReviewsNotification object:self];
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	[self updateReviewDownloadProgress:@""];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedReviewsNotification object:self];
 }
 
 @end

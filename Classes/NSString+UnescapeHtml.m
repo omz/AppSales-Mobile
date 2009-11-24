@@ -53,6 +53,12 @@
 										 range:NSMakeRange(0, translatedText.length)];
 	[translatedText replaceOccurrencesOfString:@"&gt;" withString:@">" options:NSCaseInsensitiveSearch 
 										 range:NSMakeRange(0, translatedText.length)];
+	
+	// not an actual escaped character, but shows up enough that we'll deal with it here
+	[translatedText replaceOccurrencesOfString:@"<br/>" withString:@"\n" options:NSCaseInsensitiveSearch 
+										 range:NSMakeRange(0, translatedText.length)];
+	[translatedText replaceOccurrencesOfString:@"<br />" withString:@"\n" options:NSCaseInsensitiveSearch 
+										 range:NSMakeRange(0, translatedText.length)];
 	return translatedText;
 }
 
