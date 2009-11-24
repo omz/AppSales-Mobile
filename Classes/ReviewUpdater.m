@@ -54,19 +54,22 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 
 - (NSDictionary*) getNextStoreToFetch {
 	NSDictionary *storeInfo;
-	NSString *status = nil;
 	@synchronized (storeInfos) {
 		storeInfo = [storeInfos lastObject];
 		if (storeInfo) {
-			const NSUInteger percentComplete = 100 * (1 - (storeInfos.count / (float)numberOfStores));
-			status = [NSString stringWithFormat:@"%2d complete", percentComplete];
 			[storeInfos removeLastObject];
 		}
 	}
-	if (status) {
-		[callback performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO]; // FIXME
-	}
 	return storeInfo;
+}
+
+- (void) incrementStatusPercentage {
+	float percentComplete;
+	@synchronized (storeInfos) {
+		percentComplete = 100 * (1 - (storeInfos.count / (float)numberOfStores));
+	}
+	NSString *status = [NSString stringWithFormat:@"%2.0f%% complete", percentComplete];
+	[callback performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO]; // FIXME
 }
 
 - (void) workerDone {
@@ -203,6 +206,7 @@ NSString* unescapeHtmlCrap(NSString *string) { // could be a method on NSString 
 				i++;
 			} while (![scanner isAtEnd]);
 		}
+		[self incrementStatusPercentage];
 		[innerPool release];
 	}
 	
