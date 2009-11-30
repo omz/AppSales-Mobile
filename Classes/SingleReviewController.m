@@ -8,6 +8,7 @@
 
 #import "SingleReviewController.h"
 #import "Review.h"
+#import "NSString+UnescapeHtml.h"
 
 @implementation SingleReviewController
 
@@ -26,7 +27,7 @@
 	NSString *templatePath = [[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"];
 	NSString *template = [[[NSString alloc] initWithContentsOfFile:templatePath usedEncoding:NULL error:NULL] autorelease];
 	
-	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.presentedTitle];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:[review.presentedTitle encodeIntoBasicHtml]];
 	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
@@ -35,9 +36,9 @@
 	for (int i=0; i<review.stars; i++) {
 		[starsString appendString:@"✭"];
 	}
-	NSString *variousInfo = [NSString stringWithFormat:@"%@<br/>(%@) – %@ – %@", starsString, review.version, review.user, dateString];
+	NSString *variousInfo = [NSString stringWithFormat:@"%@<br/>(%@) – %@ – %@", starsString, review.version, [review.user encodeIntoBasicHtml], dateString];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[DATE]]]" withString:variousInfo];
-	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.presentedText];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:[review.presentedText encodeIntoBasicHtml]];
 	
 	[self.webView loadHTMLString:template baseURL:nil];
 }

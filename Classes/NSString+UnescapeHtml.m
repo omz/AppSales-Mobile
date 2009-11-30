@@ -62,5 +62,22 @@
 	return translatedText;
 }
 
+- (NSString*) encodeIntoBasicHtml {
+	NSMutableString *encoded = [NSMutableString stringWithString:self];
+	[encoded replaceOccurrencesOfString:@"&" withString:@"&amp;" options:NSCaseInsensitiveSearch
+								  range:NSMakeRange(0, encoded.length)]; // must be first
+	[encoded replaceOccurrencesOfString:@"'" withString:@"&apos;" options:NSCaseInsensitiveSearch
+								  range:NSMakeRange(0, encoded.length)];
+	[encoded replaceOccurrencesOfString:@"\"" withString:@"&quot;" options:NSCaseInsensitiveSearch
+								  range:NSMakeRange(0, encoded.length)];
+	[encoded replaceOccurrencesOfString:@"<" withString:@"&lt;" options:NSCaseInsensitiveSearch 
+								  range:NSMakeRange(0, encoded.length)];
+	[encoded replaceOccurrencesOfString:@">" withString:@"&gt;" options:NSCaseInsensitiveSearch
+								  range:NSMakeRange(0, encoded.length)];
+	[encoded replaceOccurrencesOfString:@"\n" withString:@"<br/>" options:NSCaseInsensitiveSearch
+								  range:NSMakeRange(0, encoded.length)]; // must be last
+	return encoded;
+}
+
 
 @end
