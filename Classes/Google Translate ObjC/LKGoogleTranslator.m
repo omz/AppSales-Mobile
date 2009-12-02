@@ -9,7 +9,7 @@
 #import "JSON.h"
 #import "NSString+UnescapeHtml.h"
 
-#define MAX_INPUT_TEXT_LENGTH 2200 // size after url encoding, and arbitrarily set by Google 
+#define MAX_INPUT_TEXT_LENGTH 2000 // size after url encoding, and arbitrarily set by Google 
 #define URL_STRING @"http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&langpair="
 #define TEXT_VAR @"&q="
 
