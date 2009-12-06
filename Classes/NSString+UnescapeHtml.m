@@ -74,6 +74,8 @@
 								  range:NSMakeRange(0, encoded.length)];
 	[encoded replaceOccurrencesOfString:@">" withString:@"&gt;" options:NSCaseInsensitiveSearch
 								  range:NSMakeRange(0, encoded.length)];
+	[encoded replaceOccurrencesOfString:@"  " withString:@" &nbsp;" options:NSCaseInsensitiveSearch
+								  range:NSMakeRange(0, encoded.length)];
 	[encoded replaceOccurrencesOfString:@"\n" withString:@"<br/>" options:NSCaseInsensitiveSearch
 								  range:NSMakeRange(0, encoded.length)]; // must be last
 	return encoded;

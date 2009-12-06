@@ -2,6 +2,7 @@
 #import "App.h"
 #import "Review.h"
 #import "NSString+UnescapeHtml.h"
+#import "ReportManager.h" 
 
 @implementation ReviewUpdater
 
@@ -49,6 +50,11 @@
 	[condition unlock];	
 }
 
+- (void) notifyOfNewReviews {
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedReviewsNotification 
+														object:[ReportManager sharedManager]];
+}
+
 - (void) addOrUpdatedReviewIfNeeded:(Review*)review appID:(NSString*)appID {
 	App *app = [appsByID objectForKey:appID];
 	NSAssert(app, nil);
@@ -69,6 +75,7 @@
 		[existingReviews setObject:review forKey:review.user];
 		app.newReviewsCount += 1;
 	}
+	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:YES];
 }
 
 - (void) workerThreadFetch { // called by worker threads
@@ -102,6 +109,7 @@
 		[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
 		[headers setObject:storeFront forKey:@"X-Apple-Store-Front"];
 		[request setAllHTTPHeaderFields:headers];
+		[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
 				
 		for (NSString *appID in [appsByID keyEnumerator]) {
 			NSString *reviewsURLString = [NSString stringWithFormat:@"http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=4&type=Purple+Software", appID];

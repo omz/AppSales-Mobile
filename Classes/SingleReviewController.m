@@ -18,8 +18,9 @@
 {
 	self.view = [[[UIWebView alloc] initWithFrame:CGRectMake(0,0,320,480)] autorelease];
 	self.webView = (UIWebView *)self.view;
-	self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+	self.webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	self.webView.scalesPageToFit = NO;
+	self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 }
 
 - (void)viewWillAppear:(BOOL)animated
