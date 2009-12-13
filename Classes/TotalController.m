@@ -40,7 +40,10 @@
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-
+	if (sortedWeeks.count == 0) {
+		NSLog(@"no weekly data found"); // if user views totals during first report download
+		return;
+	}
 	Day *latestWeek = [sortedWeeks objectAtIndex:0];
 
 	Day *total = nil;
