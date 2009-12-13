@@ -290,9 +290,8 @@
 		cell.accessoryView = self.weeklyTrendView;
 	}
 	else if ((row == 2) && (section == 0)) {
-		// cell.imageView.image = [UIImage imageNamed:@"Weekly.png"];
+		cell.imageView.image = [UIImage imageNamed:@"Cash.png"];
 		cell.textLabel.text = NSLocalizedString(@"Total",nil);
-		// cell.accessoryView = self.weeklyTrendView;
 	}
 	else if ((row == 3) && (section == 0)) {
 		cell.imageView.image = [UIImage imageNamed:@"Statistics.png"];

@@ -301,6 +301,7 @@
 		7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */; };
 		7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */; };
 		B9A29C0A10B69B99003D90B5 /* TotalController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9A29C0910B69B99003D90B5 /* TotalController.m */; };
+		FA57125010D5910000D44E63 /* Cash.png in Resources */ = {isa = PBXBuildFile; fileRef = FA57124F10D5910000D44E63 /* Cash.png */; };
 		FA7E7F4110B765BE00D046E0 /* LKGoogleTranslator.m in Sources */ = {isa = PBXBuildFile; fileRef = FA7E7F3A10B765BE00D046E0 /* LKGoogleTranslator.m */; };
 		FA7E7F4210B765BE00D046E0 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FA7E7F3C10B765BE00D046E0 /* NSObject+SBJSON.m */; };
 		FA7E7F4310B765BE00D046E0 /* NSString+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FA7E7F3E10B765BE00D046E0 /* NSString+SBJSON.m */; };
@@ -652,6 +653,7 @@
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9A29C0810B69B99003D90B5 /* TotalController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TotalController.h; sourceTree = "<group>"; };
 		B9A29C0910B69B99003D90B5 /* TotalController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TotalController.m; sourceTree = "<group>"; };
+		FA57124F10D5910000D44E63 /* Cash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Cash.png; sourceTree = "<group>"; };
 		FA7E7F3710B765BE00D046E0 /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON.h; path = "Classes/Google Translate ObjC/JSON.h"; sourceTree = "<group>"; };
 		FA7E7F3810B765BE00D046E0 /* LKConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LKConstants.h; path = "Classes/Google Translate ObjC/LKConstants.h"; sourceTree = "<group>"; };
 		FA7E7F3910B765BE00D046E0 /* LKGoogleTranslator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LKGoogleTranslator.h; path = "Classes/Google Translate ObjC/LKGoogleTranslator.h"; sourceTree = "<group>"; };
@@ -791,6 +793,7 @@
 				7FEA5AA8105B61CD000A12E6 /* 5stars.png */,
 				7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */,
 				7F4C217610230EF200F17F7D /* About.png */,
+				FA57124F10D5910000D44E63 /* Cash.png */,
 				7F4C217710230EF200F17F7D /* Daily.png */,
 				7F4C217810230EF200F17F7D /* DateButtonHighlight.png */,
 				7F4C217910230EF200F17F7D /* DateButtonNormal.png */,
@@ -1517,6 +1520,7 @@
 				7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */,
 				7F47897810661CBD002415A2 /* Entitlements.plist in Resources */,
 				3AD3315810B76D9F00A2670E /* Prefetched in Resources */,
+				FA57125010D5910000D44E63 /* Cash.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1624,6 +1628,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1631,8 +1636,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = "APPSALES_DEBUG=1";
+				GCC_WARN_UNDECLARED_SELECTOR = NO;
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = AppSalesMobile;
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 			};
 			name = Debug;
@@ -1641,11 +1648,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = AppSalesMobile;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 			};
 			name = Release;
 		};
@@ -1669,12 +1680,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = AppSalesMobile;
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 			};
 			name = Distribution;
