@@ -13,7 +13,7 @@
 #import "AppIconManager.h"
 #import "AppCell.h"
 #import "ReviewsListController.h"
-#import "ReviewUpdater.h"
+#import "ReviewManager.h"
 
 @implementation ReviewsController
 
@@ -24,22 +24,22 @@
 	if (self = [super initWithStyle:style]) {
 		[self reload];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReviewUpdaterDownloadedReviewsNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) name:ReviewUpdaterUpdatedReviewDownloadProgressNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReviewManagerDownloadedReviewsNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) name:ReviewManagerUpdatedReviewDownloadProgressNotification object:nil];
 	}
     return self;
 }
 
 - (void)reload
 {
-	self.sortedApps = [[ReviewUpdater sharedManager] appNamesSorted];
+	self.sortedApps = [[ReviewManager sharedManager] appNamesSorted];
 	[self.tableView reloadData];
 }
 
 - (void)updateStatus
 {
-	if ([[ReviewUpdater sharedManager] isDownloadingReviews]) {
-		statusLabel.text = [[ReviewUpdater sharedManager] reviewDownloadStatus];
+	if ([[ReviewManager sharedManager] isDownloadingReviews]) {
+		statusLabel.text = [[ReviewManager sharedManager] reviewDownloadStatus];
 		[activityIndicator startAnimating];
 	}
 	else {
@@ -77,10 +77,10 @@
 
 - (void)downloadReviews
 {
-	if ([[ReviewUpdater sharedManager] isDownloadingReviews])
+	if ([[ReviewManager sharedManager] isDownloadingReviews])
 		return;
 	
-	[[ReviewUpdater sharedManager] downloadReviews];
+	[[ReviewManager sharedManager] downloadReviews];
 }
 
 #pragma mark Table view methods

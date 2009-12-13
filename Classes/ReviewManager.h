@@ -2,12 +2,12 @@
 
 #define NUMBER_OF_FETCHING_THREADS 10  // also the max number of concurrent network connections.
 
-#define ReviewUpdaterDownloadedReviewsNotification					@"ReviewUpdaterDownloadedReviewsNotification"
-#define ReviewUpdaterUpdatedReviewDownloadProgressNotification		@"ReviewUpdaterUpdatedReviewDownloadProgressNotification"
+#define ReviewManagerDownloadedReviewsNotification					@"ReviewManagerDownloadedReviewsNotification"
+#define ReviewManagerUpdatedReviewDownloadProgressNotification		@"ReviewManagerUpdatedReviewDownloadProgressNotification"
 
 @class App;
 
-@interface ReviewUpdater : NSObject {
+@interface ReviewManager : NSObject {
 	@private
 	NSMutableDictionary *appsByID;
 	float percentComplete, progressIncrement; // for presentation
@@ -22,7 +22,7 @@
 	NSDateFormatter *defaultDateFormatter;
 }
 
-+ (ReviewUpdater*) sharedManager;
++ (ReviewManager*) sharedManager;
 
 @property (retain) NSString *reviewDownloadStatus;
 @property (readonly) NSUInteger numberOfApps;

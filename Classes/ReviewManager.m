@@ -1,4 +1,4 @@
-#import "ReviewUpdater.h"
+#import "ReviewManager.h"
 #import "App.h"
 #import "Review.h"
 #import "NSString+UnescapeHtml.h"
@@ -6,14 +6,14 @@
 
 #define REVIEW_SAVED_FILE_NAME @"ReviewApps.rev"
 
-@implementation ReviewUpdater
+@implementation ReviewManager
 
 @synthesize reviewDownloadStatus;
 
-+ (ReviewUpdater*) sharedManager {
-	static ReviewUpdater *sharedManager = nil;
++ (ReviewManager*) sharedManager {
+	static ReviewManager *sharedManager = nil;
 	if (sharedManager == nil) {
-		sharedManager = [ReviewUpdater new];
+		sharedManager = [ReviewManager new];
 	}
 	return sharedManager;
 }
@@ -68,7 +68,7 @@
 }
 
 - (void) notifyOfNewReviews {
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewUpdaterDownloadedReviewsNotification 
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification 
 														object:[ReportManager sharedManager]];
 }
 
@@ -588,7 +588,7 @@
 - (void) updateReviewDownloadProgress:(NSString *)status {
 	NSAssert([NSThread isMainThread], nil);
 	self.reviewDownloadStatus = status;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewUpdaterUpdatedReviewDownloadProgressNotification object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerUpdatedReviewDownloadProgressNotification object:self];
 }
 
 - (void) finishDownloadingReviews {
@@ -596,7 +596,7 @@
 	isDownloadingReviews = NO;
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	[self updateReviewDownloadProgress:@""];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewUpdaterDownloadedReviewsNotification object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
 
 - (void) saveData {

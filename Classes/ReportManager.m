@@ -17,7 +17,7 @@
 #import "App.h"
 #import "Review.h"
 #import "ASIFormDataRequest.h"
-#import "ReviewUpdater.h"
+#import "ReviewManager.h"
 
 #error BACKUP_HOSTNAME -- Set macro appropriate for your setup 
 #define BACKUP_HOSTNAME \
@@ -457,7 +457,7 @@
 	[days addEntriesFromDictionary:newDays];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
 	
-	ReviewUpdater *reviewManager = [ReviewUpdater sharedManager];
+	ReviewManager *reviewManager = [ReviewManager sharedManager];
 	for (Day *d in [newDays allValues]) {
 		for (Country *c in [d.countries allValues]) {
 			for (Entry *e in c.entries) {
