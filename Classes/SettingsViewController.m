@@ -32,6 +32,7 @@ AppSalesMobile
 #import "CurrencyManager.h"
 #import "CurrencySelectionDialog.h"
 #import "SFHFKeychainUtils.h"
+#import "ReportManager.h"
 #import "Review.h"
 
 @implementation SettingsViewController
@@ -47,7 +48,7 @@ AppSalesMobile
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	explanationsLabel.font = [UIFont systemFontOfSize:12.0];
-	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours.\n\nAll information is presented without any warranties.\n\nThe presented market trend reports should not be considered to be your monthly royalty reports.",nil);
+	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours. All information is presented without any warranties. The presented market trend reports should not be considered to be your monthly royalty reports.",nil);
 	copyrightLabel.font = [UIFont systemFontOfSize:12.0];
 	currencySectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	loginSectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
@@ -129,6 +130,12 @@ AppSalesMobile
 - (IBAction)refreshExchangeRates:(id)sender
 {
 	[[CurrencyManager sharedManager] forceRefresh];
+}
+
+- (IBAction)uploadBackups:(id)sender
+{
+	backupButton.hidden = YES;
+	[[ReportManager sharedManager] backupData];
 }
 
 @end

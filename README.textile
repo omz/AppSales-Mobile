@@ -15,9 +15,11 @@ Because there is no real API to access iTunes Connect trend reports, AppSales Mo
 You can follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
 If you like, check out my commercial iPhone apps at "omz-software.com":http://omz-software.com
 
-h2. Modded version by Edward Patel.
+h2. Modified version by Edward Patel
 
 * Changed version -> 1.1
-* Added compile time versioning which givs a bundle version like 1.1.yymmddhhmmss
+* Added compile time versioning which gives a bundle version like 1.1.yymmddhhmmss
 * Added backup of reportfiles to computer. Compiling will give an error at a line where a http access is hardcoded. We are developers so I think most should be able to figure it out.
 * Added a php script to receive and store reportfiles on the computer. Please read in upload_appsales.php for more information.
+* Merged ktakayama Totals additions
+* Merged jonkean translation additions 

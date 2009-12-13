@@ -43,10 +43,12 @@ AppSalesMobile
 	IBOutlet UILabel *loginSectionLabel;
 	IBOutlet UILabel *currencySectionLabel;
 	IBOutlet UILabel *lastRefreshLabel;
+	IBOutlet UISegmentedControl *backupButton;
 }
 
 - (IBAction)refreshExchangeRates:(id)sender;
 - (IBAction)changeCurrency:(id)sender;
+- (IBAction)uploadBackups:(id)sender;
 - (void)currencyRatesDidUpdate;
 - (void)currencyRatesFailedToUpdate;
 - (void)baseCurrencyChanged;

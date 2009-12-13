@@ -39,6 +39,7 @@
 #import "SettingsViewController.h"
 #import "DaysController.h"
 #import "WeeksController.h"
+#import "TotalController.h"
 #import "HelpBrowser.h"
 #import "SFHFKeychainUtils.h"
 #import "StatisticsViewController.h"
@@ -47,7 +48,7 @@
 
 @implementation RootViewController
 
-@synthesize activityIndicator, statusLabel, daysController, weeksController, settingsController, statisticsController, reviewsController;
+@synthesize activityIndicator, statusLabel, daysController, weeksController, totalController, settingsController, statisticsController, reviewsController;
 @synthesize dailyTrendView, weeklyTrendView;
 
 - (void)loadView
@@ -129,14 +130,28 @@
 		}
 	}
 	
-	int maxUnitSales = 0;
 	NSMutableArray *unitSales = [NSMutableArray array];
+	
+	int maxUnitSales = 0;
 	for (Day *d in [sortedDays reverseObjectEnumerator]) {
-		int units = [d totalUnits];
-		if (units > maxUnitSales)
-			maxUnitSales = units;
-		[unitSales addObject:[NSNumber numberWithInt:units]];
+		float revenue = [d totalRevenueInBaseCurrency];
+		if (revenue > maxUnitSales)
+			maxUnitSales = (int)revenue;
+		[unitSales addObject:[NSNumber numberWithFloat:revenue]];
 	}
+	
+	//Use number of sales if no revenue was made (e.g. for free apps):
+	if (maxUnitSales == 0) {
+		[unitSales removeAllObjects];
+		maxUnitSales = 0;
+		for (Day *d in [sortedDays reverseObjectEnumerator]) {
+			int units = [d totalUnits];
+			if (units > maxUnitSales)
+				maxUnitSales = units;
+			[unitSales addObject:[NSNumber numberWithInt:units]];
+		}
+	}
+	
 	[[UIColor grayColor] set];
 	float maxY = 27.0;
 	float minY = 3.0;
@@ -248,7 +263,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
 	if (section == 0)
-		return 3; //daily + weekly + graphs
+		return 4; //daily + weekly + total + graphs
 	else
 		return 1; //reviews / settings
 }
@@ -275,6 +290,11 @@
 		cell.accessoryView = self.weeklyTrendView;
 	}
 	else if ((row == 2) && (section == 0)) {
+		// cell.imageView.image = [UIImage imageNamed:@"Weekly.png"];
+		cell.textLabel.text = NSLocalizedString(@"Total",nil);
+		// cell.accessoryView = self.weeklyTrendView;
+	}
+	else if ((row == 3) && (section == 0)) {
 		cell.imageView.image = [UIImage imageNamed:@"Statistics.png"];
 		cell.textLabel.text = NSLocalizedString(@"Graphs",nil);
 	}
@@ -308,6 +328,13 @@
 		[self.navigationController pushViewController:weeksController animated:YES];
 	}
 	else if ((row == 2) && (section == 0)) {
+		if (!self.totalController) {
+			self.totalController = [[[TotalController alloc] init] autorelease];
+			totalController.hidesBottomBarWhenPushed = YES;		
+		}
+		[self.navigationController pushViewController:totalController animated:YES];
+	}
+	else if ((row == 3) && (section == 0)) {
 		if (!self.statisticsController) {
 			self.statisticsController = [[StatisticsViewController new] autorelease];
 			statisticsController.hidesBottomBarWhenPushed = YES;

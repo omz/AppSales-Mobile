@@ -16,12 +16,16 @@
 #import "SFHFKeychainUtils.h"
 #import "App.h"
 #import "Review.h"
+#import "ASIFormDataRequest.h"
 #import "ReviewUpdater.h"
 
+#error BACKUP_HOSTNAME -- Set macro appropriate for your setup 
+#define BACKUP_HOSTNAME \
+	@"http://<computer-name>.local/~<username>/upload_appsales.php"
 
 @implementation ReportManager
 
-@synthesize days, weeks, appsByID, reviewDownloadStatus, reportDownloadStatus;
+@synthesize days, weeks, backupList, appsByID, reviewDownloadStatus, reportDownloadStatus;
 
 - (id)init
 {
@@ -29,9 +33,11 @@
 	
 	self.days = [NSMutableDictionary dictionary];
 	self.weeks = [NSMutableDictionary dictionary];
+	self.backupList = [NSMutableArray array];
 
 	NSString *docPath = [self docPath];
-	
+	NSString *prefetchedPath = [self prefetchedPath];
+
 	NSString *reviewsFile = [docPath stringByAppendingPathComponent:@"ReviewApps.rev"];
 	if ([[NSFileManager defaultManager] fileExistsAtPath:reviewsFile]) {
 		self.appsByID = [NSKeyedUnarchiver unarchiveObjectWithFile:reviewsFile];
@@ -47,6 +53,32 @@
 			continue;
 		
 		Day *loadedDay = [Day dayFromFile:filename atPath:docPath];
+		
+		if (loadedDay != nil) {
+			if (loadedDay.isWeek)
+				[self.weeks setObject:loadedDay forKey:[loadedDay name]];
+			else
+			{
+				if (loadedDay.date)
+				{
+					NSDateFormatter * lFormat = [NSDateFormatter new];
+					[lFormat setDateFormat:@"MM/dd/yyyy"];
+					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
+					[lFormat release];
+					if ([lDate isEqual:loadedDay.date])
+						[self.days setObject:loadedDay forKey:[loadedDay name]];
+				}
+			}
+		}
+	}
+
+	filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:prefetchedPath error:NULL];
+
+	for (NSString *filename in filenames) {
+		if (![[filename pathExtension] isEqual:@"dat"])
+			continue;
+		
+		Day *loadedDay = [Day dayFromFile:filename atPath:prefetchedPath];
 		
 		if (loadedDay != nil) {
 			if (loadedDay.isWeek)
@@ -282,6 +314,7 @@
 		[scanner scanUpToString:@"</font>" intoString:&errorMessageString];
 	}
 	
+	int numberOfNewReports = 0;
 	for (int i=0; i<=1; i++) {
 		NSString *downloadType;
 		NSString *downloadActionName;
@@ -391,6 +424,7 @@
 			[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:YES];
 			dayNumber++;
 		}
+		numberOfNewReports += [downloadedDays count];
 		if (i == 0) {
 			[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays waitUntilDone:YES];
 			[downloadedDays removeAllObjects];
@@ -398,7 +432,10 @@
 		else
 			[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays waitUntilDone:YES];
 	}
-	[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
+	if (numberOfNewReports == 0)
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:YES];
+	else
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
 	
 	if (errorMessageString) {
 		[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:YES];
@@ -497,6 +534,13 @@
 	return documentsDirectory;
 }
 
+- (NSString *)prefetchedPath
+{
+	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
+	NSString *prefetchedPath = [NSString stringWithFormat:@"%@/Prefetched/", bundlePath];
+	return prefetchedPath;
+}
+
 - (void)saveData
 {
 	//save all days/weeks in separate files:
@@ -518,6 +562,76 @@
 	NSString *reviewsFile = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
 }
+
+#pragma mark Backup Reports methods
+
+- (void)startUpload
+{
+	if ([backupList count] > 0) {
+		Day *d = [backupList objectAtIndex:0];
+		NSURL *url = [NSURL URLWithString:BACKUP_HOSTNAME];
+		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[d proposedFilename]];
+		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
+		[request setPostValue:[d proposedFilename] forKey:@"filename"];
+		if ([[NSFileManager defaultManager] fileExistsAtPath:fullPath])
+			[request setFile:fullPath forKey:@"report"];
+		[request setDelegate:self];
+		[request startAsynchronous];
+	} else if (backupReviewsFile) {
+		backupReviewsFile = NO;
+		NSURL *url = [NSURL URLWithString:BACKUP_HOSTNAME];
+		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
+		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
+		[request setPostValue:@"ReviewApps.rev" forKey:@"filename"];
+		if ([[NSFileManager defaultManager] fileExistsAtPath:fullPath])
+			[request setFile:fullPath forKey:@"report"];
+		[request setDelegate:self];
+		[request startAsynchronous];
+	}
+}
+
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
+	if ([backupList count] > 0)
+		[backupList removeObjectAtIndex:0];
+	if ([backupList count] > 0 || backupReviewsFile) {
+		[self setProgress:[NSString stringWithFormat:@"Left to upload: %d", [backupList count]+1]];
+		retryIfBackupFailure = 5;
+		[self startUpload];
+	} else {
+		[self setProgress:[NSString stringWithFormat:@"Done backup"]];
+	}
+}
+
+- (void)requestFailed:(ASIHTTPRequest *)request
+{
+	//NSError *error = [request error];
+	if (retryIfBackupFailure) {
+		[self setProgress:[NSString stringWithFormat:@"Failed, retries"]];
+		retryIfBackupFailure--;
+		backupReviewsFile = YES;
+		[self startUpload];
+	} else {
+		[backupList removeAllObjects];
+		backupReviewsFile = NO;
+		[self setProgress:[NSString stringWithFormat:@"Failed, gave up"]];
+	}
+}
+
+- (void)backupData
+{
+	[backupList removeAllObjects];
+	[backupList addObjectsFromArray:[self.days allValues]];
+	[backupList addObjectsFromArray:[self.weeks allValues]];
+	retryIfBackupFailure = 5;
+	backupReviewsFile = YES;
+	if ([backupList count] > 0) {
+		[self setProgress:[NSString stringWithFormat:@"Left to upload: %d", [backupList count]+1]];
+		[self startUpload];	
+	}	
+}
+
+#pragma mark -------------------------
 
 - (void)downloadReviews
 {

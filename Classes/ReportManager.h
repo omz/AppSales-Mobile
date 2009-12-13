@@ -20,9 +20,13 @@
 
 	NSMutableDictionary *days;
 	NSMutableDictionary *weeks;
+	NSMutableArray      *backupList;
+	
 	BOOL isRefreshing;
 	NSString *reportDownloadStatus;
 	
+	int retryIfBackupFailure;
+	BOOL backupReviewsFile;
 	
 	NSMutableDictionary *appsByID;
 	BOOL isDownloadingReviews;
@@ -31,6 +35,7 @@
 
 @property (retain) NSMutableDictionary *days;
 @property (retain) NSMutableDictionary *weeks;
+@property (retain) NSMutableArray      *backupList;
 @property (retain) NSMutableDictionary *appsByID;
 @property (retain) NSString *reviewDownloadStatus;
 @property (retain) NSString *reportDownloadStatus;
@@ -43,7 +48,9 @@
 
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 - (void)saveData;
+- (void)backupData;
 - (NSString *)docPath;
+- (NSString *)prefetchedPath;
 
 - (void)deleteDay:(Day *)dayToDelete;
 
