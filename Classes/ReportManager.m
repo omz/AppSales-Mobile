@@ -23,9 +23,10 @@
 #define BACKUP_HOSTNAME \
 	@"http://<computer-name>.local/~<username>/upload_appsales.php"
 
+
 @implementation ReportManager
 
-@synthesize days, weeks, backupList, appsByID, reviewDownloadStatus, reportDownloadStatus;
+@synthesize days, weeks, backupList, reportDownloadStatus;
 
 - (id)init
 {
@@ -35,16 +36,8 @@
 	self.weeks = [NSMutableDictionary dictionary];
 	self.backupList = [NSMutableArray array];
 
-	NSString *docPath = [self docPath];
-	NSString *prefetchedPath = [self prefetchedPath];
-
-	NSString *reviewsFile = [docPath stringByAppendingPathComponent:@"ReviewApps.rev"];
-	if ([[NSFileManager defaultManager] fileExistsAtPath:reviewsFile]) {
-		self.appsByID = [NSKeyedUnarchiver unarchiveObjectWithFile:reviewsFile];
-	}
-	else {
-		self.appsByID = [NSMutableDictionary dictionary];
-	}
+	NSString *docPath = getDocPath();
+	NSString *prefetchedPath = getPrefetchedPath();
 	
 	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
 	
@@ -116,7 +109,7 @@
 
 - (void)deleteDay:(Day *)dayToDelete
 {
-	NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[dayToDelete proposedFilename]];
+	NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[dayToDelete proposedFilename]];
 	[[NSFileManager defaultManager] removeItemAtPath:fullPath error:NULL];
 	if (dayToDelete.isWeek) {
 		[self.weeks removeObjectForKey:dayToDelete.name];
@@ -463,18 +456,19 @@
 {
 	[days addEntriesFromDictionary:newDays];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
-		
+	
+	ReviewUpdater *reviewManager = [ReviewUpdater sharedManager];
 	for (Day *d in [newDays allValues]) {
 		for (Country *c in [d.countries allValues]) {
 			for (Entry *e in c.entries) {
 				NSString *appID = e.productIdentifier;
 				NSString *appName = e.productName;
-				if (![self.appsByID objectForKey:appID]) {
+				if ([reviewManager appWithID:appID] == nil) {
 					App *app = [[App new] autorelease];
 					app.appID = appID;
 					app.appName = appName;
 					app.reviewsByUser = [NSMutableDictionary dictionary];
-					[appsByID setObject:app forKey:appID];
+					[reviewManager addApp:app];
 				}
 			}
 		}
@@ -527,40 +521,23 @@
 	}
 }
 
-- (NSString *)docPath
-{
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	NSString *documentsDirectory = [paths objectAtIndex:0];
-	return documentsDirectory;
-}
-
-- (NSString *)prefetchedPath
-{
-	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
-	NSString *prefetchedPath = [NSString stringWithFormat:@"%@/Prefetched/", bundlePath];
-	return prefetchedPath;
-}
-
 - (void)saveData
 {
 	//save all days/weeks in separate files:
 	for (Day *d in [self.days allValues]) {
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[d proposedFilename]];
+		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[d proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!d.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:d toFile:fullPath];
 		}
 	}
 	for (Day *w in [self.weeks allValues]) {
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[w proposedFilename]];
+		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[w proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!w.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:w toFile:fullPath];
 		}
 	}
-	
-	NSString *reviewsFile = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
-	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
 }
 
 #pragma mark Backup Reports methods
@@ -570,7 +547,7 @@
 	if ([backupList count] > 0) {
 		Day *d = [backupList objectAtIndex:0];
 		NSURL *url = [NSURL URLWithString:BACKUP_HOSTNAME];
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[d proposedFilename]];
+		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[d proposedFilename]];
 		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
 		[request setPostValue:[d proposedFilename] forKey:@"filename"];
 		if ([[NSFileManager defaultManager] fileExistsAtPath:fullPath])
@@ -580,7 +557,7 @@
 	} else if (backupReviewsFile) {
 		backupReviewsFile = NO;
 		NSURL *url = [NSURL URLWithString:BACKUP_HOSTNAME];
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
+		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:@"ReviewApps.rev"];
 		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
 		[request setPostValue:@"ReviewApps.rev" forKey:@"filename"];
 		if ([[NSFileManager defaultManager] fileExistsAtPath:fullPath])
@@ -629,53 +606,6 @@
 		[self setProgress:[NSString stringWithFormat:@"Left to upload: %d", [backupList count]+1]];
 		[self startUpload];	
 	}	
-}
-
-#pragma mark -------------------------
-
-- (void)downloadReviews
-{
-	if (isDownloadingReviews)
-		return;
-
-	isDownloadingReviews = YES;
-	[UIApplication sharedApplication].idleTimerDisabled = YES;	
-	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
-	
-	[self performSelectorInBackground:@selector(fetchReviewsWithInfo) withObject:nil];
-}
-
-- (BOOL)isDownloadingReviews
-{
-	return isDownloadingReviews;
-}
-
-- (void)updateReviewDownloadProgress:(NSString *)status
-{
-	self.reviewDownloadStatus = status;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedReviewDownloadProgressNotification object:self];
-}
-
-- (void)fetchReviewsWithInfo
-{
-	NSAutoreleasePool *pool = [NSAutoreleasePool new];
-	NSAssert([NSThread isMainThread] == false, nil);
-	
-	ReviewUpdater *updater = [[ReviewUpdater alloc] initWithApps:appsByID];
-	updater.callback = self; // FIXME
-	[updater updateReviews]; // blocking call
-	//NSLog(@"%@", reviews);
-
-	[self performSelectorOnMainThread:@selector(finishDownloadingReviews) withObject:nil waitUntilDone:NO];
-	[pool release];
-}
-
-- (void)finishDownloadingReviews
-{
-	isDownloadingReviews = NO;
-	[UIApplication sharedApplication].idleTimerDisabled = NO;
-	[self updateReviewDownloadProgress:@""];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedReviewsNotification object:self];
 }
 
 @end

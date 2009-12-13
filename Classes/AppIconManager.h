@@ -8,11 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+// TODO: move into the 'controller' group?
 
 @interface AppIconManager : NSObject {
-
 	NSMutableDictionary *iconsByAppName;
-	NSString *docPath;
 }
 
 + (AppIconManager *)sharedManager;

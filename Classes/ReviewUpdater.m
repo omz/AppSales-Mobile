@@ -2,15 +2,32 @@
 #import "App.h"
 #import "Review.h"
 #import "NSString+UnescapeHtml.h"
-#import "ReportManager.h" 
+#import "ReportManager.h"
+
+#define REVIEW_SAVED_FILE_NAME @"ReviewApps.rev"
 
 @implementation ReviewUpdater
 
-@synthesize callback; // FIXME
+@synthesize reviewDownloadStatus;
 
-- (id) initWithApps:(NSDictionary*)appIDsToFetch {
++ (ReviewUpdater*) sharedManager {
+	static ReviewUpdater *sharedManager = nil;
+	if (sharedManager == nil) {
+		sharedManager = [ReviewUpdater new];
+	}
+	return sharedManager;
+}
+
+- (id) init {
 	if (self = [super init]) {
-		appsByID = [appIDsToFetch retain];
+		NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
+		if ([[NSFileManager defaultManager] fileExistsAtPath:reviewsFile]) {
+			appsByID = [[NSKeyedUnarchiver unarchiveObjectWithFile:reviewsFile] retain];
+		} else {
+			appsByID = [[NSMutableDictionary alloc] init];
+		}
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveData) 
+													 name:UIApplicationWillTerminateNotification object:nil];
 	}
 	return self;
 }
@@ -38,7 +55,7 @@
 		currentPercentComplete = percentComplete;
 	}
 	NSString *status = [NSString stringWithFormat:@"%2.0f%% complete", currentPercentComplete];
-	[callback performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO]; // FIXME
+	[self performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO];
 }
 
 - (void) workerDone {
@@ -51,7 +68,7 @@
 }
 
 - (void) notifyOfNewReviews {
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedReviewsNotification 
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewUpdaterDownloadedReviewsNotification 
 														object:[ReportManager sharedManager]];
 }
 
@@ -80,6 +97,7 @@
 
 - (void) workerThreadFetch { // called by worker threads
 	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];
+	NSAssert(! [NSThread isMainThread], nil);
 	
 	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
 	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
@@ -95,12 +113,6 @@
 		if (!dateFormatter) {
 			@synchronized (defaultDateFormatter) {
 				dateFormatter = [[defaultDateFormatter copy] autorelease]; // date formatters are not thread safe
-			}
-			if ([countryCode isEqual:@"it"]) {
-				NSLocale *currentLocale = [[[NSLocale alloc] initWithLocaleIdentifier:countryCode] autorelease];
-				[dateFormatter setLocale:currentLocale];
-			} else {
-				[dateFormatter setLocale:defaultLocale];
 			}
 		}
 		
@@ -189,20 +201,33 @@
 }
 
 - (void) updateReviews {
+	NSAutoreleasePool *pool = [NSAutoreleasePool new];
+	NSAssert(! [NSThread isMainThread], nil);
+
 	// setup store fronts, this should probably go into a plist...:
 	NSDateFormatter *frenchDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	NSLocale *frenchLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"fr"] autorelease];
 	[frenchDateFormatter setLocale:frenchLocale];
 	[frenchDateFormatter setDateFormat:@"dd MMM yyyy"];
+	
 	NSDateFormatter *germanDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSLocale *germanLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"de"] autorelease];
+	[germanDateFormatter setLocale:germanLocale];
 	[germanDateFormatter setDateFormat:@"dd.MM.yyyy"];
+	
+	NSDateFormatter *itDateFormatter = [[NSDateFormatter alloc] init];
+	[itDateFormatter setDateFormat:@"dd-MMM-yyyy"];
+	NSLocale *itLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"it"] autorelease];
+	[itDateFormatter setLocale:itLocale];
+		
 	NSDateFormatter *usDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
 	[usDateFormatter setLocale:usLocale];
 	[usDateFormatter setDateFormat:@"MMM dd, yyyy"];
+	
 	defaultDateFormatter = [[NSDateFormatter alloc] init];
 	[defaultDateFormatter setDateFormat:@"dd-MMM-yyyy"];
-	defaultLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en-us"];
+    [defaultDateFormatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease]];
 	storeInfos = [[NSMutableArray alloc] init];
 
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -493,7 +518,8 @@
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 						   @"Italy", @"countryName", 
 						   @"it", @"countryCode",
-						   @"143450", @"storeFrontID", 
+						   @"143450", @"storeFrontID",
+						   itDateFormatter, @"dateFormatter",
 						   nil]];
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 						   @"Netherlands", @"countryName", 
@@ -538,8 +564,63 @@
 	storeInfos = nil;
 	[defaultDateFormatter release];
 	defaultDateFormatter = nil;
-	[defaultLocale release];
-	defaultLocale = nil;
+	
+	[self performSelectorOnMainThread:@selector(finishDownloadingReviews) withObject:nil waitUntilDone:NO];
+	[pool release];
 }
+
+- (void) downloadReviews {
+	NSAssert([NSThread isMainThread], nil);
+	if (isDownloadingReviews) {
+		return;
+	}
+	isDownloadingReviews = YES;
+	[UIApplication sharedApplication].idleTimerDisabled = YES;	
+	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
+	
+	[self performSelectorInBackground:@selector(updateReviews) withObject:nil];
+}
+
+- (BOOL) isDownloadingReviews {
+	return isDownloadingReviews;
+}
+
+- (void) updateReviewDownloadProgress:(NSString *)status {
+	NSAssert([NSThread isMainThread], nil);
+	self.reviewDownloadStatus = status;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewUpdaterUpdatedReviewDownloadProgressNotification object:self];
+}
+
+- (void) finishDownloadingReviews {
+	NSAssert([NSThread isMainThread], nil);	
+	isDownloadingReviews = NO;
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	[self updateReviewDownloadProgress:@""];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewUpdaterDownloadedReviewsNotification object:self];
+}
+
+- (void) saveData {
+	NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
+	[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
+}
+
+- (App*) appWithID:(NSString*)appID {
+	return [appsByID objectForKey:appID];
+}
+
+- (void) addApp:(App*)app {
+	[appsByID setObject:app forKey:app.appID];
+}
+
+- (NSUInteger) numberOfApps {
+	return appsByID.count;
+}
+
+- (NSArray*) appNamesSorted {
+	NSArray *allApps = [appsByID allValues];
+	NSSortDescriptor *appSorter = [[[NSSortDescriptor alloc] initWithKey:@"appName" ascending:YES] autorelease];
+	return [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
+}
+
 
 @end

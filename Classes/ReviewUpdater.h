@@ -2,25 +2,39 @@
 
 #define NUMBER_OF_FETCHING_THREADS 10  // also the max number of concurrent network connections.
 
+#define ReviewUpdaterDownloadedReviewsNotification					@"ReviewUpdaterDownloadedReviewsNotification"
+#define ReviewUpdaterUpdatedReviewDownloadProgressNotification		@"ReviewUpdaterUpdatedReviewDownloadProgressNotification"
+
+@class App;
+
 @interface ReviewUpdater : NSObject {
 	@private
-	NSDictionary *appsByID;
+	NSMutableDictionary *appsByID;
 	float percentComplete, progressIncrement; // for presentation
 	
-	id callback; // FIXME  Ugly hack, used to update the GUI status
+	BOOL isDownloadingReviews;
+	NSString *reviewDownloadStatus;
 	
 	// used by worker threads
 	NSCondition *condition;
 	NSUInteger numThreadsActive;
 	NSMutableArray *storeInfos;
 	NSDateFormatter *defaultDateFormatter;
-	NSLocale *defaultLocale;
 }
 
-@property (assign) id callback; // FIXME
++ (ReviewUpdater*) sharedManager;
 
-- (id) initWithApps:(NSDictionary*)appIDsToFetch;
-- (void) updateReviews; // blocking call
+@property (retain) NSString *reviewDownloadStatus;
+@property (readonly) NSUInteger numberOfApps;
+
+- (void) downloadReviews;
+- (void) updateReviewDownloadProgress:(NSString *)status;
+- (BOOL) isDownloadingReviews;
+
+- (App*) appWithID:(NSString*)appID;
+- (void) addApp:(App*)app;
+
+- (NSArray*) appNamesSorted;
 
 @end
 

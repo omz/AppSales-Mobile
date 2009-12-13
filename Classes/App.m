@@ -9,6 +9,25 @@
 #import "App.h"
 #import "Review.h"
 
+NSString* getDocPath() {
+	static NSString *documentsDirectory = nil;
+	if (!documentsDirectory) {
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+		documentsDirectory = [[paths objectAtIndex:0] retain];
+	}
+	return documentsDirectory;
+}
+
+NSString* getPrefetchedPath() {
+	static NSString *prefetchedPath = nil;
+	if (!prefetchedPath) {
+		NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
+		prefetchedPath = [[NSString stringWithFormat:@"%@/Prefetched/", bundlePath] retain];
+	}
+	return prefetchedPath;
+}
+
+
 @implementation App
 
 @synthesize appID, appName, reviewsByUser, newReviewsCount;

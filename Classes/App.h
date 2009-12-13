@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+NSString* getDocPath(); // utility methods that belong in some other file
+NSString* getPrefetchedPath(); 
+
 
 @interface App : NSObject <NSCoding> {
 

@@ -13,6 +13,7 @@
 #import "AppIconManager.h"
 #import "AppCell.h"
 #import "ReviewsListController.h"
+#import "ReviewUpdater.h"
 
 @implementation ReviewsController
 
@@ -23,24 +24,22 @@
 	if (self = [super initWithStyle:style]) {
 		[self reload];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedReviewsNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) name:ReportManagerUpdatedReviewDownloadProgressNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReviewUpdaterDownloadedReviewsNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) name:ReviewUpdaterUpdatedReviewDownloadProgressNotification object:nil];
 	}
     return self;
 }
 
 - (void)reload
 {
-	NSArray *allApps = [[ReportManager sharedManager].appsByID allValues];
-	NSSortDescriptor *appSorter = [[[NSSortDescriptor alloc] initWithKey:@"appName" ascending:YES] autorelease];
-	self.sortedApps = [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
+	self.sortedApps = [[ReviewUpdater sharedManager] appNamesSorted];
 	[self.tableView reloadData];
 }
 
 - (void)updateStatus
 {
-	if ([[ReportManager sharedManager] isDownloadingReviews]) {
-		statusLabel.text = [[ReportManager sharedManager] reviewDownloadStatus];
+	if ([[ReviewUpdater sharedManager] isDownloadingReviews]) {
+		statusLabel.text = [[ReviewUpdater sharedManager] reviewDownloadStatus];
 		[activityIndicator startAnimating];
 	}
 	else {
@@ -78,10 +77,10 @@
 
 - (void)downloadReviews
 {
-	if ([[ReportManager sharedManager] isDownloadingReviews])
+	if ([[ReviewUpdater sharedManager] isDownloadingReviews])
 		return;
 	
-	[[ReportManager sharedManager] downloadReviews];
+	[[ReviewUpdater sharedManager] downloadReviews];
 }
 
 #pragma mark Table view methods

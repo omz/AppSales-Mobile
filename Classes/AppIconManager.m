@@ -7,6 +7,7 @@
 //
 
 #import "AppIconManager.h"
+#import "App.h" // for getDocPath()
 
 
 @implementation AppIconManager
@@ -15,8 +16,6 @@
 {
 	[super init];
 	iconsByAppName = [[NSMutableDictionary alloc] init];
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	docPath = [[paths objectAtIndex:0] retain];
 	return self;
 }
 
@@ -34,7 +33,7 @@
 	UIImage *cachedIcon = [iconsByAppName objectForKey:appName];
 	if (cachedIcon)
 		return cachedIcon;
-	NSString *iconPath = [docPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appName]];
+	NSString *iconPath = [getDocPath() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appName]];
 	cachedIcon = [UIImage imageWithContentsOfFile:iconPath];
 	if (!cachedIcon)
 		return nil;
@@ -55,13 +54,12 @@
 	if (!imageData) return;
 	UIImage *icon = [UIImage imageWithData:imageData];
 	if (icon) [iconsByAppName setObject:icon forKey:appName];
-	NSString *iconPath = [docPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appName]];
+	NSString *iconPath = [getDocPath() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appName]];
 	[imageData writeToFile:iconPath atomically:YES];
 }
 
 - (void)dealloc 
 {
-	[docPath release];
 	[iconsByAppName release];
     [super dealloc];
 }
