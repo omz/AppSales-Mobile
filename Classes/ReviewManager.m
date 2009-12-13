@@ -543,6 +543,7 @@
 						   usDateFormatter, @"dateFormatter",
 						   nil]];
 	
+	percentComplete = 0;
 	progressIncrement = 100.0f / storeInfos.count;
 	
 	condition = [[NSCondition alloc] init];
