@@ -50,7 +50,11 @@
 	if (responseData == [NSNull null]) {
 		return sourceText;
 	}
-	NSString *translatedText = [[responseData objectForKey: @"translatedText"] removeHtmlEscaping];
+	NSString *translatedText = [responseData objectForKey: @"translatedText"];
+	if (translatedText == nil) {
+		return sourceText;
+	}
+	translatedText = [translatedText removeHtmlEscaping];
 	if (markTranslationsWithDetectedOriginalLanguage) {
 		// marks which language the original was in
 		NSString *detectedLanguage = [responseData objectForKey:@"detectedSourceLanguage"];

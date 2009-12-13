@@ -75,7 +75,7 @@ static NSString *presentationLanguage, *defaultCountryCode;
 
 - (NSString*) translateToCurrentCountry:(NSString*)string {
 	NSAssert(! [NSThread isMainThread], nil);
-	if ([countryCode isEqualToString:defaultCountryCode]) {
+	if ([countryCode caseInsensitiveCompare:defaultCountryCode] == NSOrderedSame) {
 		return string; // already in native country language
 	}
 	LKGoogleTranslator *translator = [[LKGoogleTranslator alloc] init];
