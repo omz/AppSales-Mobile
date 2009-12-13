@@ -47,7 +47,6 @@
 		7F4C219510230EF300F17F7D /* Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C218310230EF200F17F7D /* Settings.png */; };
 		7F4C219610230EF300F17F7D /* Statistics.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C218410230EF200F17F7D /* Statistics.png */; };
 		7F4C219710230EF300F17F7D /* TB_Reload.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C218510230EF200F17F7D /* TB_Reload.png */; };
-		7F4C219810230EF300F17F7D /* Thailand.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C218610230EF200F17F7D /* Thailand.png */; };
 		7F4C219910230EF300F17F7D /* Weekly.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C218710230EF300F17F7D /* Weekly.png */; };
 		7F4C227310230F1100F17F7D /* ad.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C219B10230F1100F17F7D /* ad.png */; };
 		7F4C227410230F1100F17F7D /* ae.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C219C10230F1100F17F7D /* ae.png */; };
@@ -367,7 +366,6 @@
 		7F4C218310230EF200F17F7D /* Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Settings.png; sourceTree = "<group>"; };
 		7F4C218410230EF200F17F7D /* Statistics.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Statistics.png; sourceTree = "<group>"; };
 		7F4C218510230EF200F17F7D /* TB_Reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TB_Reload.png; sourceTree = "<group>"; };
-		7F4C218610230EF200F17F7D /* Thailand.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Thailand.png; sourceTree = "<group>"; };
 		7F4C218710230EF300F17F7D /* Weekly.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Weekly.png; sourceTree = "<group>"; };
 		7F4C219B10230F1100F17F7D /* ad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ad.png; sourceTree = "<group>"; };
 		7F4C219C10230F1100F17F7D /* ae.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ae.png; sourceTree = "<group>"; };
@@ -810,7 +808,6 @@
 				7FD9B3A110587C2500FE74C3 /* Reviews.png */,
 				7F4C218410230EF200F17F7D /* Statistics.png */,
 				7F4C218510230EF200F17F7D /* TB_Reload.png */,
-				7F4C218610230EF200F17F7D /* Thailand.png */,
 				7F4C218710230EF300F17F7D /* Weekly.png */,
 			);
 			path = Images;
@@ -1296,7 +1293,6 @@
 				7F4C219510230EF300F17F7D /* Settings.png in Resources */,
 				7F4C219610230EF300F17F7D /* Statistics.png in Resources */,
 				7F4C219710230EF300F17F7D /* TB_Reload.png in Resources */,
-				7F4C219810230EF300F17F7D /* Thailand.png in Resources */,
 				7F4C219910230EF300F17F7D /* Weekly.png in Resources */,
 				7F4C227310230F1100F17F7D /* ad.png in Resources */,
 				7F4C227410230F1100F17F7D /* ae.png in Resources */,
