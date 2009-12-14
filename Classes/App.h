@@ -11,20 +11,24 @@
 NSString* getDocPath(); // utility methods that belong in some other file
 NSString* getPrefetchedPath(); 
 
+@class Review;
 
 @interface App : NSObject <NSCoding> {
-
+	@private
 	NSString *appID;
 	NSString *appName;
 	NSMutableDictionary *reviewsByUser;
-	int newReviewsCount;
+	NSUInteger newReviewsCount;
+	float averageStars;
 }
 
-@property (nonatomic, retain) NSString *appID;
-@property (nonatomic, retain) NSString *appName;
-@property (nonatomic, retain) NSMutableDictionary *reviewsByUser;
-@property (assign) int newReviewsCount;
+@property (readonly) NSString *appID;
+@property (readonly) NSString *appName;
+@property (readonly) NSDictionary *reviewsByUser;
+@property (readonly) NSUInteger newReviewsCount;
+@property (readonly) float averageStars;
 
-- (float)averageStars;
+- (id) initWithID:(NSString*)identifier name:(NSString*)name;
+- (void) addOrReplaceReview:(Review*)review;
 
 @end

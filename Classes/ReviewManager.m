@@ -77,7 +77,7 @@
 	NSAssert(app, nil);
 	
 	@synchronized (app) {
-		NSMutableDictionary *existingReviews = app.reviewsByUser;
+		NSDictionary *existingReviews = app.reviewsByUser;
 		Review *oldReview = [existingReviews objectForKey:review.user];
 		if  ((oldReview != nil) && ([oldReview.text isEqual:review.text]) 
 			 && (oldReview.translatedText != nil)) {
@@ -88,9 +88,7 @@
 	[review updateTranslations]; // network call, done outside of synchronized block
 
 	@synchronized (app) {
-		NSMutableDictionary *existingReviews = app.reviewsByUser;
-		[existingReviews setObject:review forKey:review.user];
-		app.newReviewsCount += 1;
+		[app addOrReplaceReview:review];
 	}
 	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:YES];
 }
@@ -200,6 +198,21 @@
 	[outerPool release];
 }
 
+
+NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
+	NSString *arg1CountryCode = [(NSDictionary*)arg1 objectForKey:@"countryCode"];
+	NSString *arg2CountryCode = [(NSDictionary*)arg2 objectForKey:@"countryCode"];
+	NSNumber *arg1Count = [(NSDictionary*)arg3 objectForKey:arg1CountryCode];
+	NSNumber *arg2Count = [(NSDictionary*)arg3 objectForKey:arg2CountryCode];
+	if ([arg1Count intValue] < [arg2Count intValue]) {
+		return NSOrderedAscending;
+	}
+	if ([arg1Count intValue] > [arg2Count intValue]) {
+		return NSOrderedDescending;
+	}
+	return NSOrderedSame;
+}
+
 - (void) updateReviews {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	NSAssert(! [NSThread isMainThread], nil);
@@ -228,12 +241,13 @@
 	defaultDateFormatter = [[NSDateFormatter alloc] init];
 	[defaultDateFormatter setDateFormat:@"dd-MMM-yyyy"];
     [defaultDateFormatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease]];
+	
+	
 	storeInfos = [[NSMutableArray alloc] init];
-
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 						   @"Argentina", @"countryName", 
 						   @"ar", @"countryCode",
-						   @"143505", @"storeFrontID", 
+						   @"143505", @"storeFrontID",
 						   nil]];
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 						   @"Belgium", @"countryName", 
@@ -486,8 +500,6 @@
 						   @"143471", @"storeFrontID", 
 						   nil]];
 	
-	// keep larger app stores at the back of the list, as they are processed from the back to the front
-	
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 						   @"Australia", @"countryName", 
 						   @"au", @"countryCode",
@@ -543,6 +555,17 @@
 						   usDateFormatter, @"dateFormatter",
 						   nil]];
 	
+	// sort regions by its number of existing reviews, so the less active regions are downloaded last
+	NSMutableDictionary *numExistingReviews = [NSMutableDictionary dictionary];
+	for (App *app in [appsByID objectEnumerator]) {
+		for (Review *review in [app.reviewsByUser objectEnumerator]) {
+			NSNumber *object = [numExistingReviews objectForKey:review.countryCode];
+			const NSUInteger count = (object ? [object intValue] + 1 : 1);
+			[numExistingReviews setObject:[NSNumber numberWithInt:count] forKey:review.countryCode];
+		}
+	}
+	[storeInfos sortUsingFunction:&numStoreReviewsComparator context:numExistingReviews];
+		
 	percentComplete = 0;
 	progressIncrement = 100.0f / storeInfos.count;
 	
@@ -570,6 +593,14 @@
 	[pool release];
 }
 
+- (void) updateReviewDownloadProgress:(NSString *)status {
+	NSAssert([NSThread isMainThread], nil);
+	[status retain];
+	[reviewDownloadStatus release];
+	reviewDownloadStatus = status;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerUpdatedReviewDownloadProgressNotification object:self];
+}
+
 - (void) downloadReviews {
 	NSAssert([NSThread isMainThread], nil);
 	if (isDownloadingReviews) {
@@ -584,12 +615,6 @@
 
 - (BOOL) isDownloadingReviews {
 	return isDownloadingReviews;
-}
-
-- (void) updateReviewDownloadProgress:(NSString *)status {
-	NSAssert([NSThread isMainThread], nil);
-	self.reviewDownloadStatus = status;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerUpdatedReviewDownloadProgressNotification object:self];
 }
 
 - (void) finishDownloadingReviews {

@@ -24,11 +24,10 @@
 
 + (ReviewManager*) sharedManager;
 
-@property (retain) NSString *reviewDownloadStatus;
+@property (readonly) NSString *reviewDownloadStatus;
 @property (readonly) NSUInteger numberOfApps;
 
 - (void) downloadReviews;
-- (void) updateReviewDownloadProgress:(NSString *)status;
 - (BOOL) isDownloadingReviews;
 
 - (App*) appWithID:(NSString*)appID;

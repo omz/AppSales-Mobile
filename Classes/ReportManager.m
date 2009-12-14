@@ -464,10 +464,7 @@
 				NSString *appID = e.productIdentifier;
 				NSString *appName = e.productName;
 				if ([reviewManager appWithID:appID] == nil) {
-					App *app = [[App new] autorelease];
-					app.appID = appID;
-					app.appName = appName;
-					app.reviewsByUser = [NSMutableDictionary dictionary];
+					App *app = [[[App alloc] initWithID:appID name:appName] autorelease];
 					[reviewManager addApp:app];
 				}
 			}
