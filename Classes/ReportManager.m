@@ -39,6 +39,8 @@
 	}
 	
 	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
+
+	NSCalendar *calendar = [NSCalendar currentCalendar];
 	
 	for (NSString *filename in filenames) {
 		if (![[filename pathExtension] isEqual:@"dat"])
@@ -53,11 +55,13 @@
 			{
 				if (loadedDay.date)
 				{
+					NSDateComponents *components = [calendar components:(NSWeekdayCalendarUnit | NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit) fromDate:loadedDay.date];
+					NSDate *loadedDate = [calendar dateFromComponents:components];
 					NSDateFormatter * lFormat = [NSDateFormatter new];
 					[lFormat setDateFormat:@"MM/dd/yyyy"];
 					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
 					[lFormat release];
-					if ([lDate isEqual:loadedDay.date])
+					if ([lDate isEqual:loadedDate])
 						[self.days setObject:loadedDay forKey:[loadedDay name]];
 				}
 			}
