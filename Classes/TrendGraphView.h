@@ -10,9 +10,9 @@
 #import "GraphView.h"
 
 @interface TrendGraphView : GraphView {
-	NSString *app;
+	NSString *appID;
 }
 
-@property (retain) NSString *app;
+@property (retain) NSString *appID;
 
 @end

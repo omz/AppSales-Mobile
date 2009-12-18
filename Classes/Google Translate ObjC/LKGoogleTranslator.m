@@ -18,7 +18,7 @@
 @synthesize markTranslationsWithDetectedOriginalLanguage;
 
 - (NSString*)translateText:(NSString*)sourceText toLanguage:(NSString*)targetLanguage {
-	return [self translateText:@"" toLanguage:targetLanguage];
+	return [self translateText:sourceText fromLanguage:@"" toLanguage:targetLanguage];
 }
 
 - (NSString*)translateText:(NSString*)sourceText fromLanguage:(NSString*)sourceLanguage toLanguage:(NSString*)targetLanguage {

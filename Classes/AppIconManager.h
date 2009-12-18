@@ -11,11 +11,11 @@
 // TODO: move into the 'controller' group?
 
 @interface AppIconManager : NSObject {
-	NSMutableDictionary *iconsByAppName;
+	NSMutableDictionary *iconsByAppID;
 }
 
 + (AppIconManager *)sharedManager;
-- (UIImage *)iconForAppNamed:(NSString *)appName;
-- (void)downloadIconForAppID:(NSString *)appID appName:(NSString *)appName;
+- (UIImage *)iconForAppID:(NSString *)appID;
+- (void)downloadIconForAppID:(NSString *)appID;
 
 @end

@@ -61,10 +61,10 @@
 - (Country *)countryNamed:(NSString *)countryName;
 - (void)setDateString:(NSString *)dateString;
 - (float)totalRevenueInBaseCurrency;
-- (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
-- (int)totalUnitsForApp:(NSString *)app;
+- (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app;
+- (int)totalUnitsForAppID:(NSString *)appID;
 - (int)totalUnits;
-- (NSArray *)allProductNames;
+- (NSArray *)allProductIDs;
 - (NSString *)dayString;
 - (NSString *)weekdayString;
 - (NSString *)weekEndDateString;

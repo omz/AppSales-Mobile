@@ -43,31 +43,35 @@
 @synthesize units;
 
 
-- (id)initWithProductName:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry
+- (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry
 {
-	[super init];
-	self.country = aCountry;
-	self.productName = name;
-	self.currency = currencyCode;
-	self.transactionType = type;
-	self.units = u;
-	self.royalties = r;
-	[country.entries addObject:self];
+	self = [super init];
+	if (self) {
+		productIdentifier = [identifier retain];
+		productName = [name retain];
+		transactionType = type;
+		country = [aCountry retain];
+		currency = [currencyCode retain];
+		self.units = u;
+		self.royalties = r;
+		[country.entries addObject:self];
+	}
 	return self;
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	[super init];
-	self.country = [coder decodeObjectForKey:@"country"];
-	[country.entries addObject:self];
-	self.productName = [coder decodeObjectForKey:@"productName"];
-	self.currency = [coder decodeObjectForKey:@"currency"];
-	self.transactionType = [coder decodeIntForKey:@"transactionType"];
-	self.units = [coder decodeIntForKey:@"units"];
-	self.royalties = [coder decodeFloatForKey:@"royalties"];
-	self.productIdentifier = [coder decodeObjectForKey:@"productIdentifier"];
-	
+	self = [super init];
+	if (self) {
+		country = [[coder decodeObjectForKey:@"country"] retain];
+		productName = [[coder decodeObjectForKey:@"productName"] retain];
+		currency = [[coder decodeObjectForKey:@"currency"] retain];
+		transactionType = [coder decodeIntForKey:@"transactionType"];
+		productIdentifier = [[coder decodeObjectForKey:@"productIdentifier"] retain];
+		self.units = [coder decodeIntForKey:@"units"];
+		self.royalties = [coder decodeFloatForKey:@"royalties"];
+		[country.entries addObject:self];
+	}
 	return self;
 }
 
@@ -90,9 +94,7 @@
 		float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenueInLocalCurrency fromCurrency:self.currency];
 		return revenueInBaseCurrency;
 	}
-	else {
-		return 0.0;
-	}
+	return 0;
 }
 
 - (NSString *)description
@@ -108,17 +110,15 @@
 		
 		return [NSString stringWithFormat:@"%@ : %i × %@ %@ = %@ %@ ≈ %@", self.productName, self.units, royaltiesString, self.currency, royaltiesSumString, self.currency, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:totalRevenueString]];
 	}
-	else {
-		return [NSString stringWithFormat:NSLocalizedString(@"%@ : %i free downloads",nil), self.productName, self.units];
-	}
+	return [NSString stringWithFormat:NSLocalizedString(@"%@ : %i free downloads",nil), self.productName, self.units];
 }
 
 - (void)dealloc
 {
-	self.country = nil;
-	self.productName = nil;
-	self.currency = nil;
-	self.productIdentifier = nil;
+	[country release];
+	[productName release];
+	[currency release];
+	[productIdentifier release];
 	
 	[super dealloc];
 }

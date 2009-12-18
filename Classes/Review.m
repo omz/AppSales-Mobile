@@ -79,7 +79,7 @@ static NSString *presentationLanguage, *defaultCountryCode;
 		return string; // already in native country language
 	}
 	LKGoogleTranslator *translator = [[LKGoogleTranslator alloc] init];
-	NSString *translated = [translator translateText:string fromLanguage:@"" toLanguage:presentationLanguage];
+	NSString *translated = [translator translateText:string toLanguage:presentationLanguage];
 	[translator release];
 	return translated;
 }
@@ -113,10 +113,10 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	return translatedText;
 }
 
-- (NSString*) presentedTitle {
+- (NSString*) presentationTitle {
 	return showTranslations ? translatedTitle : title;
 }
-- (NSString*) presentedText {
+- (NSString*) presentationText {
 	return showTranslations ? translatedText : text;
 }
 

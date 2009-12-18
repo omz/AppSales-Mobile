@@ -66,7 +66,7 @@
 	[[UIColor colorWithWhite:0.95 alpha:1.0] set];
 	CGContextFillRect(c, CGRectMake(0,0,45,44));
 	
-	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppNamed:app.appName];
+	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppID:app.appID];
 	[appIcon drawInRect:CGRectMake(6, 7, 28, 28)];
 	[[UIImage imageNamed:@"ProductMask.png"] drawInRect:CGRectMake(4, 6, 32, 32)];
 	

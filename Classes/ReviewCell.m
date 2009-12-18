@@ -90,10 +90,10 @@
 	[userAndDate drawInRect:CGRectMake(125, 2, 188, 14) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeMiddleTruncation alignment:UITextAlignmentRight];
 		
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor blackColor]) set];
-	[review.presentedTitle drawInRect:CGRectMake(50, 16, 265, 18) withFont:[UIFont boldSystemFontOfSize:15.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
+	[review.presentationTitle drawInRect:CGRectMake(50, 16, 265, 18) withFont:[UIFont boldSystemFontOfSize:15.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
 		
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
-	[review.presentedText drawInRect:CGRectMake(50, 36, 265, 45) withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
+	[review.presentationText drawInRect:CGRectMake(50, 36, 265, 45) withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
 	
 }	
 

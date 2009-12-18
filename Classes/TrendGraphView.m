@@ -12,7 +12,7 @@
 
 @implementation TrendGraphView
 
-@synthesize app;
+@synthesize appID;
 
 - (id)initWithFrame:(CGRect)rect
 {
@@ -42,7 +42,7 @@
 	float maxRevenue = 0.0;
 	float totalRevenue = 0.0;
 	for (Day *d in self.days) {
-		float revenue = (showUnits) ? (float)[d totalUnitsForApp:self.app] : [d totalRevenueInBaseCurrencyForApp:self.app];
+		float revenue = (showUnits) ? (float)[d totalUnitsForAppID:self.appID] : [d totalRevenueInBaseCurrencyForAppID:self.appID];
 		[revenues addObject:[NSNumber numberWithFloat:revenue]];
 		totalRevenue += revenue;
 		if (revenue > maxRevenue) maxRevenue = revenue;
@@ -51,7 +51,7 @@
 		return;
 	}
 	
-	UIColor *graphColor = (self.app) ? [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0] : [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0];
+	UIColor *graphColor = (self.appID) ? [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0] : [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0];
 	
 	//draw grid and captions:
 	CGContextBeginPath(c);
@@ -91,7 +91,7 @@
 	
 	[subtitle drawInRect:CGRectMake(10, maxY + 5, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 	
-	NSString *appName = (self.app != nil) ? (self.app) : NSLocalizedString(@"All Apps",nil);
+	NSString *appName = (self.appID != nil) ? (self.appID) : NSLocalizedString(@"All Apps",nil);
 	float actualFontSize = 10.0;
 	[appName sizeWithFont:[UIFont boldSystemFontOfSize:100.0] minFontSize:10.0 actualFontSize:&actualFontSize forWidth:(maxX - minX) lineBreakMode:UILineBreakModeClip];
 	CGSize actualSize = [appName sizeWithFont:[UIFont boldSystemFontOfSize:actualFontSize]];
@@ -107,7 +107,7 @@
 		float weekendWidth = (maxX - minX) / ([days count] - 1);
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 		UIColor *shade;
-		if (self.app == nil)
+		if (self.appID == nil)
 			shade = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:0.1];
 		else
 			shade = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:0.1];
@@ -169,7 +169,7 @@
 
 - (void)dealloc 
 {
-	self.app = nil;
+	self.appID = nil;
 	
     [super dealloc];
 }

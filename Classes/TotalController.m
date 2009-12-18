@@ -70,27 +70,26 @@
 	for(Day *w in days) {
 		for (Country *c in [w.countries allValues]) {
 			Country *country = [total countryNamed:c.name];
-			Entry *totalEntry = nil;
-			
 			for (Entry *e in c.entries) {
+				Entry *totalEntry = nil;
 				for (Entry *totalE in country.entries) {
-					if ([e.productName isEqualToString:totalE.productName] &&
-							e.royalties == totalE.royalties &&
-							e.transactionType == totalE.transactionType) {
+					if ([e.productIdentifier isEqualToString:totalE.productIdentifier] 
+							&& e.royalties == totalE.royalties
+							&& e.transactionType == totalE.transactionType) {
 						totalEntry = totalE;
 						break;
 					}
 				}
 				if (totalEntry == nil) {
-					[[[Entry alloc] initWithProductName:e.productName
-										transactionType:e.transactionType
-												units:e.units
-												royalties:e.royalties
-												currency:e.currency
-												country:country] autorelease];
+					[[[Entry alloc] initWithProductIdentifier:e.productIdentifier
+														 name:e.productName
+											  transactionType:e.transactionType
+														units:e.units
+													royalties:e.royalties
+													 currency:e.currency
+													  country:country] autorelease];
 				} else {
 					totalEntry.units += e.units;
-					totalEntry = nil;
 				}
 			}
 		}

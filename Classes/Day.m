@@ -79,7 +79,7 @@
 			NSString *royalties = [columns objectAtIndex:10];
 			NSString *dateColumn = [columns objectAtIndex:11];
 			NSString *appId = [columns objectAtIndex:19];
-			[[AppIconManager sharedManager] downloadIconForAppID:appId appName:productName];
+			[[AppIconManager sharedManager] downloadIconForAppID:appId];
 			if (!self.date) {
 				if ((([dateColumn rangeOfString:@"/"].location != NSNotFound) && ([dateColumn length] == 10))
 					|| (([dateColumn rangeOfString:@"/"].location == NSNotFound) && ([dateColumn length] == 8))) {
@@ -107,13 +107,13 @@
 				transactionType = @"1";
 
 			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
-			Entry *entry = [[[Entry alloc] initWithProductName:productName 
-								transactionType:[transactionType intValue] 
-										  units:[units intValue] 
-									  royalties:[royalties floatValue] 
-									   currency:royaltyCurrency
-										country:country] autorelease]; //gets added to the countries entry list automatically
-			entry.productIdentifier = appId;
+			[[[Entry alloc] initWithProductIdentifier:appId
+												 name:productName 
+									  transactionType:[transactionType intValue] 
+												units:[units intValue] 
+											royalties:[royalties floatValue] 
+											 currency:royaltyCurrency
+											  country:country] autorelease]; //gets added to the countries entry list automatically
 		}
 	}
 	return self;
@@ -245,24 +245,24 @@ static BOOL shouldLoadCountries = YES;
 	return sum;
 }
 
-- (float)totalRevenueInBaseCurrencyForApp:(NSString *)app
+- (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app
 {
 	if (app == nil)
 		return [self totalRevenueInBaseCurrency];
 	float sum = 0.0;
 	for (Country *c in [self.countries allValues]) {
-		sum += [c totalRevenueInBaseCurrencyForApp:app];
+		sum += [c totalRevenueInBaseCurrencyForAppID:app];
 	}
 	return sum;
 }
 
-- (int)totalUnitsForApp:(NSString *)app
+- (int)totalUnitsForAppID:(NSString *)appID
 {
-	if (app == nil)
+	if (appID == nil)
 		return [self totalUnits];
 	int sum = 0;
 	for (Country *c in [self.countries allValues]) {
-		sum += [c totalUnitsForApp:app];
+		sum += [c totalUnitsForAppID:appID];
 	}
 	return sum;
 }
@@ -276,11 +276,11 @@ static BOOL shouldLoadCountries = YES;
 	return sum;
 }
 
-- (NSArray *)allProductNames
+- (NSArray *)allProductIDs
 {
 	NSMutableSet *names = [NSMutableSet set];
 	for (Country *c in [self.countries allValues]) {
-		[names addObjectsFromArray:[c allProductNames]];
+		[names addObjectsFromArray:[c allProductIDs]];
 	}
 	return [names allObjects];
 }

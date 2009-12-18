@@ -112,7 +112,7 @@
 	
 	NSMutableSet *allApps = [NSMutableSet set];
 	for (Day *d in selectedDays) {
-		[allApps addObjectsFromArray:[d allProductNames]];
+		[allApps addObjectsFromArray:[d allProductIDs]];
 	}
 	NSArray *allAppsSorted = [[allApps allObjects] sortedArrayUsingSelector:@selector(compare:)];
 	for (UIView *v in self.trendViewsForApps) {
@@ -123,7 +123,7 @@
 	for (NSString *app in allAppsSorted) {
 		TrendGraphView *trendView = [[[TrendGraphView alloc] initWithFrame:CGRectMake(x, 0, 320, 200)] autorelease];
 		trendView.days = nil;
-		trendView.app = app;
+		trendView.appID = app;
 		[trendViewsForApps addObject:trendView];
 		[self.scrollView addSubview:trendView];
 		x += 320;

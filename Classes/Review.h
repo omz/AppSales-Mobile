@@ -38,8 +38,8 @@
 @property (nonatomic, retain) NSString *countryCode;
 @property (nonatomic, assign) BOOL newOrUpdatedReview;
 
-@property (readonly) NSString *presentedTitle; // either translated, or non translated text (depending on user preference) 
-@property (readonly) NSString *presentedText;
+@property (readonly) NSString *presentationTitle; // either translated, or non translated text (depending on user preference) 
+@property (readonly) NSString *presentationText;
 
 - (void) updateTranslations;
 
