@@ -32,41 +32,65 @@ NSString* getPrefetchedPath() {
 
 @synthesize appID, appName, reviewsByUser, newReviewsCount;
 
-- (id)initWithCoder:(NSCoder *)coder
-{
-	[super init];
-	self.appID = [coder decodeObjectForKey:@"appID"];
-	self.appName = [coder decodeObjectForKey:@"appName"];
-	self.reviewsByUser = [coder decodeObjectForKey:@"reviewsByUser"];
-	return self;
-}
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"App %@ (%@)", self.appName, self.appID];
-}
-
-- (float)averageStars
-{
-	if ([reviewsByUser count] == 0)
-		return 0.0;
+- (void) updateAverageStars {
+	if (reviewsByUser.count == 0) {
+		averageStars = 0;
+		return;
+	}
 	
-	float sum = 0.0;
+	float sum = 0;
 	for (Review *r in [reviewsByUser allValues]) {
 		sum += r.stars;
 	}
-	return sum / (float)[reviewsByUser count];
+	averageStars = sum / reviewsByUser.count;
 }
 
-- (void)encodeWithCoder:(NSCoder *)coder
-{
+- (float) averageStars {
+	return averageStars;
+}
+
+- (id)initWithCoder:(NSCoder *)coder {
+	self = [super init];
+	if (self) {
+		appID = [[coder decodeObjectForKey:@"appID"] retain];
+		appName = [[coder decodeObjectForKey:@"appName"] retain];
+		reviewsByUser = [[coder decodeObjectForKey:@"reviewsByUser"] retain];
+		averageStars = [coder decodeFloatForKey:@"averageStars"];
+		if (reviewsByUser.count && averageStars == 0) {
+			[self updateAverageStars]; // reading in older data
+		}
+	}
+	return self;
+}
+
+- (id) initWithID:(NSString*)identifier name:(NSString*)name {
+	self = [super init];
+	if (self) {
+		appID = [identifier retain];
+		appName = [name retain];
+		reviewsByUser = [[NSMutableDictionary alloc] init];
+	}
+	return self;
+}
+
+- (NSString *) description {
+	return [NSString stringWithFormat:@"App %@ (%@)", self.appName, self.appID];
+}
+
+- (void) addOrReplaceReview:(Review*)review {
+	[reviewsByUser setObject:review forKey:review.user];
+	[self updateAverageStars];
+	newReviewsCount++;
+}
+
+- (void) encodeWithCoder:(NSCoder *)coder {
 	[coder encodeObject:self.appID forKey:@"appID"];
 	[coder encodeObject:self.appName forKey:@"appName"];
 	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
+	[coder encodeFloat:self.averageStars forKey:@"averageStars"];
 }
 
-- (void)dealloc
-{
+- (void) dealloc {
 	[appID release];
 	[appName release];
 	[reviewsByUser release];
