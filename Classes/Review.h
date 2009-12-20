@@ -13,7 +13,7 @@
 	@private
 	NSString *user;
 	NSString *title, *translatedTitle;
-	int stars;
+	NSUInteger stars;
 	NSDate *reviewDate;
 	NSDate *downloadDate;
 	NSString *text, *translatedText;
@@ -26,20 +26,22 @@
 + (BOOL) showTranslatedReviews;
 + (void) setShowTranslatedReviews:(BOOL)showTranslatedReviews;
 
-@property (nonatomic, retain) NSString *user;
-@property (nonatomic, retain) NSString *title;
-@property (nonatomic, readonly) NSString *translatedTitle;
-@property (nonatomic, retain) NSDate *reviewDate;
-@property (nonatomic, retain) NSDate *downloadDate;
-@property (nonatomic, retain) NSString *text;
-@property (nonatomic, readonly) NSString *translatedText;
-@property (nonatomic, assign) int stars;
-@property (nonatomic, retain) NSString *version;
-@property (nonatomic, retain) NSString *countryCode;
-@property (nonatomic, assign) BOOL newOrUpdatedReview;
-
+@property (retain, readonly) NSString *user;
+@property (retain, readonly) NSDate *reviewDate;
+@property (retain, readonly) NSDate *downloadDate;
+@property (retain, readonly) NSString *version;
+@property (retain, readonly) NSString *countryCode;
+@property (retain, readonly) NSString *title;
+@property (retain, readonly) NSString *text;
+@property (assign, readonly) BOOL newOrUpdatedReview;
+@property (assign, readonly) NSUInteger stars;
+@property (readonly) NSString *translatedTitle;
+@property (readonly) NSString *translatedText;
 @property (readonly) NSString *presentationTitle; // either translated, or non translated text (depending on user preference) 
 @property (readonly) NSString *presentationText;
+
+- (id) initWithUser:(NSString*)userName reviewDate:(NSDate*)rDate downloadDate:(NSDate*)dDate version:(NSString*)reviewVersion 
+		countryCode:(NSString*)reviewCountryCode title:(NSString*)reviewTitle text:(NSString*)reviewText stars:(NSUInteger)numStars;
 
 - (void) updateTranslations;
 

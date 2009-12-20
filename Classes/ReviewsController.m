@@ -118,8 +118,8 @@
 	NSArray *allReviews = [app.reviewsByUser allValues];
 	
 	ReviewsListController *listController = [[[ReviewsListController alloc] initWithStyle:UITableViewStylePlain] autorelease];
-	NSSortDescriptor *reviewSorter1 = [[[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO] autorelease];
-	NSSortDescriptor *reviewSorter2 = [[[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO] autorelease];
+	NSSortDescriptor *reviewSorter1 = [[[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO] autorelease];
+	NSSortDescriptor *reviewSorter2 = [[[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO] autorelease];
 	NSSortDescriptor *reviewSorter3 = [[[NSSortDescriptor alloc] initWithKey:@"countryCode" ascending:YES] autorelease];
 	listController.reviews = [allReviews sortedArrayUsingDescriptors:[NSArray arrayWithObjects:reviewSorter1, reviewSorter2, reviewSorter3, nil]];
 	listController.hidesBottomBarWhenPushed = YES;

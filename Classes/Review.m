@@ -37,19 +37,37 @@ static NSString *presentationLanguage, *defaultCountryCode;
 
 @synthesize user, stars, reviewDate, downloadDate, version, countryCode, newOrUpdatedReview;
 
+- (id) initWithUser:(NSString*)userName reviewDate:(NSDate*)rDate downloadDate:(NSDate*)dDate
+			version:(NSString*)reviewVersion countryCode:(NSString*)reviewCountryCode title:(NSString*)reviewTitle 
+			   text:(NSString*)reviewText stars:(NSUInteger)numStars {
+	self = [super init];
+	if (self) {
+		user = [userName retain];
+		reviewDate = [rDate retain];
+		downloadDate = [dDate retain];
+		version = [reviewVersion retain];
+		countryCode = [reviewCountryCode retain];
+		title = [reviewTitle retain];
+		text = [reviewText retain];
+		stars = numStars;
+		newOrUpdatedReview = true;
+	}
+	return self;
+}
+
 - (id)initWithCoder:(NSCoder *)coder
 {
 	[super init];
-	self.user = [coder decodeObjectForKey:@"user"];
-	self.title = [coder decodeObjectForKey:@"title"];
+	user = [[coder decodeObjectForKey:@"user"] retain];
+	title = [[coder decodeObjectForKey:@"title"] retain];
 	translatedTitle = [[coder decodeObjectForKey:@"translatedTitle"] retain];
-	self.stars = [coder decodeIntForKey:@"stars"];
-	self.reviewDate = [coder decodeObjectForKey:@"reviewDate"];
-	self.downloadDate = [coder decodeObjectForKey:@"downloadDate"];
-	self.text = [coder decodeObjectForKey:@"text"];
+	stars = [coder decodeIntForKey:@"stars"];
+	reviewDate = [[coder decodeObjectForKey:@"reviewDate"] retain];
+	downloadDate = [[coder decodeObjectForKey:@"downloadDate"] retain];
+	text = [[coder decodeObjectForKey:@"text"] retain];
 	translatedText = [[coder decodeObjectForKey:@"translatedText"] retain];
-	self.version = [coder decodeObjectForKey:@"version"];
-	self.countryCode = [coder decodeObjectForKey:@"countryCode"];
+	version = [[coder decodeObjectForKey:@"version"] retain];
+	countryCode = [[coder decodeObjectForKey:@"countryCode"] retain];
 	// newOrUpdatedReview field is not set, as it's only used to indicate a review was newly added 
 	return self;
 }

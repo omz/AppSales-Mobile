@@ -84,7 +84,6 @@
 			return; // up to date
 		}
 	}
-	review.newOrUpdatedReview = YES;
 	[review updateTranslations]; // network call, done outside of synchronized block
 
 	@synchronized (app) {
@@ -97,7 +96,6 @@
 	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];
 	NSAssert(! [NSThread isMainThread], nil);
 	
-	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
 	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
 	NSMutableDictionary *headers = [NSMutableDictionary dictionary];
 	
@@ -175,15 +173,10 @@
 				[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];
 				
 				if (reviewUser && reviewTitle && reviewText && reviewStars) {
-					Review *review = [[Review new] autorelease];
-					review.downloadDate = [NSDate dateWithTimeIntervalSince1970:t - i];
-					review.reviewDate = reviewDate;
-					review.user = [reviewUser removeHtmlEscaping];
-					review.stars = [reviewStars intValue];
-					review.title = [reviewTitle removeHtmlEscaping];
-					review.text = [reviewText removeHtmlEscaping];
-					review.version = reviewVersion;
-					review.countryCode = countryCode;
+					Review *review = [[[Review alloc] initWithUser:[reviewUser removeHtmlEscaping] reviewDate:reviewDate
+													 downloadDate:downloadDate version:reviewVersion countryCode:countryCode
+															title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
+															 stars:[reviewStars intValue]] autorelease];
 					[self addOrUpdatedReviewIfNeeded:review appID:appID];
 				}
 				
@@ -568,6 +561,7 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 		
 	percentComplete = 0;
 	progressIncrement = 100.0f / storeInfos.count;
+	downloadDate = [NSDate new];
 	
 	condition = [[NSCondition alloc] init];
 	numThreadsActive = NUMBER_OF_FETCHING_THREADS;
@@ -588,6 +582,8 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	storeInfos = nil;
 	[defaultDateFormatter release];
 	defaultDateFormatter = nil;
+	[downloadDate release];
+	downloadDate = nil;
 	
 	[self performSelectorOnMainThread:@selector(finishDownloadingReviews) withObject:nil waitUntilDone:NO];
 	[pool release];

@@ -20,6 +20,7 @@
 	NSUInteger numThreadsActive;
 	NSMutableArray *storeInfos;
 	NSDateFormatter *defaultDateFormatter;
+	NSDate *downloadDate;
 }
 
 + (ReviewManager*) sharedManager;
