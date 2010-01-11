@@ -66,7 +66,9 @@
 	UIBarButtonItem *graphModeButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mode...",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectGraphMode)] autorelease];
 	self.navigationItem.rightBarButtonItem = graphModeButton;
 	
-	self.days = [ReportManager sharedManager].allAvailableDaysSorted;
+	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
+	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	self.days = sortedDays;
 }
 
 - (void)viewDidLoad

@@ -24,7 +24,7 @@
 - (id)init
 {
 	[super init];
-		
+	
 	self.days = [NSMutableDictionary dictionary];
 	self.weeks = [NSMutableDictionary dictionary];
 
@@ -56,6 +56,7 @@
 					NSDateFormatter * lFormat = [NSDateFormatter new];
 					[lFormat setDateFormat:@"MM/dd/yyyy"];
 					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
+					[lFormat release];
 					NSTimeInterval lInterval = [lDate timeIntervalSinceDate:loadedDay.date];
 					if (lInterval < 12*60*60 && lInterval > -12*60*60)
 						[self.days setObject:loadedDay forKey:[loadedDay name]];
@@ -101,6 +102,8 @@
 {
 	if (isRefreshing)
 		return;
+	
+	[UIApplication sharedApplication].idleTimerDisabled = YES;
 	
 	NSError *error = nil;
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
@@ -283,18 +286,18 @@
 		NSString *downloadActionName;
 		if (i==0) {
 			downloadType = @"Daily";
-			downloadActionName = @"11.11.1";
+			downloadActionName = @"11.13.1";
 		}
 		else {
 			downloadType = @"Weekly";
-			downloadActionName = @"11.13.1";
+			downloadActionName = @"11.15.1";
 		}
 		
 		NSString *dateTypeSelectionURLString = [ittsBaseURL stringByAppendingString:dateTypeAction]; 
 		NSDictionary *dateTypeDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  downloadType, @"11.9", 
+									  downloadType, @"11.11", 
 									  downloadType, @"hiddenDayOrWeekSelection", 
-									  @"Summary", @"11.7", 
+									  @"Summary", @"11.9", 
 									  @"ShowDropDown", @"hiddenSubmitTypeName", nil];
 		NSString *encodedDateTypeDict = [dateTypeDict formatForHTTP];
 		NSData *httpBody = [encodedDateTypeDict dataUsingEncoding:NSASCIIStringEncoding];
@@ -350,10 +353,11 @@
 		int dayNumber = 1;
 		for (NSString *dayString in availableDays) {
 			NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
-											 downloadType, @"11.9", 
-											 downloadType, @"hiddenDayOrWeekSelection",
+											 downloadType, @"11.11", 
+											 dayString, @"hiddenDayOrWeekSelection",
 											 @"Download", @"hiddenSubmitTypeName",
-											 @"Summary", @"11.7",
+											 @"ShowDropDown", @"hiddenSubmitTypeName",
+											 @"Summary", @"11.9",
 											 dayString, downloadActionName, 
 											 @"Download", @"download", nil];
 			NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
@@ -403,6 +407,8 @@
 
 - (void)downloadFailed
 {
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	
 	isRefreshing = NO;
 	[self setProgress:@""];
 	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Download Failed",nil) message:NSLocalizedString(@"Sorry, an error occured when trying to download the report files. Please check your username, password and internet connection.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
@@ -441,6 +447,8 @@
 
 - (void)successfullyDownloadedWeeks:(NSDictionary *)newDays
 {
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	
 	isRefreshing = NO;
 	[weeks addEntriesFromDictionary:newDays];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
@@ -510,43 +518,12 @@
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
 }
 
-/*
- * this is used by StatisticsViewController in the Graphs view;
- * iTunnes Connect erases older days reports, but if you have 
- * week reports for older weeks, show the beginning of those weeks
- * in the graph so that the calculation expands for that period also.
-*/
-- (NSArray *) allAvailableDaysSorted
-{		
-	//sort the days array by date
-	NSSortDescriptor *daySorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
-	NSArray *sortedDays = [[self.days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:daySorter]];
-
-	// this will hold all the days to be returned
-	NSMutableArray *allDays = [NSMutableArray array];
-	[allDays addObjectsFromArray:sortedDays];
-	
-	Day *oldestDayReport = [sortedDays objectAtIndex:0];
-	// we don't want to calculate this each time in the following loop
-	NSTimeInterval oldestDayReportInterval = [oldestDayReport.date timeIntervalSince1970];
-	
-	//sort the weeks array by date, descending
-	NSSortDescriptor *weekSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
-	NSArray *sortedWeeks = [[self.weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:weekSorter]]; 
-
-	//insert only the weeks older than the oldest daily report
-	for (Day *w in sortedWeeks) {
-		if ([w.date timeIntervalSince1970] < oldestDayReportInterval) {
-			[allDays insertObject:w atIndex:0];
-		}
-	}	
-	return [NSArray arrayWithArray:allDays];
-}
-
 - (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly
 {
 	if (isDownloadingReviews)
 		return;
+	
+	[UIApplication sharedApplication].idleTimerDisabled = YES;
 	
 	isDownloadingReviews = YES;
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
@@ -1025,6 +1002,8 @@
 
 - (void)finishDownloadingReviews:(NSDictionary *)reviews
 {
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	
 	//NSLog(@"%@", reviews);
 	isDownloadingReviews = NO;
 	for (NSString *appID in [reviews allKeys]) {
