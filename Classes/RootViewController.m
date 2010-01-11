@@ -129,14 +129,28 @@
 		}
 	}
 	
-	int maxUnitSales = 0;
 	NSMutableArray *unitSales = [NSMutableArray array];
+	
+	int maxUnitSales = 0;
 	for (Day *d in [sortedDays reverseObjectEnumerator]) {
-		int units = [d totalUnits];
-		if (units > maxUnitSales)
-			maxUnitSales = units;
-		[unitSales addObject:[NSNumber numberWithInt:units]];
+		float revenue = [d totalRevenueInBaseCurrency];
+		if (revenue > maxUnitSales)
+			maxUnitSales = (int)revenue;
+		[unitSales addObject:[NSNumber numberWithFloat:revenue]];
 	}
+	
+	//Use number of sales if no revenue was made (e.g. for free apps):
+	if (maxUnitSales == 0) {
+		[unitSales removeAllObjects];
+		maxUnitSales = 0;
+		for (Day *d in [sortedDays reverseObjectEnumerator]) {
+			int units = [d totalUnits];
+			if (units > maxUnitSales)
+				maxUnitSales = units;
+			[unitSales addObject:[NSNumber numberWithInt:units]];
+		}
+	}
+	
 	[[UIColor grayColor] set];
 	float maxY = 27.0;
 	float minY = 3.0;

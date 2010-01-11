@@ -39,6 +39,8 @@
 	}
 	
 	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
+
+	NSCalendar *calendar = [NSCalendar currentCalendar];
 	
 	for (NSString *filename in filenames) {
 		if (![[filename pathExtension] isEqual:@"dat"])
@@ -53,6 +55,8 @@
 			{
 				if (loadedDay.date)
 				{
+					NSDateComponents *components = [calendar components:(NSWeekdayCalendarUnit | NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit) fromDate:loadedDay.date];
+					NSDate *loadedDate = [calendar dateFromComponents:components];
 					NSDateFormatter * lFormat = [NSDateFormatter new];
 					[lFormat setDateFormat:@"MM/dd/yyyy"];
 					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
@@ -281,6 +285,7 @@
 		[scanner scanUpToString:@"</font>" intoString:&errorMessageString];
 	}
 	
+	int numberOfNewReports = 0;
 	for (int i=0; i<=1; i++) {
 		NSString *downloadType;
 		NSString *downloadActionName;
@@ -390,6 +395,7 @@
 			[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:YES];
 			dayNumber++;
 		}
+		numberOfNewReports += [downloadedDays count];
 		if (i == 0) {
 			[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays waitUntilDone:YES];
 			[downloadedDays removeAllObjects];
@@ -397,7 +403,10 @@
 		else
 			[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays waitUntilDone:YES];
 	}
-	[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
+	if (numberOfNewReports == 0)
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:YES];
+	else
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
 	
 	if (errorMessageString) {
 		[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:YES];
