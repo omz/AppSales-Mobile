@@ -902,7 +902,87 @@
 							   @"vn", @"countryCode",
 							   @"143471", @"storeFrontID", 
 							   nil]];
-		
+		// stores added April 1, 2009
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Croatia", @"countryName", 
+							   @"hr", @"countryCode",
+							   @"143494", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Dominican Republic", @"countryName", 
+							   @"do", @"countryCode",
+							   @"143508", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Ecuador", @"countryName", 
+							   @"ec", @"countryCode",
+							   @"143509", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Honduras", @"countryName", 
+							   @"hn", @"countryCode",
+							   @"143510", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Jamaica", @"countryName", 
+							   @"jm", @"countryCode",
+							   @"143511", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Nicaragua", @"countryName", 
+							   @"ni", @"countryCode",
+							   @"143512", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Paraguay", @"countryName", 
+							   @"py", @"countryCode",
+							   @"143513", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Uruguay", @"countryName", 
+							   @"uy", @"countryCode",
+							   @"143514", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Macau", @"countryName", 
+							   @"mo", @"countryCode",
+							   @"143515", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Egypt", @"countryName", 
+							   @"eg", @"countryCode",
+							   @"143516", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Kazakhstan", @"countryName", 
+							   @"kz", @"countryCode",
+							   @"143517", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Estonia", @"countryName", 
+							   @"ee", @"countryCode",
+							   @"143518", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Latvia", @"countryName", 
+							   @"lv", @"countryCode",
+							   @"143519", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Lithuania", @"countryName", 
+							   @"lt", @"countryCode",
+							   @"143520", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Republic of Malta", @"countryName", 
+							   @"mt", @"countryCode",
+							   @"143521", @"storeFrontID", 
+							   nil]];
+		[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+							   @"Republic of Moldova", @"countryName", 
+							   @"md", @"countryCode",
+							   @"143523", @"storeFrontID", 
+							   nil]];
 	} while (NO);
 	
 	
