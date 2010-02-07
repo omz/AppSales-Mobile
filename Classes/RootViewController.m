@@ -331,6 +331,7 @@
 	else if ((row == 0) && (section == 1)) {
 		if ([[ReportManager sharedManager].appsByID count] == 0) {
 			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease] show];
+            [[self tableView ] deselectRowAtIndexPath:indexPath animated:YES];
 			return;
 		}
 		else {
