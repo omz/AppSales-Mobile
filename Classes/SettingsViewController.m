@@ -134,8 +134,18 @@ AppSalesMobile
 
 - (IBAction)uploadBackups:(id)sender
 {
+#if BACKUP_HOSTNAME
 	backupButton.hidden = YES;
 	[[ReportManager sharedManager] backupData];
+#else 
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"error: BACKUP_HOSTNAME is not set", nil)
+													message:NSLocalizedString(@"See documentation in source code", nil)
+												   delegate:self
+										  cancelButtonTitle:NSLocalizedString(@"ok", nil)
+										  otherButtonTitles:nil];
+	[alert show];
+	[alert release];
+#endif
 }
 
 @end
