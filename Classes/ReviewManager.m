@@ -26,7 +26,7 @@
 		} else {
 			appsByID = [[NSMutableDictionary alloc] init];
 		}
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveData) 
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancelWorkersAndSaveData) 
 													 name:UIApplicationWillTerminateNotification object:nil];
 	}
 	return self;
@@ -35,6 +35,27 @@
 - (void) dealloc {
 	[appsByID release];
 	[super dealloc];
+}
+
+- (void) cancel {
+#if APPSALES_DEBUG
+	NSLog(@"cancel requested");
+#endif	
+	@synchronized (self) {
+		cancelRequested = YES;
+	}
+}
+- (void) resetCacelRequested {
+	@synchronized (self) {
+		cancelRequested = NO;
+	}
+}
+- (BOOL) cancelWasRequested {
+	BOOL value; // GCC is stupid
+	@synchronized (self) {
+		value = cancelRequested;
+	}
+	return value;
 }
 
 - (NSDictionary*) getNextStoreToFetch {
@@ -93,106 +114,108 @@
 }
 
 - (void) workerThreadFetch { // called by worker threads
-	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];
-	NSAssert(! [NSThread isMainThread], nil);
-	
-	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
-	NSMutableDictionary *headers = [NSMutableDictionary dictionary];
-	
-	NSDictionary *storeInfo;
-	
-	while ((storeInfo = [self getNextStoreToFetch]) != nil) {
-		NSAutoreleasePool *innerPool = [NSAutoreleasePool new];
+	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];		
+	@try {
+		NSAssert(! [NSThread isMainThread], nil);
+		NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
+		NSMutableDictionary *headers = [NSMutableDictionary dictionary];
 		
-		NSString *countryCode = [storeInfo objectForKey:@"countryCode"];
-		NSDateFormatter *dateFormatter = [storeInfo objectForKey:@"dateFormatter"];
-		if (!dateFormatter) {
-			@synchronized (defaultDateFormatter) {
-				dateFormatter = [[defaultDateFormatter copy] autorelease]; // date formatters are not thread safe
+		NSDictionary *storeInfo;
+		while ((storeInfo = [self getNextStoreToFetch]) != nil) {
+			NSString *countryCode = [storeInfo objectForKey:@"countryCode"];
+			NSDateFormatter *dateFormatter = [storeInfo objectForKey:@"dateFormatter"];
+			if (!dateFormatter) {
+				@synchronized (defaultDateFormatter) {
+					dateFormatter = [[defaultDateFormatter copy] autorelease]; // date formatters are not thread safe
+				}
 			}
-		}
-		
-		NSString *storeFrontID = [storeInfo objectForKey:@"storeFrontID"];
-		NSString *storeFront = [storeFrontID stringByAppendingFormat:@"-1"];
-		[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
-		[headers setObject:storeFront forKey:@"X-Apple-Store-Front"];
-		[request setAllHTTPHeaderFields:headers];
-		[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
-				
-		for (NSString *appID in [appsByID keyEnumerator]) {
-			NSString *reviewsURLString = [NSString stringWithFormat:@"http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=4&type=Purple+Software", appID];
-			[request setURL:[NSURL URLWithString:reviewsURLString]];
-			
-			NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
-			NSString *xml = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 						
-			NSScanner *scanner = [NSScanner scannerWithString:xml];
-			int i = 0;
-			do {
-				NSString *reviewTitle = nil;
-				NSString *reviewDateAndVersion = nil;
-				NSString *reviewUser = nil;
-				NSString *reviewText = nil;
-				NSString *reviewStars = nil;
-				NSString *reviewVersion = nil;
-				NSDate *reviewDate = nil;
+			NSString *storeFrontID = [storeInfo objectForKey:@"storeFrontID"];
+			NSString *storeFront = [storeFrontID stringByAppendingFormat:@"-1"];
+			[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
+			[headers setObject:storeFront forKey:@"X-Apple-Store-Front"];
+			[request setAllHTTPHeaderFields:headers];
+			[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+					
+			for (NSString *appID in [appsByID keyEnumerator]) {
+				NSString *reviewsURLString = [NSString stringWithFormat:@"http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=4&type=Purple+Software", appID];
+				[request setURL:[NSURL URLWithString:reviewsURLString]];
 				
-				[scanner scanUpToString:@"<TextView topInset=\"0\" truncation=\"right\" leftInset=\"0\" squishiness=\"1\" styleSet=\"basic13\" textJust=\"left\" maxLines=\"1\">" intoString:NULL];
-				[scanner scanUpToString:@"<b>" intoString:NULL];
-				[scanner scanString:@"<b>" intoString:NULL];
-				[scanner scanUpToString:@"</b>" intoString:&reviewTitle];
-				
-				[scanner scanUpToString:@"<HBoxView topInset=\"1\" alt=\"" intoString:NULL];
-				[scanner scanString:@"<HBoxView topInset=\"1\" alt=\"" intoString:NULL];
-				[scanner scanUpToString:@" " intoString:&reviewStars];
-				
-				[scanner scanUpToString:@"viewUsersUserReviews" intoString:NULL];
-				[scanner scanString:@"viewUsersUserReviews" intoString:NULL];
-				[scanner scanUpToString:@">" intoString:NULL];
-				[scanner scanString:@">" intoString:NULL];
-				[scanner scanUpToString:@"</GotoURL>" intoString:&reviewUser];
-				reviewUser = [reviewUser stringByReplacingOccurrencesOfString:@"<b>" withString:@""]; // should use a regular expression to strip html tags
-				reviewUser = [reviewUser stringByReplacingOccurrencesOfString:@"</b>" withString:@""];
-				reviewUser = [reviewUser stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-				
-				[scanner scanUpToString:@" - " intoString:NULL];
-				[scanner scanString:@" - " intoString:NULL];
-				[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewDateAndVersion];
-				reviewDateAndVersion = [reviewDateAndVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-				NSArray *dateVersionSplitted = [reviewDateAndVersion componentsSeparatedByString:@"- "];
-				if ([dateVersionSplitted count] == 3) {
-					NSString *version = [dateVersionSplitted objectAtIndex:1];
-					reviewVersion = [version stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-					NSString *date = [dateVersionSplitted objectAtIndex:2];
-					date = [date stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-					reviewDate = [dateFormatter dateFromString:date];
+				NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
+				if ([self cancelWasRequested]) { // check after making slow network call
+					return;
 				}
-				
-				[scanner scanUpToString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
-				[scanner scanString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
-				[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];
-				
-				if (reviewUser && reviewTitle && reviewText && reviewStars) {
-					Review *review = [[[Review alloc] initWithUser:[reviewUser removeHtmlEscaping] reviewDate:reviewDate
-													 downloadDate:downloadDate version:reviewVersion countryCode:countryCode
-															title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
-															 stars:[reviewStars intValue]] autorelease];
-					[self addOrUpdatedReviewIfNeeded:review appID:appID];
-				}
-				
-				i++;
-			} while (![scanner isAtEnd]);
+				NSString *xml = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+							
+				NSScanner *scanner = [NSScanner scannerWithString:xml];
+				int i = 0;
+				do {
+					NSString *reviewTitle = nil;
+					NSString *reviewDateAndVersion = nil;
+					NSString *reviewUser = nil;
+					NSString *reviewText = nil;
+					NSString *reviewStars = nil;
+					NSString *reviewVersion = nil;
+					NSDate *reviewDate = nil;
+					
+					[scanner scanUpToString:@"<TextView topInset=\"0\" truncation=\"right\" leftInset=\"0\" squishiness=\"1\" styleSet=\"basic13\" textJust=\"left\" maxLines=\"1\">" intoString:NULL];
+					[scanner scanUpToString:@"<b>" intoString:NULL];
+					[scanner scanString:@"<b>" intoString:NULL];
+					[scanner scanUpToString:@"</b>" intoString:&reviewTitle];
+					
+					[scanner scanUpToString:@"<HBoxView topInset=\"1\" alt=\"" intoString:NULL];
+					[scanner scanString:@"<HBoxView topInset=\"1\" alt=\"" intoString:NULL];
+					[scanner scanUpToString:@" " intoString:&reviewStars];
+					
+					[scanner scanUpToString:@"viewUsersUserReviews" intoString:NULL];
+					[scanner scanString:@"viewUsersUserReviews" intoString:NULL];
+					[scanner scanUpToString:@">" intoString:NULL];
+					[scanner scanString:@">" intoString:NULL];
+					[scanner scanUpToString:@"</GotoURL>" intoString:&reviewUser];
+					reviewUser = [reviewUser stringByReplacingOccurrencesOfString:@"<b>" withString:@""]; // should use a regular expression to strip html tags
+					reviewUser = [reviewUser stringByReplacingOccurrencesOfString:@"</b>" withString:@""];
+					reviewUser = [reviewUser stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+					
+					[scanner scanUpToString:@" - " intoString:NULL];
+					[scanner scanString:@" - " intoString:NULL];
+					[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewDateAndVersion];
+					reviewDateAndVersion = [reviewDateAndVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+					NSArray *dateVersionSplitted = [reviewDateAndVersion componentsSeparatedByString:@"- "];
+					if ([dateVersionSplitted count] == 3) {
+						NSString *version = [dateVersionSplitted objectAtIndex:1];
+						reviewVersion = [version stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+						NSString *date = [dateVersionSplitted objectAtIndex:2];
+						date = [date stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+						reviewDate = [dateFormatter dateFromString:date];
+					}
+					
+					[scanner scanUpToString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
+					[scanner scanString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
+					[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];
+					
+					if (reviewUser && reviewTitle && reviewText && reviewStars) {
+						Review *review = [[[Review alloc] initWithUser:[reviewUser removeHtmlEscaping] reviewDate:reviewDate
+														 downloadDate:downloadDate version:reviewVersion countryCode:countryCode
+																title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
+																 stars:[reviewStars intValue]] autorelease];
+						[self addOrUpdatedReviewIfNeeded:review appID:appID];
+					}
+					i++;
+					if ([self cancelWasRequested]) { // check again after potentially making another network call  
+						return;
+					}					
+				} while (![scanner isAtEnd]);
+			}
+			[self incrementStatusPercentage];
 		}
-		[self incrementStatusPercentage];
-		[innerPool release];
+	} @finally {
+		[self workerDone];
+		[outerPool release];
 	}
-	
-	[self workerDone];
-	[outerPool release];
 }
 
 
-NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
+static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	NSString *arg1CountryCode = [(NSDictionary*)arg1 objectForKey:@"countryCode"];
 	NSString *arg2CountryCode = [(NSDictionary*)arg2 objectForKey:@"countryCode"];
 	NSNumber *arg1Count = [(NSDictionary*)arg3 objectForKey:arg1CountryCode];
@@ -209,6 +232,9 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 - (void) updateReviews {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	NSAssert(! [NSThread isMainThread], nil);
+#if APPSALES_DEBUG
+	NSDate *start = [NSDate date];
+#endif
 
 	// setup store fronts, this should probably go into a plist...:
 	NSDateFormatter *frenchDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
@@ -492,7 +518,6 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 						   @"vn", @"countryCode",
 						   @"143471", @"storeFrontID", 
 						   nil]];
-	
 	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
 						   @"Australia", @"countryName", 
 						   @"au", @"countryCode",
@@ -566,16 +591,14 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	condition = [[NSCondition alloc] init];
 	numThreadsActive = NUMBER_OF_FETCHING_THREADS;
 	
-	NSDate *start = [NSDate date];
 	for (int i=0; i < NUMBER_OF_FETCHING_THREADS; i++) {
 		[self performSelectorInBackground:@selector(workerThreadFetch) withObject:nil];
 	}
 	
 	[condition lock];
-	[condition wait]; // wait for workers to finish
+	[condition wait]; // wait for workers to finish (or cancel is requested)
 	[condition unlock];
-	NSLog(@"update took %f sec", -1*[start timeIntervalSinceNow]);
-			
+	
 	[condition release];
 	condition = nil;
 	[storeInfos release];
@@ -584,8 +607,11 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	defaultDateFormatter = nil;
 	[downloadDate release];
 	downloadDate = nil;
-	
+		
 	[self performSelectorOnMainThread:@selector(finishDownloadingReviews) withObject:nil waitUntilDone:NO];
+#if APPSALES_DEBUG
+	NSLog(@"update took %f sec", -1*start.timeIntervalSinceNow);
+#endif		
 	[pool release];
 }
 
@@ -603,6 +629,7 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 		return;
 	}
 	isDownloadingReviews = YES;
+	[self resetCacelRequested];
 	[UIApplication sharedApplication].idleTimerDisabled = YES;	
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
@@ -617,13 +644,20 @@ NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	NSAssert([NSThread isMainThread], nil);	
 	isDownloadingReviews = NO;
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
-	[self updateReviewDownloadProgress:@""];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
+	if (! [self cancelWasRequested]) {
+		[self updateReviewDownloadProgress:@""];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
+	}
 }
 
-- (void) saveData {
+- (void) cancelWorkersAndSaveData {
+	[self cancel];
 	NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
+	// FIXME: synchronization should be here.  See comments inside App serialization encoding method 
 	[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
+#if APPSALES_DEBUG
+	NSLog(@"reviews archived");
+#endif
 }
 
 - (App*) appWithID:(NSString*)appID {

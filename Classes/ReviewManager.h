@@ -13,6 +13,7 @@
 	float percentComplete, progressIncrement; // for presentation
 	
 	BOOL isDownloadingReviews;
+	BOOL cancelRequested; // guarded by self synchronization
 	NSString *reviewDownloadStatus;
 	
 	// used by worker threads
