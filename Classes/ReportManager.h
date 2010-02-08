@@ -12,6 +12,10 @@
 #define ReportManagerDownloadedWeeklyReportsNotification			@"ReportManagerDownloadedWeeklyReportsNotification"
 #define ReportManagerUpdatedDownloadProgressNotification			@"ReportManagerUpdatedDownloadProgressNotification"
 
+// only needed if using backup feature.  See comments in upload_appsales.php file.
+//#define BACKUP_HOSTNAME \
+//	@"http://<computer-name>.local/~<username>/upload_appsales.php"
+
 @class Day;
 
 @interface ReportManager : NSObject {

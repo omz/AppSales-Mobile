@@ -6,8 +6,8 @@
 //  Copyright 2009 omz:software. All rights reserved.
 //
 
-#import "ReportManager.h"
 #import <zlib.h>
+#import "ReportManager.h"
 #import "NSDictionary+HTTP.h"
 #import "Day.h"
 #import "Country.h"
@@ -18,11 +18,6 @@
 #import "Review.h"
 #import "ASIFormDataRequest.h"
 #import "ReviewManager.h"
-
-#error BACKUP_HOSTNAME -- Set macro appropriate for your setup 
-#define BACKUP_HOSTNAME \
-	@"http://<computer-name>.local/~<username>/upload_appsales.php"
-
 
 @implementation ReportManager
 
@@ -545,9 +540,15 @@
 
 - (void)startUpload
 {
+	NSURL *url;
+#if BACKUP_HOSTNAME
+	url = [NSURL URLWithString:BACKUP_HOSTNAME];
+#else
+	NSAssert(false, @"please set BACKUP_HOSTNAME before using");
+#endif
 	if ([backupList count] > 0) {
 		Day *d = [backupList objectAtIndex:0];
-		NSURL *url = [NSURL URLWithString:BACKUP_HOSTNAME];
+
 		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[d proposedFilename]];
 		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
 		[request setPostValue:[d proposedFilename] forKey:@"filename"];
@@ -557,7 +558,6 @@
 		[request startAsynchronous];
 	} else if (backupReviewsFile) {
 		backupReviewsFile = NO;
-		NSURL *url = [NSURL URLWithString:BACKUP_HOSTNAME];
 		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:@"ReviewApps.rev"];
 		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
 		[request setPostValue:@"ReviewApps.rev" forKey:@"filename"];
