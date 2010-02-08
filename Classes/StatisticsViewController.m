@@ -11,6 +11,8 @@
 #import "RegionsGraphView.h"
 #import "Day.h"
 #import "ReportManager.h"
+#import "Entry.h"
+#import "Country.h"
 
 #define GRAPH_MODE_ALERT_TAG	123
 
@@ -110,20 +112,28 @@
 	NSRange selectedRange = NSMakeRange(fromIndex, toIndex - fromIndex + 1);
 	self.selectedDays = [self.days subarrayWithRange:selectedRange];
 	
-	NSMutableSet *allApps = [NSMutableSet set];
+	// this is gross!  There should be a way to lookup an app name by it's id, and the converse
+	NSMutableDictionary *appNamesByAppId = [NSMutableDictionary dictionary];
+	NSMutableDictionary *appIdByAppName = [NSMutableDictionary dictionary];
 	for (Day *d in selectedDays) {
-		[allApps addObjectsFromArray:[d allProductIDs]];
+		for (Country *c in d.countries.allValues) {
+			for (Entry *e in c.entries) { // O(N^3) for a simple lookup?  You know it baby!
+				[appNamesByAppId setObject:e.productName forKey:e.productIdentifier];
+				[appIdByAppName setObject:e.productIdentifier forKey:e.productName];
+			}
+		}
 	}
-	NSArray *allAppsSorted = [[allApps allObjects] sortedArrayUsingSelector:@selector(compare:)];
+	NSArray *allAppsSorted = [[appNamesByAppId allValues] sortedArrayUsingSelector:@selector(compare:)];
 	for (UIView *v in self.trendViewsForApps) {
 		[v removeFromSuperview];
 	}
 	[trendViewsForApps removeAllObjects];
 	float x = 640.0;
-	for (NSString *app in allAppsSorted) {
+	for (NSString *appName in allAppsSorted) {
 		TrendGraphView *trendView = [[[TrendGraphView alloc] initWithFrame:CGRectMake(x, 0, 320, 200)] autorelease];
 		trendView.days = nil;
-		trendView.appID = app;
+		trendView.appName = appName;
+		trendView.appID = [appIdByAppName objectForKey:appName];
 		[trendViewsForApps addObject:trendView];
 		[self.scrollView addSubview:trendView];
 		x += 320;
