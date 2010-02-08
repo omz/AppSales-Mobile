@@ -91,7 +91,7 @@
 	
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
 	int numberOfReviews = [app.reviewsByUser count];
-	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i Reviews",nil), numberOfReviews];
+	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i reviews",nil), numberOfReviews];
 	if (app.newReviewsCount) {
 		numberOfReviewsDescription = [numberOfReviewsDescription stringByAppendingFormat:
 									  NSLocalizedString(@" (%i new)",nil), app.newReviewsCount];
