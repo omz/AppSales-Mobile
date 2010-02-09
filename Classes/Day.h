@@ -59,6 +59,8 @@
 + (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
+- (id)initAsAllOfTime; // fragile hack used by TotalController 
+
 - (Country *)countryNamed:(NSString *)countryName;
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app;

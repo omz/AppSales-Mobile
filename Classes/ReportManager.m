@@ -60,17 +60,18 @@
 	if (! needsDataSavedToDisk) {
 		return; // everythings up to date
 	}
+	needsDataSavedToDisk = NO;
 	
-	//save all days/weeks in separate files:
+	// save all days/weeks in separate files
+	NSString *docPath = getDocPath();
 	for (Day *d in days.allValues) {
-		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[d proposedFilename]];
+		NSString *fullPath = [docPath stringByAppendingPathComponent:[d proposedFilename]];
 		[NSKeyedArchiver archiveRootObject:d toFile:fullPath];
 	}
 	for (Day *w in weeks.allValues) {
-		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[w proposedFilename]];
+		NSString *fullPath = [docPath stringByAppendingPathComponent:[w proposedFilename]];
 		[NSKeyedArchiver archiveRootObject:w toFile:fullPath];
 	}
-	needsDataSavedToDisk = NO;
 }
 
 - (void)loadSavedFilesFromPath:(NSString*)docPath 

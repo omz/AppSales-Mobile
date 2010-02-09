@@ -33,6 +33,7 @@
 #import "Entry.h"
 #import "CurrencyManager.h"
 #import "AppIconManager.h"
+#import "ReportManager.h"
 
 static BOOL parseDateString(NSString *dateString, int *year, int *month, int *day) {
 	if ([dateString rangeOfString:@"/"].location == NSNotFound) {
@@ -175,6 +176,71 @@ static BOOL shouldLoadCountries = YES;
 	return self;
 }
 
+- (id) initAsAllOfTime { //  not intended to be used by anyone except TotalController
+	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
+	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	if (sortedWeeks.count == 0) {
+		[self dealloc];
+		return nil;
+	}
+
+	self = [self init];
+	if (self) {		
+		Day *latestWeek = [sortedWeeks objectAtIndex:0];
+		
+		countries = [[NSMutableDictionary alloc] init];
+		isWeek = TRUE;
+		name = cachedWeekEndDateString = @"total";
+		date = [latestWeek.date retain];
+		
+		NSDate *startOfDay = [date addTimeInterval:(24*7-1)*3600];
+		NSMutableArray *additionalDays = [NSMutableArray array];
+		for (Day *d in sortedDays) {
+			if ([d.date compare:startOfDay] == NSOrderedDescending) {
+				[additionalDays addObject:d];
+			}
+		}
+		
+		if (sortedDays.count > 0) {
+			[date release];
+			date = [[[sortedDays objectAtIndex:0] date] retain];
+		}
+		
+		NSArray *days = [sortedWeeks arrayByAddingObjectsFromArray:additionalDays];
+		for (Day *w in days) {
+			for (Country *c in [w.countries allValues]) {
+				Country *country = [self countryNamed:c.name];
+				Entry *totalEntry = nil;
+				
+				for (Entry *e in c.entries) {
+					for (Entry *totalE in country.entries) {
+						if ([e.productName isEqualToString:totalE.productName] &&
+							e.royalties == totalE.royalties &&
+							e.transactionType == totalE.transactionType) {
+							totalEntry = totalE;
+							break;
+						}
+					}
+					if (totalEntry == nil) {
+						[[[Entry alloc] initWithProductIdentifier:e.productIdentifier 
+															name:e.productName 
+												 transactionType:e.transactionType 
+														   units:e.units 
+													   royalties:e.royalties
+														currency:e.currency
+														  country:country] autorelease];
+					} else {
+						totalEntry.units += e.units;
+						totalEntry = nil;
+					}
+				}
+			}
+		}
+	}
+	return self;
+}
+
 + (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // serialized data 
 {
 	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
@@ -196,6 +262,7 @@ static BOOL shouldLoadCountries = YES;
 	
 	return [loadedDay autorelease];
 }
+
 
 - (NSMutableDictionary *)countries
 {	

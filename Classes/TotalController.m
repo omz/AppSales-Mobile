@@ -7,16 +7,9 @@
 //
 
 #import "TotalController.h"
-
-#import "Day.h"
-#import "WeekCell.h"
-#import "CountriesController.h"
-#import "RootViewController.h"
 #import "CurrencyManager.h"
 #import "ReportManager.h"
-
-#import "Country.h"
-#import "Entry.h"
+#import "Day.h"
 
 @implementation TotalController
 
@@ -35,66 +28,9 @@
 - (void)reload
 {
 	self.daysByMonth = [NSMutableArray array];
-	[daysByMonth addObject:[NSMutableArray array]];
+	Day *total = [[[Day alloc] initAsAllOfTime] autorelease];
+	[daysByMonth addObject:[NSMutableArray arrayWithObject:total]];
 	
-	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
-	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-	NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-	if (sortedWeeks.count == 0) {
-		NSLog(@"no weekly data found"); // if user views totals during first report download
-		return;
-	}
-//	Day *latestWeek = [sortedWeeks objectAtIndex:0];
-//
-//	Day *total = nil;
-//	total = [[[Day alloc] init] autorelease];
-//	total.countries = [NSMutableDictionary dictionary];
-//	total.isWeek = TRUE;
-//	total.wasLoadedFromDisk = TRUE;
-//	total.cachedWeekEndDateString = @"total"; // FIXME
-//	total.date = latestWeek.date;
-//
-//	NSDate *startOfDay = [total.date addTimeInterval:(24*7-1)*3600];
-//	NSMutableArray *additionalDays = [NSMutableArray array];
-//	for(Day *d in sortedDays) {
-//		if([d.date compare:startOfDay] == NSOrderedDescending) {
-//			[additionalDays addObject:d];
-//		}
-//	}
-//
-//	if([sortedDays count] > 0) {
-//		total.date = [[sortedDays objectAtIndex:0] date]; // FIXME
-//	}
-
-	NSArray *days = [sortedWeeks arrayByAddingObjectsFromArray:sortedDays];
-	for(Day *w in days) {
-		for (Country *country in [w.countries allValues]) {
-			for (Entry *e in country.entries) {
-				Entry *totalEntry = nil;
-				for (Entry *totalE in country.entries) {
-					if ([e.productIdentifier isEqualToString:totalE.productIdentifier] 
-							&& e.royalties == totalE.royalties
-							&& e.transactionType == totalE.transactionType) {
-						totalEntry = totalE;
-						break;
-					}
-				}
-				if (totalEntry == nil) {
-					[[[Entry alloc] initWithProductIdentifier:e.productIdentifier
-														 name:e.productName
-											  transactionType:e.transactionType
-														units:e.units
-													royalties:e.royalties
-													 currency:e.currency
-													  country:country] autorelease];
-				} else {
-					totalEntry.units += e.units;
-				}
-			}
-		}
-	}
-//	[[daysByMonth lastObject] addObject:total];
-
 	[self.tableView reloadData];
 }
 

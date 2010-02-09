@@ -88,7 +88,12 @@
 
 - (void)selectGraphMode
 {
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:NSLocalizedString(@"Sales",nil), NSLocalizedString(@"Revenue",nil), nil] autorelease];
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" 
+													 message:@"" 
+													delegate:self 
+										   cancelButtonTitle:NSLocalizedString(@"Cancel",nil) 
+										   otherButtonTitles:NSLocalizedString(@"Sales",nil), 
+															 NSLocalizedString(@"Revenue",nil), nil] autorelease];
 	alert.tag = GRAPH_MODE_ALERT_TAG;
 	[alert show];
 }
@@ -204,12 +209,17 @@
 			break;
 	}
 	
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self 
+										   cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
 	[alert addButtonWithTitle:NSLocalizedString(@"All Time",nil)];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 7 Days",nil)];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 30 Days",nil)];
+	int i = 2; // alertView acts screwy if too many entries are present
 	for (NSString *monthButton in months) {
 		[alert addButtonWithTitle:monthButton];
+		if (--i == 0) {
+			break; // stop adding buttons, otherwise they'll run off the dialog
+		}
 	}
 	
 	[alert show];
