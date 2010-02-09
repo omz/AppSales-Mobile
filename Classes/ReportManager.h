@@ -39,6 +39,7 @@
 + (ReportManager *)sharedManager;
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
+- (void) loadSavedFiles;
 
 - (void)setProgress:(NSString *)status;
 

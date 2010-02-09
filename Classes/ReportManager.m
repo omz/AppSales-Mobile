@@ -102,6 +102,24 @@
 }
 
 #define LOAD_PREFETCH_PREVIOUSLY_RAN @"PrefetchPreviouslyLoaded"
+- (void) loadSavedFiles {
+	NSAssert(! [NSThread isMainThread], nil);
+	
+	// files included in bundle.  Only load once since the data is re-saved in documents path
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	if (! [defaults boolForKey:LOAD_PREFETCH_PREVIOUSLY_RAN]) {
+#if APPSALES_DEBUG
+		NSLog(@"loading old data");
+#endif
+		[self loadSavedFilesFromPath:getPrefetchedPath()];
+		[self saveDataIfNeeded];
+		[defaults setBool:YES forKey:LOAD_PREFETCH_PREVIOUSLY_RAN];
+		[defaults synchronize];
+	}
+	
+	[self loadSavedFilesFromPath:getDocPath()]; // files saved by app
+}
+
 - (id)init {
 	[super init];
 	
@@ -109,21 +127,6 @@
 	self.weeks = [NSMutableDictionary dictionary];
 	self.backupList = [NSMutableArray array];
 	
-	// TODO: all loading should be done on a background thread, 
-	// otherwise lots of data can cause the application to 'timeout' on startup
-	[self loadSavedFilesFromPath:getDocPath()]; // files saved by app
-	
-	// files included in bundle.  Only load once since the data is re-saved in documents path
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	if (! [defaults boolForKey:LOAD_PREFETCH_PREVIOUSLY_RAN]) {
-		#if APPSALES_DEBUG
-		NSLog(@"loading old data");
-		#endif
-		[self loadSavedFilesFromPath:getPrefetchedPath()];
-		[self saveDataIfNeeded];
-		[defaults setBool:YES forKey:LOAD_PREFETCH_PREVIOUSLY_RAN];
-		[defaults synchronize];
-	}
 		
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
