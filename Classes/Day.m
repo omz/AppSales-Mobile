@@ -34,41 +34,48 @@
 #import "CurrencyManager.h"
 #import "AppIconManager.h"
 
+static BOOL parseDateString(NSString *dateString, int *year, int *month, int *day) {
+	if ([dateString rangeOfString:@"/"].location == NSNotFound) {
+		if (dateString.length == 8) { //old date format
+			*year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
+			*month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
+			*day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
+			return YES; // parsed ok
+		}
+	} else if (dateString.length == 10) { //new date format
+		*year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
+		*month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
+		*day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
+		return YES;
+	}
+	return NO; // unrecognized string
+}
+
+@interface Day (private) // used by class factory methods
+- (void) setPathOnDisk:(NSString*)path;
+@end
+
+
 @implementation Day
 
 @synthesize date;
 @synthesize countries;
-@synthesize cachedWeekEndDateString;
-@synthesize cachedWeekDayColor;
-@synthesize cachedDayString;
 @synthesize isWeek;
-@synthesize wasLoadedFromDisk;
 @synthesize name;
-@synthesize pathOnDisk;
-
-- (id)init
-{
-	if (self = [super init]) {
-	}
-	
-	return self;
-}
 
 - (id)initWithCSV:(NSString *)csv
 {
 	[self init];
-	
-	self.wasLoadedFromDisk = NO;
-	
-	self.countries = [NSMutableDictionary dictionary];
+		
+	countries = [[NSMutableDictionary alloc] init];
 	
 	NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
-	if ([lines count] > 0)
-		[lines removeObjectAtIndex:0];
-	if ([lines count] == 0) {
+	if (lines.count == 0) { //sanity check
+		NSLog(@"unrecognized CSV text %@", csv);
 		[self release];
-		return nil; //sanity check
+		return nil;
 	}
+	[lines removeObjectAtIndex:0];
 	
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
@@ -77,20 +84,46 @@
 			NSString *transactionType = [columns objectAtIndex:8];
 			NSString *units = [columns objectAtIndex:9];
 			NSString *royalties = [columns objectAtIndex:10];
-			NSString *dateColumn = [columns objectAtIndex:11];
+			NSString *dateStartColumn = [columns objectAtIndex:11];
+			NSString *dateEndColumn = [columns objectAtIndex:12];
 			NSString *appId = [columns objectAtIndex:19];
 			[[AppIconManager sharedManager] downloadIconForAppID:appId];
-			if (!self.date) {
-				if ((([dateColumn rangeOfString:@"/"].location != NSNotFound) && ([dateColumn length] == 10))
-					|| (([dateColumn rangeOfString:@"/"].location == NSNotFound) && ([dateColumn length] == 8))) {
-					[self setDateString:dateColumn];
-				}
-				else {
-					NSLog(@"Date is invalid: %@", dateColumn);
-					[self release];
-					return nil;
-				}
+			isWeek = ![dateStartColumn isEqualToString:dateEndColumn];
+			
+			int startYear, startMonth, startDay;
+			// not storing the end date, but we'll verify it's in the format we expect
+			if (! parseDateString(dateStartColumn, &startYear, &startMonth, &startDay)) {
+				NSLog(@"start date is invalid: %@", dateEndColumn);
+				[self release];
+				return nil;				
 			}
+			
+			int endYear, endMonth, endDay;
+			if (! parseDateString(dateEndColumn, &endYear, &endMonth, &endDay)) {
+				NSLog(@"end date is invalid: %@", dateEndColumn);
+				[self release];
+				return nil;
+			}
+			
+			int nameYear, nameMonth, nameDay;
+			NSCalendar *calendar = [NSCalendar currentCalendar];
+			NSDateComponents *components = [[NSDateComponents new] autorelease];
+			if (isWeek) { // weeks use their ending period as the 'name', just as iTunes Connect does
+				nameYear = endYear;
+				nameMonth = endMonth;
+				nameDay = endDay;
+			} else {
+				nameYear = startYear;
+				nameMonth = startMonth;
+				nameDay = startDay;				
+			}
+			[components setYear:nameYear];
+			[components setMonth:nameMonth];
+			[components setDay:nameDay];
+			date = [[calendar dateFromComponents:components] retain];
+			name = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", nameMonth, nameDay, nameYear];	
+
+			
 			NSString *countryString = [columns objectAtIndex:14];
 			if ([countryString length] != 2) {
 				NSLog(@"Country code is invalid");
@@ -125,9 +158,9 @@ static BOOL shouldLoadCountries = YES;
 {
 	[self init];
 	
-	self.date = [coder decodeObjectForKey:@"date"];
-	self.isWeek = [coder decodeBoolForKey:@"isWeek"];
-	self.name = [coder decodeObjectForKey:@"name"];
+	date = [[coder decodeObjectForKey:@"date"] retain];
+	name = [[coder decodeObjectForKey:@"name"] retain];
+	isWeek = [coder decodeBoolForKey:@"isWeek"];
 	
 	/* 
 	 * shouldLoadCountries will be set to NO if we're loading via dayFromFile:atPath:
@@ -135,33 +168,40 @@ static BOOL shouldLoadCountries = YES;
 	 * point a new Day object will be loaded from disk at the same path and load its countries. We'll
 	 * then assign countries to that Day object's countries.
 	 */
-	if (shouldLoadCountries)
-		self.countries = [coder decodeObjectForKey:@"countries"];
-	
-	self.wasLoadedFromDisk = YES;
+	if (shouldLoadCountries) {
+		countries = [[coder decodeObjectForKey:@"countries"] retain];
+	}
 	
 	return self;
 }
 
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
++ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // serialized data 
 {
-	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];	
+	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
 	
 	shouldLoadCountries = NO;
 	Day *loadedDay = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
-	shouldLoadCountries = YES;
 	loadedDay.pathOnDisk = fullPath;
+	shouldLoadCountries = YES;
 	
 	return loadedDay;
 }
 
++ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
+{
+	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];	
+	
+	Day *loadedDay = [[Day alloc] initWithCSV:[NSString stringWithContentsOfFile:fullPath encoding:NSUTF8StringEncoding error:nil]];
+	loadedDay.pathOnDisk = fullPath;
+	
+	return [loadedDay autorelease];
+}
+
 - (NSMutableDictionary *)countries
 {	
-	if (self.pathOnDisk && !countries) {
-		if (!countries) {		
-			countries = [((Day *)[NSKeyedUnarchiver unarchiveObjectWithFile:self.pathOnDisk]).countries retain];
-			self.pathOnDisk = nil;
-		}
+	if (pathOnDisk && !countries) {
+		countries = [((Day *)[NSKeyedUnarchiver unarchiveObjectWithFile:pathOnDisk]).countries retain];
+		[self setPathOnDisk:nil];
 	}
 	return countries;
 }
@@ -170,8 +210,8 @@ static BOOL shouldLoadCountries = YES;
 {
 	[coder encodeObject:self.countries forKey:@"countries"];
 	[coder encodeObject:self.date forKey:@"date"];
-	[coder encodeBool:self.isWeek forKey:@"isWeek"];
 	[coder encodeObject:self.name forKey:@"name"];
+	[coder encodeBool:self.isWeek forKey:@"isWeek"];
 }
 
 - (Country *)countryNamed:(NSString *)countryName
@@ -184,27 +224,12 @@ static BOOL shouldLoadCountries = YES;
 	return country;
 }
 
-- (void)setDateString:(NSString *)dateString
-{
-	int year, month, day;
-	if ([dateString rangeOfString:@"/"].location == NSNotFound) { //old date format
-		year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
-		month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
-		day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
-	}
-	else { //new date format
-		year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
-		month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
-		day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
-	}
-	
-	NSCalendar *calendar = [NSCalendar currentCalendar];
-	NSDateComponents *components = [[NSDateComponents new] autorelease];
-	[components setYear:year];
-	[components setMonth:month];
-	[components setDay:day];
-	self.date = [calendar dateFromComponents:components];
+- (void) setPathOnDisk:(NSString *)path {
+	[path retain];
+	[pathOnDisk release];
+	pathOnDisk = path;
 }
+
 
 - (NSString *)description
 {
@@ -292,60 +317,61 @@ static BOOL shouldLoadCountries = YES;
 
 - (NSString *)dayString
 {
-	if (!self.cachedDayString) {
+	if (!cachedDayString) {
 		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:self.date];
-		self.cachedDayString = [NSString stringWithFormat:@"%i", [components day]];
+		cachedDayString = [[NSString alloc] initWithFormat:@"%i", [components day]];
 	}
-	return self.cachedDayString;
+	return cachedDayString;
 }
 
 - (NSString *)weekdayString
 {
 	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
-	int weekday = [components weekday];
-	if (weekday == 1)
-		return NSLocalizedString(@"SUN",nil);
-	if (weekday == 2)
-		return NSLocalizedString(@"MON",nil);
-	if (weekday == 3)
-		return NSLocalizedString(@"TUE",nil);
-	if (weekday == 4)
-		return NSLocalizedString(@"WED",nil);
-	if (weekday == 5)
-		return NSLocalizedString(@"THU",nil);
-	if (weekday == 6)
-		return NSLocalizedString(@"FRI",nil);
-	if (weekday == 7)
-		return NSLocalizedString(@"SAT",nil);
-	return @"---";
+	switch ([components weekday]) {
+		case 1:
+			return NSLocalizedString(@"SUN",nil);
+		case 2:
+			return NSLocalizedString(@"MON",nil);
+		case 3:
+			return NSLocalizedString(@"TUE",nil);
+		case 4:
+			return NSLocalizedString(@"WED",nil);
+		case 5:
+			return NSLocalizedString(@"THU",nil);
+		case 6:
+			return NSLocalizedString(@"FRI",nil);
+		case 7:
+			return NSLocalizedString(@"SAT",nil);			
+	}
+	@throw [NSException exceptionWithName:@"unknown weekday" reason:[self.date description] userInfo:nil];
 }
 
 - (UIColor *)weekdayColor
 {
-	if (!self.cachedWeekDayColor) {
+	if (!cachedWeekDayColor) {
 		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
 		int weekday = [components weekday];
 		if (weekday == 1) //show sundays in red
-			self.cachedWeekDayColor = [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
+			cachedWeekDayColor = [[UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0] retain];
 		else
-			self.cachedWeekDayColor = [UIColor blackColor];
+			cachedWeekDayColor = [[UIColor blackColor] retain];
 	}
-	return self.cachedWeekDayColor;
+	return cachedWeekDayColor;
 }
 
 - (NSString *)weekEndDateString
 {
 	//The Day class is also used to represent weeks. This returns a formatted date of the day the week ends (7 days after date)
-	if (!self.cachedWeekEndDateString) {
+	if (!cachedWeekEndDateString) {
 		NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
 		[comp setHour:167];
 		NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:self.date options:0];
 		NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
 		[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
 		[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-		self.cachedWeekEndDateString = [dateFormatter stringFromDate:dateWeekLater];
+		cachedWeekEndDateString = [[dateFormatter stringFromDate:dateWeekLater] retain];
 	}
-	return self.cachedWeekEndDateString;
+	return cachedWeekEndDateString;
 }
 
 
@@ -367,14 +393,13 @@ static BOOL shouldLoadCountries = YES;
 
 - (void)dealloc
 {
-	self.cachedDayString = nil;
-	self.cachedWeekDayColor = nil;
-	self.cachedWeekEndDateString = nil;
-	self.countries = nil;
-	self.date = nil;
-	self.name = nil;
-	self.pathOnDisk = nil;
-	//self.lock_countries = nil;
+	[cachedDayString release];
+	[cachedWeekDayColor release];
+	[cachedWeekEndDateString release];
+	[countries release];
+	[date release];
+	[name release];
+	[pathOnDisk release];
 	
 	[super dealloc];
 }

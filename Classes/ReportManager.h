@@ -19,12 +19,12 @@
 @class Day;
 
 @interface ReportManager : NSObject {
-
 	NSMutableDictionary *days;
 	NSMutableDictionary *weeks;
 	NSMutableArray      *backupList;
 	
 	BOOL isRefreshing;
+	BOOL needsDataSavedToDisk;
 	NSString *reportDownloadStatus;
 	
 	int retryIfBackupFailure;
@@ -43,8 +43,7 @@
 - (void)setProgress:(NSString *)status;
 
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
-- (void)saveData;
-- (void)backupData;
+- (void)backupData; // backup to a remote host
 
 - (void)deleteDay:(Day *)dayToDelete;
 

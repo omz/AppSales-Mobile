@@ -26,7 +26,7 @@
 		} else {
 			appsByID = [[NSMutableDictionary alloc] init];
 		}
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancelWorkersAndSaveData) 
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancel) 
 													 name:UIApplicationWillTerminateNotification object:nil];
 	}
 	return self;
@@ -39,7 +39,7 @@
 
 - (void) cancel {
 #if APPSALES_DEBUG
-	NSLog(@"cancel requested");
+	if (isDownloadingReviews) NSLog(@"cancel requested");
 #endif	
 	@synchronized (self) {
 		cancelRequested = YES;
@@ -109,6 +109,7 @@
 
 	@synchronized (app) {
 		[app addOrReplaceReview:review];
+		saveToDiskNeeded = YES;
 	}
 	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:YES];
 }
@@ -645,19 +646,17 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	isDownloadingReviews = NO;
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	if (! [self cancelWasRequested]) {
+		if (saveToDiskNeeded) {
+			#if APPSALES_DEBUG
+			NSLog(@"saving reviews to disk");
+			#endif
+			NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
+			[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
+			saveToDiskNeeded = NO;
+		}
 		[self updateReviewDownloadProgress:@""];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 	}
-}
-
-- (void) cancelWorkersAndSaveData {
-	[self cancel];
-	NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
-	// FIXME: synchronization should be here.  See comments inside App serialization encoding method 
-	[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
-#if APPSALES_DEBUG
-	NSLog(@"reviews archived");
-#endif
 }
 
 - (App*) appWithID:(NSString*)appID {
@@ -666,6 +665,19 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 
 - (void) addApp:(App*)app {
 	[appsByID setObject:app forKey:app.appID];
+}
+
+- (BOOL) createOrUpdateAppIfNeededWithID:(NSString*)appID name:(NSString*)appName {
+	App *app = [self appWithID:appID];
+	if (app == nil) {
+		App *app = [[App alloc] initWithID:appID name:appName];
+		[self addApp:app];
+		[app release];
+		return YES;
+	} else if (! [app.appName isEqualToString:appName]) {
+		[app updateApplicationName:appName]; // name of app has changed
+	}
+	return NO; // was already present
 }
 
 - (NSUInteger) numberOfApps {

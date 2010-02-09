@@ -45,6 +45,12 @@ NSString* getPrefetchedPath() {
 	averageStars = sum / reviewsByUser.count;
 }
 
+- (void) updateApplicationName:(NSString*)newAppName {
+	[newAppName retain];
+	[appName release];
+	appName = newAppName;
+}
+
 - (float) averageStars {
 	return averageStars;
 }
@@ -84,17 +90,10 @@ NSString* getPrefetchedPath() {
 }
 
 - (void) encodeWithCoder:(NSCoder *)coder {
-	// FIXME: synchronization is needed here since ReviewManager might be modifying
-	// this instance while the app is shutting down and serializing out it's data.  
-	// This synchronization could be removed, but then the serialization caller would need to 
-	// synchronize on each instance it writes out (instead of just writing out a root object containing all apps)
-	// yes, this is kind of gross
-	@synchronized (self) {
-		[coder encodeObject:self.appID forKey:@"appID"];
-		[coder encodeObject:self.appName forKey:@"appName"];
-		[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
-		[coder encodeFloat:self.averageStars forKey:@"averageStars"];
-	}
+	[coder encodeObject:self.appID forKey:@"appID"];
+	[coder encodeObject:self.appName forKey:@"appName"];
+	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
+	[coder encodeFloat:self.averageStars forKey:@"averageStars"];
 }
 
 - (void) dealloc {

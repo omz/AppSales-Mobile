@@ -111,13 +111,18 @@ AppSalesMobile
 
 - (void)currencyRatesFailedToUpdate
 {
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error",nil) message:NSLocalizedString(@"The currency exchange rates could not be refreshed. Please check your internet connection.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error",nil) 
+													 message:NSLocalizedString(@"The currency exchange rates could not be refreshed. Please check your internet connection.",nil)
+													delegate:nil
+										   cancelButtonTitle:NSLocalizedString(@"OK",nil)
+										   otherButtonTitles:nil] autorelease];
 	[alert show];
 }
 
 - (void)baseCurrencyChanged
 {
-	[currencySelectionControl setTitle:[NSString stringWithFormat:NSLocalizedString(@"Select... ( %@ )",nil), [[CurrencyManager sharedManager] baseCurrencyDescription]] forSegmentAtIndex:0];
+	[currencySelectionControl setTitle:[NSString stringWithFormat:NSLocalizedString(@"Select... ( %@ )",nil), 
+										[[CurrencyManager sharedManager] baseCurrencyDescription]] forSegmentAtIndex:0];
 }
 
 - (IBAction)changeCurrency:(id)sender
@@ -138,8 +143,10 @@ AppSalesMobile
 	backupButton.hidden = YES;
 	[[ReportManager sharedManager] backupData];
 #else 
+	NSString *message = [NSLocalizedString(@"See documentation in source header of: ", nil) 
+						 stringByAppendingString:[[ReportManager class] description]];
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"error: BACKUP_HOSTNAME is not set", nil)
-													message:NSLocalizedString(@"See documentation in source code", nil)
+													message:message
 												   delegate:self
 										  cancelButtonTitle:NSLocalizedString(@"ok", nil)
 										  otherButtonTitles:nil];

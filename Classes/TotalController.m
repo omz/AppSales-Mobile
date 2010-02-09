@@ -44,33 +44,32 @@
 		NSLog(@"no weekly data found"); // if user views totals during first report download
 		return;
 	}
-	Day *latestWeek = [sortedWeeks objectAtIndex:0];
+//	Day *latestWeek = [sortedWeeks objectAtIndex:0];
+//
+//	Day *total = nil;
+//	total = [[[Day alloc] init] autorelease];
+//	total.countries = [NSMutableDictionary dictionary];
+//	total.isWeek = TRUE;
+//	total.wasLoadedFromDisk = TRUE;
+//	total.cachedWeekEndDateString = @"total"; // FIXME
+//	total.date = latestWeek.date;
+//
+//	NSDate *startOfDay = [total.date addTimeInterval:(24*7-1)*3600];
+//	NSMutableArray *additionalDays = [NSMutableArray array];
+//	for(Day *d in sortedDays) {
+//		if([d.date compare:startOfDay] == NSOrderedDescending) {
+//			[additionalDays addObject:d];
+//		}
+//	}
+//
+//	if([sortedDays count] > 0) {
+//		total.date = [[sortedDays objectAtIndex:0] date]; // FIXME
+//	}
 
-	Day *total = nil;
-	total = [[[Day alloc] init] autorelease];
-	total.countries = [NSMutableDictionary dictionary];
-	total.isWeek = TRUE;
-	total.wasLoadedFromDisk = TRUE;
-	total.cachedWeekEndDateString = @"total";
-	total.date = latestWeek.date;
-
-	NSDate *startOfDay = [total.date addTimeInterval:(24*7-1)*3600];
-	NSMutableArray *additionalDays = [NSMutableArray array];
-	for(Day *d in sortedDays) {
-		if([d.date compare:startOfDay] == NSOrderedDescending) {
-			[additionalDays addObject:d];
-		}
-	}
-
-	if([sortedDays count] > 0) {
-		total.date = [[sortedDays objectAtIndex:0] date];
-	}
-
-	NSArray *days = [sortedWeeks arrayByAddingObjectsFromArray:additionalDays];
+	NSArray *days = [sortedWeeks arrayByAddingObjectsFromArray:sortedDays];
 	for(Day *w in days) {
-		for (Country *c in [w.countries allValues]) {
-			Country *country = [total countryNamed:c.name];
-			for (Entry *e in c.entries) {
+		for (Country *country in [w.countries allValues]) {
+			for (Entry *e in country.entries) {
 				Entry *totalEntry = nil;
 				for (Entry *totalE in country.entries) {
 					if ([e.productIdentifier isEqualToString:totalE.productIdentifier] 
@@ -94,7 +93,7 @@
 			}
 		}
 	}
-	[[daysByMonth lastObject] addObject:total];
+//	[[daysByMonth lastObject] addObject:total];
 
 	[self.tableView reloadData];
 }

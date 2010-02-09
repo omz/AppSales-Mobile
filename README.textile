@@ -17,9 +17,16 @@ If you like, check out my commercial iPhone apps at "omz-software.com":http://om
 
 h2. Modified version by Edward Patel
 
-* Changed version -> 1.1
+* Changed version -> 1.2
 * Added compile time versioning which gives a bundle version like 1.1.yymmddhhmmss
 * Added backup of reportfiles to computer. Compiling will give an error at a line where a http access is hardcoded. We are developers so I think most should be able to figure it out.
 * Added a php script to receive and store reportfiles on the computer. Please read in upload_appsales.php for more information.
 * Merged ktakayama Totals additions
-* Merged jonkean translation additions 
+
+
+Jon Kean additions:
+* automatic translation of foreign reviews (using Google translate)
+* app review fetching is done in parallel (and now an order of magnitude faster than before)
+* importing of CSV files:
+  Copy any old CSV report files into the 'Prefetched' folder, and they'll be automatically imported the first time launching the app (which may take a few seconds to process everything)
+  CSV files can have either .csv or .txt extension.

@@ -14,6 +14,7 @@
 	
 	BOOL isDownloadingReviews;
 	BOOL cancelRequested; // guarded by self synchronization
+	BOOL saveToDiskNeeded;
 	NSString *reviewDownloadStatus;
 	
 	// used by worker threads
@@ -33,6 +34,7 @@
 - (BOOL) isDownloadingReviews;
 
 - (App*) appWithID:(NSString*)appID;
+- (BOOL) createOrUpdateAppIfNeededWithID:(NSString*)appID name:(NSString*)appName;
 - (void) addApp:(App*)app;
 
 - (NSArray*) appNamesSorted;
