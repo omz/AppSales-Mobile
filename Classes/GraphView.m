@@ -19,6 +19,7 @@
 		self.days = [NSArray array];
 		self.opaque = NO;
 		self.backgroundColor = [UIColor clearColor];
+		backgroundImage = [[UIImage imageNamed:@"GraphBackground.png"] retain];
     }
     return self;
 }
@@ -36,13 +37,14 @@
 
 - (void)drawRect:(CGRect)rect 
 {
-	[[UIImage imageNamed:@"GraphBackground.png"] drawAtPoint:CGPointZero];
+	[backgroundImage drawAtPoint:CGPointZero];
 }
 
 
 - (void)dealloc 
 {
 	self.days = nil;
+	[backgroundImage release];
     [super dealloc];
 }
 

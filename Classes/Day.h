@@ -29,46 +29,44 @@
  */
 
 #import <UIKit/UIKit.h>
+
 @class Country;
 
 @interface Day : NSObject {
-	//NSLock *lock_countries;
 	NSMutableDictionary *countries;
 	NSDate *date;
+	BOOL isWeek;
+	NSString *pathOnDisk;	
+	NSString *name;
+
+	// generated as needed
+	NSString *cachedDayString;
 	NSString *cachedWeekEndDateString;
 	UIColor *cachedWeekDayColor;
-	NSString *cachedDayString;
-	BOOL isWeek;
-	BOOL wasLoadedFromDisk;
-	NSString *pathOnDisk;
-	
-	NSString *name;
 }
 
-@property (nonatomic, retain) NSDate *date;
-@property (nonatomic, retain) NSMutableDictionary *countries;
-@property (nonatomic, retain) NSString *cachedWeekEndDateString;
-@property (nonatomic, retain) UIColor *cachedWeekDayColor;
-@property (nonatomic, retain) NSString *cachedDayString;
-@property (nonatomic, assign) BOOL isWeek;
-@property (nonatomic, assign) BOOL wasLoadedFromDisk;
-@property (nonatomic, retain) NSString *name;
-@property (nonatomic, retain) NSString *pathOnDisk;
+@property (readonly) NSDate *date;
+@property (readonly) NSMutableDictionary *countries;
+@property (readonly) NSString *weekEndDateString;
+@property (readonly) UIColor *weekdayColor;
+@property (readonly) NSString *dayString;
+@property (readonly) NSString *weekdayString;
+@property (readonly) NSString *totalRevenueString;
+@property (readonly) BOOL isWeek;
+@property (readonly) NSString *name; // the date as a full string, and typically used as a primary key
 
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
++ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // from serialized data
++ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
+- (id)initAsAllOfTime; // fragile hack used by TotalController 
+
 - (Country *)countryNamed:(NSString *)countryName;
-- (void)setDateString:(NSString *)dateString;
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app;
 - (int)totalUnitsForAppID:(NSString *)appID;
 - (int)totalUnits;
 - (NSArray *)allProductIDs;
-- (NSString *)dayString;
-- (NSString *)weekdayString;
-- (NSString *)weekEndDateString;
-- (NSString *)totalRevenueString;
 - (UIColor *)weekdayColor;
 - (NSString *)proposedFilename;
 - (NSArray *)children;

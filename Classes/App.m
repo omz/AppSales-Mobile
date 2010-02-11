@@ -45,6 +45,12 @@ NSString* getPrefetchedPath() {
 	averageStars = sum / reviewsByUser.count;
 }
 
+- (void) updateApplicationName:(NSString*)newAppName {
+	[newAppName retain];
+	[appName release];
+	appName = newAppName;
+}
+
 - (float) averageStars {
 	return averageStars;
 }

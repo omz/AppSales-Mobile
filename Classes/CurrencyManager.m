@@ -66,7 +66,7 @@
 	isRefreshing = NO;
 	self.baseCurrency = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerBaseCurrency"];
 	if (!self.baseCurrency)
-		self.baseCurrency = @"EUR";
+		self.baseCurrency = @"USD";
 	
 	self.lastRefresh = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerLastRefresh"];
 	if (!self.lastRefresh)

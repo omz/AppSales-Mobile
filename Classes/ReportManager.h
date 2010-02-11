@@ -12,15 +12,19 @@
 #define ReportManagerDownloadedWeeklyReportsNotification			@"ReportManagerDownloadedWeeklyReportsNotification"
 #define ReportManagerUpdatedDownloadProgressNotification			@"ReportManagerUpdatedDownloadProgressNotification"
 
+// only needed if using backup feature.  See comments in upload_appsales.php file.
+//#define BACKUP_HOSTNAME \
+//	@"http://<computer-name>.local/~<username>/upload_appsales.php"
+
 @class Day;
 
 @interface ReportManager : NSObject {
-
 	NSMutableDictionary *days;
 	NSMutableDictionary *weeks;
 	NSMutableArray      *backupList;
 	
 	BOOL isRefreshing;
+	BOOL needsDataSavedToDisk;
 	NSString *reportDownloadStatus;
 	
 	int retryIfBackupFailure;
@@ -35,12 +39,12 @@
 + (ReportManager *)sharedManager;
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
+- (void) loadSavedFiles;
 
 - (void)setProgress:(NSString *)status;
 
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
-- (void)saveData;
-- (void)backupData;
+- (void)backupData; // backup to a remote host
 
 - (void)deleteDay:(Day *)dayToDelete;
 

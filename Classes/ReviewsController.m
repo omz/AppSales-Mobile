@@ -23,7 +23,6 @@
 {
 	if (self = [super initWithStyle:style]) {
 		[self reload];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReviewManagerDownloadedReviewsNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) name:ReviewManagerUpdatedReviewDownloadProgressNotification object:nil];
 	}

@@ -35,7 +35,6 @@
 		7F4C218910230EF300F17F7D /* Daily.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217710230EF200F17F7D /* Daily.png */; };
 		7F4C218A10230EF300F17F7D /* DateButtonHighlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217810230EF200F17F7D /* DateButtonHighlight.png */; };
 		7F4C218B10230EF300F17F7D /* DateButtonNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217910230EF200F17F7D /* DateButtonNormal.png */; };
-		7F4C218C10230EF300F17F7D /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217A10230EF200F17F7D /* Default.png */; };
 		7F4C218D10230EF300F17F7D /* Download.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217B10230EF200F17F7D /* Download.png */; };
 		7F4C218E10230EF300F17F7D /* GraphBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217C10230EF200F17F7D /* GraphBackground.png */; };
 		7F4C218F10230EF300F17F7D /* GraphScrollBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4C217D10230EF200F17F7D /* GraphScrollBackground.png */; };
@@ -354,7 +353,6 @@
 		7F4C217710230EF200F17F7D /* Daily.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Daily.png; sourceTree = "<group>"; };
 		7F4C217810230EF200F17F7D /* DateButtonHighlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButtonHighlight.png; sourceTree = "<group>"; };
 		7F4C217910230EF200F17F7D /* DateButtonNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButtonNormal.png; sourceTree = "<group>"; };
-		7F4C217A10230EF200F17F7D /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		7F4C217B10230EF200F17F7D /* Download.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Download.png; sourceTree = "<group>"; };
 		7F4C217C10230EF200F17F7D /* GraphBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraphBackground.png; sourceTree = "<group>"; };
 		7F4C217D10230EF200F17F7D /* GraphScrollBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GraphScrollBackground.png; sourceTree = "<group>"; };
@@ -670,6 +668,7 @@
 		FA7E808010B7784200D046E0 /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonParser.m; path = "Classes/Google Translate ObjC/SBJsonParser.m"; sourceTree = "<group>"; };
 		FA7E808110B7784200D046E0 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = "Classes/Google Translate ObjC/SBJsonWriter.h"; sourceTree = "<group>"; };
 		FA7E808210B7784200D046E0 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = "Classes/Google Translate ObjC/SBJsonWriter.m"; sourceTree = "<group>"; };
+		FA81AF781122124200BDDBFC /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -795,7 +794,6 @@
 				7F4C217710230EF200F17F7D /* Daily.png */,
 				7F4C217810230EF200F17F7D /* DateButtonHighlight.png */,
 				7F4C217910230EF200F17F7D /* DateButtonNormal.png */,
-				7F4C217A10230EF200F17F7D /* Default.png */,
 				7F4C217B10230EF200F17F7D /* Download.png */,
 				7F4C217C10230EF200F17F7D /* GraphBackground.png */,
 				7F4C217D10230EF200F17F7D /* GraphScrollBackground.png */,
@@ -1281,7 +1279,6 @@
 				7F4C218910230EF300F17F7D /* Daily.png in Resources */,
 				7F4C218A10230EF300F17F7D /* DateButtonHighlight.png in Resources */,
 				7F4C218B10230EF300F17F7D /* DateButtonNormal.png in Resources */,
-				7F4C218C10230EF300F17F7D /* Default.png in Resources */,
 				7F4C218D10230EF300F17F7D /* Download.png in Resources */,
 				7F4C218E10230EF300F17F7D /* GraphBackground.png in Resources */,
 				7F4C218F10230EF300F17F7D /* GraphScrollBackground.png in Resources */,
@@ -1613,6 +1610,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				7FA7ECBF0EE437BF00C1954E /* English */,
+				FA81AF781122124200BDDBFC /* German */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1644,12 +1642,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
+				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = Info.plist;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
