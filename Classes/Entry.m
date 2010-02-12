@@ -49,11 +49,12 @@
 	if (self) {
 		productIdentifier = [identifier retain];
 		productName = [name retain];
-		transactionType = type;
 		country = [aCountry retain];
 		currency = [currencyCode retain];
-		self.units = u;
-		self.royalties = r;
+		
+		transactionType = type;
+		units = u;
+		royalties = r;
 		[country.entries addObject:self];
 	}
 	return self;
@@ -63,13 +64,14 @@
 {
 	self = [super init];
 	if (self) {
-		country = [[coder decodeObjectForKey:@"country"] retain];
-		productName = [[coder decodeObjectForKey:@"productName"] retain];
-		currency = [[coder decodeObjectForKey:@"currency"] retain];
-		transactionType = [coder decodeIntForKey:@"transactionType"];
 		productIdentifier = [[coder decodeObjectForKey:@"productIdentifier"] retain];
-		self.units = [coder decodeIntForKey:@"units"];
-		self.royalties = [coder decodeFloatForKey:@"royalties"];
+		productName = [[coder decodeObjectForKey:@"productName"] retain];
+		country = [[coder decodeObjectForKey:@"country"] retain];
+		currency = [[coder decodeObjectForKey:@"currency"] retain];
+		
+		transactionType = [coder decodeIntForKey:@"transactionType"];
+		units = [coder decodeIntForKey:@"units"];
+		royalties = [coder decodeFloatForKey:@"royalties"];
 		[country.entries addObject:self];
 	}
 	return self;
@@ -77,21 +79,22 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-	[coder encodeObject:self.country forKey:@"country"];
+	[coder encodeObject:self.productIdentifier forKey:@"productIdentifier"];
 	[coder encodeObject:self.productName forKey:@"productName"];
+	[coder encodeObject:self.country forKey:@"country"];
 	[coder encodeObject:self.currency forKey:@"currency"];
+	
 	[coder encodeInt:self.transactionType forKey:@"transactionType"];
 	[coder encodeInt:self.units forKey:@"units"];
 	[coder encodeFloat:self.royalties forKey:@"royalties"];
-	[coder encodeObject:self.productIdentifier forKey:@"productIdentifier"];
 }
 
 
 - (float)totalRevenueInBaseCurrency
 {
 	if (transactionType == 1) {
-		float revenueInLocalCurrency = self.royalties * self.units;
-		float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenueInLocalCurrency fromCurrency:self.currency];
+		const float revenueInLocalCurrency = self.royalties * self.units;
+		const float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenueInLocalCurrency fromCurrency:self.currency];
 		return revenueInBaseCurrency;
 	}
 	return 0;

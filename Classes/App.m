@@ -55,20 +55,6 @@ NSString* getPrefetchedPath() {
 	return averageStars;
 }
 
-- (id)initWithCoder:(NSCoder *)coder {
-	self = [super init];
-	if (self) {
-		appID = [[coder decodeObjectForKey:@"appID"] retain];
-		appName = [[coder decodeObjectForKey:@"appName"] retain];
-		reviewsByUser = [[coder decodeObjectForKey:@"reviewsByUser"] retain];
-		averageStars = [coder decodeFloatForKey:@"averageStars"];
-		if (reviewsByUser.count && averageStars == 0) {
-			[self updateAverageStars]; // reading in older data
-		}
-	}
-	return self;
-}
-
 - (id) initWithID:(NSString*)identifier name:(NSString*)name {
 	self = [super init];
 	if (self) {
@@ -79,6 +65,24 @@ NSString* getPrefetchedPath() {
 	return self;
 }
 
+- (id)initWithCoder:(NSCoder *)coder {
+	self = [super init];
+	if (self) {
+		appID = [[coder decodeObjectForKey:@"appID"] retain];
+		appName = [[coder decodeObjectForKey:@"appName"] retain];
+		reviewsByUser = [[coder decodeObjectForKey:@"reviewsByUser"] retain];
+		averageStars = [coder decodeFloatForKey:@"averageStars"];
+	}
+	return self;
+}
+
+- (void) encodeWithCoder:(NSCoder *)coder {
+	[coder encodeObject:self.appID forKey:@"appID"];
+	[coder encodeObject:self.appName forKey:@"appName"];
+	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
+	[coder encodeFloat:self.averageStars forKey:@"averageStars"];
+}
+
 - (NSString *) description {
 	return [NSString stringWithFormat:@"App %@ (%@)", self.appName, self.appID];
 }
@@ -87,13 +91,6 @@ NSString* getPrefetchedPath() {
 	[reviewsByUser setObject:review forKey:review.user];
 	[self updateAverageStars];
 	newReviewsCount++;
-}
-
-- (void) encodeWithCoder:(NSCoder *)coder {
-	[coder encodeObject:self.appID forKey:@"appID"];
-	[coder encodeObject:self.appName forKey:@"appName"];
-	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
-	[coder encodeFloat:self.averageStars forKey:@"averageStars"];
 }
 
 - (void) dealloc {

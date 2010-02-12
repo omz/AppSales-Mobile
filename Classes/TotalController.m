@@ -28,8 +28,11 @@
 - (void)reload
 {
 	self.daysByMonth = [NSMutableArray array];
-	Day *total = [[[Day alloc] initAsAllOfTime] autorelease];
-	[daysByMonth addObject:[NSMutableArray arrayWithObject:total]];
+	Day *total = [[Day alloc] initAsAllOfTime];
+	if (total) {
+		[daysByMonth addObject:[NSMutableArray arrayWithObject:total]];
+		[total release];
+	}
 	
 	[self.tableView reloadData];
 }

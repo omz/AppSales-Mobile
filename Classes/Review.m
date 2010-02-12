@@ -61,20 +61,15 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	user = [[coder decodeObjectForKey:@"user"] retain];
 	title = [[coder decodeObjectForKey:@"title"] retain];
 	translatedTitle = [[coder decodeObjectForKey:@"translatedTitle"] retain];
-	stars = [coder decodeIntForKey:@"stars"];
 	reviewDate = [[coder decodeObjectForKey:@"reviewDate"] retain];
 	downloadDate = [[coder decodeObjectForKey:@"downloadDate"] retain];
 	text = [[coder decodeObjectForKey:@"text"] retain];
 	translatedText = [[coder decodeObjectForKey:@"translatedText"] retain];
 	version = [[coder decodeObjectForKey:@"version"] retain];
 	countryCode = [[coder decodeObjectForKey:@"countryCode"] retain];
+	stars = [coder decodeIntForKey:@"stars"];
 	// newOrUpdatedReview field is not set, as it's only used to indicate a review was newly added 
 	return self;
-}
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@ (%@ %@): %@ (%i stars)", self.user, self.countryCode, self.reviewDate, self.title, self.stars];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -82,13 +77,19 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	[coder encodeObject:self.user forKey:@"user"];
 	[coder encodeObject:self.title forKey:@"title"];
 	[coder encodeObject:self.translatedTitle forKey:@"translatedTitle"];
-	[coder encodeInt:self.stars forKey:@"stars"];
 	[coder encodeObject:self.reviewDate forKey:@"reviewDate"];
 	[coder encodeObject:self.downloadDate forKey:@"downloadDate"];
 	[coder encodeObject:self.text forKey:@"text"];
 	[coder encodeObject:self.translatedText forKey:@"translatedText"];
 	[coder encodeObject:self.version forKey:@"version"];
 	[coder encodeObject:self.countryCode forKey:@"countryCode"];
+	[coder encodeInt:self.stars forKey:@"stars"];
+}
+
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@ (%@ %@): %@ (%i stars)", self.user, self.countryCode, self.reviewDate, self.title, self.stars];
 }
 
 - (NSString*) translateToCurrentCountry:(NSString*)string {

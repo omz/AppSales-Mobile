@@ -36,15 +36,19 @@
 	NSMutableDictionary *countries;
 	NSDate *date;
 	BOOL isWeek;
-	NSString *pathOnDisk;	
 	NSString *name;
 
-	// generated as needed
-	NSString *cachedDayString;
-	NSString *cachedWeekEndDateString;
-	UIColor *cachedWeekDayColor;
+	// lazily generated as needed, and serialized out to disk
+	NSString *dayString;
+	NSString *weekEndDateString;
+	
+	// lazyily generated, and never saved out to disk as they may change in the future
+	NSString *proposedFileName;
+	NSString *weekDayString;
+	UIColor *weekDayColor;
 }
 
+@property (readonly) NSString *name; // the date as a full string, and typically used as a primary key
 @property (readonly) NSDate *date;
 @property (readonly) NSMutableDictionary *countries;
 @property (readonly) NSString *weekEndDateString;
@@ -53,13 +57,15 @@
 @property (readonly) NSString *weekdayString;
 @property (readonly) NSString *totalRevenueString;
 @property (readonly) BOOL isWeek;
-@property (readonly) NSString *name; // the date as a full string, and typically used as a primary key
 
 + (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // from serialized data
 + (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
-- (id)initAsAllOfTime; // fragile hack used by TotalController 
+- (id)initAsAllOfTime; // fragile hack used by TotalController
+
+// returns true if instances was serialized out to docPath
+- (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath;
 
 - (Country *)countryNamed:(NSString *)countryName;
 - (float)totalRevenueInBaseCurrency;
