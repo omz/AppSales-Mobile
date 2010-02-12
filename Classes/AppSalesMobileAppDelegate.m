@@ -32,19 +32,8 @@
 #import "RootViewController.h"
 #import "Day.h"
 #import "ReportManager.h"
-//#import "ReviewManager.h"
 
 @implementation AppSalesMobileAppDelegate
-
-//- (void) hackOnMain {
-//	if ([ReviewManager sharedManager].numberOfApps) {
-//		[[ReviewManager sharedManager] downloadReviews];
-//	}
-//}
-//- (void) hackOnBackground {
-//	[self performSelectorOnMainThread:@selector(hackOnMain) withObject:nil waitUntilDone:NO];
-//}
-//[self performSelector:@selector(hackOnBackground) withObject:nil afterDelay:0.1];
 
 - (void) finishLoadingUI {
 	NSAssert([NSThread isMainThread], nil);
@@ -84,12 +73,6 @@
 	[UIView commitAnimations];
 	[self performSelectorInBackground:@selector(loadSavedFiles) withObject:nil];
 }
-
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-	
-}
-
 
 - (void)dealloc {
 	[navigationController release];
