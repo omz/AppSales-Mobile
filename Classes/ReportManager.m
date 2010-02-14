@@ -554,7 +554,7 @@
 - (void)startUpload
 {
 	NSURL *url;
-#if BACKUP_HOSTNAME
+#ifdef BACKUP_HOSTNAME
 	url = [NSURL URLWithString:BACKUP_HOSTNAME];
 #else
 	NSAssert(false, @"please set BACKUP_HOSTNAME before using");

@@ -139,7 +139,7 @@ AppSalesMobile
 
 - (IBAction)uploadBackups:(id)sender
 {
-#if BACKUP_HOSTNAME
+#ifdef BACKUP_HOSTNAME
 	backupButton.hidden = YES;
 	[[ReportManager sharedManager] backupData];
 #else 
