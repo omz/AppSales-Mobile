@@ -264,322 +264,336 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	
 	
 	storeInfos = [[NSMutableArray alloc] init];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Argentina", @"countryName", 
-						   @"ar", @"countryCode",
-						   @"143505", @"storeFrontID",
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Belgium", @"countryName", 
-						   @"be", @"countryCode",
-						   @"143446", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Brazil", @"countryName", 
-						   @"br", @"countryCode",
-						   @"143503", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Chile", @"countryName", 
-						   @"cl", @"countryCode",
-						   @"143483", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"China", @"countryName", 
-						   @"cn", @"countryCode",
-						   @"143465", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Colombia", @"countryName", 
-						   @"co", @"countryCode",
-						   @"143501", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Costa Rica", @"countryName", 
-						   @"cr", @"countryCode",
-						   @"143495", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Czech Republic", @"countryName", 
-						   @"cz", @"countryCode",
-						   @"143489", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Denmark", @"countryName", 
-						   @"dk", @"countryCode",
-						   @"143458", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"El Salvador", @"countryName", 
-						   @"sv", @"countryCode",
-						   @"143506", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Finland", @"countryName", 
-						   @"fi", @"countryCode",
-						   @"143447", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Greece", @"countryName", 
-						   @"gr", @"countryCode",
-						   @"143448", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Guatemala", @"countryName", 
-						   @"gt", @"countryCode",
-						   @"143504", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Hong Kong", @"countryName", 
-						   @"hk", @"countryCode",
-						   @"143463", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Hungary", @"countryName", 
-						   @"hu", @"countryCode",
-						   @"143482", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"India", @"countryName", 
-						   @"in", @"countryCode",
-						   @"143467", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Indonesia", @"countryName", 
-						   @"id", @"countryCode",
-						   @"143476", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Ireland", @"countryName", 
-						   @"ie", @"countryCode",
-						   @"143449", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Israel", @"countryName", 
-						   @"il", @"countryCode",
-						   @"143491", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Korea", @"countryName", 
-						   @"kr", @"countryCode",
-						   @"143466", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Kuwait", @"countryName", 
-						   @"kw", @"countryCode",
-						   @"143493", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Lebanon", @"countryName", 
-						   @"lb", @"countryCode",
-						   @"143497", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Luxemburg", @"countryName", 
-						   @"lu", @"countryCode",
-						   @"143451", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Malaysia", @"countryName", 
-						   @"my", @"countryCode",
-						   @"143473", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Mexico", @"countryName", 
-						   @"mx", @"countryCode",
-						   @"143468", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"New Zealand", @"countryName", 
-						   @"nz", @"countryCode",
-						   @"143461", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Norway", @"countryName", 
-						   @"no", @"countryCode",
-						   @"143457", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Austria", @"countryName", 
-						   @"at", @"countryCode",
-						   @"143445", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Pakistan", @"countryName", 
-						   @"pk", @"countryCode",
-						   @"143477", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Panama", @"countryName", 
-						   @"pa", @"countryCode",
-						   @"143485", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Peru", @"countryName", 
-						   @"pe", @"countryCode",
-						   @"143507", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Phillipines", @"countryName", 
-						   @"ph", @"countryCode",
-						   @"143474", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Poland", @"countryName", 
-						   @"pl", @"countryCode",
-						   @"143478", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Portugal", @"countryName", 
-						   @"pt", @"countryCode",
-						   @"143453", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Qatar", @"countryName", 
-						   @"qa", @"countryCode",
-						   @"143498", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Romania", @"countryName", 
-						   @"ro", @"countryCode",
-						   @"143487", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Russia", @"countryName", 
-						   @"ru", @"countryCode",
-						   @"143469", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Saudi Arabia", @"countryName", 
-						   @"sa", @"countryCode",
-						   @"143479", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Switzerland", @"countryName", 
-						   @"ch", @"countryCode",
-						   @"143459", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Singapore", @"countryName", 
-						   @"sg", @"countryCode",
-						   @"143464", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Slovakia", @"countryName", 
-						   @"sk", @"countryCode",
-						   @"143496", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Slovenia", @"countryName", 
-						   @"si", @"countryCode",
-						   @"143499", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"South Africa", @"countryName", 
-						   @"za", @"countryCode",
-						   @"143472", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Sri Lanka", @"countryName", 
-						   @"lk", @"countryCode",
-						   @"143486", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Sweden", @"countryName", 
-						   @"se", @"countryCode",
-						   @"143456", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Taiwan", @"countryName", 
-						   @"tw", @"countryCode",
-						   @"143470", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Thailand", @"countryName", 
-						   @"th", @"countryCode",
-						   @"143475", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Turkey", @"countryName", 
-						   @"tr", @"countryCode",
-						   @"143480", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"United Arab Emirates", @"countryName", 
-						   @"ae", @"countryCode",
-						   @"143481", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Venezuela", @"countryName", 
-						   @"ve", @"countryCode",
-						   @"143502", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Vietnam", @"countryName", 
-						   @"vn", @"countryCode",
-						   @"143471", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Australia", @"countryName", 
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 						   @"au", @"countryCode",
 						   @"143460", @"storeFrontID", 
 						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Canada", @"countryName", 
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 						   @"ca", @"countryCode",
 						   @"143455", @"storeFrontID", 
 						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Germany", @"countryName", 
-						   @"de", @"countryCode",
-						   @"143443", @"storeFrontID",
-						   germanDateFormatter, @"dateFormatter",
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Spain", @"countryName", 
-						   @"es", @"countryCode",
-						   @"143454", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"France", @"countryName", 
-						   @"fr", @"countryCode",
-						   @"143442", @"storeFrontID", 
-						   frenchDateFormatter, @"dateFormatter",
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Italy", @"countryName", 
-						   @"it", @"countryCode",
-						   @"143450", @"storeFrontID",
-						   itDateFormatter, @"dateFormatter",
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Netherlands", @"countryName", 
-						   @"nl", @"countryCode",
-						   @"143452", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"United Kingdom", @"countryName", 
-						   @"gb", @"countryCode",
-						   @"143444", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"Japan", @"countryName", 
-						   @"jp", @"countryCode",
-						   @"143462", @"storeFrontID", 
-						   nil]];
-	[storeInfos addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-						   @"United States", @"countryName", 
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 						   @"us", @"countryCode",
 						   @"143441", @"storeFrontID",
 						   usDateFormatter, @"dateFormatter",
 						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"de", @"countryCode",
+						   @"143443", @"storeFrontID",
+						   germanDateFormatter, @"dateFormatter",
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"es", @"countryCode",
+						   @"143454", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"fr", @"countryCode",
+						   @"143442", @"storeFrontID", 
+						   frenchDateFormatter, @"dateFormatter",
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"it", @"countryCode",
+						   @"143450", @"storeFrontID",
+						   itDateFormatter, @"dateFormatter",
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"nl", @"countryCode",
+						   @"143452", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"gb", @"countryCode",
+						   @"143444", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"jp", @"countryCode",
+						   @"143462", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ar", @"countryCode",
+						   @"143505", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"be", @"countryCode",
+						   @"143446", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"br", @"countryCode",
+						   @"143503", @"storeFrontID", 
+						   nil]];	
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"cl", @"countryCode",
+						   @"143483", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"cn", @"countryCode",
+						   @"143465", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"co", @"countryCode",
+						   @"143501", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"cr", @"countryCode",
+						   @"143495", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"cz", @"countryCode",
+						   @"143489", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"dk", @"countryCode",
+						   @"143458", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"sv", @"countryCode",
+						   @"143506", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"fi", @"countryCode",
+						   @"143447", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"gr", @"countryCode",
+						   @"143448", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"gt", @"countryCode",
+						   @"143504", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"hk", @"countryCode",
+						   @"143463", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"hu", @"countryCode",
+						   @"143482", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"in", @"countryCode",
+						   @"143467", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"id", @"countryCode",
+						   @"143476", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ie", @"countryCode",
+						   @"143449", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"il", @"countryCode",
+						   @"143491", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"kr", @"countryCode",
+						   @"143466", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"kw", @"countryCode",
+						   @"143493", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"lb", @"countryCode",
+						   @"143497", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"lu", @"countryCode",
+						   @"143451", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"my", @"countryCode",
+						   @"143473", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"mx", @"countryCode",
+						   @"143468", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"nz", @"countryCode",
+						   @"143461", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"no", @"countryCode",
+						   @"143457", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"at", @"countryCode",
+						   @"143445", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"pk", @"countryCode",
+						   @"143477", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"pa", @"countryCode",
+						   @"143485", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"pe", @"countryCode",
+						   @"143507", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ph", @"countryCode",
+						   @"143474", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"pl", @"countryCode",
+						   @"143478", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"pt", @"countryCode",
+						   @"143453", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"qa", @"countryCode",
+						   @"143498", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ro", @"countryCode",
+						   @"143487", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ru", @"countryCode",
+						   @"143469", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"sa", @"countryCode",
+						   @"143479", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ch", @"countryCode",
+						   @"143459", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"sg", @"countryCode",
+						   @"143464", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"sk", @"countryCode",
+						   @"143496", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"si", @"countryCode",
+						   @"143499", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"za", @"countryCode",
+						   @"143472", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"lk", @"countryCode",
+						   @"143486", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"se", @"countryCode",
+						   @"143456", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"tw", @"countryCode",
+						   @"143470", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"th", @"countryCode",
+						   @"143475", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"tr", @"countryCode",
+						   @"143480", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ae", @"countryCode",
+						   @"143481", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ve", @"countryCode",
+						   @"143502", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"vn", @"countryCode",
+						   @"143471", @"storeFrontID", 
+						   nil]];
+	//
+	// stores added April 1, 2009
+	//
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"hr", @"countryCode",
+						   @"143494", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"do", @"countryCode",
+						   @"143508", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ec", @"countryCode",
+						   @"143509", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"hn", @"countryCode",
+						   @"143510", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"jm", @"countryCode",
+						   @"143511", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ni", @"countryCode",
+						   @"143512", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"py", @"countryCode",
+						   @"143513", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"uy", @"countryCode",
+						   @"143514", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"mo", @"countryCode",
+						   @"143515", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"eg", @"countryCode",
+						   @"143516", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"kz", @"countryCode",
+						   @"143517", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"ee", @"countryCode",
+						   @"143518", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"lv", @"countryCode",
+						   @"143519", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"lt", @"countryCode",
+						   @"143520", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"mt", @"countryCode",
+						   @"143521", @"storeFrontID", 
+						   nil]];
+	[storeInfos addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						   @"md", @"countryCode",
+						   @"143523", @"storeFrontID", 
+						   nil]];
+	
+	// add localized country name
+	NSLocale *currentLocale = [NSLocale currentLocale];
+	for (NSMutableDictionary *eachStore in storeInfos) {
+		NSString *countryName = [currentLocale displayNameForKey:NSLocaleCountryCode 
+														   value:[eachStore objectForKey:@"countryCode"]];
+		[eachStore setValue:countryName forKey:@"countryName"];
+	}
 	
 	// sort regions by its number of existing reviews, so the less active regions are downloaded last
 	NSMutableDictionary *numExistingReviews = [NSMutableDictionary dictionary];
 	for (App *app in [appsByID objectEnumerator]) {
 		for (Review *review in [app.reviewsByUser objectEnumerator]) {
 			NSNumber *object = [numExistingReviews objectForKey:review.countryCode];
-			const NSUInteger count = (object ? [object intValue] + 1 : 1);
+			const NSUInteger count = (object ? object.intValue + 1 : 1);
 			[numExistingReviews setObject:[NSNumber numberWithInt:count] forKey:review.countryCode];
 		}
 	}
