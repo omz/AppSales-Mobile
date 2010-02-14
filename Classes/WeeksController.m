@@ -38,15 +38,12 @@
 
 @implementation WeeksController
 
-
 - (id)init
 {
-	[super init];
-	
-	[self reload];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
-	self.title = NSLocalizedString(@"Weekly",nil);
-	
+	self = [super init];
+	if (self) {		
+		self.title = NSLocalizedString(@"Weekly",nil);
+	}
 	return self;
 }
 
@@ -73,6 +70,20 @@
 	}
 	self.maxRevenue = max;
 	[self.tableView reloadData];
+}
+
+- (void) viewDidLoad
+{
+	[super viewDidLoad];
+	[self reload];	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) 
+												 name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
+}
+
+- (void) viewDidUnload
+{
+	[super viewDidUnload];
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerDownloadedWeeklyReportsNotification];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 

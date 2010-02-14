@@ -8,7 +8,7 @@
 
 @implementation ReviewManager
 
-@synthesize reviewDownloadStatus;
+@synthesize reviewDownloadStatus, isDownloadingReviews;
 
 + (ReviewManager*) sharedManager {
 	static ReviewManager *sharedManager = nil;
@@ -416,10 +416,6 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
 	[self performSelectorInBackground:@selector(updateReviews) withObject:nil];
-}
-
-- (BOOL) isDownloadingReviews {
-	return isDownloadingReviews;
 }
 
 - (void) finishDownloadingReviews {

@@ -15,14 +15,27 @@
 
 - (id)init
 {
-	[super init];
+	self = [super init];
+	if (self) {
+		self.title = NSLocalizedString(@"Total",nil);
+	}
 	
+	return self;
+}
+
+- (void) viewDidLoad
+{
+	[super viewDidLoad];
 	[self reload];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
-	self.title = NSLocalizedString(@"Total",nil);
-	
-	return self;
+}
+
+- (void) viewDidUnload
+{
+	[super viewDidUnload];
+	[[NSNotificationCenter defaultCenter]removeObserver:self forKeyPath:ReportManagerDownloadedDailyReportsNotification];
+	[[NSNotificationCenter defaultCenter]removeObserver:self forKeyPath:ReportManagerDownloadedWeeklyReportsNotification];
 }
 
 - (void)reload

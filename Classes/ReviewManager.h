@@ -29,15 +29,13 @@
 
 @property (readonly) NSString *reviewDownloadStatus;
 @property (readonly) NSUInteger numberOfApps;
+@property (readonly) BOOL isDownloadingReviews;
+@property (readonly) NSArray* appNamesSorted;
 
 - (void) downloadReviews;
-- (BOOL) isDownloadingReviews;
-
 - (App*) appWithID:(NSString*)appID;
 - (BOOL) createOrUpdateAppIfNeededWithID:(NSString*)appID name:(NSString*)appName;
 - (void) addApp:(App*)app;
-
-- (NSArray*) appNamesSorted;
 
 @end
 

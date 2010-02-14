@@ -37,13 +37,13 @@
 
 static BOOL parseDateString(NSString *dateString, int *year, int *month, int *day) {
 	if ([dateString rangeOfString:@"/"].location == NSNotFound) {
-		if (dateString.length == 8) { //old date format
+		if (dateString.length == 8) { // old date format
 			*year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
 			*month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
 			*day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
 			return YES; // parsed ok
 		}
-	} else if (dateString.length == 10) { //new date format
+	} else if (dateString.length == 10) { // new date format
 		*year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
 		*month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
 		*day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
@@ -140,14 +140,14 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 			transactionType = @"1";
 		}
 
-		Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
+		Country *country = [self countryNamed:countryString]; // will be created on-the-fly if needed.
 		[[[Entry alloc] initWithProductIdentifier:appId
 											 name:productName 
 								  transactionType:[transactionType intValue] 
 											units:[units intValue] 
 										royalties:[royalties floatValue] 
 										 currency:royaltyCurrency
-										  country:country] release]; //gets added to the countries entry list automatically
+										  country:country] release]; // gets added to the countries entry list automatically
 	}
 	if (name == nil || date == nil) {
 		NSLog(@"coulnd't parse CSV: %@", csv);
@@ -157,7 +157,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	return self;
 }
 
-- (id) initAsAllOfTime { //  not intended to be used by anyone except TotalController
+- (id) initAsAllOfTime { // not intended to be used by anyone except TotalController
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 	NSArray *sortingDescriptors = [NSArray arrayWithObject:dateSorter];
 	NSArray *sortedDays = [[ReportManager sharedManager].days.allValues sortedArrayUsingDescriptors:sortingDescriptors];
@@ -425,7 +425,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	if (!weekDayColor) {
 		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
 		int weekday = [components weekday];
-		if (weekday == 1) { //show sundays in red
+		if (weekday == 1) { // show sundays in red
 			weekDayColor = [[UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0] retain];
 		} else {
 			weekDayColor = [[UIColor blackColor] retain];
@@ -436,7 +436,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 - (NSString *)weekEndDateString
 {
-	//The Day class is also used to represent weeks. This returns a formatted date of the day the week ends (7 days after date)
+	// the Day class is also used to represent weeks. This returns a formatted date of the day the week ends (7 days after date)
 	if (!weekEndDateString) {
 		// FIXME: Why do all this work?  why not save off the 'end date' when parsing the CSV?
 		NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];

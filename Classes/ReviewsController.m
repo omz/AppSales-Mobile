@@ -23,36 +23,32 @@
 {
 	if (self = [super initWithStyle:style]) {
 		[self reload];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReviewManagerDownloadedReviewsNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) name:ReviewManagerUpdatedReviewDownloadProgressNotification object:nil];
 	}
     return self;
 }
 
-- (void)reload
-{
-	self.sortedApps = [[ReviewManager sharedManager] appNamesSorted];
-	[self.tableView reloadData];
-}
-
 - (void)updateStatus
 {
-	if ([[ReviewManager sharedManager] isDownloadingReviews]) {
-		statusLabel.text = [[ReviewManager sharedManager] reviewDownloadStatus];
+	ReviewManager *manager = [ReviewManager sharedManager];
+	statusLabel.text = manager.reviewDownloadStatus;
+	if (manager.isDownloadingReviews) {
 		[activityIndicator startAnimating];
-	}
-	else {
-		statusLabel.text = @"";
+	} else {
 		[activityIndicator stopAnimating];
 	}
 }
 
 - (void)viewDidLoad
 {
-	self.tableView.rowHeight = 45.0;
-	self.title = NSLocalizedString(@"Reviews",nil);
-	UIBarButtonItem *downloadButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Download",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(downloadReviews)] autorelease];
+	[super viewDidLoad];
+	self.sortedApps = [[ReviewManager sharedManager] appNamesSorted];
 	
+	self.tableView.rowHeight = 45;
+	self.title = NSLocalizedString(@"Reviews",nil);
+	UIBarButtonItem *downloadButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Download",nil) 
+																		style:UIBarButtonItemStyleBordered 
+																	   target:self 
+																	   action:@selector(downloadReviews)] autorelease];
 	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 25)] autorelease];
 	statusLabel.textColor = [UIColor whiteColor];
 	statusLabel.shadowColor = [UIColor darkGrayColor];
@@ -72,13 +68,33 @@
 	
 	self.toolbarItems = [NSArray arrayWithObjects:downloadButton, flexSpace, statusItem, flexSpace, activityItem, nil];
 	[self updateStatus];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) 
+												 name:ReviewManagerDownloadedReviewsNotification 
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) 
+												 name:ReviewManagerUpdatedReviewDownloadProgressNotification 
+											   object:nil];
+}
+
+- (void) viewDidUnload {
+	[super viewDidUnload];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReviewManagerDownloadedReviewsNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReviewManagerUpdatedReviewDownloadProgressNotification];
+	
+}
+
+- (void)reload
+{
+	[self.tableView reloadData];
 }
 
 - (void)downloadReviews
 {
-	if ([[ReviewManager sharedManager] isDownloadingReviews])
+	if ([[ReviewManager sharedManager] isDownloadingReviews]) {
 		return;
-	
+	}
 	[[ReviewManager sharedManager] downloadReviews];
 }
 
@@ -91,7 +107,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
-	return [sortedApps count];
+	return sortedApps.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -113,14 +129,8 @@
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
-	App *app = [sortedApps objectAtIndex:indexPath.row];
-	NSArray *allReviews = [app.reviewsByUser allValues];
-	
-	ReviewsListController *listController = [[[ReviewsListController alloc] initWithStyle:UITableViewStylePlain] autorelease];
-	NSSortDescriptor *reviewSorter1 = [[[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO] autorelease];
-	NSSortDescriptor *reviewSorter2 = [[[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO] autorelease];
-	NSSortDescriptor *reviewSorter3 = [[[NSSortDescriptor alloc] initWithKey:@"countryCode" ascending:YES] autorelease];
-	listController.reviews = [allReviews sortedArrayUsingDescriptors:[NSArray arrayWithObjects:reviewSorter1, reviewSorter2, reviewSorter3, nil]];
+	App *app = [sortedApps objectAtIndex:indexPath.row];		
+	ReviewsListController *listController = [[[ReviewsListController alloc] initWithApp:app] autorelease];
 	listController.hidesBottomBarWhenPushed = YES;
 	listController.title = app.appName;
 	[self.navigationController pushViewController:listController animated:YES];

@@ -79,15 +79,6 @@
 	
 	self.toolbarItems = [NSArray arrayWithObjects:refreshItem, flexSpaceItem, statusItem, flexSpaceItem, progressItem, nil];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) name:ReportManagerUpdatedDownloadProgressNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
-}
-
-
-- (void)viewDidLoad 
-{
-	[super viewDidLoad];
 	self.navigationItem.title = @"AppSales";
 	
 	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
@@ -96,10 +87,29 @@
 	self.navigationItem.rightBarButtonItem = infoButtonItem;
 	
 	self.tableView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0);
-	[self.tableView setScrollEnabled:NO];
+	[self.tableView setScrollEnabled:NO];	
+}
+
+
+- (void)viewDidLoad 
+{
+	[super viewDidLoad];
 	
 	[self refreshDailyTrend];
 	[self refreshWeeklyTrend];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) 
+												 name:ReportManagerUpdatedDownloadProgressNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) 
+												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) 
+												 name:ReportManagerDownloadedWeeklyReportsNotification object:nil];	
+}
+
+- (void) viewDidUnload {
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerUpdatedDownloadProgressNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerDownloadedDailyReportsNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerDownloadedWeeklyReportsNotification];
 }
 
 - (void)refreshDailyTrend

@@ -8,12 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+@class App;
 
 @interface ReviewsListController : UITableViewController {
-
+	App *app;
 	NSArray *reviews;
 }
 
-@property (nonatomic, retain) NSArray *reviews;
+- (id) initWithApp:(App*)appToUse;
 
 @end

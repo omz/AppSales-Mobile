@@ -69,9 +69,20 @@ AppSalesMobile
 	[self baseCurrencyChanged]; //set proper currency button title
 	[self currencyRatesDidUpdate]; //set proper refresh date in label
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesDidUpdate) name:@"CurrencyManagerDidUpdate" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesFailedToUpdate) name:@"CurrencyManagerError" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(baseCurrencyChanged) name:@"CurrencyManagerDidChangeBaseCurrency" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesDidUpdate) 
+												 name:CurrencyManagerDidUpdateNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesFailedToUpdate) 
+												 name:CurrencyManagerErrorNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(baseCurrencyChanged) 
+												 name:CurrencyManagerDidChangeBaseCurrencyNotification object:nil];
+}
+
+- (void) viewDidUnload
+{
+	[super viewDidUnload];
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:CurrencyManagerDidUpdateNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:CurrencyManagerErrorNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:CurrencyManagerDidChangeBaseCurrencyNotification];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -79,13 +90,14 @@ AppSalesMobile
 	if (usernameTextField.text.length) {
 		[[NSUserDefaults standardUserDefaults] setObject:usernameTextField.text
 												  forKey:@"iTunesConnectUsername"];
-		NSError *error = nil;
-		if (passwordTextField.text.length)
+
+		if (passwordTextField.text.length) {
 			[SFHFKeychainUtils storeUsername:usernameTextField.text
 								 andPassword:passwordTextField.text
 							  forServiceName:@"omz:software AppSales Mobile Service"
 							  updateExisting:YES
-									   error:&error];
+									   error:nil];
+		}
 	}
 	[Review setShowTranslatedReviews:translationSwitch.on];
 }
