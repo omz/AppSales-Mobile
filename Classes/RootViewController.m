@@ -86,7 +86,7 @@
 	UIBarButtonItem *infoButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:infoButton] autorelease];
 	self.navigationItem.rightBarButtonItem = infoButtonItem;
 	
-	self.tableView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0);
+	self.tableView.contentInset = UIEdgeInsetsMake(22, 0, 0, 0);
 	[self.tableView setScrollEnabled:NO];	
 }
 
