@@ -121,14 +121,18 @@
 		NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
 		NSMutableDictionary *headers = [NSMutableDictionary dictionary];
 		
+		NSDateFormatter *threadDefaultDateFormatter;
+		@synchronized (defaultDateFormatter) {
+			// date formatters are not thread safe.  Make a copy for just this thread
+			threadDefaultDateFormatter = [[defaultDateFormatter copy] autorelease];
+		}
+		
 		NSDictionary *storeInfo;
 		while ((storeInfo = [self getNextStoreToFetch]) != nil) {
 			NSString *countryCode = [storeInfo objectForKey:@"countryCode"];
 			NSDateFormatter *dateFormatter = [storeInfo objectForKey:@"dateFormatter"];
-			if (!dateFormatter) {
-				@synchronized (defaultDateFormatter) {
-					dateFormatter = [[defaultDateFormatter copy] autorelease]; // date formatters are not thread safe
-				}
+			if (dateFormatter == nil) {
+				dateFormatter = threadDefaultDateFormatter;
 			}
 						
 			NSString *storeFrontID = [storeInfo objectForKey:@"storeFrontID"];
@@ -200,11 +204,12 @@
 																title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
 																 stars:[reviewStars intValue]] autorelease];
 						[self addOrUpdatedReviewIfNeeded:review appID:appID];
+						
+						if ([self cancelWasRequested]) { // check again after potentially making another network call  
+							return;
+						}
 					}
 					i++;
-					if ([self cancelWasRequested]) { // check again after potentially making another network call  
-						return;
-					}					
 				} while (![scanner isAtEnd]);
 			}
 			[self incrementStatusPercentage];
