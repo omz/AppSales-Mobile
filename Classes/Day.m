@@ -401,35 +401,9 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 - (NSString *)weekdayString
 {
-	if (weekDayString == nil) {
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
-		switch (components.weekday) {
-			case 1:
-				weekDayString = NSLocalizedString(@"SUN",nil);
-				break;
-			case 2:
-				weekDayString = NSLocalizedString(@"MON",nil);
-				break;
-			case 3:
-				weekDayString = NSLocalizedString(@"TUE",nil);
-				break;
-			case 4:
-				weekDayString = NSLocalizedString(@"WED",nil);
-				break;
-			case 5:
-				weekDayString = NSLocalizedString(@"THU",nil);
-				break;
-			case 6:
-				weekDayString = NSLocalizedString(@"FRI",nil);
-				break;
-			case 7:
-				weekDayString = NSLocalizedString(@"SAT",nil);
-				break;
-			default: 
-				@throw [NSException exceptionWithName:@"unknown weekday" reason:[self.date description] userInfo:nil];
-		}
-	}
-	return weekDayString;
+	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	[dateFormatter setDateFormat:@"EEE"];
+	return [[dateFormatter stringFromDate:self.date] uppercaseString];
 }
 
 - (UIColor *)weekdayColor
