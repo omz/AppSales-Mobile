@@ -55,7 +55,7 @@
 
 - (void)viewDidUnload {
 	[super viewDidUnload];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReviewManagerDownloadedReviewsNotification];	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];	
 }
 
 #pragma mark Table view methods

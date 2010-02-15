@@ -107,9 +107,7 @@
 }
 
 - (void) viewDidUnload {
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerUpdatedDownloadProgressNotification];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerDownloadedDailyReportsNotification];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerDownloadedWeeklyReportsNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)refreshDailyTrend

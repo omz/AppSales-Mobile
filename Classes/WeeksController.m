@@ -83,7 +83,7 @@
 - (void) viewDidUnload
 {
 	[super viewDidUnload];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReportManagerDownloadedWeeklyReportsNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 

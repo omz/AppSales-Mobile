@@ -80,8 +80,7 @@
 - (void) viewDidUnload {
 	[super viewDidUnload];
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReviewManagerDownloadedReviewsNotification];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:ReviewManagerUpdatedReviewDownloadProgressNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 }
 

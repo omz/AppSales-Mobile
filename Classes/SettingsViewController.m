@@ -80,9 +80,7 @@ AppSalesMobile
 - (void) viewDidUnload
 {
 	[super viewDidUnload];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:CurrencyManagerDidUpdateNotification];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:CurrencyManagerErrorNotification];
-	[[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:CurrencyManagerDidChangeBaseCurrencyNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
