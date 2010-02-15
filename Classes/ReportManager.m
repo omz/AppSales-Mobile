@@ -406,11 +406,11 @@
 			for (NSString *dayString in availableDays) {
 				NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
 												 downloadType, @"11.11", 
-												 dayString, @"hiddenDayOrWeekSelection", // FIXME? adding it twice? 
+												 dayString, @"hiddenDayOrWeekSelection",
 												 @"Download", @"hiddenSubmitTypeName",
 												 @"ShowDropDown", @"hiddenSubmitTypeName",
 												 @"Summary", @"11.9",
-												 dayString, downloadActionName, // FIXME?
+												 dayString, downloadActionName,
 												 @"Download", @"download", nil];
 				NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
 				httpBody = [encodedDayDownloadDict dataUsingEncoding:NSASCIIStringEncoding];

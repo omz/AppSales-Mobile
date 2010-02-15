@@ -35,6 +35,18 @@
 #import "AppIconManager.h"
 #import "ReportManager.h"
 
+static BOOL containsOnlyWhiteSpace(NSArray* array) {
+	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
+	for (NSString *string in array) {
+		for (int i = string.length - 1; i >= 0; i--) {
+			if (! [charSet characterIsMember:[string characterAtIndex:i]]) {
+				return NO;
+			}
+		}
+	}
+	return YES;
+}
+
 static BOOL parseDateString(NSString *dateString, int *year, int *month, int *day) {
 	if ([dateString rangeOfString:@"/"].location == NSNotFound) {
 		if (dateString.length == 8) { // old date format
@@ -76,7 +88,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
-		if (columns.count == 1 && [columns.lastObject length] == 0) { // blank line
+		if (containsOnlyWhiteSpace(columns)) {
 			continue;
 		}
 		if (columns.count < 19) {
