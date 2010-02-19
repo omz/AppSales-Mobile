@@ -29,19 +29,23 @@
 	
 	int retryIfBackupFailure;
 	BOOL backupReviewsFile;
+	
+	// temporary fields, used while fetching reports
+	NSString *username;
+	NSString *password;
+	NSArray *weeksToSkip;
+	NSArray *daysToSkip;
 }
 
-@property (retain) NSMutableDictionary *days;
-@property (retain) NSMutableDictionary *weeks;
-@property (retain) NSMutableArray      *backupList;
-@property (retain) NSString *reportDownloadStatus;
+@property (readonly) NSDictionary *days;
+@property (readonly) NSDictionary *weeks;
+@property (readonly) NSString *reportDownloadStatus;
 
 + (ReportManager *)sharedManager;
+
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
-- (void) loadSavedFiles;
-
-- (void)setProgress:(NSString *)status;
+- (void)loadSavedFiles;
 
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 - (void)backupData; // backup to a remote host

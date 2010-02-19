@@ -119,25 +119,15 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 			return nil;
 		}
 		
-		int nameYear, nameMonth, nameDay;
 		NSCalendar *calendar = [NSCalendar currentCalendar];
 		NSDateComponents *components = [[NSDateComponents new] autorelease];
-		if (isWeek) { // weeks use their ending period as the 'name', just as iTunes Connect does
-			nameYear = endYear;
-			nameMonth = endMonth;
-			nameDay = endDay;
-		} else {
-			nameYear = startYear;
-			nameMonth = startMonth;
-			nameDay = startDay;				
-		}
-		[components setYear:nameYear];
-		[components setMonth:nameMonth];
-		[components setDay:nameDay];
+		[components setYear:startYear];
+		[components setMonth:startMonth];
+		[components setDay:startDay];
 		date = [[calendar dateFromComponents:components] retain];
-		name = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", nameMonth, nameDay, nameYear];	
+		name = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", startMonth, startDay, startYear];
+		weekEndDateString = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", endMonth, endDay, endYear];
 
-		
 		NSString *countryString = [columns objectAtIndex:14];
 		if (countryString.length != 2) { // country code has two characters
 			[NSException raise:@"invalid country code" format:countryString];
@@ -422,17 +412,6 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 - (NSString *)weekEndDateString
 {
-	// the Day class is also used to represent weeks. This returns a formatted date of the day the week ends (7 days after date)
-	if (!weekEndDateString) {
-		// FIXME: Why do all this work?  why not save off the 'end date' when parsing the CSV?
-		NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
-		[comp setHour:167];
-		NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:self.date options:0];
-		NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-		[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-		[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-		weekEndDateString = [[dateFormatter stringFromDate:dateWeekLater] retain];
-	}
 	return weekEndDateString;
 }
 

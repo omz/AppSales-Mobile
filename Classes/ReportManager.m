@@ -22,7 +22,7 @@
 
 @implementation ReportManager
 
-@synthesize days, weeks, backupList, reportDownloadStatus;
+@synthesize days, weeks, reportDownloadStatus;
 
 + (ReportManager *)sharedManager
 {
@@ -122,15 +122,29 @@
 }
 
 - (id)init {
-	[super init];
-	
-	days = [[NSMutableDictionary alloc] init];
-	weeks = [[NSMutableDictionary alloc] init];
-	backupList = [[NSMutableArray alloc] init];
-	
-	[[CurrencyManager sharedManager] refreshIfNeeded];
-	
+	self = [super init];
+	if (self) {	
+		days = [[NSMutableDictionary alloc] init];
+		weeks = [[NSMutableDictionary alloc] init];
+		backupList = [[NSMutableArray alloc] init];
+		
+		[[CurrencyManager sharedManager] refreshIfNeeded];
+	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[days release];
+	[weeks release];
+	[backupList release];
+	[reportDownloadStatus release];
+	[username release];
+	[password release];
+	[weeksToSkip release];
+	[daysToSkip release];	
+	
+	[super dealloc];
 }
 
 - (void)deleteDay:(Day *)dayToDelete
@@ -142,9 +156,9 @@
 	}
 	
 	if (dayToDelete.isWeek) {
-		[self.weeks removeObjectForKey:dayToDelete.name];
+		[weeks removeObjectForKey:dayToDelete.name];
 	} else {
-		[self.days removeObjectForKey:dayToDelete.name];
+		[days removeObjectForKey:dayToDelete.name];
 	}
 }
 
@@ -162,12 +176,15 @@
 	[UIApplication sharedApplication].idleTimerDisabled = YES;
 	
 	NSError *error = nil;
-	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
-	NSString *password = nil;
+	username = [[[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"] retain];
+	password = nil;
 	if (username) {
-		password = [SFHFKeychainUtils getPasswordForUsername:username andServiceName:@"omz:software AppSales Mobile Service" error:&error];
+		password = [[SFHFKeychainUtils getPasswordForUsername:username 
+											  andServiceName:@"omz:software AppSales Mobile Service" error:&error] retain];
 	}
 	if (username.length == 0 || password.length == 0) {
+		[username release];
+		[password release];
 		UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Username / Password Missing",nil) 
 														 message:NSLocalizedString(@"Please enter a username and a password in the settings.",nil) 
 														delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
@@ -176,293 +193,284 @@
 	}
 	
 	isRefreshing = YES;
-	NSArray *daysToSkip = days.allKeys;
-	NSArray *weeksToSkip = weeks.allKeys;
-	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-							  username, @"username", 
-							  password, @"password", 
-							  weeksToSkip, @"weeksToSkip", 
-							  daysToSkip, @"daysToSkip", nil];
-	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo:) withObject:userInfo];
+	daysToSkip = [days.allKeys retain];
+	weeksToSkip = [[weeks.allValues valueForKey:@"weekEndDateString"] retain];
+
+	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo) withObject:nil];
 }
 
-- (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
+- (void)fetchReportsWithUserInfo
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
-	NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];
-	
-	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:NO];
-	
-	NSString *username = [userInfo objectForKey:@"username"];
-	NSString *password = [userInfo objectForKey:@"password"];
-	
-	NSString *ittsBaseURL = @"https://itts.apple.com";
-	NSString *ittsLoginPageURL = @"https://itts.apple.com/cgi-bin/WebObjects/Piano.woa";
-	NSString *loginPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ittsLoginPageURL] usedEncoding:NULL error:NULL];
-	
-	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Logging in...",nil) waitUntilDone:NO];
-	
-	NSScanner *scanner = [NSScanner scannerWithString:loginPage];
-	NSString *loginAction = nil;
-	[scanner scanUpToString:@"method=\"post\" action=\"" intoString:NULL];
-	[scanner scanString:@"method=\"post\" action=\"" intoString:NULL];
-	[scanner scanUpToString:@"\"" intoString:&loginAction];
-	NSString *dateTypeSelectionPage;
-	if (loginAction) { //not logged in yet
-		NSString *loginURLString = [ittsBaseURL stringByAppendingString:loginAction];
-		NSURL *loginURL = [NSURL URLWithString:loginURLString];
-		NSDictionary *loginDict = [NSDictionary dictionaryWithObjectsAndKeys:username, @"theAccountName", password, @"theAccountPW", @"0", @"1.Continue.x", @"0", @"1.Continue.y", nil];
-		NSString *encodedLoginDict = [loginDict formatForHTTP];
-		NSData *httpBody = [encodedLoginDict dataUsingEncoding:NSASCIIStringEncoding];
-		NSMutableURLRequest *loginRequest = [NSMutableURLRequest requestWithURL:loginURL];
-		[loginRequest setHTTPMethod:@"POST"];
-		[loginRequest setHTTPBody:httpBody];
-		NSData *dateTypeSelectionPageData = [NSURLConnection sendSynchronousRequest:loginRequest returningResponse:NULL error:NULL];
-		if (dateTypeSelectionPageData == nil) {
-			[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:nil waitUntilDone:YES];
-			[pool release];
-			return;
-		}
-		dateTypeSelectionPage = [[[NSString alloc] initWithData:dateTypeSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
-	} else {
-		dateTypeSelectionPage = loginPage; //already logged in
-	}
-	
-	scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
-	
-	// check if page is "choose vendor" page (Patch by Christian Beer, thanks!)
-	if ([scanner scanUpToString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL]) {
-		NSString *chooseVendorAction = nil;
-		[scanner scanString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
-		[scanner scanUpToString:@"\"" intoString:&chooseVendorAction];
+	@try {		
+		NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];
 		
-		// get vendor Id
-		[scanner scanUpToString:@"<option value=\"null\">" intoString:NULL];
-		[scanner scanString:@"<option value=\"null\">" intoString:NULL];
-		[scanner scanUpToString:@"<option value=\"" intoString:NULL];
-		[scanner scanString:@"<option value=\"" intoString:NULL];
-		NSString *vendorId = nil;
-		[scanner scanUpToString:@"\"" intoString:&vendorId];
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:NO];
 		
-		if (chooseVendorAction != nil) {
-			NSString *chooseVendorURLString = [ittsBaseURL stringByAppendingString:chooseVendorAction];
-			NSURL *chooseVendorURL = [NSURL URLWithString:chooseVendorURLString];
-			NSDictionary *chooseVendorDict = [NSDictionary dictionaryWithObjectsAndKeys:
-											  vendorId, @"9.6.0", 
-											  vendorId, @"vndrid", 
-											  @"1", @"Select1", 
-											  @"", @"9.18", nil];
-			NSString *encodedChooseVendorDict = [chooseVendorDict formatForHTTP];
-			NSData *httpBody = [encodedChooseVendorDict dataUsingEncoding:NSASCIIStringEncoding];
-			NSMutableURLRequest *chooseVendorRequest = [NSMutableURLRequest requestWithURL:chooseVendorURL];
-			[chooseVendorRequest setHTTPMethod:@"POST"];
-			[chooseVendorRequest setHTTPBody:httpBody];
-			NSData *chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:chooseVendorRequest returningResponse:NULL error:NULL];
-			if (chooseVendorSelectionPageData == nil) {
-				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not choose vendor" waitUntilDone:YES];
-				[pool release];
+		NSString *ittsBaseURL = @"https://itts.apple.com";
+		NSString *ittsLoginPageURL = @"https://itts.apple.com/cgi-bin/WebObjects/Piano.woa";
+		NSString *loginPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ittsLoginPageURL] usedEncoding:NULL error:NULL];
+		
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Logging in...",nil) waitUntilDone:NO];
+		
+		NSScanner *scanner = [NSScanner scannerWithString:loginPage];
+		NSString *loginAction = nil;
+		[scanner scanUpToString:@"method=\"post\" action=\"" intoString:NULL];
+		[scanner scanString:@"method=\"post\" action=\"" intoString:NULL];
+		[scanner scanUpToString:@"\"" intoString:&loginAction];
+		NSString *dateTypeSelectionPage;
+		if (loginAction) { //not logged in yet
+			NSString *loginURLString = [ittsBaseURL stringByAppendingString:loginAction];
+			NSURL *loginURL = [NSURL URLWithString:loginURLString];
+			NSDictionary *loginDict = [NSDictionary dictionaryWithObjectsAndKeys:username, @"theAccountName", password, @"theAccountPW", @"0", @"1.Continue.x", @"0", @"1.Continue.y", nil];
+			NSString *encodedLoginDict = [loginDict formatForHTTP];
+			NSData *httpBody = [encodedLoginDict dataUsingEncoding:NSASCIIStringEncoding];
+			NSMutableURLRequest *loginRequest = [NSMutableURLRequest requestWithURL:loginURL];
+			[loginRequest setHTTPMethod:@"POST"];
+			[loginRequest setHTTPBody:httpBody];
+			NSData *dateTypeSelectionPageData = [NSURLConnection sendSynchronousRequest:loginRequest returningResponse:NULL error:NULL];
+			if (dateTypeSelectionPageData == nil) {
+				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:nil waitUntilDone:YES];
 				return;
 			}
-			NSString *chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
-			
-			scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
-			[scanner scanUpToString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
-			NSString *chooseVendorAction2 = nil;
+			dateTypeSelectionPage = [[[NSString alloc] initWithData:dateTypeSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
+		} else {
+			dateTypeSelectionPage = loginPage; //already logged in
+		}
+		
+		scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
+		
+		// check if page is "choose vendor" page (Patch by Christian Beer, thanks!)
+		if ([scanner scanUpToString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL]) {
+			NSString *chooseVendorAction = nil;
 			[scanner scanString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
-			[scanner scanUpToString:@"\"" intoString:&chooseVendorAction2];
+			[scanner scanUpToString:@"\"" intoString:&chooseVendorAction];
 			
-			chooseVendorURLString = [ittsBaseURL stringByAppendingString:chooseVendorAction2];
-			chooseVendorURL = [NSURL URLWithString:chooseVendorURLString];
-			chooseVendorDict = [NSDictionary dictionaryWithObjectsAndKeys:
-								vendorId, @"9.6.0", 
-								vendorId, @"vndrid", 
-								@"999998", @"Select1", 
-								@"", @"9.18", 
-								@"Submit", @"SubmitBtn", nil];
-			encodedChooseVendorDict = [chooseVendorDict formatForHTTP];
-			httpBody = [encodedChooseVendorDict dataUsingEncoding:NSASCIIStringEncoding];
-			chooseVendorRequest = [NSMutableURLRequest requestWithURL:chooseVendorURL];
-			[chooseVendorRequest setHTTPMethod:@"POST"];
-			[chooseVendorRequest setHTTPBody:httpBody];
-			chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:chooseVendorRequest returningResponse:NULL error:NULL];
-			if (chooseVendorSelectionPageData == nil) {
-				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not choose vendor page 2" waitUntilDone:YES];
-				[pool release];
-				return;
-			}
-			chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];			
-			
-			scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
-			[scanner scanUpToString:@"<td class=\"content\">" intoString:NULL];
-			[scanner scanUpToString:@"<a href=\"" intoString:NULL];
-			[scanner scanString:@"<a href=\"" intoString:NULL];
-			NSString *trendReportsAction = nil;
-			[scanner scanUpToString:@"\"" intoString:&trendReportsAction];
-			NSString *trendReportsURLString = [ittsBaseURL stringByAppendingString:trendReportsAction];
-			NSURL *trendReportsURL = [NSURL URLWithString:trendReportsURLString];
-			NSMutableURLRequest *trendReportsRequest = [NSMutableURLRequest requestWithURL:trendReportsURL];
-			[trendReportsRequest setHTTPMethod:@"GET"];
-			chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:trendReportsRequest returningResponse:NULL error:NULL];
-			if (chooseVendorSelectionPageData == nil) {
-				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not open trend report page" waitUntilDone:YES];
-				[pool release];
-				return;
-			}
-			dateTypeSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
-		}
-	}
-	
-	scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
-	NSString *dateTypeAction = nil;
-	[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
-	[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
-	[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
-	if (dateTypeAction == nil) {
-		[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not select date type" waitUntilDone:YES];
-		[pool release];
-		return;
-	}
-	
-	NSString *errorMessageString = nil;
-	[scanner setScanLocation:0];
-	const BOOL errorMessagePresent = [scanner scanUpToString:@"<font color=\"red\">" intoString:NULL];
-	if (errorMessagePresent) {
-		[scanner scanString:@"<font color=\"red\">" intoString:NULL];
-		[scanner scanUpToString:@"</font>" intoString:&errorMessageString];
-	}
-	
-	int numberOfNewReports = 0;
-	for (int i=0; i<=1; i++) {
-		NSString *downloadType;
-		NSString *downloadActionName;
-		if (i==0) {
-			downloadType = @"Daily";
-			downloadActionName = @"11.13.1";
-		}
-		else {
-			downloadType = @"Weekly";
-			downloadActionName = @"11.15.1";
-		}
-		
-		NSString *dateTypeSelectionURLString = [ittsBaseURL stringByAppendingString:dateTypeAction]; 
-		NSDictionary *dateTypeDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  downloadType, @"11.11", 
-									  downloadType, @"hiddenDayOrWeekSelection", 
-									  @"Summary", @"11.9", 
-									  @"ShowDropDown", @"hiddenSubmitTypeName", nil];
-		NSString *encodedDateTypeDict = [dateTypeDict formatForHTTP];
-		NSData *httpBody = [encodedDateTypeDict dataUsingEncoding:NSASCIIStringEncoding];
-		NSMutableURLRequest *dateTypeRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:dateTypeSelectionURLString]];
-		[dateTypeRequest setHTTPMethod:@"POST"];
-		[dateTypeRequest setHTTPBody:httpBody];
-		NSData *daySelectionPageData = [NSURLConnection sendSynchronousRequest:dateTypeRequest returningResponse:NULL error:NULL];
-		
-		if (daySelectionPageData == nil) {
-			[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not select day page" waitUntilDone:YES];
-			[pool release];
-			return;
-		}
-		NSString *daySelectionPage = [[[NSString alloc] initWithData:daySelectionPageData encoding:NSUTF8StringEncoding] autorelease];
-		scanner = [NSScanner scannerWithString:daySelectionPage];
-		NSMutableArray *availableDays = [NSMutableArray array];
-		BOOL scannedDay = YES;
-		while (scannedDay) {
-			NSString *dayString = nil;
+			// get vendor Id
+			[scanner scanUpToString:@"<option value=\"null\">" intoString:NULL];
+			[scanner scanString:@"<option value=\"null\">" intoString:NULL];
 			[scanner scanUpToString:@"<option value=\"" intoString:NULL];
 			[scanner scanString:@"<option value=\"" intoString:NULL];
-			[scanner scanUpToString:@"\"" intoString:&dayString];
-			if (dayString) {
-				if ([dayString rangeOfString:@"/"].location != NSNotFound)
-					[availableDays addObject:dayString];
-				scannedDay = YES;
+			NSString *vendorId = nil;
+			[scanner scanUpToString:@"\"" intoString:&vendorId];
+			
+			if (chooseVendorAction != nil) {
+				NSString *chooseVendorURLString = [ittsBaseURL stringByAppendingString:chooseVendorAction];
+				NSURL *chooseVendorURL = [NSURL URLWithString:chooseVendorURLString];
+				NSDictionary *chooseVendorDict = [NSDictionary dictionaryWithObjectsAndKeys:
+												  vendorId, @"9.6.0", 
+												  vendorId, @"vndrid", 
+												  @"1", @"Select1", 
+												  @"", @"9.18", nil];
+				NSString *encodedChooseVendorDict = [chooseVendorDict formatForHTTP];
+				NSData *httpBody = [encodedChooseVendorDict dataUsingEncoding:NSASCIIStringEncoding];
+				NSMutableURLRequest *chooseVendorRequest = [NSMutableURLRequest requestWithURL:chooseVendorURL];
+				[chooseVendorRequest setHTTPMethod:@"POST"];
+				[chooseVendorRequest setHTTPBody:httpBody];
+				NSData *chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:chooseVendorRequest returningResponse:NULL error:NULL];
+				if (chooseVendorSelectionPageData == nil) {
+					[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not choose vendor" waitUntilDone:YES];
+					return;
+				}
+				NSString *chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
+				
+				scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
+				[scanner scanUpToString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
+				NSString *chooseVendorAction2 = nil;
+				[scanner scanString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
+				[scanner scanUpToString:@"\"" intoString:&chooseVendorAction2];
+				
+				chooseVendorURLString = [ittsBaseURL stringByAppendingString:chooseVendorAction2];
+				chooseVendorURL = [NSURL URLWithString:chooseVendorURLString];
+				chooseVendorDict = [NSDictionary dictionaryWithObjectsAndKeys:
+									vendorId, @"9.6.0", 
+									vendorId, @"vndrid", 
+									@"999998", @"Select1", 
+									@"", @"9.18", 
+									@"Submit", @"SubmitBtn", nil];
+				encodedChooseVendorDict = [chooseVendorDict formatForHTTP];
+				httpBody = [encodedChooseVendorDict dataUsingEncoding:NSASCIIStringEncoding];
+				chooseVendorRequest = [NSMutableURLRequest requestWithURL:chooseVendorURL];
+				[chooseVendorRequest setHTTPMethod:@"POST"];
+				[chooseVendorRequest setHTTPBody:httpBody];
+				chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:chooseVendorRequest returningResponse:NULL error:NULL];
+				if (chooseVendorSelectionPageData == nil) {
+					[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not choose vendor page 2" waitUntilDone:YES];
+					return;
+				}
+				chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];			
+				
+				scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
+				[scanner scanUpToString:@"<td class=\"content\">" intoString:NULL];
+				[scanner scanUpToString:@"<a href=\"" intoString:NULL];
+				[scanner scanString:@"<a href=\"" intoString:NULL];
+				NSString *trendReportsAction = nil;
+				[scanner scanUpToString:@"\"" intoString:&trendReportsAction];
+				NSString *trendReportsURLString = [ittsBaseURL stringByAppendingString:trendReportsAction];
+				NSURL *trendReportsURL = [NSURL URLWithString:trendReportsURLString];
+				NSMutableURLRequest *trendReportsRequest = [NSMutableURLRequest requestWithURL:trendReportsURL];
+				[trendReportsRequest setHTTPMethod:@"GET"];
+				chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:trendReportsRequest returningResponse:NULL error:NULL];
+				if (chooseVendorSelectionPageData == nil) {
+					[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not open trend report page" waitUntilDone:YES];
+					return;
+				}
+				dateTypeSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
+			}
+		}
+		
+		scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
+		NSString *dateTypeAction = nil;
+		[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+		[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+		[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
+		if (dateTypeAction == nil) {
+			[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not select date type" waitUntilDone:YES];
+			return;
+		}
+		
+		NSString *errorMessageString = nil;
+		[scanner setScanLocation:0];
+		const BOOL errorMessagePresent = [scanner scanUpToString:@"<font color=\"red\">" intoString:NULL];
+		if (errorMessagePresent) {
+			[scanner scanString:@"<font color=\"red\">" intoString:NULL];
+			[scanner scanUpToString:@"</font>" intoString:&errorMessageString];
+		}
+		
+		int numberOfNewReports = 0;
+		for (int i=0; i<=1; i++) {
+			NSString *downloadType;
+			NSString *downloadActionName;
+			if (i==0) {
+				downloadType = @"Daily";
+				downloadActionName = @"11.13.1";
 			}
 			else {
-				scannedDay = NO;
+				downloadType = @"Weekly";
+				downloadActionName = @"11.15.1";
 			}
-		}
-		
-		if (i==0) { //daily
-			NSArray *daysToSkip = [userInfo objectForKey:@"daysToSkip"];
-			[availableDays removeObjectsInArray:daysToSkip];			
-		} else { //weekly
-			NSArray *weeksToSkip = [userInfo objectForKey:@"weeksToSkip"];
-			[availableDays removeObjectsInArray:weeksToSkip];
-		}
-
-		const int numberOfDays = availableDays.count;
-		if (numberOfDays) {
-			scanner = [NSScanner scannerWithString:daySelectionPage];
-			NSString *dayDownloadAction = nil;
-			[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
-			[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
-			[scanner scanUpToString:@"\"" intoString:&dayDownloadAction];
-			if (dayDownloadAction == nil) {
-				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not find day download action" waitUntilDone:YES];
-				[pool release];
+			
+			NSString *dateTypeSelectionURLString = [ittsBaseURL stringByAppendingString:dateTypeAction]; 
+			NSDictionary *dateTypeDict = [NSDictionary dictionaryWithObjectsAndKeys:
+										  downloadType, @"11.11", 
+										  downloadType, @"hiddenDayOrWeekSelection", 
+										  @"Summary", @"11.9", 
+										  @"ShowDropDown", @"hiddenSubmitTypeName", nil];
+			NSString *encodedDateTypeDict = [dateTypeDict formatForHTTP];
+			NSData *httpBody = [encodedDateTypeDict dataUsingEncoding:NSASCIIStringEncoding];
+			NSMutableURLRequest *dateTypeRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:dateTypeSelectionURLString]];
+			[dateTypeRequest setHTTPMethod:@"POST"];
+			[dateTypeRequest setHTTPBody:httpBody];
+			NSData *daySelectionPageData = [NSURLConnection sendSynchronousRequest:dateTypeRequest returningResponse:NULL error:NULL];
+			
+			if (daySelectionPageData == nil) {
+				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not select day page" waitUntilDone:YES];
 				return;
 			}
-			NSString *dayDownloadActionURLString = [ittsBaseURL stringByAppendingString:dayDownloadAction];
-			int dayNumber = 1;
-			for (NSString *dayString in availableDays) {
-				NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
-												 downloadType, @"11.11", 
-												 dayString, @"hiddenDayOrWeekSelection",
-												 @"Download", @"hiddenSubmitTypeName",
-												 @"ShowDropDown", @"hiddenSubmitTypeName",
-												 @"Summary", @"11.9",
-												 dayString, downloadActionName,
-												 @"Download", @"download", nil];
-				NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
-				httpBody = [encodedDayDownloadDict dataUsingEncoding:NSASCIIStringEncoding];
-				NSMutableURLRequest *dayDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:dayDownloadActionURLString]];
-				[dayDownloadRequest setHTTPMethod:@"POST"];
-				[dayDownloadRequest setHTTPBody:httpBody];
-				NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:NULL error:NULL];
-				
-				if (dayData == nil) {
-					[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:nil waitUntilDone:YES];
-					[pool release];
-					return;
+			NSString *daySelectionPage = [[[NSString alloc] initWithData:daySelectionPageData encoding:NSUTF8StringEncoding] autorelease];
+			scanner = [NSScanner scannerWithString:daySelectionPage];
+			NSMutableArray *availableDays = [NSMutableArray array];
+			BOOL scannedDay = YES;
+			while (scannedDay) {
+				NSString *dayString = nil;
+				[scanner scanUpToString:@"<option value=\"" intoString:NULL];
+				[scanner scanString:@"<option value=\"" intoString:NULL];
+				[scanner scanUpToString:@"\"" intoString:&dayString];
+				if (dayString) {
+					if ([dayString rangeOfString:@"/"].location != NSNotFound)
+						[availableDays addObject:dayString];
+					scannedDay = YES;
 				}
-				
-				Day *day = [self dayWithData:dayData compressed:YES];
-				if (day == nil) {
-					[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"report data did not parse correctly" waitUntilDone:YES];
-					[pool release];
-					return;
+				else {
+					scannedDay = NO;
 				}
-				[downloadedDays setObject:day forKey:day.name];
-				NSString *status;
-				if (i == 0) {
-					status = [NSString stringWithFormat:NSLocalizedString(@"Daily Report %i of %i", nil), dayNumber, numberOfDays];
-				} else {
-					status = [NSString stringWithFormat:NSLocalizedString(@"Weekly Report %i of %i", nil), dayNumber, numberOfDays];
-				}
-				[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:NO];
-				dayNumber++;
 			}
-			numberOfNewReports += downloadedDays.count;
-			if (i == 0) {
-				[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays.allValues waitUntilDone:NO];
-				[downloadedDays removeAllObjects];
-			} else {
-				[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays.allValues waitUntilDone:NO];
+			
+			if (i==0) { //daily
+				[availableDays removeObjectsInArray:daysToSkip];			
+			} else { //weekly
+				[availableDays removeObjectsInArray:weeksToSkip];
+			}
+
+			const int numberOfDays = availableDays.count;
+			if (numberOfDays) {
+				scanner = [NSScanner scannerWithString:daySelectionPage];
+				NSString *dayDownloadAction = nil;
+				[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+				[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+				[scanner scanUpToString:@"\"" intoString:&dayDownloadAction];
+				if (dayDownloadAction == nil) {
+					[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not find day download action" waitUntilDone:YES];
+					return;
+				}
+				NSString *dayDownloadActionURLString = [ittsBaseURL stringByAppendingString:dayDownloadAction];
+				int dayNumber = 1;
+				for (NSString *dayString in availableDays) {
+					NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
+													 downloadType, @"11.11", 
+													 dayString, @"hiddenDayOrWeekSelection",
+													 @"Download", @"hiddenSubmitTypeName",
+													 @"ShowDropDown", @"hiddenSubmitTypeName",
+													 @"Summary", @"11.9",
+													 dayString, downloadActionName,
+													 @"Download", @"download", nil];
+					NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
+					httpBody = [encodedDayDownloadDict dataUsingEncoding:NSASCIIStringEncoding];
+					NSMutableURLRequest *dayDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:dayDownloadActionURLString]];
+					[dayDownloadRequest setHTTPMethod:@"POST"];
+					[dayDownloadRequest setHTTPBody:httpBody];
+					NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:NULL error:NULL];
+					if (dayData == nil) {
+						[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:nil waitUntilDone:YES];
+						return;
+					}
+					
+					Day *day = [self dayWithData:dayData compressed:YES];
+					if (day == nil) {
+						[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"report data did not parse correctly" waitUntilDone:YES];
+						return;
+					}
+					[downloadedDays setObject:day forKey:day.name];
+					NSString *status;
+					if (i == 0) {
+						status = [NSString stringWithFormat:NSLocalizedString(@"Daily Report %i of %i", nil), dayNumber, numberOfDays];
+					} else {
+						status = [NSString stringWithFormat:NSLocalizedString(@"Weekly Report %i of %i", nil), dayNumber, numberOfDays];
+					}
+					[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:NO];
+					dayNumber++;
+				}
+				numberOfNewReports += downloadedDays.count;
+				if (i == 0) {
+					[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays.allValues waitUntilDone:NO];
+					[downloadedDays removeAllObjects];
+				} else {
+					[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays.allValues waitUntilDone:NO];
+				}
 			}
 		}
-	}
-	
-	[self performSelectorOnMainThread:@selector(finishDownloadingReports) withObject:nil waitUntilDone:NO]; // all done!
-	
-	if (numberOfNewReports == 0) {
-		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:NO];
-	} else { 
-		[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:NO];
-	}
-	if (errorMessageString) {
-		[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:NO];
-	}
 		
-	[pool release];
+		[self performSelectorOnMainThread:@selector(finishDownloadingReports) withObject:nil waitUntilDone:NO]; // all done!
+		
+		if (numberOfNewReports == 0) {
+			[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:NO];
+		} else { 
+			[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:NO];
+		}
+		if (errorMessageString) {
+			[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:NO];
+		}
+	} @finally {
+		[username release];
+		username = nil;
+		[password release];
+		password = nil;
+		[daysToSkip release];
+		daysToSkip = nil;
+		[weeksToSkip release];
+		weeksToSkip = nil;
+		[pool release];
+	}
 }
 
 - (void)finishDownloadingReports {
@@ -470,6 +478,15 @@
 	isRefreshing = NO;
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
 }
+
+- (void)setProgress:(NSString *)status
+{
+	[status retain];
+	[reportDownloadStatus release];
+	reportDownloadStatus = status;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
+}
+
 
 - (void)downloadFailed:(NSString*)errorMessage
 {
@@ -515,11 +532,6 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 }
 
-- (void)setProgress:(NSString *)status
-{
-	self.reportDownloadStatus = status;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
-}
 
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed
 {
@@ -612,8 +624,8 @@
 - (void)backupData
 {
 	[backupList removeAllObjects];
-	[backupList addObjectsFromArray:[self.days allValues]];
-	[backupList addObjectsFromArray:[self.weeks allValues]];
+	[backupList addObjectsFromArray:self.days.allValues];
+	[backupList addObjectsFromArray:self.weeks.allValues];
 	retryIfBackupFailure = 5;
 	backupReviewsFile = YES;
 	if (backupList.count > 0) {
