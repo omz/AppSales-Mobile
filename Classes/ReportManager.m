@@ -20,6 +20,36 @@
 #import "ASIFormDataRequest.h"
 #import "ReviewManager.h"
 
+
+static NSString* decompressAsGzipString(NSData *dayData) // could be a method on NSData
+{
+	NSString *zipFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.gz"];
+	NSString *textFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.txt"];
+	[dayData writeToFile:zipFile atomically:YES];
+	gzFile file = gzopen(zipFile.UTF8String, "rb");
+	FILE *dest = fopen(textFile.UTF8String, "w");
+	unsigned char buffer[262144]; // magic number FIXME: why is this exact size needed?
+	int uncompressedLength = gzread(file, buffer, 262144);
+	if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
+		NSLog(@"error writing data");
+	}
+	fclose(dest);
+	gzclose(file);
+	
+	NSError *error = nil;
+	NSString *text = [NSString stringWithContentsOfFile:textFile encoding:NSUTF8StringEncoding error:&error];
+	if (error) {
+		NSLog(@"%@", error);
+	}
+	if (! [[NSFileManager defaultManager] removeItemAtPath:zipFile error:&error]) {
+		NSLog(@"%@", error);
+	}
+	if (! [[NSFileManager defaultManager] removeItemAtPath:textFile error:&error]) {
+		NSLog(@"%@", error);
+	}
+	return text;
+}
+
 @implementation ReportManager
 
 @synthesize days, weeks, reportDownloadStatus;
@@ -67,10 +97,14 @@
 	// save all days/weeks in separate files
 	NSString *docPath = getDocPath();
 	for (Day *d in days.allValues) {
-		[d archiveToDocumentPathIfNeeded:docPath];
+		if (! [d archiveToDocumentPathIfNeeded:docPath]) {
+			NSLog(@"could not save %@");
+		}
 	}
 	for (Day *w in weeks.allValues) {
-		[w archiveToDocumentPathIfNeeded:docPath];
+		if (! [w archiveToDocumentPathIfNeeded:docPath]) {
+			NSLog(@"could not save %@");	
+		}
 	}
 }
 
@@ -82,12 +116,12 @@
 	for (NSString *filename in fileNames) {
 		NSString *pathExtension = [filename pathExtension];
 		Day *loaded;
-		if ([pathExtension isEqual:@"dat"]) {
-			// saved from backup data
-			loaded = [Day dayFromFile:filename atPath:docPath];
-		} else if ([pathExtension isEqual:@"txt"] || [pathExtension isEqual:@"csv"]) {
+		if ([pathExtension isEqual:@"txt"] || [pathExtension isEqual:@"csv"]) {
 			// load any CVS files manually added	
 			loaded = [Day dayFromCSVFile:filename atPath:docPath];
+		} else if ([pathExtension isEqual:@"dat"]) {
+			// saved from backup data
+			loaded = [Day dayFromFile:filename atPath:docPath];
 		} else {
 			continue;
 		}
@@ -149,7 +183,7 @@
 
 - (void)deleteDay:(Day *)dayToDelete
 {
-	NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[dayToDelete proposedFilename]];
+	NSString *fullPath = [getDocPath() stringByAppendingPathComponent:dayToDelete.proposedFilename];
 	NSError *error = nil;
 	if (! [[NSFileManager defaultManager] removeItemAtPath:fullPath error:&error]) {
 		NSLog(@"error encountered: %@", error);
@@ -203,7 +237,7 @@
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	@try {		
-		NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];
+		NSMutableArray *downloadedDays = [NSMutableArray array];
 		
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:NO];
 		
@@ -425,12 +459,23 @@
 						return;
 					}
 					
-					Day *day = [self dayWithData:dayData compressed:YES];
+					NSString *csv = decompressAsGzipString(dayData);
+					
+					// save off the original CSV for the backup function
+					NSError *error = nil; 
+					// this code for naming 
+					NSString *csvFilePath = [getDocPath() stringByAppendingPathComponent:
+											 [Day fileNameForString:dayString extension:@"csv" isWeek:(i != 0)]];
+					if (! [csv writeToFile:csvFilePath atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
+						[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not save raw CSV file" waitUntilDone:YES];
+						return;
+					}
+					Day *day = [[[Day alloc] initWithCSV:csv] autorelease];
 					if (day == nil) {
 						[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"report data did not parse correctly" waitUntilDone:YES];
 						return;
 					}
-					[downloadedDays setObject:day forKey:day.name];
+					[downloadedDays addObject:day];
 					NSString *status;
 					if (i == 0) {
 						status = [NSString stringWithFormat:NSLocalizedString(@"Daily Report %i of %i", nil), dayNumber, numberOfDays];
@@ -440,12 +485,16 @@
 					[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:NO];
 					dayNumber++;
 				}
+
 				numberOfNewReports += downloadedDays.count;
+				// must make a copy, since the main thread will iterate through it while we're still using it.
+				// could wait until done, but instead we'll give a copy so this thread can keep working
+				NSArray *downloadedDaysCopy = [NSArray arrayWithArray:downloadedDays];
+				[downloadedDays removeAllObjects];
 				if (i == 0) {
-					[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays.allValues waitUntilDone:NO];
-					[downloadedDays removeAllObjects];
+					[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDaysCopy waitUntilDone:NO];
 				} else {
-					[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays.allValues waitUntilDone:NO];
+					[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDaysCopy waitUntilDone:NO];
 				}
 			}
 		}
@@ -533,34 +582,6 @@
 }
 
 
-- (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed
-{
-	if (compressed) {
-		NSString *zipFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.gz"];
-		NSString *textFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.txt"];
-		[dayData writeToFile:zipFile atomically:YES];
-		gzFile file = gzopen([zipFile UTF8String], "rb");
-		FILE *dest = fopen([textFile UTF8String], "w");
-		unsigned char buffer[262144];
-		int uncompressedLength = gzread(file, buffer, 262144);
-		if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
-			NSLog(@"error writing data");
-		}
-		fclose(dest);
-		gzclose(file);
-		
-		NSString *text = [NSString stringWithContentsOfFile:textFile encoding:NSUTF8StringEncoding error:NULL];
-		[[NSFileManager defaultManager] removeItemAtPath:zipFile error:NULL];
-		[[NSFileManager defaultManager] removeItemAtPath:textFile error:NULL];
-		return [[[Day alloc] initWithCSV:text] autorelease];
-	} else {
-		NSString *text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
-		Day *day = [[[Day alloc] initWithCSV:text] autorelease];
-		[text release];
-		return day;
-	}
-}
-
 #pragma mark Backup Reports methods
 
 - (void)startUpload
@@ -574,9 +595,9 @@
 	if (backupList.count > 0) {
 		Day *d = [backupList objectAtIndex:0];
 
-		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:[d proposedFilename]];
+		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:d.proposedFilename];
 		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
-		[request setPostValue:[d proposedFilename] forKey:@"filename"];
+		[request setPostValue:d.proposedFilename forKey:@"filename"];
 		if ([[NSFileManager defaultManager] fileExistsAtPath:fullPath])
 			[request setFile:fullPath forKey:@"report"];
 		[request setDelegate:self];

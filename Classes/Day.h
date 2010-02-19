@@ -58,6 +58,12 @@
 @property (readonly) NSString *totalRevenueString;
 @property (readonly) BOOL isWeek;
 
+@property (readonly) NSArray *allProductIDs;
+@property (readonly) NSString *proposedFilename;
+@property (readonly) NSArray *children;
+
++ (NSString*) fileNameForString:(NSString*)fileName extension:(NSString*)fileExtension isWeek:(BOOL)isWeek;
+
 + (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // from serialized data
 + (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
 
@@ -72,9 +78,5 @@
 - (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app;
 - (int)totalUnitsForAppID:(NSString *)appID;
 - (int)totalUnits;
-- (NSArray *)allProductIDs;
-- (UIColor *)weekdayColor;
-- (NSString *)proposedFilename;
-- (NSArray *)children;
 
 @end

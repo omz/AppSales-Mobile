@@ -34,6 +34,7 @@
 #import "CurrencyManager.h"
 #import "AppIconManager.h"
 #import "ReportManager.h"
+#import "App.h"
 
 static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
@@ -71,6 +72,12 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 @synthesize countries;
 @synthesize isWeek;
 @synthesize name;
+
++ (NSString*) fileNameForString:(NSString*)name extension:(NSString*)fileExtension isWeek:(BOOL)isWeek {
+	return [NSString stringWithFormat:@"%@_%@.%@",  (isWeek ? @"week" : @"day"), 
+			[name stringByReplacingOccurrencesOfString:@"/" withString:@"_"], 
+			fileExtension];
+}
 
 - (id)initWithCSV:(NSString *)csv
 {
@@ -266,7 +273,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 - (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath {
 	NSFileManager *manager = [NSFileManager defaultManager];
-	NSString *fullPath = [docPath stringByAppendingPathComponent:[self proposedFilename]];
+	NSString *fullPath = [docPath stringByAppendingPathComponent:self.proposedFilename];
 	BOOL isDirectory = false;
 	if ([manager fileExistsAtPath:fullPath isDirectory:&isDirectory]) {
 		if (isDirectory) {
@@ -275,8 +282,8 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 		return FALSE;
 	}
 	// hasn't been arhived yet, write it out now
-	[NSKeyedArchiver archiveRootObject:self toFile:fullPath];
-	return YES;
+	
+	return [NSKeyedArchiver archiveRootObject:self toFile:fullPath];
 }
 
 - (Country *)countryNamed:(NSString *)countryName
@@ -426,12 +433,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 - (NSString *)proposedFilename
 {
 	if (proposedFileName == nil) {
-		NSString *dateString = [self.name stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-		if (self.isWeek) {
-			proposedFileName = [[NSString alloc] initWithFormat:@"week_%@.dat", dateString];
-		} else {
-			proposedFileName = [[NSString alloc] initWithFormat:@"day_%@.dat", dateString];
-		}
+		proposedFileName = [Day fileNameForString:self.name extension:@"dat" isWeek:isWeek];
 	}
 	return proposedFileName;
 }

@@ -47,7 +47,6 @@
 - (void)downloadReports;
 - (void)loadSavedFiles;
 
-- (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 - (void)backupData; // backup to a remote host
 
 - (void)deleteDay:(Day *)dayToDelete;
