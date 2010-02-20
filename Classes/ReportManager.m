@@ -39,6 +39,8 @@
 	}
 	
 	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
+
+	NSCalendar *calendar = [NSCalendar currentCalendar];
 	
 	for (NSString *filename in filenames) {
 		if (![[filename pathExtension] isEqual:@"dat"])
@@ -53,11 +55,13 @@
 			{
 				if (loadedDay.date)
 				{
+					NSDateComponents *components = [calendar components:(NSWeekdayCalendarUnit | NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit) fromDate:loadedDay.date];
+					NSDate *loadedDate = [calendar dateFromComponents:components];
 					NSDateFormatter * lFormat = [NSDateFormatter new];
 					[lFormat setDateFormat:@"MM/dd/yyyy"];
 					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
 					[lFormat release];
-					if ([lDate isEqual:loadedDay.date])
+					if ([lDate isEqual:loadedDate])
 						[self.days setObject:loadedDay forKey:[loadedDay name]];
 				}
 			}
@@ -280,23 +284,24 @@
 		[scanner scanUpToString:@"</font>" intoString:&errorMessageString];
 	}
 	
+	int numberOfNewReports = 0;
 	for (int i=0; i<=1; i++) {
 		NSString *downloadType;
 		NSString *downloadActionName;
 		if (i==0) {
 			downloadType = @"Daily";
-			downloadActionName = @"11.13.1";
+			downloadActionName = @"17.13.1";
 		}
 		else {
 			downloadType = @"Weekly";
-			downloadActionName = @"11.15.1";
+			downloadActionName = @"17.15.1";
 		}
 		
 		NSString *dateTypeSelectionURLString = [ittsBaseURL stringByAppendingString:dateTypeAction]; 
 		NSDictionary *dateTypeDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  downloadType, @"11.11", 
+									  downloadType, @"17.11", 
 									  downloadType, @"hiddenDayOrWeekSelection", 
-									  @"Summary", @"11.9", 
+									  @"Summary", @"17.9", 
 									  @"ShowDropDown", @"hiddenSubmitTypeName", nil];
 		NSString *encodedDateTypeDict = [dateTypeDict formatForHTTP];
 		NSData *httpBody = [encodedDateTypeDict dataUsingEncoding:NSASCIIStringEncoding];
@@ -352,11 +357,11 @@
 		int dayNumber = 1;
 		for (NSString *dayString in availableDays) {
 			NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
-											 downloadType, @"11.11", 
+											 downloadType, @"17.11", 
 											 dayString, @"hiddenDayOrWeekSelection",
 											 @"Download", @"hiddenSubmitTypeName",
 											 @"ShowDropDown", @"hiddenSubmitTypeName",
-											 @"Summary", @"11.9",
+											 @"Summary", @"17.9",
 											 dayString, downloadActionName, 
 											 @"Download", @"download", nil];
 			NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
@@ -389,6 +394,7 @@
 			[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:YES];
 			dayNumber++;
 		}
+		numberOfNewReports += [downloadedDays count];
 		if (i == 0) {
 			[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays waitUntilDone:YES];
 			[downloadedDays removeAllObjects];
@@ -396,7 +402,10 @@
 		else
 			[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays waitUntilDone:YES];
 	}
-	[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
+	if (numberOfNewReports == 0)
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:YES];
+	else
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
 	
 	if (errorMessageString) {
 		[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:YES];

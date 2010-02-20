@@ -130,14 +130,28 @@
 		}
 	}
 	
-	int maxUnitSales = 0;
 	NSMutableArray *unitSales = [NSMutableArray array];
+	
+	int maxUnitSales = 0;
 	for (Day *d in [sortedDays reverseObjectEnumerator]) {
-		int units = [d totalUnits];
-		if (units > maxUnitSales)
-			maxUnitSales = units;
-		[unitSales addObject:[NSNumber numberWithInt:units]];
+		float revenue = [d totalRevenueInBaseCurrency];
+		if (revenue > maxUnitSales)
+			maxUnitSales = (int)revenue;
+		[unitSales addObject:[NSNumber numberWithFloat:revenue]];
 	}
+	
+	//Use number of sales if no revenue was made (e.g. for free apps):
+	if (maxUnitSales == 0) {
+		[unitSales removeAllObjects];
+		maxUnitSales = 0;
+		for (Day *d in [sortedDays reverseObjectEnumerator]) {
+			int units = [d totalUnits];
+			if (units > maxUnitSales)
+				maxUnitSales = units;
+			[unitSales addObject:[NSNumber numberWithInt:units]];
+		}
+	}
+	
 	[[UIColor grayColor] set];
 	float maxY = 27.0;
 	float minY = 3.0;
@@ -330,6 +344,7 @@
 	else if ((row == 0) && (section == 1)) {
 		if ([[ReportManager sharedManager].appsByID count] == 0) {
 			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease] show];
+            [[self tableView ] deselectRowAtIndexPath:indexPath animated:YES];
 			return;
 		}
 		else {
