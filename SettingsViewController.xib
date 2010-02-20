@@ -246,10 +246,12 @@
 					<object class="IBUISegmentedControl" id="995183575">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">298</int>
-						<string key="NSFrame">{{20, 266}, {280, 30}}</string>
+						<string key="NSFrame">{{20, 272}, {280, 30}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
+						<int key="IBUIContentHorizontalAlignment">0</int>
+						<int key="IBUIContentVerticalAlignment">0</int>
 						<int key="IBSegmentControlStyle">2</int>
 						<int key="IBNumberOfSegments">1</int>
 						<object class="NSArray" key="IBSegmentTitles">
@@ -592,11 +594,11 @@
 							<reference ref="1025655004"/>
 							<reference ref="740996447"/>
 							<reference ref="344336398"/>
-							<reference ref="995183575"/>
 							<reference ref="587798911"/>
 							<reference ref="474335261"/>
 							<reference ref="338510456"/>
 							<reference ref="945961431"/>
+							<reference ref="995183575"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
