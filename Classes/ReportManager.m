@@ -97,14 +97,10 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 	// save all days/weeks in separate files
 	NSString *docPath = getDocPath();
 	for (Day *d in days.allValues) {
-		if (! [d archiveToDocumentPathIfNeeded:docPath]) {
-			NSLog(@"could not save %@");
-		}
+		[d archiveToDocumentPathIfNeeded:docPath];
 	}
 	for (Day *w in weeks.allValues) {
-		if (! [w archiveToDocumentPathIfNeeded:docPath]) {
-			NSLog(@"could not save %@");	
-		}
+		[w archiveToDocumentPathIfNeeded:docPath];
 	}
 }
 
@@ -115,17 +111,14 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 	
 	for (NSString *filename in fileNames) {
 		NSString *pathExtension = [filename pathExtension];
-		Day *loaded;
+		Day *loaded = nil;
 		if ([pathExtension isEqual:@"txt"] || [pathExtension isEqual:@"csv"]) {
 			// load any CVS files manually added	
 			loaded = [Day dayFromCSVFile:filename atPath:docPath];
 		} else if ([pathExtension isEqual:@"dat"]) {
 			// saved from backup data
 			loaded = [Day dayFromFile:filename atPath:docPath];
-		} else {
-			continue;
 		}
-		
 		if (loaded != nil) {
 			if (loaded.isWeek) {
 				[self addWeek:loaded];
@@ -453,16 +446,16 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 					NSMutableURLRequest *dayDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:dayDownloadActionURLString]];
 					[dayDownloadRequest setHTTPMethod:@"POST"];
 					[dayDownloadRequest setHTTPBody:httpBody];
-					NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:NULL error:NULL];
-					if (dayData == nil) {
-						[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:nil waitUntilDone:YES];
+					NSError *error = nil;
+					NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:NULL error:&error];
+					if (dayData == nil || error) {
+						[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:error.description waitUntilDone:YES];
 						return;
 					}
 					
 					NSString *csv = decompressAsGzipString(dayData);
 					
 					// save off the original CSV for the backup function
-					NSError *error = nil; 
 					// this code for naming 
 					NSString *csvFilePath = [getDocPath() stringByAppendingPathComponent:
 											 [Day fileNameForString:dayString extension:@"csv" isWeek:(i != 0)]];
@@ -583,6 +576,61 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 
 
 #pragma mark Backup Reports methods
+
+// TODO?  move this view controller logic into the settings view controller, and leave the FileManager/NSData logic here
+- (void) backupRawCSVToEmail:(UIViewController*)viewController {
+	NSString *docPath = getDocPath();
+	NSFileManager *manager = [NSFileManager defaultManager];
+	NSError *error = nil;
+	NSArray *dirContents = [manager contentsOfDirectoryAtPath:docPath error:&error];
+	if (error) {
+		[self presentErrorMessage:[NSString stringWithFormat:@"%@\n%@", NSLocalizedString(@"document error",nil), error]];
+		 return;
+	}
+	
+	MFMailComposeViewController *picker = [[[[MFMailComposeViewController class] alloc] init] autorelease];
+    [picker setSubject:NSLocalizedString(@"AppSales CSV reports", nil)];
+    [picker setMailComposeDelegate:self];
+	
+	int numAttachments = 0;
+	
+	for (NSString *fileName in dirContents) {
+		if ([[fileName pathExtension] isEqualToString:@"csv"]) {
+			NSError *error = nil;
+			NSString *csvString = [NSString stringWithContentsOfFile:[docPath stringByAppendingPathComponent:fileName] 
+															encoding:NSUTF8StringEncoding error:&error];
+			if (error) {
+				[self presentErrorMessage:error.description];
+				return;
+			}
+			[picker addAttachmentData:[csvString dataUsingEncoding:NSUTF8StringEncoding] 
+							 mimeType:@"text/csv" fileName:fileName.lastPathComponent];
+			numAttachments++;
+		}
+	}
+	if (numAttachments == 0) {
+		// no reports have been downloaded yet, or all reports were previously imported as CSV/DAT files
+		[self presentErrorMessage:@"could not find any previously downloaded CSV files"];
+		return;
+	}
+	[viewController presentModalViewController:picker animated:YES];
+}
+
+- (void)mailComposeController:(MFMailComposeViewController*)controller 
+		didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
+	[controller.parentViewController dismissModalViewControllerAnimated:YES];
+	
+	if (result == MFMailComposeResultFailed) {
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Mail send error", nil)
+														message: error.localizedDescription
+													   delegate: self
+											  cancelButtonTitle: NSLocalizedString(@"OK", nil)
+											  otherButtonTitles: nil];
+		[alert show];
+		[alert release];		
+	}
+}
+
 
 - (void)startUpload
 {

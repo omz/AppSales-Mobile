@@ -26,7 +26,6 @@
 		3AD3335D10B771B200A2670E /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335510B771B200A2670E /* ASINetworkQueue.m */; };
 		3AD3335E10B771B200A2670E /* ASINSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3335710B771B200A2670E /* ASINSStringAdditions.m */; };
 		3AD3336210B771CC00A2670E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AD3336110B771CC00A2670E /* CFNetwork.framework */; };
-		7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */; };
 		7F17E0570ED4F21E0005D8AF /* CurrencySelectionDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */; };
 		7F29EA420ED861B20018C18A /* help in Resources */ = {isa = PBXBuildFile; fileRef = 7F29EA340ED861B20018C18A /* help */; };
 		7F29EA630ED861CE0018C18A /* HelpBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F29EA620ED861CE0018C18A /* HelpBrowser.m */; };
@@ -308,6 +307,8 @@
 		FA7E808310B7784200D046E0 /* SBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = FA7E807E10B7784200D046E0 /* SBJsonBase.m */; };
 		FA7E808410B7784200D046E0 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = FA7E808010B7784200D046E0 /* SBJsonParser.m */; };
 		FA7E808510B7784200D046E0 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = FA7E808210B7784200D046E0 /* SBJsonWriter.m */; };
+		FACF07291130954300EA2548 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FACF07281130954300EA2548 /* SettingsViewController.xib */; };
+		FACF079411309A5B00EA2548 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FACF079311309A5B00EA2548 /* MessageUI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -343,7 +344,6 @@
 		3AD3335610B771B200A2670E /* ASINSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASINSStringAdditions.h; sourceTree = "<group>"; };
 		3AD3335710B771B200A2670E /* ASINSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASINSStringAdditions.m; sourceTree = "<group>"; };
 		3AD3336110B771CC00A2670E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		4030455211279483009CC08F /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/SettingsViewController.xib; sourceTree = "<group>"; };
 		7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrencySelectionDialog.h; sourceTree = "<group>"; };
 		7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencySelectionDialog.m; sourceTree = "<group>"; };
 		7F29EA340ED861B20018C18A /* help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = help; sourceTree = "<group>"; };
@@ -607,7 +607,6 @@
 		7FB0C4AA0EB99D01005E2C45 /* CurrencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencyManager.m; sourceTree = "<group>"; };
 		7FB0C5990EBA3680005E2C45 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		7FB0C59A0EBA3680005E2C45 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		7FB0C59C0EBA39C7005E2C45 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/SettingsViewController.xib; sourceTree = "<group>"; };
 		7FB0C62D0EBA43BC005E2C45 /* DaysController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DaysController.h; sourceTree = "<group>"; };
 		7FB0C62E0EBA43BC005E2C45 /* DaysController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DaysController.m; sourceTree = "<group>"; };
 		7FB0C7040EBA8348005E2C45 /* WeeksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeeksController.h; sourceTree = "<group>"; };
@@ -670,6 +669,8 @@
 		FA7E808110B7784200D046E0 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBJsonWriter.h; path = "Classes/Google Translate ObjC/SBJsonWriter.h"; sourceTree = "<group>"; };
 		FA7E808210B7784200D046E0 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBJsonWriter.m; path = "Classes/Google Translate ObjC/SBJsonWriter.m"; sourceTree = "<group>"; };
 		FA81AF781122124200BDDBFC /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FACF07281130954300EA2548 /* SettingsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsViewController.xib; sourceTree = "<group>"; };
+		FACF079311309A5B00EA2548 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -684,6 +685,7 @@
 				7FB391990EE7991D00AC30D5 /* SystemConfiguration.framework in Frameworks */,
 				3AD3336210B771CC00A2670E /* CFNetwork.framework in Frameworks */,
 				3A41327D10B89DF300313F61 /* libz.dylib in Frameworks */,
+				FACF079411309A5B00EA2548 /* MessageUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -743,7 +745,7 @@
 				7F29EA340ED861B20018C18A /* help */,
 				7F4C219A10230F1100F17F7D /* ImagesFlags */,
 				7F4C217510230EF200F17F7D /* Images */,
-				7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */,
+				FACF07281130954300EA2548 /* SettingsViewController.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				7FA7ECC10EE437C400C1954E /* Localizable.strings */,
 			);
@@ -760,6 +762,7 @@
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
+				FACF079311309A5B00EA2548 /* MessageUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1273,7 +1276,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */,
 				7F29EA420ED861B20018C18A /* help in Resources */,
 				7FA7ECC20EE437C400C1954E /* Localizable.strings in Resources */,
 				7F4C218810230EF300F17F7D /* About.png in Resources */,
@@ -1515,6 +1517,7 @@
 				7F47897810661CBD002415A2 /* Entitlements.plist in Resources */,
 				3AD3315810B76D9F00A2670E /* Prefetched in Resources */,
 				FA57125010D5910000D44E63 /* Cash.png in Resources */,
+				FACF07291130954300EA2548 /* SettingsViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1599,15 +1602,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7FB0C59C0EBA39C7005E2C45 /* English */,
-				4030455211279483009CC08F /* German */,
-			);
-			name = SettingsViewController.xib;
-			sourceTree = "<group>";
-		};
 		7FA7ECC10EE437C400C1954E /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (

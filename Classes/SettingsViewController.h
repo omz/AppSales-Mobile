@@ -49,6 +49,7 @@ AppSalesMobile
 - (IBAction)refreshExchangeRates:(id)sender;
 - (IBAction)changeCurrency:(id)sender;
 - (IBAction)uploadBackups:(id)sender;
+- (IBAction)emailCSVReports:(id)sender;
 - (void)currencyRatesDidUpdate;
 - (void)currencyRatesFailedToUpdate;
 - (void)baseCurrencyChanged;

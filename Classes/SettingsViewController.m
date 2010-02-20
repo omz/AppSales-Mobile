@@ -47,12 +47,7 @@ AppSalesMobile
     [super viewDidLoad];
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-	explanationsLabel.font = [UIFont systemFontOfSize:12.0];
-	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours. All information is presented without any warranties. The presented market trend reports should not be considered to be your monthly royalty reports.",nil);
-	copyrightLabel.font = [UIFont systemFontOfSize:12.0];
-	currencySectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
-	loginSectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
-	lastRefreshLabel.font = [UIFont systemFontOfSize:12.0];
+	explanationsLabel.text = NSLocalizedString(@"Exchange rates automatically refreshed every 6 hours.",nil);
 	translationLabel.text = NSLocalizedString(@"Translate foreign reviews",nil);
 	
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
@@ -163,6 +158,11 @@ AppSalesMobile
 	[alert show];
 	[alert release];
 #endif
+}
+
+- (IBAction)emailCSVReports:(id)sender
+{
+	[[ReportManager sharedManager] backupRawCSVToEmail:self];	
 }
 
 @end

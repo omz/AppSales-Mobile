@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <MessageUI/MFMailComposeViewController.h>
 
 #define ReportManagerDownloadedDailyReportsNotification				@"ReportManagerDownloadedDailyReportsNotification"
 #define ReportManagerDownloadedWeeklyReportsNotification			@"ReportManagerDownloadedWeeklyReportsNotification"
@@ -18,7 +19,7 @@
 
 @class Day;
 
-@interface ReportManager : NSObject {
+@interface ReportManager : NSObject <MFMailComposeViewControllerDelegate> {
 	NSMutableDictionary *days;
 	NSMutableDictionary *weeks;
 	NSMutableArray      *backupList;
@@ -47,8 +48,12 @@
 - (void)downloadReports;
 - (void)loadSavedFiles;
 
+- (void)deleteDay:(Day *)dayToDelete;
+
+// backup files through email.  requiring the view controller is kinda hacky, but could easily refactor later
+- (void) backupRawCSVToEmail:(UIViewController*)viewController;
 - (void)backupData; // backup to a remote host
 
-- (void)deleteDay:(Day *)dayToDelete;
+
 
 @end

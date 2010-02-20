@@ -260,7 +260,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 + (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // serialized data 
 {
-	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];	
+	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
 	return [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
 }
 
@@ -282,8 +282,11 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 		return FALSE;
 	}
 	// hasn't been arhived yet, write it out now
-	
-	return [NSKeyedArchiver archiveRootObject:self toFile:fullPath];
+	if (! [NSKeyedArchiver archiveRootObject:self toFile:fullPath]) {
+		NSLog(@"could not archive out %@", self);
+		return FALSE;
+	}
+	return TRUE;
 }
 
 - (Country *)countryNamed:(NSString *)countryName
