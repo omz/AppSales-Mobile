@@ -93,7 +93,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 		return; // everythings up to date
 	}
 	needsDataSavedToDisk = NO;
-		
+	
 	// save all days/weeks in separate files
 	NSString *docPath = getDocPath();
 	for (Day *d in days.allValues) {
@@ -207,7 +207,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 	password = nil;
 	if (username) {
 		password = [[SFHFKeychainUtils getPasswordForUsername:username 
-											  andServiceName:@"omz:software AppSales Mobile Service" error:&error] retain];
+											   andServiceName:@"omz:software AppSales Mobile Service" error:&error] retain];
 	}
 	if (username.length == 0 || password.length == 0) {
 		[username release];
@@ -222,7 +222,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 	isRefreshing = YES;
 	daysToSkip = [days.allKeys retain];
 	weeksToSkip = [[weeks.allValues valueForKey:@"weekEndDateString"] retain];
-
+	
 	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo) withObject:nil];
 }
 
@@ -418,7 +418,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 			} else { //weekly
 				[availableDays removeObjectsInArray:weeksToSkip];
 			}
-
+			
 			const int numberOfDays = availableDays.count;
 			if (numberOfDays) {
 				scanner = [NSScanner scannerWithString:daySelectionPage];
@@ -478,7 +478,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 					[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:NO];
 					dayNumber++;
 				}
-
+				
 				numberOfNewReports += downloadedDays.count;
 				// must make a copy, since the main thread will iterate through it while we're still using it.
 				// could wait until done, but instead we'll give a copy so this thread can keep working
@@ -557,7 +557,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 												otherButtonTitles:nil] autorelease];
 	[errorAlert show];
 }
-	
+
 - (void)successfullyDownloadedDays:(NSArray*)newDays
 {
 	for (Day *d in newDays) {
@@ -585,7 +585,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 	NSArray *dirContents = [manager contentsOfDirectoryAtPath:docPath error:&error];
 	if (error) {
 		[self presentErrorMessage:[NSString stringWithFormat:@"%@\n%@", NSLocalizedString(@"document error",nil), error]];
-		 return;
+		return;
 	}
 	
 	MFMailComposeViewController *picker = [[[[MFMailComposeViewController class] alloc] init] autorelease];
@@ -617,7 +617,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 }
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller 
-		didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
+		  didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
 	[controller.parentViewController dismissModalViewControllerAnimated:YES];
 	
 	if (result == MFMailComposeResultFailed) {
@@ -642,7 +642,7 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 #endif
 	if (backupList.count > 0) {
 		Day *d = [backupList objectAtIndex:0];
-
+		
 		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:d.proposedFilename];
 		ASIFormDataRequest *request = [[[ASIFormDataRequest alloc] initWithURL:url] autorelease];
 		[request setPostValue:d.proposedFilename forKey:@"filename"];
