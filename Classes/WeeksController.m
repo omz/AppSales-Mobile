@@ -138,13 +138,18 @@
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
 	NSString *formattedDate1 = [dateFormatter stringFromDate:selectedDay.date];
-	
-	NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
-	[comp setHour:167];
-	NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:selectedDay.date options:0];
-	NSString *formattedDate2 = [dateFormatter stringFromDate:dateWeekLater];
-	
-	NSString *weekDesc = [NSString stringWithFormat:@"%@ - %@", formattedDate1, formattedDate2];
+		
+	NSString *weekDesc;
+	if ([self.title isEqualToString:NSLocalizedString(@"Total",nil)]) {
+		weekDesc = NSLocalizedString(@"Total",nil);
+	}
+	else {
+		NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
+		[comp setHour:167];
+		NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:selectedDay.date options:0];
+		NSString *formattedDate2 = [dateFormatter stringFromDate:dateWeekLater];
+		weekDesc = [NSString stringWithFormat:@"%@ - %@", formattedDate1, formattedDate2];
+	}
 		
 	countriesController.title = weekDesc;
 	countriesController.countries = children;
