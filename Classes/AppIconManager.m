@@ -7,6 +7,7 @@
 //
 
 #import "AppIconManager.h"
+#import "App.h" // for getDocPath()
 
 
 @implementation AppIconManager
@@ -14,9 +15,7 @@
 - (id)init
 {
 	[super init];
-	iconsByAppName = [[NSMutableDictionary alloc] init];
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	docPath = [[paths objectAtIndex:0] retain];
+	iconsByAppID = [[NSMutableDictionary alloc] init];
 	return self;
 }
 
@@ -29,24 +28,25 @@
 	return sharedManager;
 }
 
-- (UIImage *)iconForAppNamed:(NSString *)appName
+- (UIImage *)iconForAppID:(NSString *)appID
 {
-	UIImage *cachedIcon = [iconsByAppName objectForKey:appName];
+	UIImage *cachedIcon = [iconsByAppID objectForKey:appID];
 	if (cachedIcon)
 		return cachedIcon;
-	NSString *iconPath = [docPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appName]];
+	NSString *iconPath = [getDocPath() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appID]];
 	cachedIcon = [UIImage imageWithContentsOfFile:iconPath];
 	if (!cachedIcon)
 		return nil;
-	[iconsByAppName setObject:cachedIcon forKey:appName];
+	[iconsByAppID setObject:cachedIcon forKey:appID];
 	return cachedIcon;
 }
 
-- (void)downloadIconForAppID:(NSString *)appID appName:(NSString *)appName
+- (void)downloadIconForAppID:(NSString *)appID
 {
-	if ([self iconForAppNamed:appName] != nil)
+	if ([self iconForAppID:appID] != nil) {
 		return;
-	if ([appID length] < 4) {
+	}
+	if (appID.length < 4) {
 		NSLog(@"Invalid app id");
 		return;
 	}
@@ -54,15 +54,14 @@
 	if (!imageData) imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.jpg", [appID substringToIndex:3], [appID substringFromIndex:3]]]];
 	if (!imageData) return;
 	UIImage *icon = [UIImage imageWithData:imageData];
-	if (icon) [iconsByAppName setObject:icon forKey:appName];
-	NSString *iconPath = [docPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appName]];
+	if (icon) [iconsByAppID setObject:icon forKey:appID];
+	NSString *iconPath = [getDocPath() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appID]];
 	[imageData writeToFile:iconPath atomically:YES];
 }
 
 - (void)dealloc 
 {
-	[docPath release];
-	[iconsByAppName release];
+	[iconsByAppID release];
     [super dealloc];
 }
 

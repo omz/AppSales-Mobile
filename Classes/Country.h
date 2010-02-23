@@ -44,10 +44,10 @@
 
 - (id)initWithName:(NSString *)countryName day:(Day *)aDay;
 - (float)totalRevenueInBaseCurrency;
-- (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
-- (int)totalUnitsForApp:(NSString *)app;
+- (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app;
+- (int)totalUnitsForAppID:(NSString *)appID;
 - (int)totalUnits;
-- (NSArray *)allProductNames;
+- (NSArray *)allProductIDs;
 - (NSString *)totalRevenueString;
 - (NSArray *)children;
 

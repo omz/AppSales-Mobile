@@ -62,7 +62,7 @@
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
 		revenueLabel.opaque = YES;
 		
-		detailsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 14)] autorelease];
+		detailsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 15)] autorelease];
 		detailsLabel.textColor = [UIColor grayColor];
 		detailsLabel.backgroundColor = [UIColor whiteColor];
 		detailsLabel.opaque = YES;

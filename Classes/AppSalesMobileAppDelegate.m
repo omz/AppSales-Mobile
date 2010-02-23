@@ -31,34 +31,50 @@
 #import "AppSalesMobileAppDelegate.h"
 #import "RootViewController.h"
 #import "Day.h"
-
+#import "ReportManager.h"
 
 @implementation AppSalesMobileAppDelegate
 
-@synthesize window;
-@synthesize navigationController;
-
-
-- (void)applicationDidFinishLaunching:(UIApplication *)application 
-{
-	self.window = [[[UIWindow alloc] initWithFrame:CGRectMake(0,0,320,480)] autorelease];
+- (void) finishLoadingUI {
+	NSAssert([NSThread isMainThread], nil);
+	[loadingLabel removeFromSuperview];
+	[loadingLabel release];
+	loadingLabel = nil;
+	
 	RootViewController *rootViewController = [[[RootViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
-	self.navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
+	navigationController = [[UINavigationController alloc] initWithRootViewController:rootViewController];
 	navigationController.toolbarHidden = NO;
+	[window addSubview:navigationController.view];
+}
+
+- (void) loadSavedFiles {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	[[ReportManager sharedManager] loadSavedFiles];
+	[self performSelectorOnMainThread:@selector(finishLoadingUI) withObject:nil waitUntilDone:NO];
+	[pool release];
+}
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application  {
+	window = [[UIWindow alloc] initWithFrame:CGRectMake(0,0,320,480)];
 	
-	[window addSubview:[navigationController view]];
+	loadingLabel = [[UILabel alloc] initWithFrame:window.frame];
+	loadingLabel.text = NSLocalizedString(@"Loading...", nil);
+	loadingLabel.textAlignment = UITextAlignmentCenter;
+	loadingLabel.textColor = [UIColor whiteColor];
+	loadingLabel.backgroundColor = nil;
+	loadingLabel.alpha = 0;
+	[window addSubview:loadingLabel];
 	[window makeKeyAndVisible];
-}
-
-
-- (void)applicationWillTerminate:(UIApplication *)application 
-{
 	
+	[UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDelay:1]; // only show if it's taking a moment to load
+	[UIView setAnimationDuration:0.3];
+	loadingLabel.alpha = 1;
+	[UIView commitAnimations];
+	[self performSelectorInBackground:@selector(loadSavedFiles) withObject:nil];
 }
 
-
-- (void)dealloc 
-{
+- (void)dealloc {
 	[navigationController release];
 	[window release];
 	[super dealloc];

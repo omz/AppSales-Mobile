@@ -45,6 +45,7 @@
 #import "StatisticsViewController.h"
 #import "ReportManager.h"
 #import "ReviewsController.h"
+#import "ReviewManager.h"
 
 @implementation RootViewController
 
@@ -78,15 +79,6 @@
 	
 	self.toolbarItems = [NSArray arrayWithObjects:refreshItem, flexSpaceItem, statusItem, flexSpaceItem, progressItem, nil];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) name:ReportManagerUpdatedDownloadProgressNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
-}
-
-
-- (void)viewDidLoad 
-{
-	[super viewDidLoad];
 	self.navigationItem.title = @"AppSales";
 	
 	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
@@ -94,11 +86,28 @@
 	UIBarButtonItem *infoButtonItem = [[[UIBarButtonItem alloc] initWithCustomView:infoButton] autorelease];
 	self.navigationItem.rightBarButtonItem = infoButtonItem;
 	
-	self.tableView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0);
-	[self.tableView setScrollEnabled:NO];
+	self.tableView.contentInset = UIEdgeInsetsMake(22, 0, 0, 0);
+	[self.tableView setScrollEnabled:NO];	
+}
+
+
+- (void)viewDidLoad 
+{
+	[super viewDidLoad];
 	
 	[self refreshDailyTrend];
 	[self refreshWeeklyTrend];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) 
+												 name:ReportManagerUpdatedDownloadProgressNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) 
+												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) 
+												 name:ReportManagerDownloadedWeeklyReportsNotification object:nil];	
+}
+
+- (void) viewDidUnload {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)refreshDailyTrend
@@ -290,9 +299,8 @@
 		cell.accessoryView = self.weeklyTrendView;
 	}
 	else if ((row == 2) && (section == 0)) {
-		// cell.imageView.image = [UIImage imageNamed:@"Weekly.png"];
+		cell.imageView.image = [UIImage imageNamed:@"Cash.png"];
 		cell.textLabel.text = NSLocalizedString(@"Total",nil);
-		// cell.accessoryView = self.weeklyTrendView;
 	}
 	else if ((row == 3) && (section == 0)) {
 		cell.imageView.image = [UIImage imageNamed:@"Statistics.png"];
@@ -342,8 +350,10 @@
 		[self.navigationController pushViewController:statisticsController animated:YES];
 	}
 	else if ((row == 0) && (section == 1)) {
-		if ([[ReportManager sharedManager].appsByID count] == 0) {
-			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease] show];
+		if ([ReviewManager sharedManager].numberOfApps == 0) {
+			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) 
+										delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) 
+							   otherButtonTitles:nil] autorelease] show];
             [[self tableView ] deselectRowAtIndexPath:indexPath animated:YES];
 			return;
 		}

@@ -32,6 +32,8 @@ AppSalesMobile
 #import "CurrencyManager.h"
 #import "CurrencySelectionDialog.h"
 #import "SFHFKeychainUtils.h"
+#import "ReportManager.h"
+#import "Review.h"
 
 @implementation SettingsViewController
 
@@ -45,12 +47,8 @@ AppSalesMobile
     [super viewDidLoad];
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-	explanationsLabel.font = [UIFont systemFontOfSize:12.0];
-	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours.\n\nAll information is presented without any warranties.\n\nThe presented market trend reports should not be considered to be your monthly royalty reports.",nil);
-	copyrightLabel.font = [UIFont systemFontOfSize:12.0];
-	currencySectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
-	loginSectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
-	lastRefreshLabel.font = [UIFont systemFontOfSize:12.0];
+	explanationsLabel.text = NSLocalizedString(@"Exchange rates automatically refreshed every 6 hours.",nil);
+	translationLabel.text = NSLocalizedString(@"Translate foreign reviews",nil);
 	
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
 	if (username) {
@@ -61,13 +59,23 @@ AppSalesMobile
 																 error:&error];
 		if (password) passwordTextField.text = password;
 	}
+	translationSwitch.on = [Review showTranslatedReviews];
 	
 	[self baseCurrencyChanged]; //set proper currency button title
 	[self currencyRatesDidUpdate]; //set proper refresh date in label
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesDidUpdate) name:@"CurrencyManagerDidUpdate" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesFailedToUpdate) name:@"CurrencyManagerError" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(baseCurrencyChanged) name:@"CurrencyManagerDidChangeBaseCurrency" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesDidUpdate) 
+												 name:CurrencyManagerDidUpdateNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesFailedToUpdate) 
+												 name:CurrencyManagerErrorNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(baseCurrencyChanged) 
+												 name:CurrencyManagerDidChangeBaseCurrencyNotification object:nil];
+}
+
+- (void) viewDidUnload
+{
+	[super viewDidUnload];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -75,14 +83,16 @@ AppSalesMobile
 	if (usernameTextField.text.length) {
 		[[NSUserDefaults standardUserDefaults] setObject:usernameTextField.text
 												  forKey:@"iTunesConnectUsername"];
-		NSError *error = nil;
-		if (passwordTextField.text.length)
+
+		if (passwordTextField.text.length) {
 			[SFHFKeychainUtils storeUsername:usernameTextField.text
 								 andPassword:passwordTextField.text
 							  forServiceName:@"omz:software AppSales Mobile Service"
 							  updateExisting:YES
-									   error:&error];
+									   error:nil];
+		}
 	}
+	[Review setShowTranslatedReviews:translationSwitch.on];
 }
 
 #pragma mark Text Field Delegate 
@@ -106,13 +116,18 @@ AppSalesMobile
 
 - (void)currencyRatesFailedToUpdate
 {
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error",nil) message:NSLocalizedString(@"The currency exchange rates could not be refreshed. Please check your internet connection.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error",nil) 
+													 message:NSLocalizedString(@"The currency exchange rates could not be refreshed. Please check your internet connection.",nil)
+													delegate:nil
+										   cancelButtonTitle:NSLocalizedString(@"OK",nil)
+										   otherButtonTitles:nil] autorelease];
 	[alert show];
 }
 
 - (void)baseCurrencyChanged
 {
-	[currencySelectionControl setTitle:[NSString stringWithFormat:NSLocalizedString(@"Select... ( %@ )",nil), [[CurrencyManager sharedManager] baseCurrencyDescription]] forSegmentAtIndex:0];
+	[currencySelectionControl setTitle:[NSString stringWithFormat:NSLocalizedString(@"Select... ( %@ )",nil), 
+										[[CurrencyManager sharedManager] baseCurrencyDescription]] forSegmentAtIndex:0];
 }
 
 - (IBAction)changeCurrency:(id)sender
@@ -125,6 +140,29 @@ AppSalesMobile
 - (IBAction)refreshExchangeRates:(id)sender
 {
 	[[CurrencyManager sharedManager] forceRefresh];
+}
+
+- (IBAction)uploadBackups:(id)sender
+{
+#ifdef BACKUP_HOSTNAME
+	backupButton.hidden = YES;
+	[[ReportManager sharedManager] backupData];
+#else 
+	NSString *message = [NSLocalizedString(@"See documentation in source header of: ", nil) 
+						 stringByAppendingString:[[ReportManager class] description]];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"error: BACKUP_HOSTNAME is not set", nil)
+													message:message
+												   delegate:self
+										  cancelButtonTitle:NSLocalizedString(@"ok", nil)
+										  otherButtonTitles:nil];
+	[alert show];
+	[alert release];
+#endif
+}
+
+- (IBAction)emailCSVReports:(id)sender
+{
+	[[ReportManager sharedManager] backupRawCSVToEmail:self];	
 }
 
 @end

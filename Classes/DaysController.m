@@ -40,12 +40,10 @@
 
 - (id)init
 {
-	[super init];
-	
-	[self reload];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-	self.title = NSLocalizedString(@"Daily",nil);
-	
+	self = [super init];
+	if (self) {
+		self.title = NSLocalizedString(@"Daily",nil);
+	}
 	return self;
 }
 
@@ -67,6 +65,20 @@
 		[[daysByMonth lastObject] addObject:d];
 	}
 	[self.tableView reloadData];
+}
+
+- (void) viewDidLoad
+{
+	[super viewDidLoad];
+	[self reload];	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload)
+												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
+}
+
+- (void) viewDidUnload
+{
+	[super viewDidUnload];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 

@@ -52,7 +52,7 @@
 		countryLabel.text = @"N/A";
 		countryLabel.backgroundColor = calendarBackgroundColor;
 		
-		detailsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 14)] autorelease];
+		detailsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 15)] autorelease];
 		detailsLabel.textColor = [UIColor grayColor];
 		detailsLabel.font = [UIFont systemFontOfSize:12.0]; 
 		detailsLabel.textAlignment = UITextAlignmentCenter;

@@ -7,49 +7,53 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <MessageUI/MFMailComposeViewController.h>
 
 #define ReportManagerDownloadedDailyReportsNotification				@"ReportManagerDownloadedDailyReportsNotification"
 #define ReportManagerDownloadedWeeklyReportsNotification			@"ReportManagerDownloadedWeeklyReportsNotification"
 #define ReportManagerUpdatedDownloadProgressNotification			@"ReportManagerUpdatedDownloadProgressNotification"
-#define ReportManagerDownloadedReviewsNotification					@"ReportManagerDownloadedReviewsNotification"
-#define ReportManagerUpdatedReviewDownloadProgressNotification		@"ReportManagerUpdatedReviewDownloadProgressNotification"
+
+// only needed if using backup feature.  See comments in upload_appsales.php file.
+//#define BACKUP_HOSTNAME \
+//	@"http://<computer-name>.local/~<username>/upload_appsales.php"
 
 @class Day;
 
-@interface ReportManager : NSObject {
-
+@interface ReportManager : NSObject <MFMailComposeViewControllerDelegate> {
 	NSMutableDictionary *days;
 	NSMutableDictionary *weeks;
+	NSMutableArray      *backupList;
+	
 	BOOL isRefreshing;
+	BOOL needsDataSavedToDisk;
 	NSString *reportDownloadStatus;
 	
+	int retryIfBackupFailure;
+	BOOL backupReviewsFile;
 	
-	NSMutableDictionary *appsByID;
-	BOOL isDownloadingReviews;
-	NSString *reviewDownloadStatus;
+	// temporary fields, used while fetching reports
+	NSString *username;
+	NSString *password;
+	NSArray *weeksToSkip;
+	NSArray *daysToSkip;
 }
 
-@property (retain) NSMutableDictionary *days;
-@property (retain) NSMutableDictionary *weeks;
-@property (retain) NSMutableDictionary *appsByID;
-@property (retain) NSString *reviewDownloadStatus;
-@property (retain) NSString *reportDownloadStatus;
+@property (readonly) NSDictionary *days;
+@property (readonly) NSDictionary *weeks;
+@property (readonly) NSString *reportDownloadStatus;
 
 + (ReportManager *)sharedManager;
+
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
-
-- (void)setProgress:(NSString *)status;
-
-- (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
-- (void)saveData;
-- (NSString *)docPath;
+- (void)loadSavedFiles;
 
 - (void)deleteDay:(Day *)dayToDelete;
 
-- (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly;
-- (void)updateReviewDownloadProgress:(NSString *)status;
-- (BOOL)isDownloadingReviews;
-- (NSString *)reviewDownloadStatus;
+// backup files through email.  requiring the view controller is kinda hacky, but could easily refactor later
+- (void) backupRawCSVToEmail:(UIViewController*)viewController;
+- (void)backupData; // backup to a remote host
+
+
 
 @end

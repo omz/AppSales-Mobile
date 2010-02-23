@@ -66,7 +66,7 @@
 	[[UIColor colorWithWhite:0.95 alpha:1.0] set];
 	CGContextFillRect(c, CGRectMake(0,0,45,44));
 	
-	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppNamed:app.appName];
+	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppID:app.appID];
 	[appIcon drawInRect:CGRectMake(6, 7, 28, 28)];
 	[[UIImage imageNamed:@"ProductMask.png"] drawInRect:CGRectMake(4, 6, 32, 32)];
 	
@@ -91,7 +91,11 @@
 	
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
 	int numberOfReviews = [app.reviewsByUser count];
-	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i Reviews (%i new)",nil), numberOfReviews, app.newReviewsCount];
+	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i reviews",nil), numberOfReviews];
+	if (app.newReviewsCount) {
+		numberOfReviewsDescription = [numberOfReviewsDescription stringByAppendingFormat:
+									  NSLocalizedString(@" (%i new)",nil), app.newReviewsCount];
+	}
 	[numberOfReviewsDescription drawInRect:CGRectMake(50, 25, 140, 15) withFont:[UIFont systemFontOfSize:12.0]];
 }	
 

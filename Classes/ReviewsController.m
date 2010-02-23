@@ -13,6 +13,7 @@
 #import "AppIconManager.h"
 #import "AppCell.h"
 #import "ReviewsListController.h"
+#import "ReviewManager.h"
 
 @implementation ReviewsController
 
@@ -22,39 +23,32 @@
 {
 	if (self = [super initWithStyle:style]) {
 		[self reload];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedReviewsNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) name:ReportManagerUpdatedReviewDownloadProgressNotification object:nil];
 	}
     return self;
 }
 
-- (void)reload
-{
-	NSArray *allApps = [[ReportManager sharedManager].appsByID allValues];
-	NSSortDescriptor *appSorter = [[[NSSortDescriptor alloc] initWithKey:@"appName" ascending:YES] autorelease];
-	self.sortedApps = [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
-	[self.tableView reloadData];
-}
-
 - (void)updateStatus
 {
-	if ([[ReportManager sharedManager] isDownloadingReviews]) {
-		statusLabel.text = [[ReportManager sharedManager] reviewDownloadStatus];
+	ReviewManager *manager = [ReviewManager sharedManager];
+	statusLabel.text = manager.reviewDownloadStatus;
+	if (manager.isDownloadingReviews) {
 		[activityIndicator startAnimating];
-	}
-	else {
-		statusLabel.text = @"";
+	} else {
 		[activityIndicator stopAnimating];
 	}
 }
 
 - (void)viewDidLoad
 {
-	self.tableView.rowHeight = 45.0;
-	self.title = NSLocalizedString(@"Reviews",nil);
-	UIBarButtonItem *downloadButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Download",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(downloadReviews)] autorelease];
+	[super viewDidLoad];
+	self.sortedApps = [[ReviewManager sharedManager] appNamesSorted];
 	
+	self.tableView.rowHeight = 45;
+	self.title = NSLocalizedString(@"Reviews",nil);
+	UIBarButtonItem *downloadButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Download",nil) 
+																		style:UIBarButtonItemStyleBordered 
+																	   target:self 
+																	   action:@selector(downloadReviews)] autorelease];
 	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 25)] autorelease];
 	statusLabel.textColor = [UIColor whiteColor];
 	statusLabel.shadowColor = [UIColor darkGrayColor];
@@ -73,25 +67,34 @@
 	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
 	
 	self.toolbarItems = [NSArray arrayWithObjects:downloadButton, flexSpace, statusItem, flexSpace, activityItem, nil];
+	[self updateStatus];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) 
+												 name:ReviewManagerDownloadedReviewsNotification 
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) 
+												 name:ReviewManagerUpdatedReviewDownloadProgressNotification 
+											   object:nil];
+}
+
+- (void) viewDidUnload {
+	[super viewDidUnload];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+}
+
+- (void)reload
+{
+	[self.tableView reloadData];
 }
 
 - (void)downloadReviews
 {
-	if ([[ReportManager sharedManager] isDownloadingReviews])
+	if ([[ReviewManager sharedManager] isDownloadingReviews]) {
 		return;
-	
-	UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Download Reviews",nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) destructiveButtonTitle:nil otherButtonTitles:NSLocalizedString(@"Top Countries",nil), NSLocalizedString(@"All Countries",nil), nil] autorelease];
-	[sheet showFromToolbar:self.navigationController.toolbar];
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-	if (buttonIndex == 2)
-		return;
-	if (buttonIndex == 0)
-		[[ReportManager sharedManager] downloadReviewsForTopCountriesOnly:YES];
-	else
-		[[ReportManager sharedManager] downloadReviewsForTopCountriesOnly:NO];
+	}
+	[[ReviewManager sharedManager] downloadReviews];
 }
 
 #pragma mark Table view methods
@@ -103,7 +106,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
-	return [sortedApps count];
+	return sortedApps.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -125,14 +128,8 @@
 {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
-	App *app = [sortedApps objectAtIndex:indexPath.row];
-	NSArray *allReviews = [app.reviewsByUser allValues];
-	
-	ReviewsListController *listController = [[[ReviewsListController alloc] initWithStyle:UITableViewStylePlain] autorelease];
-	NSSortDescriptor *reviewSorter1 = [[[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO] autorelease];
-	NSSortDescriptor *reviewSorter2 = [[[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO] autorelease];
-	NSSortDescriptor *reviewSorter3 = [[[NSSortDescriptor alloc] initWithKey:@"countryCode" ascending:YES] autorelease];
-	listController.reviews = [allReviews sortedArrayUsingDescriptors:[NSArray arrayWithObjects:reviewSorter1, reviewSorter2, reviewSorter3, nil]];
+	App *app = [sortedApps objectAtIndex:indexPath.row];		
+	ReviewsListController *listController = [[[ReviewsListController alloc] initWithApp:app] autorelease];
 	listController.hidesBottomBarWhenPushed = YES;
 	listController.title = app.appName;
 	[self.navigationController pushViewController:listController animated:YES];

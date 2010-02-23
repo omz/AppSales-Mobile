@@ -49,21 +49,23 @@
 
 - (NSString *)description
 {
+	NSMutableDictionary *idToName = [NSMutableDictionary dictionary];
 	NSMutableDictionary *salesByProduct = [NSMutableDictionary dictionary];
 	for (Entry *e in self.entries) {
-		if ([e transactionType] == 1) {
-			NSNumber *unitsOfProduct = [salesByProduct objectForKey:[e productName]];
-			int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
-			u += [e units];
-			[salesByProduct setObject:[NSNumber numberWithInt:u] forKey:[e productName]];
+		if (e.transactionType == 1) {
+			NSNumber *unitsOfProduct = [salesByProduct objectForKey:e.productIdentifier];
+			int u = (unitsOfProduct != nil) ? (unitsOfProduct.intValue) : 0;
+			u += e.units;
+			[salesByProduct setObject:[NSNumber numberWithInt:u] forKey:e.productIdentifier];
 		}
+		[idToName setObject:e.productName forKey:e.productIdentifier];
 	}
 	NSMutableString *productSummary = [NSMutableString stringWithString:@"("];
 	NSEnumerator *reverseEnum = [[salesByProduct keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
-	NSString *productName;
-	while (productName = [reverseEnum nextObject]) {
-		NSNumber *productSales = [salesByProduct objectForKey:productName];
-		[productSummary appendFormat:@"%@ × %@, ", productSales, productName];
+	NSString *productIdentifier;
+	while (productIdentifier = reverseEnum.nextObject) {
+		NSNumber *productSales = [salesByProduct objectForKey:productIdentifier];
+		[productSummary appendFormat:@"%@ × %@, ", productSales, [idToName objectForKey:productIdentifier]];
 	}
 	if ([productSummary length] >= 2)
 		[productSummary deleteCharactersInRange:NSMakeRange([productSummary length] - 2, 2)];
@@ -101,25 +103,25 @@
 	return sum;
 }
 
-- (float)totalRevenueInBaseCurrencyForApp:(NSString *)app
+- (float)totalRevenueInBaseCurrencyForAppID:(NSString *)appID
 {
-	if (app == nil)
+	if (appID == nil)
 		return [self totalRevenueInBaseCurrency];
 	float sum = 0.0;
 	for (Entry *e in self.entries) {
-		if ([e.productName isEqual:app])
+		if ([e.productIdentifier isEqual:appID])
 			sum += [e totalRevenueInBaseCurrency];
 	}
 	return sum;
 }
 
-- (int)totalUnitsForApp:(NSString *)app
+- (int)totalUnitsForAppID:(NSString *)appID
 {
-	if (app == nil)
+	if (appID == nil)
 		return [self totalUnits];
 	int sum = 0;
 	for (Entry *e in self.entries) {
-		if ((e.transactionType == 1) && ([e.productName isEqual:app]))
+		if ((e.transactionType == 1) && ([e.productIdentifier isEqual:appID]))
 			sum += [e units];
 	}
 	return sum;
@@ -135,11 +137,11 @@
 	return sum;
 }
 
-- (NSArray *)allProductNames
+- (NSArray *)allProductIDs
 {
 	NSMutableSet *names = [NSMutableSet set];
 	for (Entry *e in self.entries) {
-		[names addObject:e.productName];
+		[names addObject:e.productIdentifier];
 	}
 	return [names allObjects];
 }

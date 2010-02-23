@@ -29,48 +29,54 @@
  */
 
 #import <UIKit/UIKit.h>
+
 @class Country;
 
 @interface Day : NSObject {
-	//NSLock *lock_countries;
 	NSMutableDictionary *countries;
 	NSDate *date;
-	NSString *cachedWeekEndDateString;
-	UIColor *cachedWeekDayColor;
-	NSString *cachedDayString;
 	BOOL isWeek;
-	BOOL wasLoadedFromDisk;
-	NSString *pathOnDisk;
-	
 	NSString *name;
+
+	// lazily generated as needed, and serialized out to disk
+	NSString *dayString;
+	NSString *weekEndDateString;
+	
+	// lazyily generated, and never saved out to disk as they may change in the future
+	NSString *proposedFileName;
+	NSString *weekDayString;
+	UIColor *weekDayColor;
 }
 
-@property (nonatomic, retain) NSDate *date;
-@property (nonatomic, retain) NSMutableDictionary *countries;
-@property (nonatomic, retain) NSString *cachedWeekEndDateString;
-@property (nonatomic, retain) UIColor *cachedWeekDayColor;
-@property (nonatomic, retain) NSString *cachedDayString;
-@property (nonatomic, assign) BOOL isWeek;
-@property (nonatomic, assign) BOOL wasLoadedFromDisk;
-@property (nonatomic, retain) NSString *name;
-@property (nonatomic, retain) NSString *pathOnDisk;
+@property (readonly) NSString *name; // the date as a full string, and typically used as a primary key
+@property (readonly) NSDate *date;
+@property (readonly) NSMutableDictionary *countries;
+@property (readonly) NSString *weekEndDateString;
+@property (readonly) UIColor *weekdayColor;
+@property (readonly) NSString *dayString;
+@property (readonly) NSString *weekdayString;
+@property (readonly) NSString *totalRevenueString;
+@property (readonly) BOOL isWeek;
 
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
+@property (readonly) NSArray *allProductIDs;
+@property (readonly) NSString *proposedFilename;
+@property (readonly) NSArray *children;
+
++ (NSString*) fileNameForString:(NSString*)fileName extension:(NSString*)fileExtension isWeek:(BOOL)isWeek;
+
++ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // from serialized data
++ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
+- (id)initAsAllOfTime; // fragile hack used by TotalController
+
+// returns true if instances was serialized out to docPath
+- (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath;
+
 - (Country *)countryNamed:(NSString *)countryName;
-- (void)setDateString:(NSString *)dateString;
 - (float)totalRevenueInBaseCurrency;
-- (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
-- (int)totalUnitsForApp:(NSString *)app;
+- (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app;
+- (int)totalUnitsForAppID:(NSString *)appID;
 - (int)totalUnits;
-- (NSArray *)allProductNames;
-- (NSString *)dayString;
-- (NSString *)weekdayString;
-- (NSString *)weekEndDateString;
-- (NSString *)totalRevenueString;
-- (UIColor *)weekdayColor;
-- (NSString *)proposedFilename;
-- (NSArray *)children;
 
 @end
