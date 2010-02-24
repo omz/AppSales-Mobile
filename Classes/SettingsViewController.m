@@ -76,6 +76,9 @@ AppSalesMobile
 												 name:CurrencyManagerErrorNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(baseCurrencyChanged) 
 												 name:CurrencyManagerDidChangeBaseCurrencyNotification object:nil];
+#ifndef BACKUP_HOSTNAME
+	backupButton.hidden = YES;
+#endif
 }
 
 - (void) viewDidUnload
