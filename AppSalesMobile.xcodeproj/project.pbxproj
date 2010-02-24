@@ -647,6 +647,7 @@
 		7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleReviewController.m; sourceTree = "<group>"; };
 		7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5stars_gray.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		910964DB113433C30078E619 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B9A29C0810B69B99003D90B5 /* TotalController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TotalController.h; sourceTree = "<group>"; };
 		B9A29C0910B69B99003D90B5 /* TotalController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TotalController.m; sourceTree = "<group>"; };
 		FA57124F10D5910000D44E63 /* Cash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Cash.png; sourceTree = "<group>"; };
@@ -1607,6 +1608,7 @@
 			children = (
 				7FA7ECBF0EE437BF00C1954E /* English */,
 				FA81AF781122124200BDDBFC /* German */,
+				910964DB113433C30078E619 /* Japanese */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

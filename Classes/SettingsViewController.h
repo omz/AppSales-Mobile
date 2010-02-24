@@ -39,9 +39,13 @@ AppSalesMobile
 	IBOutlet UITextField *passwordTextField;
 	IBOutlet UILabel *translationLabel;
 	IBOutlet UISwitch *translationSwitch;
+	IBOutlet UILabel *backupReportsLabel;
 	IBOutlet UISegmentedControl *currencySelectionControl;
 	IBOutlet UILabel *loginSectionLabel;
+	IBOutlet UILabel *usernameLabel;
+	IBOutlet UILabel *passwordLabel;
 	IBOutlet UILabel *currencySectionLabel;
+	IBOutlet UISegmentedControl *refreshNowLabel;
 	IBOutlet UILabel *lastRefreshLabel;
 	IBOutlet UISegmentedControl *backupButton;
 }

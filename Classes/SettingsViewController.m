@@ -47,8 +47,14 @@ AppSalesMobile
     [super viewDidLoad];
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-	explanationsLabel.text = NSLocalizedString(@"Exchange rates automatically refreshed every 6 hours.",nil);
 	translationLabel.text = NSLocalizedString(@"Translate foreign reviews",nil);
+	loginSectionLabel.text = NSLocalizedString(@"iTunes Connect Login",nil);
+	usernameLabel.text = NSLocalizedString(@"User Name:",nil);
+	passwordLabel.text = NSLocalizedString(@"Password:",nil);
+	backupReportsLabel.text = NSLocalizedString(@"Backup reports", nil);
+	currencySectionLabel.text =  NSLocalizedString(@"Currency",nil);
+	[refreshNowLabel setTitle:[NSString stringWithFormat:NSLocalizedString(@"Refresh Now",nil)] forSegmentAtIndex:0];
+	explanationsLabel.text = NSLocalizedString(@"Exchange rates automatically refreshed every 6 hours.",nil);
 	
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
 	if (username) {
