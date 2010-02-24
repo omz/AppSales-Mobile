@@ -34,8 +34,7 @@
 - (void) viewDidUnload
 {
 	[super viewDidUnload];
-	[[NSNotificationCenter defaultCenter]removeObserver:self forKeyPath:ReportManagerDownloadedDailyReportsNotification];
-	[[NSNotificationCenter defaultCenter]removeObserver:self forKeyPath:ReportManagerDownloadedWeeklyReportsNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)reload
