@@ -270,10 +270,29 @@
 	[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
 	[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
 	if (dateTypeAction == nil) {
-		NSLog(@"Error: couldn't select date type");
-		[pool release];
-		[self performSelectorOnMainThread:@selector(downloadFailed) withObject:nil waitUntilDone:YES];
-		return;
+		//Check if we are on the "Sales/Trend Reporting Maintenance Notice" page, if so,
+		//follow the "Click here to continue with Sales/Trend Module" link...
+		[scanner setScanLocation:0];
+		[scanner scanUpToString:@"<a href=\"/cgi-bin/WebObjects/Piano" intoString:NULL];
+		[scanner scanUpToString:@"\"" intoString:NULL];
+		[scanner scanString:@"\"" intoString:NULL];
+		NSString *salesModuleURL = nil;
+		[scanner scanUpToString:@"\"" intoString:&salesModuleURL];
+		if (salesModuleURL) {
+			salesModuleURL = [ittsBaseURL stringByAppendingString:salesModuleURL];
+			NSData *salesModuleData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:salesModuleURL]] returningResponse:NULL error:NULL];
+			dateTypeSelectionPage = [[[NSString alloc] initWithData:salesModuleData encoding:NSUTF8StringEncoding] autorelease];
+			scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
+			[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+			[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+			[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
+		}
+		if (dateTypeAction == nil) {
+			NSLog(@"Could not select date type");
+			[pool release];
+			[self performSelectorOnMainThread:@selector(downloadFailed) withObject:nil waitUntilDone:YES];
+			return;
+		}
 	}
 	
 	NSString *errorMessageString = nil;
@@ -311,11 +330,13 @@
 		NSData *daySelectionPageData = [NSURLConnection sendSynchronousRequest:dateTypeRequest returningResponse:NULL error:NULL];
 		
 		if (daySelectionPageData == nil) {
+			NSLog(@"Could not load day selection page");
 			[pool release];
 			[self performSelectorOnMainThread:@selector(downloadFailed) withObject:nil waitUntilDone:YES];
 			return;
 		}
 		NSString *daySelectionPage = [[[NSString alloc] initWithData:daySelectionPageData encoding:NSUTF8StringEncoding] autorelease];
+		//NSLog(@"day selection page: %@", daySelectionPage);
 		scanner = [NSScanner scannerWithString:daySelectionPage];
 		NSMutableArray *availableDays = [NSMutableArray array];
 		BOOL scannedDay = YES;
