@@ -262,7 +262,7 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	[deDateFormatter setLocale:deLocale];
 	[deDateFormatter setDateFormat:@"dd.MM.yyyy"];
 	
-	NSDateFormatter *itDateFormatter = [[NSDateFormatter alloc] init];
+	NSDateFormatter *itDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	NSLocale *itLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"it"] autorelease];
 	[itDateFormatter setLocale:itLocale];
 	[itDateFormatter setDateFormat:@"dd-MMM-yyyy"];
