@@ -442,7 +442,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 																				| NSDayCalendarUnit
 																	   fromDate:self.date];
 		NSString *sortableName = [NSString stringWithFormat:@"%d/%02d/%02d", components.year, components.month, components.day];
-		proposedFileName = [Day fileNameForString:sortableName extension:@"dat" isWeek:isWeek];
+		proposedFileName = [[Day fileNameForString:sortableName extension:@"dat" isWeek:isWeek] retain];
 	}
 	return proposedFileName;
 }
