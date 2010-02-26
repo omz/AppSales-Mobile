@@ -436,7 +436,13 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 - (NSString *)proposedFilename
 {
 	if (proposedFileName == nil) {
-		proposedFileName = [Day fileNameForString:self.name extension:@"dat" isWeek:isWeek];
+		// use year/month/day, so serialized files are sortable by date
+		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit
+																				| NSMonthCalendarUnit 
+																				| NSDayCalendarUnit
+																	   fromDate:self.date];
+		NSString *sortableName = [NSString stringWithFormat:@"%d/%02d/%02d", components.year, components.month, components.day];
+		proposedFileName = [Day fileNameForString:sortableName extension:@"dat" isWeek:isWeek];
 	}
 	return proposedFileName;
 }

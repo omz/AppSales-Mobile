@@ -109,6 +109,9 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 	NSFileManager *manager = [NSFileManager defaultManager];
 	NSArray *fileNames = [manager contentsOfDirectoryAtPath:docPath error:NULL];
 	
+	NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES selector:@selector(localizedCompare:)];
+	fileNames = [fileNames sortedArrayUsingDescriptors:[NSArray arrayWithObject:desc]];
+	
 	for (NSString *filename in fileNames) {
 		NSString *pathExtension = [filename pathExtension];
 		Day *loaded = nil;
