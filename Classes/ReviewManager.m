@@ -33,6 +33,7 @@
 }
 
 - (void) dealloc {
+	[[NSNotificationCenter defaultCenter] removeObject:self];
 	[appsByID release];
 	[super dealloc];
 }
@@ -89,8 +90,7 @@
 }
 
 - (void) notifyOfNewReviews {
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification 
-														object:[ReportManager sharedManager]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
 
 - (void) addOrUpdatedReviewIfNeeded:(Review*)review appID:(NSString*)appID {
@@ -109,7 +109,6 @@
 
 	@synchronized (app) {
 		[app addOrReplaceReview:review];
-		saveToDiskNeeded = YES;
 	}
 	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:YES];
 }
@@ -440,14 +439,9 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	if ([self cancelWasRequested]) {
 		return; // stop here
 	}
-	if (saveToDiskNeeded) {
-		#if APPSALES_DEBUG
-		NSLog(@"saving reviews to disk");
-		#endif
-		NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
-		[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
-		saveToDiskNeeded = NO;
-	}
+	
+	NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
+	[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
 	[self updateReviewDownloadProgress:@""];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
