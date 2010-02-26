@@ -355,8 +355,27 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 		[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
 		[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
 		if (dateTypeAction == nil) {
-			[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not select date type" waitUntilDone:YES];
-			return;
+			//Check if we are on the "Sales/Trend Reporting Maintenance Notice" page, if so,
+			//follow the "Click here to continue with Sales/Trend Module" link...
+			[scanner setScanLocation:0];
+			[scanner scanUpToString:@"<a href=\"/cgi-bin/WebObjects/Piano" intoString:NULL];
+			[scanner scanUpToString:@"\"" intoString:NULL];
+			[scanner scanString:@"\"" intoString:NULL];
+			NSString *salesModuleURL = nil;
+			[scanner scanUpToString:@"\"" intoString:&salesModuleURL];
+			if (salesModuleURL) {
+				salesModuleURL = [ittsBaseURL stringByAppendingString:salesModuleURL];
+				NSData *salesModuleData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:salesModuleURL]] returningResponse:NULL error:NULL];
+				dateTypeSelectionPage = [[[NSString alloc] initWithData:salesModuleData encoding:NSUTF8StringEncoding] autorelease];
+				scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
+				[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+				[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+				[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
+			}
+			if (dateTypeAction == nil) {
+				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not select date type" waitUntilDone:NO];
+				return;
+			}
 		}
 		
 		NSString *errorMessageString = nil;
