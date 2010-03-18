@@ -310,6 +310,8 @@
 		7FE3135D115284A5004DEA7C /* LightGray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FE3135A115284A5004DEA7C /* LightGray.png */; };
 		7FE3135E115284A5004DEA7C /* Gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FE3135B115284A5004DEA7C /* Gray.png */; };
 		7FE3135F115284A5004DEA7C /* Blueish.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FE3135C115284A5004DEA7C /* Blueish.png */; };
+		7FE313901152891A004DEA7C /* ProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FE3138F1152891A004DEA7C /* ProgressHUD.m */; };
+		7FE3139211528920004DEA7C /* HUDFrame.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FE3139111528920004DEA7C /* HUDFrame.png */; };
 		7FEA5766105AFCF3000A12E6 /* App.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5765105AFCF3000A12E6 /* App.m */; };
 		7FEA5769105AFCFA000A12E6 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5768105AFCFA000A12E6 /* Review.m */; };
 		7FEA57A2105B06B6000A12E6 /* ReviewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA57A1105B06B6000A12E6 /* ReviewsController.m */; };
@@ -675,6 +677,9 @@
 		7FE3135A115284A5004DEA7C /* LightGray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightGray.png; sourceTree = "<group>"; };
 		7FE3135B115284A5004DEA7C /* Gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Gray.png; sourceTree = "<group>"; };
 		7FE3135C115284A5004DEA7C /* Blueish.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Blueish.png; sourceTree = "<group>"; };
+		7FE3138E1152891A004DEA7C /* ProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressHUD.h; sourceTree = "<group>"; };
+		7FE3138F1152891A004DEA7C /* ProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgressHUD.m; sourceTree = "<group>"; };
+		7FE3139111528920004DEA7C /* HUDFrame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HUDFrame.png; sourceTree = "<group>"; };
 		7FEA5764105AFCF3000A12E6 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = App.h; sourceTree = "<group>"; };
 		7FEA5765105AFCF3000A12E6 /* App.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = App.m; sourceTree = "<group>"; };
 		7FEA5767105AFCFA000A12E6 /* Review.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Review.h; sourceTree = "<group>"; };
@@ -789,6 +794,7 @@
 		7F4C217510230EF200F17F7D /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				7FE3139111528920004DEA7C /* HUDFrame.png */,
 				7FE3131A11527CC0004DEA7C /* Default.png */,
 				7FE3134C115282EE004DEA7C /* Blue.png */,
 				7FE3134D115282EE004DEA7C /* Green.png */,
@@ -1091,6 +1097,8 @@
 				7FB0C4AA0EB99D01005E2C45 /* CurrencyManager.m */,
 				34DCF08E0F0461A2009F9929 /* SFHFKeychainUtils.h */,
 				34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */,
+				7FE3138E1152891A004DEA7C /* ProgressHUD.h */,
+				7FE3138F1152891A004DEA7C /* ProgressHUD.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -1591,6 +1599,7 @@
 				7FE3135D115284A5004DEA7C /* LightGray.png in Resources */,
 				7FE3135E115284A5004DEA7C /* Gray.png in Resources */,
 				7FE3135F115284A5004DEA7C /* Blueish.png in Resources */,
+				7FE3139211528920004DEA7C /* HUDFrame.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1653,6 +1662,7 @@
 				7FE30F041150ED19004DEA7C /* unzip.c in Sources */,
 				7FE30F051150ED19004DEA7C /* zip.c in Sources */,
 				7FE30F081150ED20004DEA7C /* ZipArchive.mm in Sources */,
+				7FE313901152891A004DEA7C /* ProgressHUD.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,6 +14,7 @@
 #import "SFHFKeychainUtils.h"
 #import "Day.h"
 #import "ReportManager.h"
+#import "ProgressHUD.h"
 
 @implementation ImportExportViewController
 
@@ -48,46 +49,69 @@
 	NSString *fullPath = [httpServer.uploadPath stringByAppendingPathComponent:filename];
 	
 	if ([[[filename pathExtension] lowercaseString] isEqual:@"zip"]) {
-		NSLog(@"Zip file uploaded: %@", fullPath);
-		NSString *unzipPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"Unzip"];
+		//NSLog(@"Zip file uploaded: %@", fullPath);
+		[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Importing...",nil)];
+		[[ProgressHUD sharedHUD] show];
 		
-		//Unzip the archive:
-		ZipArchive *archive = [[[ZipArchive alloc] init] autorelease];
-		[archive UnzipOpenFile:fullPath];
-		[archive UnzipFileTo:unzipPath overWrite:YES];
+		[self performSelector:@selector(unzipAndImportFile:) withObject:fullPath afterDelay:0.0];
 		
-		//Import the report files:
-		NSFileManager *fm = [NSFileManager defaultManager];
-		NSArray *files = [fm contentsOfDirectoryAtPath:unzipPath error:NULL];
-		for (NSString *file in files) {
-			if ([[file pathExtension] isEqual:@"txt"]) {
-				NSString *reportPath = [unzipPath stringByAppendingPathComponent:file];
-				NSString *fileContents = [[[NSString alloc] initWithContentsOfFile:reportPath] autorelease];
-				Day *report = [[[Day alloc] initWithCSV:fileContents] autorelease];
-				if (!report || !report.date) {
-					NSLog(@"Invalid report file: %@", file);
-				} else {
-					[report generateNameFromDate];
-					NSLog(@"Report file read: %@", report.date);
-					NSLog(@"Suggested file name: %@", [report proposedFilename]);
-					if (report.isWeek)
-						[[ReportManager sharedManager].weeks setObject:report forKey:report.name];
-					else
-						[[ReportManager sharedManager].days setObject:report forKey:report.name];
-					[fm copyItemAtPath:reportPath toPath:[[[ReportManager sharedManager] originalReportsPath] stringByAppendingPathComponent:file] error:NULL];
-				}
-			}
-		}
-		[[ReportManager sharedManager] saveData];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 		
-		//clean up:
-		[fm removeItemAtPath:unzipPath error:NULL];
 	} else {
 		UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error",nil) 
 														 message:NSLocalizedString(@"You uploaded a file that does not have a .zip extension.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) 
 											   otherButtonTitles:nil] autorelease];
+		[alert show];
+	}
+}
+
+- (void)unzipAndImportFile:(NSString *)fullPath
+{
+	NSString *unzipPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"Unzip"];
+	
+	//Unzip the archive:
+	ZipArchive *archive = [[[ZipArchive alloc] init] autorelease];
+	[archive UnzipOpenFile:fullPath];
+	[archive UnzipFileTo:unzipPath overWrite:YES];
+	
+	//Import the report files:
+	int importedWeeks = 0;
+	int importedDays = 0;
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSArray *files = [fm contentsOfDirectoryAtPath:unzipPath error:NULL];
+	for (NSString *file in files) {
+		if ([[file pathExtension] isEqual:@"txt"]) {
+			NSString *reportPath = [unzipPath stringByAppendingPathComponent:file];
+			NSString *fileContents = [[[NSString alloc] initWithContentsOfFile:reportPath] autorelease];
+			Day *report = [[[Day alloc] initWithCSV:fileContents] autorelease];
+			if (!report || !report.date) {
+				NSLog(@"Invalid report file: %@", file);
+			} else {
+				[report generateNameFromDate];
+				if (report.isWeek) {
+					importedWeeks++;
+					[[ReportManager sharedManager].weeks setObject:report forKey:report.name];
+				} else {
+					importedDays++;
+					[[ReportManager sharedManager].days setObject:report forKey:report.name];
+				}
+				[fm copyItemAtPath:reportPath toPath:[[[ReportManager sharedManager] originalReportsPath] stringByAppendingPathComponent:file] error:NULL];
+			}
+		}
+	}
+	[[ReportManager sharedManager] saveData];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
+	
+	//clean up:
+	[fm removeItemAtPath:unzipPath error:NULL];
+	
+	[[ProgressHUD sharedHUD] hide];
+	
+	if (importedDays == 0 && importedWeeks == 0) {
+		UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Error" message:NSLocalizedString(@"No valid report files were found in the zip archive you uploaded.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
+		[alert show];
+	} else {
+		UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:[NSString stringWithFormat:NSLocalizedString(@"Successfully imported %i daily and %i weekly reports.",nil), importedDays, importedWeeks] delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
 		[alert show];
 	}
 }
