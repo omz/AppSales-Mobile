@@ -127,7 +127,8 @@
 							  username, @"username", 
 							  password, @"password", 
 							  weeksToSkip, @"weeksToSkip", 
-							  daysToSkip, @"daysToSkip", nil];
+							  daysToSkip, @"daysToSkip", 
+							  [self originalReportsPath], @"originalReportsPath", nil];
 	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo:) withObject:userInfo];
 }
 
@@ -138,6 +139,7 @@
 	
 	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:YES];
 	
+	NSString *originalReportsPath = [userInfo objectForKey:@"originalReportsPath"];
 	NSString *username = [userInfo objectForKey:@"username"];
 	NSString *password = [userInfo objectForKey:@"password"];
 	
@@ -390,7 +392,14 @@
 			NSMutableURLRequest *dayDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:dayDownloadActionURLString]];
 			[dayDownloadRequest setHTTPMethod:@"POST"];
 			[dayDownloadRequest setHTTPBody:httpBody];
-			NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:NULL error:NULL];
+			NSHTTPURLResponse *reportDownloadResponse = nil;
+			NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:&reportDownloadResponse error:NULL];
+			if (reportDownloadResponse) {
+				NSString *originalFilename = [[reportDownloadResponse allHeaderFields] objectForKey:@"Filename"];
+				if (originalFilename) {
+					[dayData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
+				}
+			}
 			
 			if (dayData == nil) {
 				[pool release];
@@ -454,13 +463,13 @@
 {
 	[days addEntriesFromDictionary:newDays];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
-		
+	
 	for (Day *d in [newDays allValues]) {
 		for (Country *c in [d.countries allValues]) {
 			for (Entry *e in c.entries) {
 				NSString *appID = e.productIdentifier;
 				NSString *appName = e.productName;
-				if (![self.appsByID objectForKey:appID]) {
+				if (appID && ![self.appsByID objectForKey:appID]) {
 					App *app = [[App new] autorelease];
 					app.appID = appID;
 					app.appName = appName;
@@ -525,18 +534,28 @@
 	return documentsDirectory;
 }
 
+- (NSString *)originalReportsPath
+{
+	NSString *path = [[self docPath] stringByAppendingPathComponent:@"OriginalReports"];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+		[[NSFileManager defaultManager] createDirectoryAtPath:path attributes:nil];
+	}
+	return path;
+}
+
 - (void)saveData
 {
 	//save all days/weeks in separate files:
+	NSString *docPath = [self docPath];
 	for (Day *d in [self.days allValues]) {
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[d proposedFilename]];
+		NSString *fullPath = [docPath stringByAppendingPathComponent:[d proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!d.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:d toFile:fullPath];
 		}
 	}
 	for (Day *w in [self.weeks allValues]) {
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[w proposedFilename]];
+		NSString *fullPath = [docPath stringByAppendingPathComponent:[w proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!w.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:w toFile:fullPath];

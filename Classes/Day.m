@@ -78,17 +78,21 @@
 			NSString *units = [columns objectAtIndex:9];
 			NSString *royalties = [columns objectAtIndex:10];
 			NSString *dateColumn = [columns objectAtIndex:11];
+			NSString *toDateColumn = [columns objectAtIndex:12];
 			NSString *appId = [columns objectAtIndex:19];
 			[[AppIconManager sharedManager] downloadIconForAppID:appId appName:productName];
 			if (!self.date) {
-				if ((([dateColumn rangeOfString:@"/"].location != NSNotFound) && ([dateColumn length] == 10))
-					|| (([dateColumn rangeOfString:@"/"].location == NSNotFound) && ([dateColumn length] == 8))) {
-					[self setDateString:dateColumn];
-				}
-				else {
+				NSDate *fromDate = [self reportDateFromString:dateColumn];
+				NSDate *toDate = [self reportDateFromString:toDateColumn];
+				if (!fromDate) {
 					NSLog(@"Date is invalid: %@", dateColumn);
 					[self release];
 					return nil;
+				} else {
+					self.date = fromDate;
+					if (![fromDate isEqualToDate:toDate]) {
+						self.isWeek = YES;
+					}
 				}
 			}
 			NSString *countryString = [columns objectAtIndex:14];
@@ -103,8 +107,8 @@
 			 * IA1: In-App Purchase
 			 * Presumably, IA7: In-App Free Upgrade / Repurchase.
 			 */
-			if ([transactionType isEqualToString:@"IA1"])
-				transactionType = @"1";
+			if ([transactionType isEqualToString:@"IA1"]) transactionType = @"1";
+			if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
 
 			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
 			Entry *entry = [[[Entry alloc] initWithProductName:productName 
@@ -184,26 +188,36 @@ static BOOL shouldLoadCountries = YES;
 	return country;
 }
 
+- (NSDate *)reportDateFromString:(NSString *)dateString
+{
+	if ((([dateString rangeOfString:@"/"].location != NSNotFound) && ([dateString length] == 10))
+		|| (([dateString rangeOfString:@"/"].location == NSNotFound) && ([dateString length] == 8))) {
+		int year, month, day;
+		if ([dateString rangeOfString:@"/"].location == NSNotFound) { //old date format
+			year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
+			month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
+			day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
+		}
+		else { //new date format
+			year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
+			month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
+			day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
+		}
+		
+		NSCalendar *calendar = [NSCalendar currentCalendar];
+		NSDateComponents *components = [[NSDateComponents new] autorelease];
+		[components setYear:year];
+		[components setMonth:month];
+		[components setDay:day];
+		
+		return [calendar dateFromComponents:components];
+	}
+	return nil;
+}
+
 - (void)setDateString:(NSString *)dateString
 {
-	int year, month, day;
-	if ([dateString rangeOfString:@"/"].location == NSNotFound) { //old date format
-		year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
-		month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
-		day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
-	}
-	else { //new date format
-		year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
-		month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
-		day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
-	}
-	
-	NSCalendar *calendar = [NSCalendar currentCalendar];
-	NSDateComponents *components = [[NSDateComponents new] autorelease];
-	[components setYear:year];
-	[components setMonth:month];
-	[components setDay:day];
-	self.date = [calendar dateFromComponents:components];
+	self.date = [self reportDateFromString:dateString];
 }
 
 - (NSString *)description
@@ -220,6 +234,7 @@ static BOOL shouldLoadCountries = YES;
 		}
 	}
 	NSMutableString *productSummary = [NSMutableString stringWithString:@"("];
+	
 	NSEnumerator *reverseEnum = [[salesByProduct keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
 	NSString *productName;
 	while (productName = [reverseEnum nextObject]) {
@@ -229,7 +244,6 @@ static BOOL shouldLoadCountries = YES;
 	if ([productSummary length] >= 2)
 		[productSummary deleteCharactersInRange:NSMakeRange([productSummary length] - 2, 2)];
 	[productSummary appendString:@")"];
-	
 	if ([productSummary isEqual:@"()"])
 		return NSLocalizedString(@"No sales",nil);
 	
@@ -354,6 +368,13 @@ static BOOL shouldLoadCountries = YES;
 	NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"totalUnits" ascending:NO] autorelease];
 	NSArray *sortedChildren = [[self.countries allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 	return sortedChildren;
+}
+
+- (void)generateNameFromDate
+{
+	NSDateFormatter *nameDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	[nameDateFormatter setDateFormat:@"MM/dd/yyyy"];
+	self.name = [nameDateFormatter stringFromDate:self.date];
 }
 
 - (NSString *)proposedFilename

@@ -60,6 +60,7 @@
 - (id)initWithCSV:(NSString *)csv;
 - (Country *)countryNamed:(NSString *)countryName;
 - (void)setDateString:(NSString *)dateString;
+- (NSDate *)reportDateFromString:(NSString *)dateString;
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
 - (int)totalUnitsForApp:(NSString *)app;
@@ -70,6 +71,7 @@
 - (NSString *)weekEndDateString;
 - (NSString *)totalRevenueString;
 - (UIColor *)weekdayColor;
+- (void)generateNameFromDate;
 - (NSString *)proposedFilename;
 - (NSArray *)children;
 

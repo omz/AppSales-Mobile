@@ -44,6 +44,7 @@
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 - (void)saveData;
 - (NSString *)docPath;
+- (NSString *)originalReportsPath;
 
 - (void)deleteDay:(Day *)dayToDelete;
 
