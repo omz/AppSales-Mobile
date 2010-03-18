@@ -32,47 +32,46 @@
 @class Country;
 
 @interface Day : NSObject {
-	//NSLock *lock_countries;
+	
 	NSMutableDictionary *countries;
 	NSDate *date;
-	NSString *cachedWeekEndDateString;
-	UIColor *cachedWeekDayColor;
-	NSString *cachedDayString;
 	BOOL isWeek;
 	BOOL wasLoadedFromDisk;
 	NSString *pathOnDisk;
-	
-	NSString *name;
 }
 
 @property (nonatomic, retain) NSDate *date;
 @property (nonatomic, retain) NSMutableDictionary *countries;
-@property (nonatomic, retain) NSString *cachedWeekEndDateString;
-@property (nonatomic, retain) UIColor *cachedWeekDayColor;
-@property (nonatomic, retain) NSString *cachedDayString;
 @property (nonatomic, assign) BOOL isWeek;
 @property (nonatomic, assign) BOOL wasLoadedFromDisk;
-@property (nonatomic, retain) NSString *name;
 @property (nonatomic, retain) NSString *pathOnDisk;
 
 + (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
+
 - (Country *)countryNamed:(NSString *)countryName;
+
 - (void)setDateString:(NSString *)dateString;
 - (NSDate *)reportDateFromString:(NSString *)dateString;
+
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
+
 - (int)totalUnitsForApp:(NSString *)app;
 - (int)totalUnits;
+
 - (NSArray *)allProductNames;
+
 - (NSString *)dayString;
 - (NSString *)weekdayString;
 - (NSString *)weekEndDateString;
+
 - (NSString *)totalRevenueString;
 - (UIColor *)weekdayColor;
-- (void)generateNameFromDate;
+
 - (NSString *)proposedFilename;
+
 - (NSArray *)children;
 
 @end

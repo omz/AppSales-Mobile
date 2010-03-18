@@ -16,6 +16,7 @@
 #import "SFHFKeychainUtils.h"
 #import "App.h"
 #import "Review.h"
+#import "NSData+Compression.h"
 
 @implementation ReportManager
 
@@ -38,35 +39,22 @@
 		self.appsByID = [NSMutableDictionary dictionary];
 	}
 	
-	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
-
-	NSCalendar *calendar = [NSCalendar currentCalendar];
 	
+	CFAbsoluteTime t = CFAbsoluteTimeGetCurrent();
+	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
 	for (NSString *filename in filenames) {
-		if (![[filename pathExtension] isEqual:@"dat"])
-			continue;
+		if (![[filename pathExtension] isEqual:@"dat"]) continue;
 		
 		Day *loadedDay = [Day dayFromFile:filename atPath:docPath];
-		
 		if (loadedDay != nil) {
-			if (loadedDay.isWeek)
-				[self.weeks setObject:loadedDay forKey:[loadedDay name]];
-			else
-			{
-				if (loadedDay.date)
-				{
-					NSDateComponents *components = [calendar components:(NSWeekdayCalendarUnit | NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit) fromDate:loadedDay.date];
-					NSDate *loadedDate = [calendar dateFromComponents:components];
-					NSDateFormatter * lFormat = [NSDateFormatter new];
-					[lFormat setDateFormat:@"MM/dd/yyyy"];
-					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
-					[lFormat release];
-					if ([lDate isEqual:loadedDate])
-						[self.days setObject:loadedDay forKey:[loadedDay name]];
-				}
+			if (loadedDay.isWeek) {
+				[weeks setObject:loadedDay forKey:loadedDay.date];
+			} else  {
+				[days setObject:loadedDay forKey:loadedDay.date];
 			}
 		}
 	}
+	NSLog(@"Loading reports took %f sec.", CFAbsoluteTimeGetCurrent() - t);
 	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
@@ -84,17 +72,8 @@
 	return sharedManager;
 }
 
-- (void)deleteDay:(Day *)dayToDelete
-{
-	NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[dayToDelete proposedFilename]];
-	[[NSFileManager defaultManager] removeItemAtPath:fullPath error:NULL];
-	if (dayToDelete.isWeek) {
-		[self.weeks removeObjectForKey:dayToDelete.name];
-	}
-	else {
-		[self.days removeObjectForKey:dayToDelete.name];
-	}
-}
+#pragma mark -
+#pragma mark Report Download
 
 - (BOOL)isDownloadingReports
 {
@@ -135,6 +114,23 @@
 - (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
+	
+	NSArray *daysToSkipDates = [userInfo objectForKey:@"daysToSkip"];
+	NSArray *weeksToSkipDates = [userInfo objectForKey:@"weeksToSkip"];
+	NSMutableArray *daysToSkip = [NSMutableArray array];
+	NSMutableArray *weeksToSkip = [NSMutableArray array];
+	NSDateFormatter *nameFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	[nameFormatter setDateFormat:@"MM/dd/yyyy"];
+	for (NSDate *date in daysToSkipDates) {
+		NSString *dayName = [nameFormatter stringFromDate:date];
+		[daysToSkip addObject:dayName];
+	}
+	for (NSDate *date in weeksToSkipDates) {
+		NSDate *toDate = [[[NSDate alloc] initWithTimeInterval:60*60*24*6.5 sinceDate:date] autorelease];
+		NSString *weekName = [nameFormatter stringFromDate:toDate];//[NSString stringWithFormat:@"%@ To %@", [nameFormatter stringFromDate:date], [nameFormatter stringFromDate:toDate]];
+		[weeksToSkip addObject:weekName];
+	}
+	
 	NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];
 	
 	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:YES];
@@ -356,13 +352,12 @@
 				scannedDay = NO;
 			}
 		}
-		
+		NSLog(@"Available %@: %@", ((i==0) ? (@"Days") : (@"Weeks")), availableDays);
+		NSLog(@"To skip: %@", ((i==0) ? (daysToSkip) : (weeksToSkip)));
 		if (i==0) { //daily
-			NSArray *daysToSkip = [userInfo objectForKey:@"daysToSkip"];
 			[availableDays removeObjectsInArray:daysToSkip];			
 		}
 		else { //weekly
-			NSArray *weeksToSkip = [userInfo objectForKey:@"weeksToSkip"];
 			[availableDays removeObjectsInArray:weeksToSkip];
 		}
 		int numberOfDays = [availableDays count];
@@ -379,6 +374,13 @@
 		NSString *dayDownloadActionURLString = [ittsBaseURL stringByAppendingString:dayDownloadAction];
 		int dayNumber = 1;
 		for (NSString *dayString in availableDays) {
+			NSString *status = @"";
+			if (i != 0) {
+				status = [NSString stringWithFormat:NSLocalizedString(@"Weekly Report %i of %i", nil), dayNumber, numberOfDays];
+			} else {
+				status = [NSString stringWithFormat:NSLocalizedString(@"Daily Report %i of %i", nil), dayNumber, numberOfDays];
+			}
+			[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:YES];
 			NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
 											 downloadType, @"17.11", 
 											 dayString, @"hiddenDayOrWeekSelection",
@@ -411,17 +413,9 @@
 			if (day != nil) {
 				if (i != 0)
 					day.isWeek = YES;
-				[downloadedDays setObject:day forKey:dayString];
-				day.name = dayString;
+				[downloadedDays setObject:day forKey:day.date];
 			}
-			NSString *status = @"";
-			if (i != 0) {
-				status = [NSString stringWithFormat:NSLocalizedString(@"Weekly Report %i of %i", nil), dayNumber, numberOfDays];
-			}
-			else {
-				status = [NSString stringWithFormat:NSLocalizedString(@"Daily Report %i of %i", nil), dayNumber, numberOfDays];
-			}
-			[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:YES];
+			
 			dayNumber++;
 		}
 		numberOfNewReports += [downloadedDays count];
@@ -479,7 +473,6 @@
 			}
 		}
 	}
-	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
 }
 
@@ -501,31 +494,29 @@
 
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed
 {
+	NSString *text = nil;
 	if (compressed) {
-		NSString *zipFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.gz"];
-		NSString *textFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.txt"];
-		[dayData writeToFile:zipFile atomically:YES];
-		gzFile file = gzopen([zipFile UTF8String], "rb");
-		FILE *dest = fopen([textFile UTF8String], "w");
-		unsigned char buffer[262144];
-		int uncompressedLength = gzread(file, buffer, 262144);
-		if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
-			NSLog(@"error writing data");
-		}
-		fclose(dest);
-		gzclose(file);
-		
-		NSString *text = [NSString stringWithContentsOfFile:textFile encoding:NSUTF8StringEncoding error:NULL];
-		[[NSFileManager defaultManager] removeItemAtPath:zipFile error:NULL];
-		[[NSFileManager defaultManager] removeItemAtPath:textFile error:NULL];
-		return [[[Day alloc] initWithCSV:text] autorelease];
+		NSData *uncompressedData = [dayData gzipInflate];
+		text = [[NSString alloc] initWithData:uncompressedData encoding:NSUTF8StringEncoding];
 	} else {
-		NSString *text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
-		Day *day = [[[Day alloc] initWithCSV:text] autorelease];
-		[text release];
-		return day;
+		text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
+	}
+	Day *day = [[[Day alloc] initWithCSV:text] autorelease];
+	[text release];
+	return day;
+}
+
+- (void)importReport:(Day *)report
+{
+	if (report.isWeek) {
+		[weeks setObject:report forKey:report.date];
+	} else {
+		[days setObject:report forKey:report.date];
 	}
 }
+
+#pragma mark -
+#pragma mark Persistence
 
 - (NSString *)docPath
 {
@@ -541,6 +532,18 @@
 		[[NSFileManager defaultManager] createDirectoryAtPath:path attributes:nil];
 	}
 	return path;
+}
+
+
+- (void)deleteDay:(Day *)dayToDelete
+{
+	NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[dayToDelete proposedFilename]];
+	[[NSFileManager defaultManager] removeItemAtPath:fullPath error:NULL];
+	if (dayToDelete.isWeek) {
+		[self.weeks removeObjectForKey:dayToDelete.date];
+	} else {
+		[self.days removeObjectForKey:dayToDelete.date];
+	}
 }
 
 - (void)saveData
@@ -565,6 +568,9 @@
 	NSString *reviewsFile = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
 }
+
+#pragma mark -
+#pragma mark Review Download
 
 - (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly
 {

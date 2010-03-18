@@ -24,7 +24,7 @@
 {
     if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
 		self.hidesBottomBarWhenPushed = YES;
-		self.info = NSLocalizedString(@"(Loading)",nil);
+		self.info = NSLocalizedString(@"(Please wait)",nil);
 		
 		NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES) objectAtIndex:0];
 		NSString *uploadPath = [docPath stringByAppendingPathComponent:@"Uploads"];
@@ -86,14 +86,12 @@
 			if (!report || !report.date) {
 				NSLog(@"Invalid report file: %@", file);
 			} else {
-				[report generateNameFromDate];
 				if (report.isWeek) {
 					importedWeeks++;
-					[[ReportManager sharedManager].weeks setObject:report forKey:report.name];
 				} else {
 					importedDays++;
-					[[ReportManager sharedManager].days setObject:report forKey:report.name];
 				}
+				[[ReportManager sharedManager] importReport:report];
 				[fm copyItemAtPath:reportPath toPath:[[[ReportManager sharedManager] originalReportsPath] stringByAppendingPathComponent:file] error:NULL];
 			}
 		}
@@ -123,8 +121,6 @@
 	
 	self.view = webView;
 	[self showInfo];
-
-	
 	
 	//[super loadView];
 }
@@ -139,13 +135,13 @@
 	
 	UInt16 port = [httpServer port];
 	if (!localIP) {
-		self.info = NSLocalizedString(@"(no wifi)",nil);
+		self.info = NSLocalizedString(@"(No Wifi connection)",nil);
 		UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error",nil) message:NSLocalizedString(@"No Wifi connection.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease];
 		[alert show];
 	} else {
 		self.info = [NSString stringWithFormat:@"http://%@:%d\n", localIP, port];
-		[self showInfo];
 	}
+	[self showInfo];
 	
 }
 

@@ -46,6 +46,7 @@
 - (NSString *)docPath;
 - (NSString *)originalReportsPath;
 
+- (void)importReport:(Day *)report;
 - (void)deleteDay:(Day *)dayToDelete;
 
 - (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly;

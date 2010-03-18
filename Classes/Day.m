@@ -36,15 +36,7 @@
 
 @implementation Day
 
-@synthesize date;
-@synthesize countries;
-@synthesize cachedWeekEndDateString;
-@synthesize cachedWeekDayColor;
-@synthesize cachedDayString;
-@synthesize isWeek;
-@synthesize wasLoadedFromDisk;
-@synthesize name;
-@synthesize pathOnDisk;
+@synthesize date, countries, isWeek, wasLoadedFromDisk, pathOnDisk;
 
 - (id)init
 {
@@ -128,19 +120,16 @@ static BOOL shouldLoadCountries = YES;
 - (id)initWithCoder:(NSCoder *)coder
 {
 	[self init];
-	
 	self.date = [coder decodeObjectForKey:@"date"];
 	self.isWeek = [coder decodeBoolForKey:@"isWeek"];
-	self.name = [coder decodeObjectForKey:@"name"];
-	
-	/* 
-	 * shouldLoadCountries will be set to NO if we're loading via dayFromFile:atPath:
-	 * This allows us to skip the costly part of loading until countries is actually accessed, at which
-	 * point a new Day object will be loaded from disk at the same path and load its countries. We'll
-	 * then assign countries to that Day object's countries.
-	 */
-	if (shouldLoadCountries)
+		
+	//shouldLoadCountries will be set to NO if we're loading via dayFromFile:atPath:
+	//This allows us to skip the costly part of loading until countries is actually accessed, at which
+	//point a new Day object will be loaded from disk at the same path and load its countries. We'll
+	//then assign countries to that Day object's countries.
+	if (shouldLoadCountries) {
 		self.countries = [coder decodeObjectForKey:@"countries"];
+	}
 	
 	self.wasLoadedFromDisk = YES;
 	
@@ -175,7 +164,6 @@ static BOOL shouldLoadCountries = YES;
 	[coder encodeObject:self.countries forKey:@"countries"];
 	[coder encodeObject:self.date forKey:@"date"];
 	[coder encodeBool:self.isWeek forKey:@"isWeek"];
-	[coder encodeObject:self.name forKey:@"name"];
 }
 
 - (Country *)countryNamed:(NSString *)countryName
@@ -306,11 +294,8 @@ static BOOL shouldLoadCountries = YES;
 
 - (NSString *)dayString
 {
-	if (!self.cachedDayString) {
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:self.date];
-		self.cachedDayString = [NSString stringWithFormat:@"%i", [components day]];
-	}
-	return self.cachedDayString;
+	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:self.date];
+	return [NSString stringWithFormat:@"%i", [components day]];
 }
 
 - (NSString *)weekdayString
@@ -331,35 +316,28 @@ static BOOL shouldLoadCountries = YES;
 		return NSLocalizedString(@"FRI",nil);
 	if (weekday == 7)
 		return NSLocalizedString(@"SAT",nil);
-	return @"---";
+	return @"N/A";
 }
 
 - (UIColor *)weekdayColor
 {
-	if (!self.cachedWeekDayColor) {
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
-		int weekday = [components weekday];
-		if (weekday == 1) //show sundays in red
-			self.cachedWeekDayColor = [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
-		else
-			self.cachedWeekDayColor = [UIColor blackColor];
+	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
+	int weekday = [components weekday];
+	if (weekday == 1) {
+		return [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
 	}
-	return self.cachedWeekDayColor;
+	return [UIColor blackColor];
 }
 
 - (NSString *)weekEndDateString
 {
-	//The Day class is also used to represent weeks. This returns a formatted date of the day the week ends (7 days after date)
-	if (!self.cachedWeekEndDateString) {
-		NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
-		[comp setHour:167];
-		NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:self.date options:0];
-		NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-		[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-		[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-		self.cachedWeekEndDateString = [dateFormatter stringFromDate:dateWeekLater];
-	}
-	return self.cachedWeekEndDateString;
+	NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
+	[comp setHour:167];
+	NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:self.date options:0];
+	NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
+	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
+	return [dateFormatter stringFromDate:dateWeekLater];
 }
 
 
@@ -370,32 +348,24 @@ static BOOL shouldLoadCountries = YES;
 	return sortedChildren;
 }
 
-- (void)generateNameFromDate
-{
-	NSDateFormatter *nameDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-	[nameDateFormatter setDateFormat:@"MM/dd/yyyy"];
-	self.name = [nameDateFormatter stringFromDate:self.date];
-}
 
 - (NSString *)proposedFilename
 {
-	NSString *dateString = [self.name stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
-	if (self.isWeek)
+	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	[dateFormatter setDateFormat:@"MM/dd/yyyy"];
+	NSString *dateString = [dateFormatter stringFromDate:self.date];
+	if (self.isWeek) {
 		return [NSString stringWithFormat:@"week_%@.dat", dateString];
-	else
+	} else {
 		return [NSString stringWithFormat:@"day_%@.dat", dateString];
+	}
 }
 
 - (void)dealloc
 {
-	self.cachedDayString = nil;
-	self.cachedWeekDayColor = nil;
-	self.cachedWeekEndDateString = nil;
-	self.countries = nil;
-	self.date = nil;
-	self.name = nil;
-	self.pathOnDisk = nil;
-	//self.lock_countries = nil;
+	[countries release];
+	[date release];
+	[pathOnDisk release];
 	
 	[super dealloc];
 }

@@ -312,6 +312,7 @@
 		7FE3135F115284A5004DEA7C /* Blueish.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FE3135C115284A5004DEA7C /* Blueish.png */; };
 		7FE313901152891A004DEA7C /* ProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FE3138F1152891A004DEA7C /* ProgressHUD.m */; };
 		7FE3139211528920004DEA7C /* HUDFrame.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FE3139111528920004DEA7C /* HUDFrame.png */; };
+		7FE313A2115294C9004DEA7C /* NSData+Compression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FE313A1115294C9004DEA7C /* NSData+Compression.m */; };
 		7FEA5766105AFCF3000A12E6 /* App.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5765105AFCF3000A12E6 /* App.m */; };
 		7FEA5769105AFCFA000A12E6 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5768105AFCFA000A12E6 /* Review.m */; };
 		7FEA57A2105B06B6000A12E6 /* ReviewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA57A1105B06B6000A12E6 /* ReviewsController.m */; };
@@ -680,6 +681,8 @@
 		7FE3138E1152891A004DEA7C /* ProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressHUD.h; sourceTree = "<group>"; };
 		7FE3138F1152891A004DEA7C /* ProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgressHUD.m; sourceTree = "<group>"; };
 		7FE3139111528920004DEA7C /* HUDFrame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HUDFrame.png; sourceTree = "<group>"; };
+		7FE313A0115294C9004DEA7C /* NSData+Compression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Compression.h"; sourceTree = "<group>"; };
+		7FE313A1115294C9004DEA7C /* NSData+Compression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Compression.m"; sourceTree = "<group>"; };
 		7FEA5764105AFCF3000A12E6 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = App.h; sourceTree = "<group>"; };
 		7FEA5765105AFCF3000A12E6 /* App.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = App.m; sourceTree = "<group>"; };
 		7FEA5767105AFCFA000A12E6 /* Review.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Review.h; sourceTree = "<group>"; };
@@ -1099,6 +1102,8 @@
 				34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */,
 				7FE3138E1152891A004DEA7C /* ProgressHUD.h */,
 				7FE3138F1152891A004DEA7C /* ProgressHUD.m */,
+				7FE313A0115294C9004DEA7C /* NSData+Compression.h */,
+				7FE313A1115294C9004DEA7C /* NSData+Compression.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -1663,6 +1668,7 @@
 				7FE30F051150ED19004DEA7C /* zip.c in Sources */,
 				7FE30F081150ED20004DEA7C /* ZipArchive.mm in Sources */,
 				7FE313901152891A004DEA7C /* ProgressHUD.m in Sources */,
+				7FE313A2115294C9004DEA7C /* NSData+Compression.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1757,7 +1763,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = AppSales;
-				SDKROOT = iphoneos3.0;
+				SDKROOT = iphoneos3.1;
 			};
 			name = Debug;
 		};
