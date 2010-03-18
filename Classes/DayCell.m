@@ -47,11 +47,13 @@
 		dayLabel.textAlignment = UITextAlignmentCenter;
 		dayLabel.font = [UIFont boldSystemFontOfSize:22.0];
 		dayLabel.backgroundColor = calendarBackgroundColor;
+		dayLabel.highlightedTextColor = [UIColor whiteColor];
 		dayLabel.opaque = YES;
 		
 		weekdayLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 27, 45, 14)] autorelease];
 		weekdayLabel.textAlignment = UITextAlignmentCenter;
 		weekdayLabel.font = [UIFont systemFontOfSize:10.0];
+		weekdayLabel.highlightedTextColor = [UIColor whiteColor];
 		weekdayLabel.backgroundColor = calendarBackgroundColor;
 		weekdayLabel.opaque = YES;
 		
@@ -59,6 +61,7 @@
 		revenueLabel.font = [UIFont boldSystemFontOfSize:20.0];
 		revenueLabel.textAlignment = UITextAlignmentRight;
 		revenueLabel.backgroundColor = [UIColor whiteColor];
+		revenueLabel.highlightedTextColor = [UIColor whiteColor];
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
 		revenueLabel.opaque = YES;
 		
@@ -67,14 +70,15 @@
 		detailsLabel.backgroundColor = [UIColor whiteColor];
 		detailsLabel.opaque = YES;
 		detailsLabel.font = [UIFont systemFontOfSize:12.0];
+		detailsLabel.highlightedTextColor = [UIColor whiteColor];
 		detailsLabel.textAlignment = UITextAlignmentCenter;
 		
-		//self.graphColor = [UIColor colorWithRed:0.54 green:0.61 blue:0.67 alpha:1.0];
 		self.graphColor = [UIColor colorWithRed:0.81 green:1.0 blue:0.4 alpha:1.0]; //lime
 		
-		graphView = [[[UIView alloc] initWithFrame:CGRectMake(160, 0, 130, 20)] autorelease];
+		graphView = [[[UIImageView alloc] initWithFrame:CGRectMake(160, 0, 130, 20)] autorelease];
 		graphView.opaque = YES;
-		graphView.backgroundColor = self.graphColor;
+		graphView.image = [UIImage imageNamed:@"Green.png"];
+		graphView.highlightedImage = [UIImage imageNamed:@"White.png"];
 		
 		[self.contentView addSubview:calendarBackgroundView];
 		[self.contentView addSubview:dayLabel];
@@ -101,34 +105,12 @@
 	revenueLabel.text = [day totalRevenueString];
 	detailsLabel.text = [day description];
 	
-	
 	dayLabel.textColor = [self.day weekdayColor];
 	weekdayLabel.textColor = [self.day weekdayColor];
 	graphView.frame = CGRectMake(160, 4, 130.0 * (self.maxRevenue ?
 												  ([self.day totalRevenueInBaseCurrency] / self.maxRevenue) :
 												  0), 21);
 }
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated 
-{
-	[super setSelected:selected animated:animated];
-	
-	if (selected) {
-		dayLabel.textColor = [UIColor whiteColor];
-		weekdayLabel.textColor = [UIColor whiteColor];
-		revenueLabel.textColor = [UIColor whiteColor];
-		detailsLabel.textColor = [UIColor whiteColor];
-		graphView.backgroundColor = [UIColor whiteColor];
-	}
-	else {
-		dayLabel.textColor = [self.day weekdayColor];
-		weekdayLabel.textColor = [self.day weekdayColor];
-		revenueLabel.textColor = [UIColor blackColor];
-		detailsLabel.textColor = [UIColor grayColor];
-		graphView.backgroundColor = self.graphColor;
-	}
-}
-
 
 - (void)dealloc 
 {

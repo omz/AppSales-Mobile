@@ -37,7 +37,7 @@
 	UILabel *weekdayLabel;
 	UILabel *revenueLabel;
 	UILabel *detailsLabel;
-	UIView *graphView;
+	UIImageView *graphView;
 	Day *day;
 	float maxRevenue;
 	UIColor *graphColor;
