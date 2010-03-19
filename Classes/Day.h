@@ -29,15 +29,26 @@
  */
 
 #import <UIKit/UIKit.h>
+
+#define kSummaryDate	@"date"
+#define kSummarySales	@"sales"
+#define kSummaryRevenue	@"revenue"
+#define kSummaryIsWeek	@"isWeek"
+
 @class Country;
+
 
 @interface Day : NSObject {
 	
-	NSMutableDictionary *countries;
 	NSDate *date;
+	NSMutableDictionary *countries;
+	
 	BOOL isWeek;
 	BOOL wasLoadedFromDisk;
 	NSString *pathOnDisk;
+	
+	BOOL isFault;
+	NSDictionary *summary;
 }
 
 @property (nonatomic, retain) NSDate *date;
@@ -46,9 +57,15 @@
 @property (nonatomic, assign) BOOL wasLoadedFromDisk;
 @property (nonatomic, retain) NSString *pathOnDisk;
 
+@property (nonatomic, assign) BOOL isFault;
+@property (nonatomic, retain) NSDictionary *summary;
+
+
 + (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
+
+- (void)generateSummary;
 
 - (Country *)countryNamed:(NSString *)countryName;
 
@@ -66,9 +83,9 @@
 - (NSString *)dayString;
 - (NSString *)weekdayString;
 - (NSString *)weekEndDateString;
+- (UIColor *)weekdayColor;
 
 - (NSString *)totalRevenueString;
-- (UIColor *)weekdayColor;
 
 - (NSString *)proposedFilename;
 

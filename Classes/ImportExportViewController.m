@@ -121,8 +121,6 @@
 	
 	self.view = webView;
 	[self showInfo];
-	
-	//[super loadView];
 }
 
 - (void)displayInfoUpdate:(NSNotification *) notification
@@ -132,7 +130,6 @@
 	if (!localIP) {
 		localIP = [addresses objectForKey:@"en1"];
 	}
-	
 	UInt16 port = [httpServer port];
 	if (!localIP) {
 		self.info = NSLocalizedString(@"(No Wifi connection)",nil);
@@ -141,8 +138,7 @@
 	} else {
 		self.info = [NSString stringWithFormat:@"http://%@:%d\n", localIP, port];
 	}
-	[self showInfo];
-	
+	[self performSelectorOnMainThread:@selector(showInfo) withObject:nil waitUntilDone:NO];
 }
 
 
@@ -155,8 +151,7 @@
 		[alert show];
 	} else {
 		NSLog(@"HTTP Server started");
-		[localhostAddresses list];// performSelectorInBackground:@selector(list) withObject:nil];
-		
+		[localhostAddresses performSelectorInBackground:@selector(list) withObject:nil];
 	}
 }
 

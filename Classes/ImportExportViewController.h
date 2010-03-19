@@ -16,7 +16,7 @@
 	NSString *info;
 }
 
-@property (nonatomic, retain) NSString *info;
+@property (retain) NSString *info;
 
 - (void)showInfo;
 

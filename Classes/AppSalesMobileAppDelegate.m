@@ -42,6 +42,7 @@
 - (void)applicationDidFinishLaunching:(UIApplication *)application 
 {
 	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+	
 	RootViewController *rootViewController = [[[RootViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
 	self.navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
 	navigationController.toolbarHidden = NO;

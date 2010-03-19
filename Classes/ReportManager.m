@@ -17,6 +17,7 @@
 #import "App.h"
 #import "Review.h"
 #import "NSData+Compression.h"
+#import "ProgressHUD.h"
 
 @implementation ReportManager
 
@@ -39,13 +40,10 @@
 		self.appsByID = [NSMutableDictionary dictionary];
 	}
 	
-	
-	CFAbsoluteTime t = CFAbsoluteTimeGetCurrent();
 	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
 	for (NSString *filename in filenames) {
 		if (![[filename pathExtension] isEqual:@"dat"]) continue;
-		
-		Day *loadedDay = [Day dayFromFile:filename atPath:docPath];
+		Day *loadedDay = [NSKeyedUnarchiver unarchiveObjectWithFile:[docPath stringByAppendingPathComponent:filename]];
 		if (loadedDay != nil) {
 			if (loadedDay.isWeek) {
 				[weeks setObject:loadedDay forKey:loadedDay.date];
@@ -54,13 +52,61 @@
 			}
 		}
 	}
-	NSLog(@"Loading reports took %f sec.", CFAbsoluteTimeGetCurrent() - t);
+	
+	
+	NSString *reportCacheFile = [docPath stringByAppendingPathComponent:@"ReportsCache3"];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:reportCacheFile]) {
+		[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Updating Cache...",nil)];
+		[[ProgressHUD sharedHUD] show];
+		[self performSelectorInBackground:@selector(generateReportCache:) withObject:reportCacheFile];
+	} else {
+		NSLog(@"Load report cache...");
+	}
 	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveData) name:UIApplicationWillTerminateNotification object:nil];
 	
 	return self;
+}
+
+- (void)generateReportCache:(NSString *)reportCacheFile
+{
+	NSAutoreleasePool *pool = [NSAutoreleasePool new];
+	
+	NSString *docPath = [reportCacheFile stringByDeletingLastPathComponent];
+	CFAbsoluteTime t = CFAbsoluteTimeGetCurrent();
+	
+	NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
+	NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
+	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
+	for (NSString *filename in filenames) {
+		if (![[filename pathExtension] isEqual:@"dat"]) continue;
+		NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
+		Day *report = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+		[report generateSummary];
+		if (report != nil) {
+			if (report.isWeek) {
+				[weeksCache setObject:report.summary forKey:report.date];
+			} else  {
+				[daysCache setObject:report.summary forKey:report.date];
+			}
+		}
+	}
+	NSDictionary *reportCache = [NSDictionary dictionaryWithObjectsAndKeys:
+								 weeksCache, @"weeks",
+								 daysCache, @"days", nil];
+	BOOL written = [NSKeyedArchiver archiveRootObject:reportCache toFile:reportCacheFile];
+	//BOOL written = [reportCache writeToFile:reportCacheFile atomically:YES];
+	//NSLog(@"Generating report cache took %f sec. written to file: %i", CFAbsoluteTimeGetCurrent() - t, written);
+	[self performSelectorOnMainThread:@selector(finishGenerateReportCache:) withObject:reportCache waitUntilDone:YES];
+	[pool release];
+}
+
+- (void)finishGenerateReportCache:(NSDictionary *)generatedCache
+{
+	[[ProgressHUD sharedHUD] hide];
+	
 }
 
 + (ReportManager *)sharedManager
@@ -352,8 +398,8 @@
 				scannedDay = NO;
 			}
 		}
-		NSLog(@"Available %@: %@", ((i==0) ? (@"Days") : (@"Weeks")), availableDays);
-		NSLog(@"To skip: %@", ((i==0) ? (daysToSkip) : (weeksToSkip)));
+		//NSLog(@"Available %@: %@", ((i==0) ? (@"Days") : (@"Weeks")), availableDays);
+		//NSLog(@"To skip: %@", ((i==0) ? (daysToSkip) : (weeksToSkip)));
 		if (i==0) { //daily
 			[availableDays removeObjectsInArray:daysToSkip];			
 		}
@@ -554,6 +600,7 @@
 		NSString *fullPath = [docPath stringByAppendingPathComponent:[d proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!d.wasLoadedFromDisk) {
+			d.wasLoadedFromDisk = NO;
 			[NSKeyedArchiver archiveRootObject:d toFile:fullPath];
 		}
 	}
@@ -561,6 +608,7 @@
 		NSString *fullPath = [docPath stringByAppendingPathComponent:[w proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!w.wasLoadedFromDisk) {
+			w.wasLoadedFromDisk = NO;
 			[NSKeyedArchiver archiveRootObject:w toFile:fullPath];
 		}
 	}

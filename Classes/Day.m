@@ -36,22 +36,13 @@
 
 @implementation Day
 
-@synthesize date, countries, isWeek, wasLoadedFromDisk, pathOnDisk;
-
-- (id)init
-{
-	if (self = [super init]) {
-	}
-	
-	return self;
-}
+@synthesize date, countries, isWeek, wasLoadedFromDisk, pathOnDisk, summary, isFault;
 
 - (id)initWithCSV:(NSString *)csv
 {
-	[self init];
+	[super init];
 	
-	self.wasLoadedFromDisk = NO;
-	
+	self.wasLoadedFromDisk = NO;	
 	self.countries = [NSMutableDictionary dictionary];
 	
 	NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
@@ -113,6 +104,28 @@
 		}
 	}
 	return self;
+}
+
+- (void)generateSummary
+{
+	NSMutableDictionary *revenueByCurrency = [NSMutableDictionary dictionary];
+	NSMutableDictionary *salesByApp = [NSMutableDictionary dictionary];
+	for (Country *country in [self.countries allValues]) {
+		for (Entry *entry in country.entries) {
+			if (entry.transactionType == 1) {
+				NSNumber *newCount = [NSNumber numberWithInt:[[salesByApp objectForKey:entry.productName] intValue] + entry.units];
+				[salesByApp setObject:newCount forKey:entry.productName];
+				NSNumber *newRevenue = [NSNumber numberWithFloat:[[revenueByCurrency objectForKey:entry.currency] floatValue] + entry.royalties * entry.units];
+				[revenueByCurrency setObject:newRevenue forKey:entry.currency];
+			}
+		}
+	}
+	self.summary = [NSDictionary dictionaryWithObjectsAndKeys:
+									self.date, kSummaryDate,
+									revenueByCurrency, kSummaryRevenue,
+									salesByApp, kSummarySales,
+									[NSNumber numberWithBool:self.isWeek], kSummaryIsWeek,
+									nil];
 }
 
 static BOOL shouldLoadCountries = YES;
@@ -352,7 +365,7 @@ static BOOL shouldLoadCountries = YES;
 - (NSString *)proposedFilename
 {
 	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-	[dateFormatter setDateFormat:@"MM/dd/yyyy"];
+	[dateFormatter setDateFormat:@"MM_dd_yyyy"];
 	NSString *dateString = [dateFormatter stringFromDate:self.date];
 	if (self.isWeek) {
 		return [NSString stringWithFormat:@"week_%@.dat", dateString];
@@ -366,6 +379,7 @@ static BOOL shouldLoadCountries = YES;
 	[countries release];
 	[date release];
 	[pathOnDisk release];
+	[summary release];
 	
 	[super dealloc];
 }
