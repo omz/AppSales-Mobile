@@ -1137,8 +1137,6 @@
 		7FE30E181150C8DF004DEA7C /* Server */ = {
 			isa = PBXGroup;
 			children = (
-				7FE0B6CE11539E6000A8B137 /* localhostAddresses.h */,
-				7FE0B6CF11539E6000A8B137 /* localhostAddresses.m */,
 				7FE30E251150C8FF004DEA7C /* Categories */,
 				7FE30E221150C8FF004DEA7C /* TCP */,
 				7FE30E191150C8FE004DEA7C /* HTTP */,
@@ -1164,6 +1162,8 @@
 		7FE30E221150C8FF004DEA7C /* TCP */ = {
 			isa = PBXGroup;
 			children = (
+				7FE0B6CE11539E6000A8B137 /* localhostAddresses.h */,
+				7FE0B6CF11539E6000A8B137 /* localhostAddresses.m */,
 				7FE30E231150C8FF004DEA7C /* AsyncSocket.h */,
 				7FE30E241150C8FF004DEA7C /* AsyncSocket.m */,
 			);

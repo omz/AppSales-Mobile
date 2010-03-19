@@ -82,11 +82,7 @@
 		if ([multipartData count] < 2) return nil;
 		
 		NSString *postInfo = [[[NSString alloc] initWithData:[multipartData objectAtIndex:1] encoding:NSUTF8StringEncoding] autorelease];
-		//NSString* postInfo = [[[NSString alloc] initWithBytes:[[multipartData objectAtIndex:1] bytes] length:[[multipartData objectAtIndex:1] length] encoding:NSUTF8StringEncoding] autorelease];
-		if (!postInfo) {
-			postInfo = [[[NSString alloc] initWithData:[multipartData objectAtIndex:1] encoding:NSASCIIStringEncoding] autorelease];
-			//postInfo = [[[NSString alloc] initWithBytes:[[multipartData objectAtIndex:1] bytes] length:[[multipartData objectAtIndex:1] length] encoding:NSASCIIStringEncoding] autorelease];
-		}
+		if (!postInfo) postInfo = [[[NSString alloc] initWithData:[multipartData objectAtIndex:1] encoding:NSASCIIStringEncoding] autorelease];
 		
 		NSArray* postInfoComponents = [postInfo componentsSeparatedByString:@"; filename="];
 		

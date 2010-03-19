@@ -39,28 +39,24 @@
 	else {
 		self.appsByID = [NSMutableDictionary dictionary];
 	}
-	
-	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
-	for (NSString *filename in filenames) {
-		if (![[filename pathExtension] isEqual:@"dat"]) continue;
-		Day *loadedDay = [NSKeyedUnarchiver unarchiveObjectWithFile:[docPath stringByAppendingPathComponent:filename]];
-		if (loadedDay != nil) {
-			if (loadedDay.isWeek) {
-				[weeks setObject:loadedDay forKey:loadedDay.date];
-			} else  {
-				[days setObject:loadedDay forKey:loadedDay.date];
-			}
-		}
-	}
-	
-	
-	NSString *reportCacheFile = [docPath stringByAppendingPathComponent:@"ReportsCache3"];
+		
+	NSString *reportCacheFile = [self reportCachePath];
 	if (![[NSFileManager defaultManager] fileExistsAtPath:reportCacheFile]) {
 		[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Updating Cache...",nil)];
 		[[ProgressHUD sharedHUD] show];
 		[self performSelectorInBackground:@selector(generateReportCache:) withObject:reportCacheFile];
 	} else {
 		NSLog(@"Load report cache...");
+		NSDictionary *reportCache = [NSKeyedUnarchiver unarchiveObjectWithFile:reportCacheFile];
+		for (NSDictionary *weekSummary in [[reportCache objectForKey:@"weeks"] allValues]) {
+			Day *weekReport = [Day dayWithSummary:weekSummary];
+			[weeks setObject:weekReport forKey:weekReport.date];
+		}
+		for (NSDictionary *daySummary in [[reportCache objectForKey:@"days"] allValues]) {
+			Day *dayReport = [Day dayWithSummary:daySummary];
+			[days setObject:dayReport forKey:dayReport.date];
+		}
+		NSLog(@"Loaded.");
 	}
 	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
@@ -74,8 +70,9 @@
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	
+	NSLog(@"Generating report cache for the first time");
+	
 	NSString *docPath = [reportCacheFile stringByDeletingLastPathComponent];
-	CFAbsoluteTime t = CFAbsoluteTimeGetCurrent();
 	
 	NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
 	NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
@@ -96,9 +93,7 @@
 	NSDictionary *reportCache = [NSDictionary dictionaryWithObjectsAndKeys:
 								 weeksCache, @"weeks",
 								 daysCache, @"days", nil];
-	BOOL written = [NSKeyedArchiver archiveRootObject:reportCache toFile:reportCacheFile];
-	//BOOL written = [reportCache writeToFile:reportCacheFile atomically:YES];
-	//NSLog(@"Generating report cache took %f sec. written to file: %i", CFAbsoluteTimeGetCurrent() - t, written);
+	[NSKeyedArchiver archiveRootObject:reportCache toFile:reportCacheFile];
 	[self performSelectorOnMainThread:@selector(finishGenerateReportCache:) withObject:reportCache waitUntilDone:YES];
 	[pool release];
 }
@@ -580,6 +575,11 @@
 	return path;
 }
 
+- (NSString *)reportCachePath
+{
+	return [[self docPath] stringByAppendingPathComponent:@"ReportCache"];
+}
+
 
 - (void)deleteDay:(Day *)dayToDelete
 {
@@ -595,26 +595,44 @@
 - (void)saveData
 {
 	//save all days/weeks in separate files:
+	BOOL shouldUpdateCache = NO;
 	NSString *docPath = [self docPath];
 	for (Day *d in [self.days allValues]) {
 		NSString *fullPath = [docPath stringByAppendingPathComponent:[d proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!d.wasLoadedFromDisk) {
-			d.wasLoadedFromDisk = NO;
 			[NSKeyedArchiver archiveRootObject:d toFile:fullPath];
+			shouldUpdateCache = YES;
 		}
 	}
 	for (Day *w in [self.weeks allValues]) {
 		NSString *fullPath = [docPath stringByAppendingPathComponent:[w proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!w.wasLoadedFromDisk) {
-			w.wasLoadedFromDisk = NO;
 			[NSKeyedArchiver archiveRootObject:w toFile:fullPath];
+			shouldUpdateCache = YES;
 		}
 	}
+	if (shouldUpdateCache) {
+		NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
+		NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
+		for (Day *d in [days allValues]) {
+			[daysCache setObject:d.summary forKey:d.date];
+		}
+		for (Day *w in [weeks allValues]) {
+			[weeksCache setObject:w.summary forKey:w.date];
+		}
+		NSDictionary *reportCache = [NSDictionary dictionaryWithObjectsAndKeys:
+									 weeksCache, @"weeks",
+									 daysCache, @"days", nil];
+		[NSKeyedArchiver archiveRootObject:reportCache toFile:[self reportCachePath]];
+	}
+	
 	
 	NSString *reviewsFile = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
+	
+	
 }
 
 #pragma mark -

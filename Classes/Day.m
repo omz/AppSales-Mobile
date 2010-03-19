@@ -33,6 +33,7 @@
 #import "Entry.h"
 #import "CurrencyManager.h"
 #import "AppIconManager.h"
+#import "ReportManager.h"
 
 @implementation Day
 
@@ -103,6 +104,7 @@
 			entry.productIdentifier = appId;
 		}
 	}
+	[self generateSummary];
 	return self;
 }
 
@@ -128,46 +130,38 @@
 									nil];
 }
 
-static BOOL shouldLoadCountries = YES;
++ (Day *)dayWithSummary:(NSDictionary *)reportSummary
+{
+	Day *d = [[[Day alloc] init] autorelease];
+	d.summary = reportSummary;
+	d.date = [reportSummary objectForKey:kSummaryDate];
+	d.isWeek = [[reportSummary objectForKey:kSummaryIsWeek] boolValue];
+	d.isFault = YES;
+	d.wasLoadedFromDisk = YES;
+	return d;
+}
 
 - (id)initWithCoder:(NSCoder *)coder
 {
 	[self init];
 	self.date = [coder decodeObjectForKey:@"date"];
 	self.isWeek = [coder decodeBoolForKey:@"isWeek"];
-		
-	//shouldLoadCountries will be set to NO if we're loading via dayFromFile:atPath:
-	//This allows us to skip the costly part of loading until countries is actually accessed, at which
-	//point a new Day object will be loaded from disk at the same path and load its countries. We'll
-	//then assign countries to that Day object's countries.
-	if (shouldLoadCountries) {
-		self.countries = [coder decodeObjectForKey:@"countries"];
-	}
-	
+	self.countries = [coder decodeObjectForKey:@"countries"];
 	self.wasLoadedFromDisk = YES;
 	
 	return self;
 }
 
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
-{
-	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];	
-	
-	shouldLoadCountries = NO;
-	Day *loadedDay = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
-	shouldLoadCountries = YES;
-	loadedDay.pathOnDisk = fullPath;
-	
-	return loadedDay;
-}
 
 - (NSMutableDictionary *)countries
 {	
-	if (self.pathOnDisk && !countries) {
-		if (!countries) {		
-			countries = [((Day *)[NSKeyedUnarchiver unarchiveObjectWithFile:self.pathOnDisk]).countries retain];
-			self.pathOnDisk = nil;
-		}
+	if (isFault) {
+		NSString *filename = [self proposedFilename];
+		NSString *docPath = [[ReportManager sharedManager] docPath];
+		NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
+		Day *fulfilledFault = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+		self.countries = fulfilledFault.countries;
+		isFault = NO;
 	}
 	return countries;
 }
@@ -216,24 +210,26 @@ static BOOL shouldLoadCountries = YES;
 	return nil;
 }
 
-- (void)setDateString:(NSString *)dateString
-{
-	self.date = [self reportDateFromString:dateString];
-}
 
 - (NSString *)description
 {
-	NSMutableDictionary *salesByProduct = [NSMutableDictionary dictionary];
-	for (Country *c in [self.countries allValues]) {
-		for (Entry *e in [c entries]) {
-			if ([e transactionType] == 1) {
-				NSNumber *unitsOfProduct = [salesByProduct objectForKey:[e productName]];
-				int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
-				u += [e units];
-				[salesByProduct setObject:[NSNumber numberWithInt:u] forKey:[e productName]];
+	NSDictionary *salesByProduct = nil;
+	if (!self.summary) {
+		NSMutableDictionary *salesByProduct = [NSMutableDictionary dictionary];
+		for (Country *c in [self.countries allValues]) {
+			for (Entry *e in [c entries]) {
+				if ([e transactionType] == 1) {
+					NSNumber *unitsOfProduct = [salesByProduct objectForKey:[e productName]];
+					int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
+					u += [e units];
+					[salesByProduct setObject:[NSNumber numberWithInt:u] forKey:[e productName]];
+				}
 			}
 		}
+	} else {
+		salesByProduct = [summary objectForKey:kSummarySales];
 	}
+		
 	NSMutableString *productSummary = [NSMutableString stringWithString:@"("];
 	
 	NSEnumerator *reverseEnum = [[salesByProduct keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
@@ -245,19 +241,29 @@ static BOOL shouldLoadCountries = YES;
 	if ([productSummary length] >= 2)
 		[productSummary deleteCharactersInRange:NSMakeRange([productSummary length] - 2, 2)];
 	[productSummary appendString:@")"];
-	if ([productSummary isEqual:@"()"])
+	if ([productSummary isEqual:@"()"]) {
 		return NSLocalizedString(@"No sales",nil);
-	
+	}
 	return productSummary;
 }
 
 - (float)totalRevenueInBaseCurrency
 {
-	float sum = 0.0;
-	for (Country *c in [self.countries allValues]) {
-		sum += [c totalRevenueInBaseCurrency];
+	if (self.summary) {
+		float sum = 0.0;
+		NSDictionary *revenueByCurrency = [summary objectForKey:kSummaryRevenue];
+		for (NSString *currency in revenueByCurrency) {
+			float revenue = [[CurrencyManager sharedManager] convertValue:[[revenueByCurrency objectForKey:currency] floatValue] fromCurrency:currency];
+			sum += revenue;
+		}
+		return sum;
+	} else {
+		float sum = 0.0;
+		for (Country *c in [self.countries allValues]) {
+			sum += [c totalRevenueInBaseCurrency];
+		}
+		return sum;
 	}
-	return sum;
 }
 
 - (float)totalRevenueInBaseCurrencyForApp:(NSString *)app

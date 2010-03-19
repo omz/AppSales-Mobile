@@ -61,15 +61,13 @@
 @property (nonatomic, retain) NSDictionary *summary;
 
 
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
-
 - (id)initWithCSV:(NSString *)csv;
 
 - (void)generateSummary;
++ (Day *)dayWithSummary:(NSDictionary *)reportSummary;
 
 - (Country *)countryNamed:(NSString *)countryName;
 
-- (void)setDateString:(NSString *)dateString;
 - (NSDate *)reportDateFromString:(NSString *)dateString;
 
 - (float)totalRevenueInBaseCurrency;

@@ -37,7 +37,6 @@
 		[httpServer setDocumentRoot:[NSURL fileURLWithPath:[[ReportManager sharedManager] originalReportsPath]]];
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(displayInfoUpdate:) name:@"LocalhostAdressesResolved" object:nil];
-		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileUploaded:) name:NewFileUploadedNotification object:nil];
     }
     return self;
@@ -118,7 +117,6 @@
 {	
 	self.title = NSLocalizedString(@"Import / Export",nil);
 	UIWebView *webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
-	
 	self.view = webView;
 	[self showInfo];
 }
@@ -138,7 +136,8 @@
 	} else {
 		self.info = [NSString stringWithFormat:@"http://%@:%d\n", localIP, port];
 	}
-	[self performSelectorOnMainThread:@selector(showInfo) withObject:nil waitUntilDone:NO];
+	
+	[self performSelectorOnMainThread:@selector(showInfo) withObject:nil waitUntilDone:YES];
 }
 
 
