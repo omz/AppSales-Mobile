@@ -8,7 +8,8 @@ Features:
 * Automatic download of daily and weekly sales reports from iTunes Connect
 * Convenient graphs for viewing trends and sales by region with selectable date range
 * Automatic conversion to your currency of choice
-* Download reviews of your apps
+* Download reviews of your apps from all App Stores
+* Import reports that you downloaded elsewhere (for example with "AppViz":http://www.ideaswarm.com/products/appviz/ on your Mac) via Bonjour
 
 Because there is no real API to access iTunes Connect trend reports, AppSales Mobile scrapes itts.apple.com. This means that even small changes on this website can break AppSales’s ability to download reports automatically. In most cases, this is easy to fix and I’ll try to make a new version available asap.
 
