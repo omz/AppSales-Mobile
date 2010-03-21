@@ -39,31 +39,34 @@
 	else {
 		self.appsByID = [NSMutableDictionary dictionary];
 	}
-		
+	
 	NSString *reportCacheFile = [self reportCachePath];
 	if (![[NSFileManager defaultManager] fileExistsAtPath:reportCacheFile]) {
 		[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Updating Cache...",nil)];
 		[[ProgressHUD sharedHUD] show];
 		[self performSelectorInBackground:@selector(generateReportCache:) withObject:reportCacheFile];
 	} else {
-		NSLog(@"Load report cache...");
-		NSDictionary *reportCache = [NSKeyedUnarchiver unarchiveObjectWithFile:reportCacheFile];
-		for (NSDictionary *weekSummary in [[reportCache objectForKey:@"weeks"] allValues]) {
-			Day *weekReport = [Day dayWithSummary:weekSummary];
-			[weeks setObject:weekReport forKey:weekReport.date];
-		}
-		for (NSDictionary *daySummary in [[reportCache objectForKey:@"days"] allValues]) {
-			Day *dayReport = [Day dayWithSummary:daySummary];
-			[days setObject:dayReport forKey:dayReport.date];
-		}
-		NSLog(@"Loaded.");
+		[self loadReportCache];
 	}
-	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveData) name:UIApplicationWillTerminateNotification object:nil];
 	
 	return self;
+}
+
+- (void)loadReportCache
+{
+	NSString *reportCacheFile = [self reportCachePath];
+	NSDictionary *reportCache = [NSKeyedUnarchiver unarchiveObjectWithFile:reportCacheFile];
+	for (NSDictionary *weekSummary in [[reportCache objectForKey:@"weeks"] allValues]) {
+		Day *weekReport = [Day dayWithSummary:weekSummary];
+		[weeks setObject:weekReport forKey:weekReport.date];
+	}
+	for (NSDictionary *daySummary in [[reportCache objectForKey:@"days"] allValues]) {
+		Day *dayReport = [Day dayWithSummary:daySummary];
+		[days setObject:dayReport forKey:dayReport.date];
+	}
 }
 
 - (void)generateReportCache:(NSString *)reportCacheFile
@@ -81,8 +84,8 @@
 		if (![[filename pathExtension] isEqual:@"dat"]) continue;
 		NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
 		Day *report = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
-		[report generateSummary];
 		if (report != nil) {
+			[report generateSummary];
 			if (report.isWeek) {
 				[weeksCache setObject:report.summary forKey:report.date];
 			} else  {
@@ -101,7 +104,7 @@
 - (void)finishGenerateReportCache:(NSDictionary *)generatedCache
 {
 	[[ProgressHUD sharedHUD] hide];
-	
+	[self loadReportCache];
 }
 
 + (ReportManager *)sharedManager

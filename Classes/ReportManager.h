@@ -36,6 +36,10 @@
 @property (retain) NSString *reportDownloadStatus;
 
 + (ReportManager *)sharedManager;
+
+- (void)loadReportCache;
+- (void)generateReportCache:(NSString *)reportCacheFile;
+
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
 
