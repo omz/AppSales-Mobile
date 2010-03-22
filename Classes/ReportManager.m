@@ -40,14 +40,14 @@
 		self.appsByID = [NSMutableDictionary dictionary];
 	}
 	
-	NSString *reportCacheFile = [self reportCachePath];
-	if (![[NSFileManager defaultManager] fileExistsAtPath:reportCacheFile]) {
+	BOOL cacheLoaded = [self loadReportCache];
+	if (!cacheLoaded) {
 		[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Updating Cache...",nil)];
 		[[ProgressHUD sharedHUD] show];
+		NSString *reportCacheFile = [self reportCachePath];
 		[self performSelectorInBackground:@selector(generateReportCache:) withObject:reportCacheFile];
-	} else {
-		[self loadReportCache];
 	}
+	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveData) name:UIApplicationWillTerminateNotification object:nil];
@@ -55,10 +55,17 @@
 	return self;
 }
 
-- (void)loadReportCache
+- (BOOL)loadReportCache
 {
 	NSString *reportCacheFile = [self reportCachePath];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:reportCacheFile]) {
+		return NO;
+	}
 	NSDictionary *reportCache = [NSKeyedUnarchiver unarchiveObjectWithFile:reportCacheFile];
+	if (!reportCache) {
+		return NO;
+	}
+	
 	for (NSDictionary *weekSummary in [[reportCache objectForKey:@"weeks"] allValues]) {
 		Day *weekReport = [Day dayWithSummary:weekSummary];
 		[weeks setObject:weekReport forKey:weekReport.date];
@@ -67,6 +74,8 @@
 		Day *dayReport = [Day dayWithSummary:daySummary];
 		[days setObject:dayReport forKey:dayReport.date];
 	}
+	
+	return YES;
 }
 
 - (void)generateReportCache:(NSString *)reportCacheFile

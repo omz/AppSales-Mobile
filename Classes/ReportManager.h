@@ -37,7 +37,7 @@
 
 + (ReportManager *)sharedManager;
 
-- (void)loadReportCache;
+- (BOOL)loadReportCache;
 - (void)generateReportCache:(NSString *)reportCacheFile;
 
 - (BOOL)isDownloadingReports;
