@@ -42,6 +42,26 @@
     return self;
 }
 
+- (void)loadView 
+{	
+	self.title = NSLocalizedString(@"Import / Export",nil);
+	UIWebView *webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
+	self.view = webView;
+	[self showInfo];
+}
+
+- (void)showInfo
+{
+	NSString *page = [[[NSString alloc] initWithContentsOfFile:
+					   [[NSBundle mainBundle] pathForResource:@"ImportHelp" ofType:@"html"]
+													  encoding:NSUTF8StringEncoding
+														 error:NULL] autorelease];
+	
+	page = [page stringByReplacingOccurrencesOfString:@"[[[ADDRESS]]]" withString:self.info];
+	
+	[(UIWebView *)self.view loadHTMLString:page baseURL:nil];
+}
+
 - (void)fileUploaded:(NSNotification *)notification
 {
 	NSString *filename = [notification object];
@@ -113,13 +133,6 @@
 	}
 }
 
-- (void)loadView 
-{	
-	self.title = NSLocalizedString(@"Import / Export",nil);
-	UIWebView *webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
-	self.view = webView;
-	[self showInfo];
-}
 
 - (void)displayInfoUpdate:(NSNotification *) notification
 {
@@ -152,18 +165,6 @@
 		NSLog(@"HTTP Server started");
 		[localhostAddresses performSelectorInBackground:@selector(list) withObject:nil];
 	}
-}
-
-- (void)showInfo
-{
-	NSString *page = [[[NSString alloc] initWithContentsOfFile:
-					   [[NSBundle mainBundle] pathForResource:@"ImportHelp" ofType:@"html"]
-													  encoding:NSUTF8StringEncoding
-														 error:NULL] autorelease];
-	
-	page = [page stringByReplacingOccurrencesOfString:@"[[[ADDRESS]]]" withString:self.info];
-	
-	[(UIWebView *)self.view loadHTMLString:page baseURL:nil];
 }
 
 
