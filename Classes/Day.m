@@ -87,13 +87,13 @@
 			}
 			NSString *royaltyCurrency = [columns objectAtIndex:15];
 			
-			/* Treat in-app purchases as regular purchases for our purposes.
-			 * IA1: In-App Purchase
-			 * Presumably, IA7: In-App Free Upgrade / Repurchase.
-			 */
-			if ([transactionType isEqualToString:@"IA1"]) transactionType = @"1";
+			//Treat in-app purchases as regular purchases for our purposes.
+			//IA1: In-App Purchase
+			//IA7: In-App Free Upgrade / Repurchase (?)
+			//IA9: In-App Subscription
+			if ([transactionType isEqualToString:@"IA1"] || [transactionType isEqualToString:@"IA9"]) transactionType = @"1";
 			if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
-
+			
 			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
 			Entry *entry = [[[Entry alloc] initWithProductName:productName 
 								transactionType:[transactionType intValue] 
