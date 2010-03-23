@@ -95,10 +95,12 @@
 		Day *report = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
 		if (report != nil) {
 			[report generateSummary];
-			if (report.isWeek) {
-				[weeksCache setObject:report.summary forKey:report.date];
-			} else  {
-				[daysCache setObject:report.summary forKey:report.date];
+			if (report.date) {
+				if (report.isWeek) {
+					[weeksCache setObject:report.summary forKey:report.date];
+				} else  {
+					[daysCache setObject:report.summary forKey:report.date];
+				}
 			}
 		}
 	}
