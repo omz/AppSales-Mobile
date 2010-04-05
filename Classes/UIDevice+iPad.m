@@ -46,6 +46,7 @@
 	static BOOL determined = NO;
 	if (!determined) {
 		isPad = (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPhone);
+		determined = YES;
 	}
 	
 	return isPad;
