@@ -52,7 +52,15 @@
 	}
 	NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.png", [appID substringToIndex:3], [appID substringFromIndex:3]]]];
 	if (!imageData) imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.jpg", [appID substringToIndex:3], [appID substringFromIndex:3]]]];
-	if (!imageData) return;
+	if (!imageData) {
+		NSLog(@"Could not get an icon for %@ (%@)", appID, appName);
+
+		/* Don't try to look it up again this session.
+		 * Don't write it to disk, so we'll check again on a subsequent launch */
+		[iconsByAppName setObject:[[[UIImage alloc] init] autorelease]
+						   forKey:appName];
+		return;
+	}
 	UIImage *icon = [UIImage imageWithData:imageData];
 	if (icon) [iconsByAppName setObject:icon forKey:appName];
 	NSString *iconPath = [docPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png", appName]];
