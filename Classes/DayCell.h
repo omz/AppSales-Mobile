@@ -29,22 +29,10 @@
  */
 
 #import <UIKit/UIKit.h>
-@class Day;
+#import "DayOrWeekCell.h"
 
-@interface DayCell : UITableViewCell {
+@interface DayCell : DayOrWeekCell {
 
-	UILabel *dayLabel;
-	UILabel *weekdayLabel;
-	UILabel *revenueLabel;
-	UILabel *detailsLabel;
-	UIImageView *graphView;
-	Day *day;
-	float maxRevenue;
-	UIColor *graphColor;
 }
-
-@property (retain) Day *day;
-@property (assign) float maxRevenue;
-@property (retain) UIColor *graphColor;
 
 @end

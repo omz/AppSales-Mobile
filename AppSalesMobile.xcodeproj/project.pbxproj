@@ -15,6 +15,8 @@
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
 		345D1A480F3174DC002AB336 /* AbstractDayOrWeekController.m in Sources */ = {isa = PBXBuildFile; fileRef = 345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */; };
 		34DCF08F0F0461A2009F9929 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */; };
+		34DDA8BD116A199D00F5BA8C /* UIDevice+iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DDA8BC116A199D00F5BA8C /* UIDevice+iPad.m */; };
+		34DDA919116A1EDF00F5BA8C /* DayOrWeekCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DDA918116A1EDF00F5BA8C /* DayOrWeekCell.m */; };
 		7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */; };
 		7F17E0570ED4F21E0005D8AF /* CurrencySelectionDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */; };
 		7F29EA420ED861B20018C18A /* help in Resources */ = {isa = PBXBuildFile; fileRef = 7F29EA340ED861B20018C18A /* help */; };
@@ -339,6 +341,10 @@
 		345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AbstractDayOrWeekController.m; sourceTree = "<group>"; };
 		34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFHFKeychainUtils.m; sourceTree = "<group>"; };
 		34DCF08E0F0461A2009F9929 /* SFHFKeychainUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFHFKeychainUtils.h; sourceTree = "<group>"; };
+		34DDA8BB116A199D00F5BA8C /* UIDevice+iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIDevice+iPad.h"; path = "Classes/UIDevice+iPad.h"; sourceTree = "<group>"; };
+		34DDA8BC116A199D00F5BA8C /* UIDevice+iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIDevice+iPad.m"; path = "Classes/UIDevice+iPad.m"; sourceTree = "<group>"; };
+		34DDA917116A1EDF00F5BA8C /* DayOrWeekCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DayOrWeekCell.h; sourceTree = "<group>"; };
+		34DDA918116A1EDF00F5BA8C /* DayOrWeekCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DayOrWeekCell.m; sourceTree = "<group>"; };
 		7F1345720EC6D7990050D5F2 /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/SettingsViewController.xib; sourceTree = "<group>"; };
 		7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrencySelectionDialog.h; sourceTree = "<group>"; };
 		7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencySelectionDialog.m; sourceTree = "<group>"; };
@@ -747,6 +753,7 @@
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
+				34DDA857116A177B00F5BA8C /* Resources-iPad */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				7FB0C4430EB97BE8005E2C45 /* libz.dylib */,
@@ -761,6 +768,8 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				34DDA8BB116A199D00F5BA8C /* UIDevice+iPad.h */,
+				34DDA8BC116A199D00F5BA8C /* UIDevice+iPad.m */,
 				28A0AAE50D9B0CCF005BE974 /* AppSalesMobile_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 			);
@@ -791,6 +800,13 @@
 				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		34DDA857116A177B00F5BA8C /* Resources-iPad */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Resources-iPad";
 			sourceTree = "<group>";
 		};
 		7F4C217510230EF200F17F7D /* Images */ = {
@@ -1076,6 +1092,8 @@
 				7FEA57EB105B0DAE000A12E6 /* AppCell.m */,
 				7FEA595D105B3D65000A12E6 /* ReviewCell.h */,
 				7FEA595E105B3D65000A12E6 /* ReviewCell.m */,
+				34DDA917116A1EDF00F5BA8C /* DayOrWeekCell.h */,
+				34DDA918116A1EDF00F5BA8C /* DayOrWeekCell.m */,
 				7FB0C7B50EBA9A19005E2C45 /* DayCell.h */,
 				7FB0C7B60EBA9A19005E2C45 /* DayCell.m */,
 				7FB0C9320EBB988B005E2C45 /* WeekCell.h */,
@@ -1657,6 +1675,8 @@
 				7FE313A2115294C9004DEA7C /* NSData+Compression.m in Sources */,
 				7FE0B6D211539E6000A8B137 /* localhostAddresses.m in Sources */,
 				7FE0B6D311539E6000A8B137 /* MyHTTPConnection.m in Sources */,
+				34DDA8BD116A199D00F5BA8C /* UIDevice+iPad.m in Sources */,
+				34DDA919116A1EDF00F5BA8C /* DayOrWeekCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1706,6 +1726,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1713,8 +1734,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = AppSalesMobile;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos3.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1722,11 +1746,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = AppSalesMobile;
+				SDKROOT = iphoneos3.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1748,13 +1776,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Ole Zorn";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = AppSalesMobile;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B62523D9-0D86-4FE2-9212-10D397E6472A";
+				SDKROOT = iphoneos3.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Distribution;
 		};
