@@ -48,6 +48,9 @@
 {
 	[super setDay:newDay];
 	
+	if (day == nil)
+		return;
+
 	weekdayLabel.text = [day weekdayString];
 	
 	dayLabel.textColor = [self.day weekdayColor];

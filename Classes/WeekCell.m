@@ -51,6 +51,9 @@
 {
 	[super setDay:newDay];
 
+	if (day == nil)
+		return;
+
 	weekdayLabel.text = [day weekEndDateString];
 }
 
