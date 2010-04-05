@@ -107,8 +107,12 @@
 			} else {
 				if (report.isWeek) {
 					importedWeeks++;
+					if (importedWeeks % 10 == 0)
+						NSLog(@"Imported week %i", importedWeeks);
 				} else {
 					importedDays++;
+					if (importedDays % 10 == 0)
+						NSLog(@"Imported day %i", importedDays);
 				}
 				[[ReportManager sharedManager] importReport:report];
 				[fm copyItemAtPath:reportPath toPath:[[[ReportManager sharedManager] originalReportsPath] stringByAppendingPathComponent:file] error:NULL];
