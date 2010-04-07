@@ -84,6 +84,7 @@
 - (UIColor *)weekdayColor;
 
 - (NSString *)totalRevenueString;
+- (NSString *)totalRevenueStringForApp:(NSString *)appName;
 
 - (NSString *)proposedFilename;
 

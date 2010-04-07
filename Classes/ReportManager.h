@@ -27,6 +27,8 @@
 	NSMutableDictionary *appsByID;
 	BOOL isDownloadingReviews;
 	NSString *reviewDownloadStatus;
+	
+	BOOL cacheChanged;
 }
 
 @property (retain) NSMutableDictionary *days;

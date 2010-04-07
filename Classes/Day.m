@@ -311,6 +311,11 @@
 	return [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:[self totalRevenueInBaseCurrency]] withFraction:YES];
 }
 
+- (NSString *)totalRevenueStringForApp:(NSString *)appName
+{
+	return [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:[self totalRevenueInBaseCurrencyForApp:appName]] withFraction:YES];
+}
+
 - (NSString *)dayString
 {
 	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:self.date];

@@ -601,15 +601,19 @@
 	[[NSFileManager defaultManager] removeItemAtPath:fullPath error:NULL];
 	if (dayToDelete.isWeek) {
 		[self.weeks removeObjectForKey:dayToDelete.date];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 	} else {
 		[self.days removeObjectForKey:dayToDelete.date];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
 	}
+	cacheChanged = YES;
+	[self saveData];
 }
 
 - (void)saveData
 {
 	//save all days/weeks in separate files:
-	BOOL shouldUpdateCache = NO;
+	BOOL shouldUpdateCache = cacheChanged;
 	NSString *docPath = [self docPath];
 	for (Day *d in [self.days allValues]) {
 		NSString *fullPath = [docPath stringByAppendingPathComponent:[d proposedFilename]];
@@ -645,8 +649,7 @@
 	
 	NSString *reviewsFile = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
-	
-	
+	cacheChanged = NO;
 }
 
 #pragma mark -

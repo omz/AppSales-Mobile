@@ -129,6 +129,9 @@ AppSalesMobile
 {
 	CurrencySelectionDialog *currencySelectionDialog = [[CurrencySelectionDialog new] autorelease];
 	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:currencySelectionDialog] autorelease];
+	if ([[UIDevice currentDevice] isPad]) {
+		navController.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
 	[self presentModalViewController:navController animated:YES];
 }
 
