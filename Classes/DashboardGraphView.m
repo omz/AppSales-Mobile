@@ -444,8 +444,8 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-	if (showsRegions) return;
-	
+	if (showsRegions || !self.reports || [self.reports count] == 0) return;
+		
 	UITouch *touch = [touches anyObject];
 	[self moveMarkerForTouch:touch];
 	markerLineView.alpha = 1.0;
