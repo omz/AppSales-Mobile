@@ -46,15 +46,23 @@ AppSalesMobile
     [super viewDidLoad];
 
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
-	/* As of iPad 3.2.0, groupTableViewBackgroundColor returns black, not the correct iPad-gray color. */
+
 	if ([[UIDevice currentDevice] isPad]) {
+		/* On the iPad, groupTableViewBackgroundColor displays black, not the correct iPad-gray color, for us.
+		 * However, a minimal application which just uses the color as a view background doesn't show the same problem.
+		 * Something funky is here. We'll just work around it for now. -evands */
+		
 		UITableView *backgroundTableView = [[[UITableView alloc] initWithFrame:self.view.bounds
 																		 style:UITableViewStyleGrouped] autorelease];
 		backgroundTableView.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth);
 		[self.view addSubview:backgroundTableView];
-		[self.view sendSubviewToBack:backgroundTableView];
-	} else
-		self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+		[self.view sendSubviewToBack:backgroundTableView];		
+	} else {
+	 self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+	}
+	
+	NSLog(@"%@", [UIColor groupTableViewBackgroundColor]);
+
 	explanationsLabel.font = [UIFont systemFontOfSize:12.0];
 	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours.\n\nAll information is presented without any warranties.\n\nThe presented market trend reports should not be considered to be your monthly royalty reports.",nil);
 	copyrightLabel.font = [UIFont systemFontOfSize:12.0];
