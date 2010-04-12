@@ -40,7 +40,7 @@
 		[self addSubview:activityIndicator];
 		
 		UIButton *downloadReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		downloadReviewsButton.frame = CGRectMake(24, 251, 209, 51);
+		downloadReviewsButton.frame = CGRectMake(24, 250, 209, 47);
 		[downloadReviewsButton setBackgroundImage:[[UIImage imageNamed:@"PaneButtonNormal.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0] forState:UIControlStateNormal];
 		[downloadReviewsButton setBackgroundImage:[[UIImage imageNamed:@"PaneButtonHighlighted.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0] forState:UIControlStateHighlighted];
 		[downloadReviewsButton setTitle:NSLocalizedString(@"Download Reviews",nil) forState:UIControlStateNormal];
@@ -82,7 +82,7 @@
 	NSDictionary *apps = [[ReportManager sharedManager] appsByID];
 	int i = 0;
 	for (App *app in [apps allValues]) {
-		ReviewSummaryView *summaryView = [[[ReviewSummaryView alloc] initWithFrame:CGRectMake(i * 235, 0, 225, 225) app:app] autorelease];
+		ReviewSummaryView *summaryView = [[[ReviewSummaryView alloc] initWithFrame:CGRectMake(i * 235, 0, 224, 215) app:app] autorelease];
 		[summaryView addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
 		[scrollView addSubview:summaryView];
 		i++;

@@ -16,10 +16,11 @@
 #import "ReportManager.h"
 #import "ReviewsPane.h"
 #import "App.h"
+#import "HelpBrowser.h"
 
 @implementation PadRootViewController
 
-@synthesize toolbar, statusLabel, activityIndicator, settingsPopover, dailyDashboardView, weeklyDashboardView, reviewsPane, importExportPopover, graphTypeSheet, filterSheet, filterItem;
+@synthesize toolbar, statusLabel, activityIndicator, settingsPopover, dailyDashboardView, weeklyDashboardView, reviewsPane, importExportPopover, graphTypeSheet, filterSheet, filterItem, aboutPopover;
 
 - (void)loadView 
 {
@@ -31,6 +32,7 @@
 	UIBarButtonItem *refreshItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReports:)] autorelease];
 	UIBarButtonItem *settingsItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TB_Settings.png"] style:UIBarButtonItemStylePlain target:self action:@selector(showSettings:)] autorelease];
 	UIBarButtonItem *flexItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
+	UIBarButtonItem *aboutItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TB_About.png"] style:UIBarButtonItemStylePlain target:self action:@selector(showAbout:)] autorelease];
 	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 32)] autorelease];
 	statusLabel.textColor = [UIColor darkGrayColor];
 	statusLabel.shadowColor = [UIColor whiteColor];
@@ -54,7 +56,7 @@
 	self.filterItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TB_Filter.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectFilter:)] autorelease];
 	self.toolbar = [[[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, bounds.size.width, 44)] autorelease];
 	toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	toolbar.items = [NSArray arrayWithObjects:refreshItem, flexItem, activityIndicatorItem, statusItem, flexItem, graphTypeItem, spaceItem, filterItem, spaceItem, spaceItem, importExportItem, spaceItem, settingsItem, nil];
+	toolbar.items = [NSArray arrayWithObjects:refreshItem, flexItem, activityIndicatorItem, statusItem, flexItem, graphTypeItem, spaceItem, filterItem, spaceItem, spaceItem, spaceItem, importExportItem, spaceItem, settingsItem, spaceItem, aboutItem, nil];
 	[self.view addSubview:toolbar];
 	
 	self.dailyDashboardView = [[[DashboardView alloc] initWithFrame:CGRectMake(0, 47, 748, 320)] autorelease];
@@ -69,7 +71,7 @@
 	dailyDashboardView.reportsPopover = daysPopover;
 	dailyDashboardView.showsWeeklyReports = NO;
 	[self.view addSubview:dailyDashboardView];
-
+	
 	self.weeklyDashboardView = [[[DashboardView alloc] initWithFrame:CGRectMake(0, 365, 748, 320)] autorelease];
 	weeklyDashboardView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	weeklyDashboardView.showsWeeklyReports = YES;
@@ -209,6 +211,20 @@
 	}
 }
 
+- (void)showAbout:(id)sender
+{
+	if (!aboutPopover) {
+		UIViewController *aboutViewController = [[[HelpBrowser alloc] initWithNibName:nil bundle:nil] autorelease];
+		aboutViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
+		self.aboutPopover = [[[UIPopoverController alloc] initWithContentViewController:aboutViewController] autorelease];
+	}
+	if (!aboutPopover.popoverVisible) {
+		[aboutPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	} else {
+		[aboutPopover dismissPopoverAnimated:YES];
+	}
+}
+
 - (void)showImportExport:(id)sender
 {
 	if (importExportPopover.popoverVisible) {
@@ -252,6 +268,7 @@
 	[activityIndicator release];
 	[settingsPopover release];
 	[importExportPopover release];
+	[aboutPopover release];
 	[graphTypeSheet release];
 	[filterSheet release];
 	[filterItem release];

@@ -1110,7 +1110,7 @@
 					date = [date stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 					reviewDate = [dateFormatter dateFromString:date];
 				}
-								
+				
 				[scanner scanUpToString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
 				[scanner scanString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
 				[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];

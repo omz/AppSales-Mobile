@@ -17,9 +17,11 @@
 	UIActivityIndicatorView *activityIndicator;
 	UIPopoverController *settingsPopover;
 	UIPopoverController *importExportPopover;
+	UIPopoverController *aboutPopover;
 	UIActionSheet *graphTypeSheet;
 	UIBarButtonItem *filterItem;
 	UIActionSheet *filterSheet;
+	
 	
 	DashboardView *dailyDashboardView;
 	DashboardView *weeklyDashboardView;
@@ -31,6 +33,7 @@
 @property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, retain) UIPopoverController *settingsPopover;
 @property (nonatomic, retain) UIPopoverController *importExportPopover;
+@property (nonatomic, retain) UIPopoverController *aboutPopover;
 @property (nonatomic, retain) UIActionSheet *graphTypeSheet;
 @property (nonatomic, retain) UIBarButtonItem *filterItem;
 @property (nonatomic, retain) UIActionSheet *filterSheet;

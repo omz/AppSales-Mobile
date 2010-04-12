@@ -17,6 +17,7 @@
 		34DCF08F0F0461A2009F9929 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */; };
 		34DDA8BD116A199D00F5BA8C /* UIDevice+iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DDA8BC116A199D00F5BA8C /* UIDevice+iPad.m */; };
 		34DDA919116A1EDF00F5BA8C /* DayOrWeekCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 34DDA918116A1EDF00F5BA8C /* DayOrWeekCell.m */; };
+		7F06B8EB11714FBF00AFB66D /* TB_About.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F06B8EA11714FBF00AFB66D /* TB_About.png */; };
 		7F1345710EC6D7940050D5F2 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F1345700EC6D7940050D5F2 /* SettingsViewController.xib */; };
 		7F17E0570ED4F21E0005D8AF /* CurrencySelectionDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */; };
 		7F29EA420ED861B20018C18A /* help in Resources */ = {isa = PBXBuildFile; fileRef = 7F29EA340ED861B20018C18A /* help */; };
@@ -368,6 +369,7 @@
 		34DDA8BC116A199D00F5BA8C /* UIDevice+iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIDevice+iPad.m"; path = "Classes/UIDevice+iPad.m"; sourceTree = "<group>"; };
 		34DDA917116A1EDF00F5BA8C /* DayOrWeekCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DayOrWeekCell.h; sourceTree = "<group>"; };
 		34DDA918116A1EDF00F5BA8C /* DayOrWeekCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DayOrWeekCell.m; sourceTree = "<group>"; };
+		7F06B8EA11714FBF00AFB66D /* TB_About.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TB_About.png; sourceTree = "<group>"; };
 		7F1345720EC6D7990050D5F2 /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/SettingsViewController.xib; sourceTree = "<group>"; };
 		7F17E0550ED4F21E0005D8AF /* CurrencySelectionDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrencySelectionDialog.h; sourceTree = "<group>"; };
 		7F17E0560ED4F21E0005D8AF /* CurrencySelectionDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencySelectionDialog.m; sourceTree = "<group>"; };
@@ -881,6 +883,7 @@
 				7F82E849116C1F5800D5F228 /* CalendarButtonHighlighted.png */,
 				7F82E71A116C03DA00D5F228 /* Default-Portrait.png */,
 				7F82E71B116C03DA00D5F228 /* Default-Landscape.png */,
+				7F06B8EA11714FBF00AFB66D /* TB_About.png */,
 				7F82E764116C0C3900D5F228 /* TB_Filter.png */,
 				7F82E6D1116BF8BC00D5F228 /* TB_Graphs.png */,
 				7F4A5799116BF1D900FA2019 /* TB_ImportExport.png */,
@@ -1710,6 +1713,7 @@
 				7F82E84B116C1F5800D5F228 /* CalendarButtonHighlighted.png in Resources */,
 				7F82E926116C322D00D5F228 /* GraphDetailTop.png in Resources */,
 				7F82E927116C322D00D5F228 /* GraphDetailBottom.png in Resources */,
+				7F06B8EB11714FBF00AFB66D /* TB_About.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1831,7 +1835,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Ole Zorn (FT3Q8ZV7JG)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1840,7 +1844,7 @@
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
 				PRODUCT_NAME = AppSalesMobile;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "39E68505-A98D-47DB-BC8C-59CC4CACDC42";
 				SDKROOT = iphoneos3.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1888,7 +1892,7 @@
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = AppSalesMobile;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B62523D9-0D86-4FE2-9212-10D397E6472A";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "86A9203A-1DB2-4FD9-89A0-F9CF991323C8";
 				SDKROOT = iphoneos3.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

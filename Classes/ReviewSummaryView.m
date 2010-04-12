@@ -23,11 +23,11 @@
 		[self addSubview:backgroundView];
 		self.app = anApp;
 		
-		UIImageView *iconView = [[[UIImageView alloc] initWithFrame:CGRectMake(84, 15, 57, 57)] autorelease];
+		UIImageView *iconView = [[[UIImageView alloc] initWithFrame:CGRectMake(84, 13, 57, 57)] autorelease];
 		iconView.image = [[AppIconManager sharedManager] iconForAppNamed:app.appName];
 		[self addSubview:iconView];
 		
-		UILabel *nameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 78, 205, 20)] autorelease];
+		UILabel *nameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 76, 205, 20)] autorelease];
 		nameLabel.font = [UIFont boldSystemFontOfSize:16.0];
 		nameLabel.text = app.appName;
 		nameLabel.textAlignment = UITextAlignmentCenter;
@@ -35,7 +35,7 @@
 		nameLabel.textColor = [UIColor darkGrayColor];
 		[self addSubview:nameLabel];
 		
-		UILabel *numberOfReviewsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 97, 205, 20)] autorelease];
+		UILabel *numberOfReviewsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 95, 205, 20)] autorelease];
 		numberOfReviewsLabel.font = [UIFont systemFontOfSize:14.0];
 		numberOfReviewsLabel.text = [NSString stringWithFormat:@"%i Reviews (+%i)", [app.reviewsByUser count], app.newReviewsCount];
 		numberOfReviewsLabel.textAlignment = UITextAlignmentCenter;
@@ -53,7 +53,7 @@
 		
 		int i = 0;
 		for (int stars=5; stars>0; stars--) {
-			UILabel *starsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 128 + (i * 18), 80, 15)] autorelease];
+			UILabel *starsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 122 + (i * 18), 80, 15)] autorelease];
 			NSMutableString *starsString = [NSMutableString string];
 			for (int s=0; s<stars; s++) { [starsString appendString:@"★"]; }
 			starsLabel.text = starsString;
@@ -65,12 +65,12 @@
 			
 			int numberOfReviews = [[numberOfReviewsByStars objectForKey:[NSNumber numberWithInt:stars]] intValue];
 			float barWidth = ((float)numberOfReviews / (float)maxNumberOfReviews) * 80;
-			UIView *barView = [[[UIView alloc] initWithFrame:CGRectMake(95, 128 + (i * 18), barWidth, 15)] autorelease];
+			UIView *barView = [[[UIView alloc] initWithFrame:CGRectMake(95, 122 + (i * 18), barWidth, 15)] autorelease];
 			barView.backgroundColor = [UIColor grayColor];
 			barView.userInteractionEnabled = NO;
 			[self addSubview:barView];
 			
-			UILabel *numberOfReviewsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(barView.frame.origin.x + barView.frame.size.width + 5, 128 + (i*18), 35, 15)] autorelease];
+			UILabel *numberOfReviewsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(barView.frame.origin.x + barView.frame.size.width + 5, 122 + (i*18), 35, 15)] autorelease];
 			numberOfReviewsLabel.text = [NSString stringWithFormat:@"%i", numberOfReviews];
 			numberOfReviewsLabel.font = [UIFont systemFontOfSize:13.0];
 			numberOfReviewsLabel.textColor = [UIColor grayColor];
