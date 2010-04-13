@@ -216,7 +216,7 @@
 	if (!aboutPopover) {
 		UIViewController *aboutViewController = [[[HelpBrowser alloc] initWithNibName:nil bundle:nil] autorelease];
 		aboutViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
-		self.aboutPopover = [[[UIPopoverController alloc] initWithContentViewController:aboutViewController] autorelease];
+		self.aboutPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:aboutViewController] autorelease];
 	}
 	if (!aboutPopover.popoverVisible) {
 		[aboutPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
