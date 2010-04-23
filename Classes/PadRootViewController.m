@@ -160,6 +160,8 @@
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+	if (buttonIndex == [actionSheet cancelButtonIndex]) return;
+	
 	if (actionSheet == self.graphTypeSheet) {
 		if (buttonIndex == 0) {
 			dailyDashboardView.graphView.showsUnits = NO;
