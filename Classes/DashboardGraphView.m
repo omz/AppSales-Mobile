@@ -325,6 +325,13 @@
 	
 	UIColor *graphColor = (showsWeeklyReports) ? [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0] : [UIColor colorWithRed:0.800 green:0.000 blue:0.000 alpha:1.0];//[UIColor colorWithRed:0.149 green:0.592 blue:0.000 alpha:1.0];
 	
+	NSString *maxString = [NSString stringWithFormat:@"%i", (int)maxRevenue];
+
+	const int rightMargin = 4;
+	float requiredWidth = [maxString sizeWithFont:[UIFont boldSystemFontOfSize:13.0]].width;
+	if (requiredWidth + rightMargin > minX)
+		minX = requiredWidth + rightMargin;
+
 	//draw grid and captions:
 	CGContextBeginPath(c);
 	CGContextSetLineWidth(c, 1.0);
@@ -336,9 +343,8 @@
 	CGContextAddLineToPoint(c, minX, maxY + 2);
 	CGContextDrawPath(c, kCGPathStroke);
 	CGContextSetAllowsAntialiasing(c, YES);
-	[@"0" drawInRect:CGRectMake(0, maxY - 8, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:13.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
-	NSString *maxString = [NSString stringWithFormat:@"%i", (int)maxRevenue];
-	[maxString drawInRect:CGRectMake(0, minY - 10, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:13.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
+	[@"0" drawInRect:CGRectMake(0, maxY - 8, minX - rightMargin, 10) withFont:[UIFont boldSystemFontOfSize:13.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
+	[maxString drawInRect:CGRectMake(0, minY - 10, minX - rightMargin, 10) withFont:[UIFont boldSystemFontOfSize:13.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	float averageRevenue = totalRevenue / [revenues count];
 	float averageY = maxY - ((averageRevenue / maxRevenue) * (maxY - minY));
 	if ((averageY < (maxY + 10)) && (averageY > (minY + 10))) {
