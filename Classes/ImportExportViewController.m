@@ -117,8 +117,28 @@
 				[[ReportManager sharedManager] importReport:report];
 				[fm copyItemAtPath:reportPath toPath:[[[ReportManager sharedManager] originalReportsPath] stringByAppendingPathComponent:file] error:NULL];
 			}
+		}else if([[file pathExtension] isEqual:@"dat"]){
+			NSString *filePath = [unzipPath stringByAppendingPathComponent:file];
+			Day *report = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+			if (!report || !report.date) {
+				NSLog(@"Invalid report file: %@", file);
+			} else {
+				if (report.isWeek) {
+					importedWeeks++;
+					if (importedWeeks % 10 == 0)
+						NSLog(@"Imported week %i", importedWeeks);
+				} else {
+					importedDays++;
+					if (importedDays % 10 == 0)
+						NSLog(@"Imported day %i", importedDays);
+				}
+				report.wasLoadedFromDisk = NO;
+				[report generateSummary];
+				[[ReportManager sharedManager] importReport:report];
+			}
 		}
 	}
+	
 	[[ReportManager sharedManager] saveData];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
