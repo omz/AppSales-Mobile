@@ -52,6 +52,7 @@
 - (NSString *)docPath;
 - (NSString *)originalReportsPath;
 - (NSString *)reportCachePath;
+- (NSString *)appIDForAppName:(NSString *)appName;
 
 - (void)importReport:(Day *)report;
 - (void)deleteDay:(Day *)dayToDelete;
