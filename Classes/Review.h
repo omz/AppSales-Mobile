@@ -19,6 +19,7 @@
 	NSString *text;
 	NSString *version;
 	NSString *countryCode;
+	BOOL newOrUpdatedReview;
 }
 
 @property (nonatomic, retain) NSString *user;
@@ -29,5 +30,6 @@
 @property (nonatomic, assign) int stars;
 @property (nonatomic, retain) NSString *version;
 @property (nonatomic, retain) NSString *countryCode;
+@property (nonatomic, assign) BOOL newOrUpdatedReview;
 
 @end

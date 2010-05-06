@@ -61,7 +61,9 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
 	SingleReviewController *reviewController = [[[SingleReviewController alloc] init] autorelease];
-	reviewController.review = [reviews objectAtIndex:indexPath.row];
+	Review *review = [reviews objectAtIndex:indexPath.row];
+	reviewController.review = review;
+	review.newOrUpdatedReview = NO;
 	[self.navigationController pushViewController:reviewController animated:YES];
 }
 

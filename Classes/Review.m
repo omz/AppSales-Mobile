@@ -12,6 +12,7 @@
 @implementation Review
 
 @synthesize user, title, stars, reviewDate, downloadDate, text, version, countryCode;
+@synthesize newOrUpdatedReview;
 
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -24,6 +25,8 @@
 	self.text = [coder decodeObjectForKey:@"text"];
 	self.version = [coder decodeObjectForKey:@"version"];
 	self.countryCode = [coder decodeObjectForKey:@"countryCode"];
+	self.newOrUpdatedReview = [coder decodeBoolForKey:@"newOrUpdatedReview"];
+	
 	return self;
 }
 
@@ -42,6 +45,7 @@
 	[coder encodeObject:self.text forKey:@"text"];
 	[coder encodeObject:self.version forKey:@"version"];
 	[coder encodeObject:self.countryCode forKey:@"countryCode"];
+	[coder encodeBool:self.newOrUpdatedReview forKey:@"newOrUpdatedReview"];
 }
 
 - (void)dealloc

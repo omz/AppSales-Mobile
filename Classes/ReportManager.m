@@ -1189,14 +1189,10 @@
 	for (NSString *appID in [reviews allKeys]) {
 		App *app = [appsByID objectForKey:appID];
 		NSArray *allReviewsForApp = [reviews objectForKey:appID];
-		int oldNumberOfReviews = [app.reviewsByUser count];
 		for (Review *review in allReviewsForApp) {
-			Review *oldReview = [app.reviewsByUser objectForKey:review.user];
-			if ((oldReview == nil) || (![oldReview.text isEqual:review.text])) {
-				[app.reviewsByUser setObject:review forKey:review.user];
-			}
+			review.newOrUpdatedReview = YES;
+			[app.reviewsByUser setObject:review forKey:review.user];
 		}
-		app.newReviewsCount = [app.reviewsByUser count] - oldNumberOfReviews;
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedReviewsNotification object:self];
 	[self updateReviewDownloadProgress:@""];

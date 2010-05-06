@@ -11,7 +11,7 @@
 
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, newReviewsCount, allAppNames;
+@synthesize appID, appName, reviewsByUser, allAppNames;
 
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -45,6 +45,15 @@
 		sum += r.stars;
 	}
 	return sum / (float)[reviewsByUser count];
+}
+
+- (int)newReviewsCount {
+	int newReviewsCount = 0;
+	for(Review *r in [self.reviewsByUser allValues]){
+		if(r.newOrUpdatedReview)
+			newReviewsCount++;
+	}
+	return newReviewsCount;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder

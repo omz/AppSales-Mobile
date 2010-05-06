@@ -64,7 +64,11 @@
 {
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	Review *review = cell.review;
-	[[UIColor colorWithWhite:0.95 alpha:1.0] set];
+	if (review.newOrUpdatedReview) {
+		[[UIColor colorWithRed:0.85 green:0.85 blue:0.95 alpha:1.0] set];
+	} else {
+		[[UIColor colorWithWhite:0.95 alpha:1.0] set];
+	}
 	CGContextFillRect(c, CGRectMake(0,0,45,84));
 	
 	UIImage *flagImage = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", review.countryCode]];
