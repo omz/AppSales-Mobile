@@ -127,6 +127,25 @@
 	return sharedManager;
 }
 
+- (NSString *)appIDForAppName:(NSString *)appName {
+	for(App *app in [appsByID objectEnumerator]){
+		for(NSString *n in app.allAppNames){
+			if([n isEqualToString:appName])
+				return app.appID;
+		}
+	}
+	//search for the app with that name
+	for(Day *d in self.days){
+		NSString *appID = [d appIDForApp:appName];
+		if(appID){
+			App *app = [appsByID objectForKey:appID];
+			[app.allAppNames addObject:appName];
+			return appID;
+		}
+	}
+	return nil;
+}
+
 #pragma mark -
 #pragma mark Report Download
 

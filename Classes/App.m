@@ -11,7 +11,7 @@
 
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, newReviewsCount;
+@synthesize appID, appName, reviewsByUser, newReviewsCount, allAppNames;
 
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -19,7 +19,15 @@
 	self.appID = [coder decodeObjectForKey:@"appID"];
 	self.appName = [coder decodeObjectForKey:@"appName"];
 	self.reviewsByUser = [coder decodeObjectForKey:@"reviewsByUser"];
+	self.allAppNames = [coder decodeObjectForKey:@"allAppNames"];
 	return self;
+}
+
+- (NSMutableArray *)allAppNames {
+	if(!allAppNames){
+		self.allAppNames = [[NSMutableArray alloc] initWithObjects:self.appName, nil];
+	}
+	return allAppNames;
 }
 
 - (NSString *)description
@@ -44,6 +52,7 @@
 	[coder encodeObject:self.appID forKey:@"appID"];
 	[coder encodeObject:self.appName forKey:@"appName"];
 	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
+	[coder encodeObject:self.allAppNames forKey:@"allAppNames"];
 }
 
 - (void)dealloc
@@ -51,6 +60,7 @@
 	[appID release];
 	[appName release];
 	[reviewsByUser release];
+	[allAppNames release];
 	[super dealloc];
 }
 

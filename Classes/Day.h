@@ -71,9 +71,8 @@
 - (NSDate *)reportDateFromString:(NSString *)dateString;
 
 - (float)totalRevenueInBaseCurrency;
-- (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
-
-- (int)totalUnitsForApp:(NSString *)app;
+- (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
+- (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
 
 - (NSArray *)allProductNames;
@@ -89,5 +88,7 @@
 - (NSString *)proposedFilename;
 
 - (NSArray *)children;
+
+- (NSString *)appIDForApp:(NSString *)appName;
 
 @end

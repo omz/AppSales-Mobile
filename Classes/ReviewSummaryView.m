@@ -47,8 +47,9 @@
 		NSMutableDictionary *numberOfReviewsByStars = [NSMutableDictionary dictionary];
 		for (Review *review in [app.reviewsByUser allValues]) {
 			int numberOfReviews = [[numberOfReviewsByStars objectForKey:[NSNumber numberWithInt:review.stars]] intValue];
+			numberOfReviews++;
 			if (numberOfReviews > maxNumberOfReviews) maxNumberOfReviews = numberOfReviews;
-			[numberOfReviewsByStars setObject:[NSNumber numberWithInt:numberOfReviews+1] forKey:[NSNumber numberWithInt:review.stars]];
+			[numberOfReviewsByStars setObject:[NSNumber numberWithInt:numberOfReviews] forKey:[NSNumber numberWithInt:review.stars]];
 		}
 		
 		int i = 0;

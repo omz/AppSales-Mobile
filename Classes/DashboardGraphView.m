@@ -11,6 +11,7 @@
 #import "Day.h"
 #import "Country.h"
 #import "NSDateFormatter+SharedInstances.h"
+#import "ReportManager.h"
 
 @implementation DashboardGraphView
 
@@ -304,13 +305,13 @@
 		float revenue;
 		if (showsUnits) {
 			if (appFilter) {
-				revenue = (float)[d totalUnitsForApp:appFilter];
+				revenue = (float)[d totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]];
 			} else {
 				revenue = (float)[d totalUnits];
 			}
 		} else {
 			if (appFilter) {
-				revenue = [d totalRevenueInBaseCurrencyForApp:appFilter];
+				revenue = [d totalRevenueInBaseCurrencyForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]];
 			} else {
 				revenue = [d totalRevenueInBaseCurrency];
 			}
@@ -511,13 +512,13 @@
 	NSString *detailText = nil;
 	if (showsUnits) {
 		if (appFilter) {
-			detailText = [NSString stringWithFormat:@"%i × %@", [report totalUnitsForApp:appFilter], appFilter];
+			detailText = [NSString stringWithFormat:@"%i × %@", [report totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]], appFilter];
 		} else {
 			detailText = [NSString stringWithFormat:@"%i sales %@", [report totalUnits], [report description]];
 		}
 	} else {
 		if (appFilter) {
-			detailText = [NSString stringWithFormat:@"%@ (%i × %@)", [report totalRevenueStringForApp:appFilter], [report totalUnitsForApp:appFilter], appFilter];
+			detailText = [NSString stringWithFormat:@"%@ (%i × %@)", [report totalRevenueStringForApp:appFilter], [report totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]], appFilter];
 		} else {
 			detailText = [NSString stringWithFormat:@"%@ %@", [report totalRevenueString], [report description]];
 		}
