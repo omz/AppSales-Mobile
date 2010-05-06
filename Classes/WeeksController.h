@@ -31,8 +31,25 @@
 #import <UIKit/UIKit.h>
 #import "AbstractDayOrWeekController.h"
 
-@interface WeeksController : AbstractDayOrWeekController {
-
+@interface PrevisionReport : NSObject
+{
+	NSString *dayString;
+	NSString *weekEndDateString;
+	float revenue;
+	BOOL newMonth;
 }
+@property (nonatomic, retain) NSString *dayString;
+@property (nonatomic, retain) NSString *weekEndDateString;
+@property (nonatomic, assign) float revenue;
+@property (nonatomic, assign) BOOL newMonth;
+
+@end
+
+
+@interface WeeksController : AbstractDayOrWeekController {
+	BOOL onlySum;
+	PrevisionReport *previsionReport;
+}
+@property (nonatomic, retain) PrevisionReport *previsionReport;
 
 @end
