@@ -35,6 +35,8 @@
 #import "Entry.h"
 #import "Country.h"
 #import "AppIconManager.h"
+#import "ReportManager.h"
+#import "App.h"
 
 @implementation CountriesController
 
@@ -90,13 +92,14 @@
 	for (Country *c in countries) {
 		for (Entry *e in c.entries) {
 			if ([e transactionType] == 1) {
-				NSMutableDictionary *productInfo = [productInfos objectForKey:[e productName]];
+				NSString *name = [(App *)[[ReportManager sharedManager].appsByID objectForKey:[[ReportManager sharedManager] appIDForAppName:[e productName]]] appName];
+				NSMutableDictionary *productInfo = [productInfos objectForKey:name];
 				if (!productInfo) {
 					productInfo = [NSMutableDictionary dictionary];
 					[productInfo setObject:[NSNumber numberWithFloat:0.0] forKey:@"revenue"];
 					[productInfo setObject:[NSNumber numberWithInt:0] forKey:@"units"];
 					[productInfo setObject:[e productName] forKey:@"name"];
-					[productInfos setObject:productInfo forKey:[e productName]];
+					[productInfos setObject:productInfo forKey:name];
 				}
 				NSNumber *revenueOfProduct = [productInfo objectForKey:@"revenue"];
 				NSNumber *unitsOfProduct = [productInfo objectForKey:@"units"];
@@ -158,7 +161,7 @@
 		NSString *appName = [productInfo objectForKey:@"name"];
 		cell.productInfo = productInfo;
 		UIImage *appIcon = [[AppIconManager sharedManager] iconForAppNamed:appName];
-		if (appIcon != nil) [cell setAppIcon:appIcon];
+		[cell setAppIcon:appIcon];
 		return cell;
 	}
 }
