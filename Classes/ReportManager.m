@@ -135,7 +135,7 @@
 		}
 	}
 	//search for the app with that name
-	for(Day *d in self.days){
+	for(Day *d in [self.days allValues]){
 		NSString *appID = [d appIDForApp:appName];
 		if(appID){
 			App *app = [appsByID objectForKey:appID];
@@ -561,12 +561,17 @@
 			for (Entry *e in c.entries) {
 				NSString *appID = e.productIdentifier;
 				NSString *appName = e.productName;
-				if (appID && ![self.appsByID objectForKey:appID]) {
-					App *app = [[App new] autorelease];
-					app.appID = appID;
-					app.appName = appName;
-					app.reviewsByUser = [NSMutableDictionary dictionary];
-					[appsByID setObject:app forKey:appID];
+				if (appID){
+					App *app = [self.appsByID objectForKey:appID];
+					if(app) {
+						app.appName = appName;
+					}else{
+						App *app = [[App new] autorelease];
+						app.appID = appID;
+						app.appName = appName;
+						app.reviewsByUser = [NSMutableDictionary dictionary];
+						[appsByID setObject:app forKey:appID];
+					}
 				}
 			}
 		}
@@ -606,6 +611,25 @@
 
 - (void)importReport:(Day *)report
 {
+	for (Country *c in [report.countries allValues]) {
+		for (Entry *e in c.entries) {
+			NSString *appID = e.productIdentifier;
+			NSString *appName = e.productName;
+			if (appID){
+				App *app = [self.appsByID objectForKey:appID];
+				if(app) {
+					app.appName = appName;
+				}else{
+					App *app = [[App new] autorelease];
+					app.appID = appID;
+					app.appName = appName;
+					app.reviewsByUser = [NSMutableDictionary dictionary];
+					[appsByID setObject:app forKey:appID];
+				}
+			}
+		}
+	}
+	
 	if (report.isWeek) {
 		[weeks setObject:report forKey:report.date];
 	} else {

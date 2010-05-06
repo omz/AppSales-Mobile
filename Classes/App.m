@@ -17,9 +17,9 @@
 {
 	[super init];
 	self.appID = [coder decodeObjectForKey:@"appID"];
+	self.allAppNames = [coder decodeObjectForKey:@"allAppNames"];
 	self.appName = [coder decodeObjectForKey:@"appName"];
 	self.reviewsByUser = [coder decodeObjectForKey:@"reviewsByUser"];
-	self.allAppNames = [coder decodeObjectForKey:@"allAppNames"];
 	return self;
 }
 
@@ -28,6 +28,18 @@
 		self.allAppNames = [[NSMutableArray alloc] initWithObjects:self.appName, nil];
 	}
 	return allAppNames;
+}
+
+- (void)setAppName:(NSString *)n {
+	if(![n isEqualToString:appName]){
+		[appName release];
+		appName = [n retain];
+	}
+	for(NSString *name in self.allAppNames){
+		if([name isEqualToString:n])
+			return;
+	}
+	[self.allAppNames addObject:n];
 }
 
 - (NSString *)description
