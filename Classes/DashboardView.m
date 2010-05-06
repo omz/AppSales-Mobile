@@ -76,30 +76,39 @@
 {
 	if ([self.reports count] == 0) return;
 	
-	NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-	Day *d = nil;
-	int lastMonth = -1;
-	NSMutableArray *months = [NSMutableArray array];
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-	NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
-	[monthFormatter setDateFormat:@"MMMM yyyy"];
-	while (d = [backEnum nextObject]) {
-		NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-		int month = [comps month];
-		if (month != lastMonth) {
-			[months addObject:[monthFormatter stringFromDate:d.date]];
-			lastMonth = month;
+	if(self.showsWeeklyReports){
+		UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil] autorelease];
+		[sheet addButtonWithTitle:NSLocalizedString(@"Last 8 Weeks",nil)];
+		[sheet addButtonWithTitle:NSLocalizedString(@"All time",nil)];
+		[sheet showFromRect:[sender frame] inView:self animated:YES];
+	}else{
+		NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
+		Day *d = nil;
+		int lastMonth = -1;
+		NSMutableArray *months = [NSMutableArray array];
+		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+		NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
+		[monthFormatter setDateFormat:@"MMMM yyyy"];
+		while (d = [backEnum nextObject]) {
+			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
+			int month = [comps month];
+			if (month != lastMonth) {
+				[months addObject:[monthFormatter stringFromDate:d.date]];
+				lastMonth = month;
+			}
+			if ([months count] >= 3)
+				break;
 		}
-		if ([months count] >= 3)
-			break;
+		UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil] autorelease];
+		[sheet addButtonWithTitle:NSLocalizedString(@"Last 7 Days",nil)];
+		[sheet addButtonWithTitle:NSLocalizedString(@"Last 30 Days",nil)];
+		for (NSString *monthButton in months) {
+			[sheet addButtonWithTitle:monthButton];
+		}
+		[sheet addButtonWithTitle:NSLocalizedString(@"Last year", nil)];
+		[sheet addButtonWithTitle:NSLocalizedString(@"All time", nil)];
+		[sheet showFromRect:[sender frame] inView:self animated:YES];
 	}
-	UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil] autorelease];
-	[sheet addButtonWithTitle:NSLocalizedString(@"Last 7 Days",nil)];
-	[sheet addButtonWithTitle:NSLocalizedString(@"Last 30 Days",nil)];
-	for (NSString *monthButton in months) {
-		[sheet addButtonWithTitle:monthButton];
-	}
-	[sheet showFromRect:[sender frame] inView:self animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -108,127 +117,166 @@
 	
 	int fromIndex = 0;
 	int toIndex = 0;
-	if (buttonIndex == 0) {
-		//Last 7 days
-		toIndex = [self.reports count] - 1;
-		fromIndex = [self.reports count] - 7;
-		if (fromIndex < 0) fromIndex = 0;
-	}
-	else if (buttonIndex == 1) {
-		//Last 7 days
-		toIndex = [self.reports count] - 1;
-		fromIndex = [self.reports count] - 30;
-		if (fromIndex < 0) fromIndex = 0;
-	}
-	else if (buttonIndex == 2) {
-		//NSLog(@"This month");
-		fromIndex = [self.reports count] - 1;
-		toIndex = fromIndex;
-		NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-		Day *d = nil;
-		int lastMonth = -1;
-		int months = 0;
-		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
-			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-			int month = [comps month];
-			if (month != lastMonth) {
-				months++;
-			}
-			if (months > 1) {
-				break;
-			}
-			if ((months == 1) && (lastMonth != -1)) {
-				fromIndex--;
-			}
-			lastMonth = month;
+	if(self.showsWeeklyReports){
+		if (buttonIndex == 0) {
+			//Last 8 month
+			toIndex = [self.reports count] - 1;
+			fromIndex = [self.reports count] - 8;
+			if (fromIndex < 0) fromIndex = 0;
 		}
-	}
-	else if (buttonIndex == 3) {
-		//NSLog(@"Last month");
-		fromIndex = [self.reports count] - 1;
-		toIndex = fromIndex;
-		int i = toIndex;
-		NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-		Day *d = nil;
-		int lastMonth = -1;
-		int months = 0;
-		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
-			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-			int month = [comps month];
-			if (month != lastMonth) {
-				months++;
-				if (months == 2) {
-					toIndex = i;
+		else if (buttonIndex == 1) {
+			//All time
+			toIndex = [self.reports count] - 1;
+			fromIndex = 0;
+		}
+	}else{
+		if (buttonIndex == 0) {
+			//Last 7 days
+			toIndex = [self.reports count] - 1;
+			fromIndex = [self.reports count] - 7;
+			if (fromIndex < 0) fromIndex = 0;
+		}
+		else if (buttonIndex == 1) {
+			//Last 7 days
+			toIndex = [self.reports count] - 1;
+			fromIndex = [self.reports count] - 30;
+			if (fromIndex < 0) fromIndex = 0;
+		}
+		else if (buttonIndex == [actionSheet numberOfButtons]-2) {
+			//NSLog(@"Last year");
+			fromIndex = [self.reports count] - 1;
+			toIndex = fromIndex;
+			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
+			Day *d = nil;
+			int lastYear = -1;
+			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+			while (d = [backEnum nextObject]) {
+				NSDateComponents *comps = [gregorian components:NSYearCalendarUnit fromDate:d.date];
+				int y = [comps year];
+				if(lastYear == -1)
+					lastYear = y;
+				else if(lastYear != y){
+					fromIndex++;
+					break;
 				}
-			}
-			if (months == 3) {
-				break;
-			}
-			if ((months <= 2) && (lastMonth != -1)) {
 				fromIndex--;
 			}
-			lastMonth = month;
-			i--;
 		}
-	}
-	else if (buttonIndex == 4) {
-		//NSLog(@"Two months ago");
-		fromIndex = [self.reports count] - 1;
-		toIndex = fromIndex;
-		int i = toIndex;
-		NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-		Day *d = nil;
-		int lastMonth = -1;
-		int months = 0;
-		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
-			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-			int month = [comps month];
-			if (month != lastMonth) {
-				months++;
+		else if (buttonIndex == [actionSheet numberOfButtons]-1) {
+			//NSLog(@"All time");
+			fromIndex = 0;
+			toIndex = [self.reports count]-1;
+		}
+		else if (buttonIndex == 2) {
+			//NSLog(@"This month");
+			fromIndex = [self.reports count] - 1;
+			toIndex = fromIndex;
+			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
+			Day *d = nil;
+			int lastMonth = -1;
+			int months = 0;
+			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+			while (d = [backEnum nextObject]) {
+				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
+				int month = [comps month];
+				if (month != lastMonth) {
+					months++;
+				}
+				if (months > 1) {
+					break;
+				}
+				if ((months == 1) && (lastMonth != -1)) {
+					fromIndex--;
+				}
+				lastMonth = month;
+			}
+		}
+		else if (buttonIndex == 3) {
+			//NSLog(@"Last month");
+			fromIndex = [self.reports count] - 1;
+			toIndex = fromIndex;
+			int i = toIndex;
+			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
+			Day *d = nil;
+			int lastMonth = -1;
+			int months = 0;
+			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+			while (d = [backEnum nextObject]) {
+				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
+				int month = [comps month];
+				if (month != lastMonth) {
+					months++;
+					if (months == 2) {
+						toIndex = i;
+					}
+				}
 				if (months == 3) {
-					toIndex = i;
+					break;
 				}
+				if ((months <= 2) && (lastMonth != -1)) {
+					fromIndex--;
+				}
+				lastMonth = month;
+				i--;
 			}
-			if (months == 4) {
-				break;
-			}
-			if ((months <= 3) && (lastMonth != -1)) {
-				fromIndex--;
-			}
-			lastMonth = month;
-			i--;
 		}
-	}
-	else if (buttonIndex == 5) {
-		//NSLog(@"Three months ago");
-		fromIndex = [self.reports count] - 1;
-		toIndex = fromIndex;
-		int i = toIndex;
-		NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-		Day *d = nil;
-		int lastMonth = -1;
-		int months = 0;
-		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
-			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-			int month = [comps month];
-			if (month != lastMonth) {
-				months++;
-				if (months == 4) {
-					toIndex = i;
+		else if (buttonIndex == 4) {
+			//NSLog(@"Two months ago");
+			fromIndex = [self.reports count] - 1;
+			toIndex = fromIndex;
+			int i = toIndex;
+			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
+			Day *d = nil;
+			int lastMonth = -1;
+			int months = 0;
+			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+			while (d = [backEnum nextObject]) {
+				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
+				int month = [comps month];
+				if (month != lastMonth) {
+					months++;
+					if (months == 3) {
+						toIndex = i;
+					}
 				}
+				if (months == 4) {
+					break;
+				}
+				if ((months <= 3) && (lastMonth != -1)) {
+					fromIndex--;
+				}
+				lastMonth = month;
+				i--;
 			}
-			if (months == 5) {
-				break;
+		}
+		else if (buttonIndex == 5) {
+			//NSLog(@"Three months ago");
+			fromIndex = [self.reports count] - 1;
+			toIndex = fromIndex;
+			int i = toIndex;
+			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
+			Day *d = nil;
+			int lastMonth = -1;
+			int months = 0;
+			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+			while (d = [backEnum nextObject]) {
+				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
+				int month = [comps month];
+				if (month != lastMonth) {
+					months++;
+					if (months == 4) {
+						toIndex = i;
+					}
+				}
+				if (months == 5) {
+					break;
+				}
+				if ((months <= 4) && (lastMonth != -1)) {
+					fromIndex--;
+				}
+				lastMonth = month;
+				i--;
 			}
-			if ((months <= 4) && (lastMonth != -1)) {
-				fromIndex--;
-			}
-			lastMonth = month;
-			i--;
 		}
 	}
 	
@@ -245,12 +293,12 @@
 	showsWeeklyReports = flag;
 	if (showsWeeklyReports) {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
-		calendarButton.hidden = YES;
-		viewReportsButton.frame = CGRectMake(24, 250, 209, 47);
+		//calendarButton.hidden = YES;
+		//viewReportsButton.frame = CGRectMake(24, 250, 209, 47);
 	} else {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ReportManagerDownloadedDailyReportsNotification object:nil];		
-		calendarButton.hidden = NO;
-		viewReportsButton.frame = CGRectMake(84, 250, 149, 47);
+		//calendarButton.hidden = NO;
+		//viewReportsButton.frame = CGRectMake(84, 250, 149, 47);
 	}
 	graphView.showsWeeklyReports = flag;
 }
@@ -259,7 +307,7 @@
 {
 	if (!self.reports || [reports count] == 0) return;
 	
-	int fromRow = [reports count] - 7;
+	int fromRow = [reports count] - (self.showsWeeklyReports ? 8 : 7);
 	if (fromRow < 0) fromRow = 0;
 	int toRow = [reports count] - 1;
 	if (toRow < 0) toRow = 0;
