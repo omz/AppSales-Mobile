@@ -75,6 +75,11 @@
 	self.toolbarItems = [NSArray arrayWithObjects:downloadButton, flexSpace, statusItem, flexSpace, activityItem, nil];
 }
 
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
+}
+
 - (void)downloadReviews
 {
 	if ([[ReportManager sharedManager] isDownloadingReviews])

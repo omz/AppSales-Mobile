@@ -20,6 +20,11 @@
 	self.tableView.rowHeight = 85.0;
 }
 
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
+}
+
 #pragma mark Table view methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 

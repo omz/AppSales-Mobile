@@ -12,6 +12,7 @@
 #import "App.h"
 #import "Review.h"
 #import "ReviewsListController.h"
+#import "ReviewsController.h"
 
 @implementation ReviewsPane
 
@@ -40,7 +41,7 @@
 		[self addSubview:activityIndicator];
 		
 		UIButton *downloadReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		downloadReviewsButton.frame = CGRectMake(24, 250, 209, 47);
+		downloadReviewsButton.frame = CGRectMake(24+169+11, 250, 209, 47);
 		[downloadReviewsButton setBackgroundImage:[[UIImage imageNamed:@"PaneButtonNormal.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0] forState:UIControlStateNormal];
 		[downloadReviewsButton setBackgroundImage:[[UIImage imageNamed:@"PaneButtonHighlighted.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0] forState:UIControlStateHighlighted];
 		[downloadReviewsButton setTitle:NSLocalizedString(@"Download Reviews",nil) forState:UIControlStateNormal];
@@ -53,6 +54,21 @@
 		downloadReviewsButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
 		[downloadReviewsButton addTarget:self action:@selector(downloadReviews:) forControlEvents:UIControlEventTouchUpInside];
 		[self addSubview:downloadReviewsButton];
+		
+		UIButton *reviewsControllerButton = [UIButton buttonWithType:UIButtonTypeCustom];
+		reviewsControllerButton.frame = CGRectMake(24, 250, 169, 47);
+		[reviewsControllerButton setBackgroundImage:[[UIImage imageNamed:@"PaneButtonNormal.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0] forState:UIControlStateNormal];
+		[reviewsControllerButton setBackgroundImage:[[UIImage imageNamed:@"PaneButtonHighlighted.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0] forState:UIControlStateHighlighted];
+		[reviewsControllerButton setTitle:NSLocalizedString(@"Show Reviews",nil) forState:UIControlStateNormal];
+		[reviewsControllerButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+		[reviewsControllerButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateHighlighted];
+		[reviewsControllerButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+		[reviewsControllerButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+		reviewsControllerButton.titleLabel.frame = reviewsControllerButton.bounds;
+		reviewsControllerButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
+		reviewsControllerButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
+		[reviewsControllerButton addTarget:self action:@selector(showReviewsController:) forControlEvents:UIControlEventTouchUpInside];
+		[self addSubview:reviewsControllerButton];
 		
 		[self reload];
 		
@@ -102,7 +118,6 @@
 	listController.reviews = [allReviews sortedArrayUsingDescriptors:[NSArray arrayWithObjects:reviewSorter1, reviewSorter2, reviewSorter3, nil]];
 	listController.hidesBottomBarWhenPushed = YES;
 	listController.title = app.appName;
-	listController.contentSizeForViewInPopover = CGSizeMake(320, 480);
 	UINavigationController *reviewListNavigationController = [[[UINavigationController alloc] initWithRootViewController:listController] autorelease];
 	self.reviewsPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:reviewListNavigationController] autorelease];
 	
@@ -121,6 +136,15 @@
 	[sheet showFromRect:[sender frame] inView:self animated:YES];
 }
 
+- (void)showReviewsController:(id)sender
+{
+	ReviewsController *reviewsController = [[[ReviewsController alloc] initWithStyle:UITableViewStylePlain] autorelease];
+	UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:reviewsController] autorelease];
+	self.reviewsPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:nav] autorelease];
+	
+	CGRect fromRect = [(UIView *)sender frame];
+	[reviewsPopover presentPopoverFromRect:fromRect inView:[sender superview] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+}
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
