@@ -17,6 +17,7 @@
 #import "ReviewsPane.h"
 #import "App.h"
 #import "HelpBrowser.h"
+#import "CalculatorView.h"
 
 @implementation PadRootViewController
 
@@ -52,11 +53,13 @@
 	UIBarButtonItem *spaceItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil] autorelease];
 	spaceItem.width = 32.0;
 	
+	UIBarButtonItem *calculatorItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TB_Calculator.png"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleCalculator:)] autorelease];
+	
 	UIBarButtonItem *graphTypeItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TB_Graphs.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectGraphType:)] autorelease];
 	self.filterItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"TB_Filter.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectFilter:)] autorelease];
 	self.toolbar = [[[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, bounds.size.width, 44)] autorelease];
 	toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	toolbar.items = [NSArray arrayWithObjects:refreshItem, flexItem, activityIndicatorItem, statusItem, flexItem, graphTypeItem, spaceItem, filterItem, spaceItem, spaceItem, spaceItem, importExportItem, spaceItem, settingsItem, spaceItem, aboutItem, nil];
+	toolbar.items = [NSArray arrayWithObjects:refreshItem, flexItem, activityIndicatorItem, statusItem, flexItem, calculatorItem, spaceItem, spaceItem, graphTypeItem, spaceItem, filterItem, spaceItem, spaceItem, spaceItem, importExportItem, spaceItem, settingsItem, spaceItem, aboutItem, nil];
 	[self.view addSubview:toolbar];
 	
 	self.dailyDashboardView = [[[DashboardView alloc] initWithFrame:CGRectMake(0, 47, 748, 320)] autorelease];
@@ -117,6 +120,33 @@
 		weeklyDashboardView.frame = weeklyFrame;
 		
 		reviewsPane.frame = CGRectMake(0, 683+320, 768, 320);
+	}
+}
+
+- (void)toggleCalculator:(id)sender
+{
+	if (!calculator) {
+		CGSize calculatorSize = CGSizeMake(280,357);
+		CGRect calculatorFrame = CGRectMake((int)(self.view.bounds.size.width/2 - calculatorSize.width/2), (int)(self.view.bounds.size.height/2 - calculatorSize.height/2), calculatorSize.width, calculatorSize.height);
+		calculator = [[[CalculatorView alloc] initWithFrame:calculatorFrame] autorelease];
+		calculator.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+		[self.view addSubview:calculator];
+		
+		CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform"];
+		animation.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+		animation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.1, 1.1, 1.0)];
+		animation.duration = 0.15;
+		animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+		animation.autoreverses = YES;
+		animation.removedOnCompletion = YES;
+		[calculator.layer addAnimation:animation forKey:@"bounce"];
+	} else {
+		[UIView beginAnimations:@"hideCalculator" context:nil];
+		calculator.transform = CGAffineTransformMakeScale(0.5,0.5);
+		calculator.alpha = 0.0;
+		[UIView commitAnimations];
+		[calculator performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.5];
+		calculator = nil;
 	}
 }
 

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class DashboardView, ReviewsPane;
+@class DashboardView, ReviewsPane, CalculatorView;
 
 @interface PadRootViewController : UIViewController <UIActionSheetDelegate> {
 
@@ -22,10 +22,11 @@
 	UIBarButtonItem *filterItem;
 	UIActionSheet *filterSheet;
 	
-	
 	DashboardView *dailyDashboardView;
 	DashboardView *weeklyDashboardView;
 	ReviewsPane *reviewsPane;
+	
+	CalculatorView *calculator;
 }
 
 @property (nonatomic, retain) UIToolbar *toolbar;
