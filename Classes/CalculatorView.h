@@ -44,6 +44,7 @@ typedef enum ButtonType {
 - (int)firstOperatorPrecedence;
 - (int)precedenceForOperator:(NSString *)op;
 - (void)evaluateStack;
+- (void)partialEvaluateStack;
 - (TokenType)tokenTypeFor:(NSString *)tokenString;
 - (ButtonType)buttonTypeFor:(NSString *)buttonTitle;
 

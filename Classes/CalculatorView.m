@@ -282,8 +282,11 @@
 	if (buttonType == ButtonTypeOperator) {
 		if (lastTokenType == TokenTypeOperand) {
 			int currentOpPrecedence = [self precedenceForOperator:title];
-			if ([self numberOfOperatorsOnStack] > 1 || [self firstOperatorPrecedence] >= currentOpPrecedence) {
+			if ([self firstOperatorPrecedence] >= currentOpPrecedence) {
 				[self evaluateStack];
+				[self setDisplay:[stack lastObject]];
+			}else if([self numberOfOperatorsOnStack] > 1){
+				[self partialEvaluateStack];
 				[self setDisplay:[stack lastObject]];
 			}
 			[stack addObject:title];
@@ -342,7 +345,7 @@
 			[stack addObject:NSLocalizedString(@"Error",nil)];
 		}
 	}
-	if ([stack count] == 5) {
+	while ([stack count] >= 5) {
 		double n1 = [[stack objectAtIndex:0] doubleValue];
 		double n2 = [[stack objectAtIndex:2] doubleValue];
 		double n3 = [[stack objectAtIndex:4] doubleValue];
@@ -359,13 +362,29 @@
 				partialResult = n2 / n3;
 			}
 		}
-		double result;
-		if ([operator1 isEqual:@"+"]) {
-			result = n1 + partialResult;
-		} else {
-			result = n1 - partialResult;
+		if(error){
+			[stack removeAllObjects];
+			[stack addObject:NSLocalizedString(@"Error",nil)];
 		}
-		if (!error) {
+		
+		if([stack count] > 5){
+			[stack removeObjectsInRange:NSMakeRange(2, 3)];
+			
+			NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+			[numberFormatter setMinimumFractionDigits:0];
+			[numberFormatter setMaximumFractionDigits:10];
+			[numberFormatter setMinimumIntegerDigits:1];
+			NSString *resultString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:partialResult]];
+			
+			[stack insertObject:resultString atIndex:2];
+		}else{
+			double result;
+			if ([operator1 isEqual:@"+"]) {
+				result = n1 + partialResult;
+			} else {
+				result = n1 - partialResult;
+			}
+			
 			NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 			[numberFormatter setMinimumFractionDigits:0];
 			[numberFormatter setMaximumFractionDigits:10];
@@ -373,11 +392,45 @@
 			NSString *resultString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:result]];
 			[stack removeAllObjects];
 			[stack addObject:resultString];
-		} else {
-			[stack removeAllObjects];
-			[stack addObject:NSLocalizedString(@"Error",nil)];
 		}
 	}
+}
+
+- (void)partialEvaluateStack {
+	if ([self tokenTypeFor:[stack lastObject]] == TokenTypeOperator) {
+		[stack removeLastObject];
+	}
+	if([stack count] != 5)
+		return;
+	
+	double n2 = [[stack objectAtIndex:2] doubleValue];
+	double n3 = [[stack objectAtIndex:4] doubleValue];
+	NSString *operator2 = [stack objectAtIndex:3];
+	double partialResult = 0.0;
+	BOOL error = NO;
+	if ([operator2 isEqual:@"×"]) {
+		partialResult = n2 * n3;
+	} else {
+		if (n3 == 0) {
+			error = YES;
+		} else {
+			partialResult = n2 / n3;
+		}
+	}
+	if(error){
+		[stack removeAllObjects];
+		[stack addObject:NSLocalizedString(@"Error",nil)];
+	}
+	
+	[stack removeObjectsInRange:NSMakeRange(2, 3)];
+	
+	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[numberFormatter setMinimumFractionDigits:0];
+	[numberFormatter setMaximumFractionDigits:10];
+	[numberFormatter setMinimumIntegerDigits:1];
+	NSString *resultString = [numberFormatter stringFromNumber:[NSNumber numberWithDouble:partialResult]];
+	
+	[stack insertObject:resultString atIndex:2];
 }
 
 - (int)firstOperatorPrecedence
