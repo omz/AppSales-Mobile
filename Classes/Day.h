@@ -29,48 +29,65 @@
  */
 
 #import <UIKit/UIKit.h>
+
+#define kSummaryDate	@"date"
+#define kSummarySales	@"sales"
+#define kSummaryRevenue	@"revenue"
+#define kSummaryIsWeek	@"isWeek"
+
 @class Country;
 
+
 @interface Day : NSObject {
-	//NSLock *lock_countries;
-	NSMutableDictionary *countries;
+	
 	NSDate *date;
-	NSString *cachedWeekEndDateString;
-	UIColor *cachedWeekDayColor;
-	NSString *cachedDayString;
+	NSMutableDictionary *countries;
+	
 	BOOL isWeek;
 	BOOL wasLoadedFromDisk;
 	NSString *pathOnDisk;
 	
-	NSString *name;
+	BOOL isFault;
+	NSDictionary *summary;
 }
 
 @property (nonatomic, retain) NSDate *date;
 @property (nonatomic, retain) NSMutableDictionary *countries;
-@property (nonatomic, retain) NSString *cachedWeekEndDateString;
-@property (nonatomic, retain) UIColor *cachedWeekDayColor;
-@property (nonatomic, retain) NSString *cachedDayString;
 @property (nonatomic, assign) BOOL isWeek;
 @property (nonatomic, assign) BOOL wasLoadedFromDisk;
-@property (nonatomic, retain) NSString *name;
 @property (nonatomic, retain) NSString *pathOnDisk;
 
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath;
+@property (nonatomic, assign) BOOL isFault;
+@property (nonatomic, retain) NSDictionary *summary;
+
 
 - (id)initWithCSV:(NSString *)csv;
+
+- (void)generateSummary;
++ (Day *)dayWithSummary:(NSDictionary *)reportSummary;
+
 - (Country *)countryNamed:(NSString *)countryName;
-- (void)setDateString:(NSString *)dateString;
+
+- (NSDate *)reportDateFromString:(NSString *)dateString;
+
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForApp:(NSString *)app;
+
 - (int)totalUnitsForApp:(NSString *)app;
 - (int)totalUnits;
+
 - (NSArray *)allProductNames;
+
 - (NSString *)dayString;
 - (NSString *)weekdayString;
 - (NSString *)weekEndDateString;
-- (NSString *)totalRevenueString;
 - (UIColor *)weekdayColor;
+
+- (NSString *)totalRevenueString;
+- (NSString *)totalRevenueStringForApp:(NSString *)appName;
+
 - (NSString *)proposedFilename;
+
 - (NSArray *)children;
 
 @end

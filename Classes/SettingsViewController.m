@@ -32,6 +32,7 @@ AppSalesMobile
 #import "CurrencyManager.h"
 #import "CurrencySelectionDialog.h"
 #import "SFHFKeychainUtils.h"
+#import "UIDevice+iPad.h"
 
 @implementation SettingsViewController
 
@@ -43,8 +44,25 @@ AppSalesMobile
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
+
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
-	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+
+	if ([[UIDevice currentDevice] isPad]) {
+		/* On the iPad, groupTableViewBackgroundColor displays black, not the correct iPad-gray color, for us.
+		 * However, a minimal application which just uses the color as a view background doesn't show the same problem.
+		 * Something funky is here. We'll just work around it for now. -evands */
+		
+		UITableView *backgroundTableView = [[[UITableView alloc] initWithFrame:self.view.bounds
+																		 style:UITableViewStyleGrouped] autorelease];
+		backgroundTableView.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth);
+		[self.view addSubview:backgroundTableView];
+		[self.view sendSubviewToBack:backgroundTableView];		
+	} else {
+	 self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+	}
+	
+	NSLog(@"%@", [UIColor groupTableViewBackgroundColor]);
+
 	explanationsLabel.font = [UIFont systemFontOfSize:12.0];
 	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours.\n\nAll information is presented without any warranties.\n\nThe presented market trend reports should not be considered to be your monthly royalty reports.",nil);
 	copyrightLabel.font = [UIFont systemFontOfSize:12.0];
@@ -119,6 +137,9 @@ AppSalesMobile
 {
 	CurrencySelectionDialog *currencySelectionDialog = [[CurrencySelectionDialog new] autorelease];
 	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:currencySelectionDialog] autorelease];
+	if ([[UIDevice currentDevice] isPad]) {
+		navController.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
 	[self presentModalViewController:navController animated:YES];
 }
 

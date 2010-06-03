@@ -37,7 +37,7 @@
 	UILabel *revenueLabel;
 	UILabel *countryLabel;
 	UILabel *detailsLabel;
-	UIView *graphView;
+	UIImageView *graphView;
 	UILabel *graphLabel;
 	float totalRevenue;
 	Country *country;	

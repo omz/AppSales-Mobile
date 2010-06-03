@@ -16,6 +16,8 @@
 #import "SFHFKeychainUtils.h"
 #import "App.h"
 #import "Review.h"
+#import "NSData+Compression.h"
+#import "ProgressHUD.h"
 
 @implementation ReportManager
 
@@ -38,35 +40,12 @@
 		self.appsByID = [NSMutableDictionary dictionary];
 	}
 	
-	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
-
-	NSCalendar *calendar = [NSCalendar currentCalendar];
-	
-	for (NSString *filename in filenames) {
-		if (![[filename pathExtension] isEqual:@"dat"])
-			continue;
-		
-		Day *loadedDay = [Day dayFromFile:filename atPath:docPath];
-		
-		if (loadedDay != nil) {
-			if (loadedDay.isWeek)
-				[self.weeks setObject:loadedDay forKey:[loadedDay name]];
-			else
-			{
-				if (loadedDay.date)
-				{
-					NSDateComponents *components = [calendar components:(NSWeekdayCalendarUnit | NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit) fromDate:loadedDay.date];
-					NSDate *loadedDate = [calendar dateFromComponents:components];
-					NSDateFormatter * lFormat = [NSDateFormatter new];
-					[lFormat setDateFormat:@"MM/dd/yyyy"];
-					NSDate *lDate = [lFormat dateFromString:[loadedDay name]];
-					[lFormat release];
-					NSTimeInterval lInterval = [lDate timeIntervalSinceDate:loadedDay.date];
-					if (lInterval < 12*60*60 && lInterval > -12*60*60)
-						[self.days setObject:loadedDay forKey:[loadedDay name]];
-				}
-			}
-		}
+	BOOL cacheLoaded = [self loadReportCache];
+	if (!cacheLoaded) {
+		[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Updating Cache...",nil)];
+		[[ProgressHUD sharedHUD] show];
+		NSString *reportCacheFile = [self reportCachePath];
+		[self performSelectorInBackground:@selector(generateReportCache:) withObject:reportCacheFile];
 	}
 	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
@@ -74,6 +53,69 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveData) name:UIApplicationWillTerminateNotification object:nil];
 	
 	return self;
+}
+
+- (BOOL)loadReportCache
+{
+	NSString *reportCacheFile = [self reportCachePath];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:reportCacheFile]) {
+		return NO;
+	}
+	NSDictionary *reportCache = [NSKeyedUnarchiver unarchiveObjectWithFile:reportCacheFile];
+	if (!reportCache) {
+		return NO;
+	}
+	
+	for (NSDictionary *weekSummary in [[reportCache objectForKey:@"weeks"] allValues]) {
+		Day *weekReport = [Day dayWithSummary:weekSummary];
+		[weeks setObject:weekReport forKey:weekReport.date];
+	}
+	for (NSDictionary *daySummary in [[reportCache objectForKey:@"days"] allValues]) {
+		Day *dayReport = [Day dayWithSummary:daySummary];
+		[days setObject:dayReport forKey:dayReport.date];
+	}
+	
+	return YES;
+}
+
+- (void)generateReportCache:(NSString *)reportCacheFile
+{
+	NSAutoreleasePool *pool = [NSAutoreleasePool new];
+	
+	NSLog(@"Generating report cache for the first time");
+	
+	NSString *docPath = [reportCacheFile stringByDeletingLastPathComponent];
+	
+	NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
+	NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
+	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
+	for (NSString *filename in filenames) {
+		if (![[filename pathExtension] isEqual:@"dat"]) continue;
+		NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
+		Day *report = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+		if (report != nil) {
+			[report generateSummary];
+			if (report.date) {
+				if (report.isWeek) {
+					[weeksCache setObject:report.summary forKey:report.date];
+				} else  {
+					[daysCache setObject:report.summary forKey:report.date];
+				}
+			}
+		}
+	}
+	NSDictionary *reportCache = [NSDictionary dictionaryWithObjectsAndKeys:
+								 weeksCache, @"weeks",
+								 daysCache, @"days", nil];
+	[NSKeyedArchiver archiveRootObject:reportCache toFile:reportCacheFile];
+	[self performSelectorOnMainThread:@selector(finishGenerateReportCache:) withObject:reportCache waitUntilDone:YES];
+	[pool release];
+}
+
+- (void)finishGenerateReportCache:(NSDictionary *)generatedCache
+{
+	[[ProgressHUD sharedHUD] hide];
+	[self loadReportCache];
 }
 
 + (ReportManager *)sharedManager
@@ -85,17 +127,8 @@
 	return sharedManager;
 }
 
-- (void)deleteDay:(Day *)dayToDelete
-{
-	NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[dayToDelete proposedFilename]];
-	[[NSFileManager defaultManager] removeItemAtPath:fullPath error:NULL];
-	if (dayToDelete.isWeek) {
-		[self.weeks removeObjectForKey:dayToDelete.name];
-	}
-	else {
-		[self.days removeObjectForKey:dayToDelete.name];
-	}
-}
+#pragma mark -
+#pragma mark Report Download
 
 - (BOOL)isDownloadingReports
 {
@@ -128,17 +161,36 @@
 							  username, @"username", 
 							  password, @"password", 
 							  weeksToSkip, @"weeksToSkip", 
-							  daysToSkip, @"daysToSkip", nil];
+							  daysToSkip, @"daysToSkip", 
+							  [self originalReportsPath], @"originalReportsPath", nil];
 	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo:) withObject:userInfo];
 }
 
 - (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
+	
+	NSArray *daysToSkipDates = [userInfo objectForKey:@"daysToSkip"];
+	NSArray *weeksToSkipDates = [userInfo objectForKey:@"weeksToSkip"];
+	NSMutableArray *daysToSkip = [NSMutableArray array];
+	NSMutableArray *weeksToSkip = [NSMutableArray array];
+	NSDateFormatter *nameFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	[nameFormatter setDateFormat:@"MM/dd/yyyy"];
+	for (NSDate *date in daysToSkipDates) {
+		NSString *dayName = [nameFormatter stringFromDate:date];
+		[daysToSkip addObject:dayName];
+	}
+	for (NSDate *date in weeksToSkipDates) {
+		NSDate *toDate = [[[NSDate alloc] initWithTimeInterval:60*60*24*6.5 sinceDate:date] autorelease];
+		NSString *weekName = [nameFormatter stringFromDate:toDate];//[NSString stringWithFormat:@"%@ To %@", [nameFormatter stringFromDate:date], [nameFormatter stringFromDate:toDate]];
+		[weeksToSkip addObject:weekName];
+	}
+	
 	NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];
 	
 	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:YES];
 	
+	NSString *originalReportsPath = [userInfo objectForKey:@"originalReportsPath"];
 	NSString *username = [userInfo objectForKey:@"username"];
 	NSString *password = [userInfo objectForKey:@"password"];
 	
@@ -148,6 +200,8 @@
 	
 	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Logging in...",nil) waitUntilDone:YES];
 	
+	if (!loginPage)
+		NSLog(@"No login page");
 	NSScanner *scanner = [NSScanner scannerWithString:loginPage];
 	NSString *loginAction = nil;
 	[scanner scanUpToString:@"method=\"post\" action=\"" intoString:NULL];
@@ -177,6 +231,8 @@
 	
 	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Downloading Daily Reports...",nil) waitUntilDone:YES];
 	
+	if (!dateTypeSelectionPage)
+		NSLog(@"No dateTypeSelectionPage");
 	scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
 	
 	// check if page is "choose vendor" page (Patch by Christian Beer, thanks!)
@@ -215,6 +271,9 @@
 			}
 			NSString *chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
 			
+			if (!chooseVendorSelectionPage)
+				NSLog(@"No chooseVendorSelectionPage");
+
 			scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
 			[scanner scanUpToString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
 			NSString *chooseVendorAction2 = nil;
@@ -243,6 +302,9 @@
 			}
 			chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];			
 			
+			if (!chooseVendorSelectionPage)
+				NSLog(@"No chooseVendorSelectionPage");
+
 			scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
 			[scanner scanUpToString:@"<td class=\"content\">" intoString:NULL];
 			[scanner scanUpToString:@"<a href=\"" intoString:NULL];
@@ -265,16 +327,42 @@
 	}
 	
 	//NSLog(@"%@", dateTypeSelectionPage);
+	if (!dateTypeSelectionPage)
+		NSLog(@"No dateTypeSelectionPage");
+
 	scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
 	NSString *dateTypeAction = nil;
 	[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
 	[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
 	[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
 	if (dateTypeAction == nil) {
-		NSLog(@"Error: couldn't select date type");
-		[pool release];
-		[self performSelectorOnMainThread:@selector(downloadFailed) withObject:nil waitUntilDone:YES];
-		return;
+		//Check if we are on the "Sales/Trend Reporting Maintenance Notice" page, if so,
+		//follow the "Click here to continue with Sales/Trend Module" link...
+		[scanner setScanLocation:0];
+		[scanner scanUpToString:@"<a href=\"/cgi-bin/WebObjects/Piano" intoString:NULL];
+		[scanner scanUpToString:@"\"" intoString:NULL];
+		[scanner scanString:@"\"" intoString:NULL];
+		NSString *salesModuleURL = nil;
+		[scanner scanUpToString:@"\"" intoString:&salesModuleURL];
+		if (salesModuleURL) {
+			salesModuleURL = [ittsBaseURL stringByAppendingString:salesModuleURL];
+			NSData *salesModuleData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:salesModuleURL]] returningResponse:NULL error:NULL];
+			dateTypeSelectionPage = [[[NSString alloc] initWithData:salesModuleData encoding:NSUTF8StringEncoding] autorelease];
+			
+			if (!dateTypeSelectionPage)
+				NSLog(@"No dateTypeSelectionPage");
+			
+			scanner = [NSScanner scannerWithString:dateTypeSelectionPage];
+			[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+			[scanner scanString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
+			[scanner scanUpToString:@"\"" intoString:&dateTypeAction];
+		}
+		if (dateTypeAction == nil) {
+			NSLog(@"Could not select date type");
+			[pool release];
+			[self performSelectorOnMainThread:@selector(downloadFailed) withObject:nil waitUntilDone:YES];
+			return;
+		}
 	}
 	
 	NSString *errorMessageString = nil;
@@ -312,11 +400,16 @@
 		NSData *daySelectionPageData = [NSURLConnection sendSynchronousRequest:dateTypeRequest returningResponse:NULL error:NULL];
 		
 		if (daySelectionPageData == nil) {
+			NSLog(@"Could not load day selection page");
 			[pool release];
 			[self performSelectorOnMainThread:@selector(downloadFailed) withObject:nil waitUntilDone:YES];
 			return;
 		}
 		NSString *daySelectionPage = [[[NSString alloc] initWithData:daySelectionPageData encoding:NSUTF8StringEncoding] autorelease];
+		//NSLog(@"day selection page: %@", daySelectionPage);
+		if (!daySelectionPage)
+			NSLog(@"No daySelectionPage");
+
 		scanner = [NSScanner scannerWithString:daySelectionPage];
 		NSMutableArray *availableDays = [NSMutableArray array];
 		BOOL scannedDay = YES;
@@ -334,16 +427,19 @@
 				scannedDay = NO;
 			}
 		}
-		
+		//NSLog(@"Available %@: %@", ((i==0) ? (@"Days") : (@"Weeks")), availableDays);
+		//NSLog(@"To skip: %@", ((i==0) ? (daysToSkip) : (weeksToSkip)));
 		if (i==0) { //daily
-			NSArray *daysToSkip = [userInfo objectForKey:@"daysToSkip"];
 			[availableDays removeObjectsInArray:daysToSkip];			
 		}
 		else { //weekly
-			NSArray *weeksToSkip = [userInfo objectForKey:@"weeksToSkip"];
 			[availableDays removeObjectsInArray:weeksToSkip];
 		}
 		int numberOfDays = [availableDays count];
+		
+		if (!daySelectionPage)
+			NSLog(@"No daySelectionPage");
+
 		scanner = [NSScanner scannerWithString:daySelectionPage];
 		NSString *dayDownloadAction = nil;
 		[scanner scanUpToString:@"name=\"frmVendorPage\" action=\"" intoString:NULL];
@@ -357,6 +453,13 @@
 		NSString *dayDownloadActionURLString = [ittsBaseURL stringByAppendingString:dayDownloadAction];
 		int dayNumber = 1;
 		for (NSString *dayString in availableDays) {
+			NSString *status = @"";
+			if (i != 0) {
+				status = [NSString stringWithFormat:NSLocalizedString(@"Weekly Report %i of %i", nil), dayNumber, numberOfDays];
+			} else {
+				status = [NSString stringWithFormat:NSLocalizedString(@"Daily Report %i of %i", nil), dayNumber, numberOfDays];
+			}
+			[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:YES];
 			NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
 											 downloadType, @"17.11", 
 											 dayString, @"hiddenDayOrWeekSelection",
@@ -370,7 +473,14 @@
 			NSMutableURLRequest *dayDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:dayDownloadActionURLString]];
 			[dayDownloadRequest setHTTPMethod:@"POST"];
 			[dayDownloadRequest setHTTPBody:httpBody];
-			NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:NULL error:NULL];
+			NSHTTPURLResponse *reportDownloadResponse = nil;
+			NSData *dayData = [NSURLConnection sendSynchronousRequest:dayDownloadRequest returningResponse:&reportDownloadResponse error:NULL];
+			if (reportDownloadResponse) {
+				NSString *originalFilename = [[reportDownloadResponse allHeaderFields] objectForKey:@"Filename"];
+				if (originalFilename) {
+					[dayData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
+				}
+			}
 			
 			if (dayData == nil) {
 				[pool release];
@@ -382,17 +492,9 @@
 			if (day != nil) {
 				if (i != 0)
 					day.isWeek = YES;
-				[downloadedDays setObject:day forKey:dayString];
-				day.name = dayString;
+				[downloadedDays setObject:day forKey:day.date];
 			}
-			NSString *status = @"";
-			if (i != 0) {
-				status = [NSString stringWithFormat:NSLocalizedString(@"Weekly Report %i of %i", nil), dayNumber, numberOfDays];
-			}
-			else {
-				status = [NSString stringWithFormat:NSLocalizedString(@"Daily Report %i of %i", nil), dayNumber, numberOfDays];
-			}
-			[self performSelectorOnMainThread:@selector(setProgress:) withObject:status waitUntilDone:YES];
+			
 			dayNumber++;
 		}
 		numberOfNewReports += [downloadedDays count];
@@ -434,13 +536,13 @@
 {
 	[days addEntriesFromDictionary:newDays];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
-		
+	
 	for (Day *d in [newDays allValues]) {
 		for (Country *c in [d.countries allValues]) {
 			for (Entry *e in c.entries) {
 				NSString *appID = e.productIdentifier;
 				NSString *appName = e.productName;
-				if (![self.appsByID objectForKey:appID]) {
+				if (appID && ![self.appsByID objectForKey:appID]) {
 					App *app = [[App new] autorelease];
 					app.appID = appID;
 					app.appName = appName;
@@ -450,7 +552,6 @@
 			}
 		}
 	}
-	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
 }
 
@@ -472,31 +573,29 @@
 
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed
 {
+	NSString *text = nil;
 	if (compressed) {
-		NSString *zipFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.gz"];
-		NSString *textFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.txt"];
-		[dayData writeToFile:zipFile atomically:YES];
-		gzFile file = gzopen([zipFile UTF8String], "rb");
-		FILE *dest = fopen([textFile UTF8String], "w");
-		unsigned char buffer[262144];
-		int uncompressedLength = gzread(file, buffer, 262144);
-		if(fwrite(buffer, 1, uncompressedLength, dest) != uncompressedLength || ferror(dest)) {
-			NSLog(@"error writing data");
-		}
-		fclose(dest);
-		gzclose(file);
-		
-		NSString *text = [NSString stringWithContentsOfFile:textFile encoding:NSUTF8StringEncoding error:NULL];
-		[[NSFileManager defaultManager] removeItemAtPath:zipFile error:NULL];
-		[[NSFileManager defaultManager] removeItemAtPath:textFile error:NULL];
-		return [[[Day alloc] initWithCSV:text] autorelease];
+		NSData *uncompressedData = [dayData gzipInflate];
+		text = [[NSString alloc] initWithData:uncompressedData encoding:NSUTF8StringEncoding];
 	} else {
-		NSString *text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
-		Day *day = [[[Day alloc] initWithCSV:text] autorelease];
-		[text release];
-		return day;
+		text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
+	}
+	Day *day = [[[Day alloc] initWithCSV:text] autorelease];
+	[text release];
+	return day;
+}
+
+- (void)importReport:(Day *)report
+{
+	if (report.isWeek) {
+		[weeks setObject:report forKey:report.date];
+	} else {
+		[days setObject:report forKey:report.date];
 	}
 }
+
+#pragma mark -
+#pragma mark Persistence
 
 - (NSString *)docPath
 {
@@ -505,27 +604,80 @@
 	return documentsDirectory;
 }
 
+- (NSString *)originalReportsPath
+{
+	NSString *path = [[self docPath] stringByAppendingPathComponent:@"OriginalReports"];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+		[[NSFileManager defaultManager] createDirectoryAtPath:path attributes:nil];
+	}
+	return path;
+}
+
+- (NSString *)reportCachePath
+{
+	return [[self docPath] stringByAppendingPathComponent:@"ReportCache"];
+}
+
+
+- (void)deleteDay:(Day *)dayToDelete
+{
+	NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[dayToDelete proposedFilename]];
+	[[NSFileManager defaultManager] removeItemAtPath:fullPath error:NULL];
+	if (dayToDelete.isWeek) {
+		[self.weeks removeObjectForKey:dayToDelete.date];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
+	} else {
+		[self.days removeObjectForKey:dayToDelete.date];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
+	}
+	cacheChanged = YES;
+	[self saveData];
+}
+
 - (void)saveData
 {
 	//save all days/weeks in separate files:
+	BOOL shouldUpdateCache = cacheChanged;
+	NSString *docPath = [self docPath];
 	for (Day *d in [self.days allValues]) {
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[d proposedFilename]];
+		NSString *fullPath = [docPath stringByAppendingPathComponent:[d proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!d.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:d toFile:fullPath];
+			shouldUpdateCache = YES;
 		}
 	}
 	for (Day *w in [self.weeks allValues]) {
-		NSString *fullPath = [[self docPath] stringByAppendingPathComponent:[w proposedFilename]];
+		NSString *fullPath = [docPath stringByAppendingPathComponent:[w proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!w.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:w toFile:fullPath];
+			shouldUpdateCache = YES;
 		}
 	}
+	if (shouldUpdateCache) {
+		NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
+		NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
+		for (Day *d in [days allValues]) {
+			[daysCache setObject:d.summary forKey:d.date];
+		}
+		for (Day *w in [weeks allValues]) {
+			[weeksCache setObject:w.summary forKey:w.date];
+		}
+		NSDictionary *reportCache = [NSDictionary dictionaryWithObjectsAndKeys:
+									 weeksCache, @"weeks",
+									 daysCache, @"days", nil];
+		[NSKeyedArchiver archiveRootObject:reportCache toFile:[self reportCachePath]];
+	}
+	
 	
 	NSString *reviewsFile = [[self docPath] stringByAppendingPathComponent:@"ReviewApps.rev"];
 	[NSKeyedArchiver archiveRootObject:self.appsByID toFile:reviewsFile];
+	cacheChanged = NO;
 }
+
+#pragma mark -
+#pragma mark Review Download
 
 - (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly
 {
@@ -982,7 +1134,7 @@
 					date = [date stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 					reviewDate = [dateFormatter dateFromString:date];
 				}
-								
+				
 				[scanner scanUpToString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
 				[scanner scanString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
 				[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];

@@ -27,6 +27,8 @@
 	NSMutableDictionary *appsByID;
 	BOOL isDownloadingReviews;
 	NSString *reviewDownloadStatus;
+	
+	BOOL cacheChanged;
 }
 
 @property (retain) NSMutableDictionary *days;
@@ -36,6 +38,10 @@
 @property (retain) NSString *reportDownloadStatus;
 
 + (ReportManager *)sharedManager;
+
+- (BOOL)loadReportCache;
+- (void)generateReportCache:(NSString *)reportCacheFile;
+
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
 
@@ -44,7 +50,10 @@
 - (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 - (void)saveData;
 - (NSString *)docPath;
+- (NSString *)originalReportsPath;
+- (NSString *)reportCachePath;
 
+- (void)importReport:(Day *)report;
 - (void)deleteDay:(Day *)dayToDelete;
 
 - (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly;

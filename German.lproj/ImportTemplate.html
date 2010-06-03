@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+	<title>AppSales</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			line-height: 130%;
+			text-align: center;
+			color: black;
+			background-color: #c5ccd2;
+			font-size: 16px; font-family: Helvetica, Arial;
+		}
+		.container {
+			margin: 1em auto;
+			margin-top: 50px;
+			padding: 15px;
+			width: 600px;
+			text-align: left;
+			border: solid 1px #a8abad;
+			-webkit-border-radius: 10px;
+			background-color: white;
+		}
+		.title {
+			margin-top: 40px;
+			color: #4d576b;
+			text-shadow: 0px 1px white;
+			text-align: center;
+		}
+		</style>
+</head>
+
+<body>
+	<h1 class="title">AppSales Import / Export</h1>
+<div class="container">
+	<p>Sie k&ouml;nnen hier Berichte importieren, die Sie manuell von iTunes Connect oder mit anderen Programmen heruntergeladen haben.</p>
+	<p>Berichte m&uuml;ssen in einem Zip-Archiv ohne Unterordner gespeichert sein, das .txt-Dateien mit Tages- oder Wochenberichten enth&auml;lt.</p>
+	
+	<form action="" method="post" enctype="multipart/form-data" name="form1" id="form1">
+	<input type="file" name="file" id="file" />
+	<label><input type="submit" name="button" id="button" value="Import" /></label>
+	</form>
+</div>
+<div class="container">
+	<p>Dies sind die originalen Bericht-Dateien, die Sie mit AppSales heruntergeladen haben. Bitte beachten Sie, dass fr&uuml;here Versionen von AppSales nicht die Originaldateien gespeichert haben, so dass diese Liste m&ouml;glicherweise unvollst&auml;ndig ist.</p>
+	<p>[[[REPORTFILES]]]</p>
+</div>
+</body>
+</html>

@@ -50,6 +50,11 @@
     [super dealloc];
 }
 
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
+}
+
 - (void)viewDidLoad
 {
 	[super viewDidLoad];

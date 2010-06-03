@@ -33,11 +33,11 @@
 @interface AppSalesMobileAppDelegate : NSObject <UIApplicationDelegate> {
     
     UIWindow *window;
-	UINavigationController *navigationController;
+	UIViewController *rootViewController;
 }
 
 @property (nonatomic, retain) UIWindow *window;
-@property (nonatomic, retain) UINavigationController *navigationController;
+@property (nonatomic, retain) UIViewController *rootViewController;
 
 @end
 

@@ -21,6 +21,11 @@
 	self.webView.scalesPageToFit = NO;
 }
 
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
 	NSString *templatePath = [[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"];

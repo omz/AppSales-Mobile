@@ -39,6 +39,8 @@
 {
     if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
 		iconView = [[[UIImageView alloc] initWithFrame:CGRectMake(6,6,32,32)] autorelease];
+		iconView.contentMode = UIViewContentModeCenter;
+		
 		descriptionLabel = [[[UILabel alloc] initWithFrame:CGRectMake(45, 0, 270, 44)] autorelease];
 		descriptionLabel.font = [UIFont systemFontOfSize:15.0];
 		descriptionLabel.lineBreakMode = UILineBreakModeWordWrap;
