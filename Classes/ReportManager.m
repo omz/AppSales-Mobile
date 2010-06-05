@@ -508,8 +508,10 @@
 	if (numberOfNewReports == 0)
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:YES];
 	else
+	{
+		cacheChanged = YES;
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:YES];
-	
+	}
 	if (errorMessageString) {
 		[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:YES];
 	}
