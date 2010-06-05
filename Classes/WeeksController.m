@@ -287,9 +287,9 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 		return cell;
 	}
 	if(!onlySum && previsionReport){
-		if(section)
+		if(previsionReport.newMonth)
 			section--;
-		else
+		else if(section == 0)
 			row--;
 	}
 	
@@ -369,9 +369,9 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 	if(!onlySum && previsionReport && section == 0 && row == 0)
 		return;
 	if(!onlySum && previsionReport){
-		if(section)
+		if(previsionReport.newMonth)
 			section--;
-		else
+		else if(section == 0)
 			row--;
 	}
 	
@@ -474,14 +474,14 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
 	NSInteger count = self.daysByMonth.count;
-	if(count > 1 && section == count){
-		return 1;//total
-	}
 	if(!onlySum && previsionReport && previsionReport.newMonth){
 		if(section == 0)
 			return 1;
 		else
 			section--;
+	}
+	if(count > 1 && section == count){
+		return 1;//total
 	}
 	
 	if (count > 0) {

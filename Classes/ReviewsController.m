@@ -73,6 +73,20 @@
 	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
 	
 	self.toolbarItems = [NSArray arrayWithObjects:downloadButton, flexSpace, statusItem, flexSpace, activityItem, nil];
+	
+	UIBarButtonItem *b = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark all as read", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)];
+	self.navigationItem.rightBarButtonItem = b;
+	[b release];	
+}
+
+- (void)markAllAsRead:(id)sender {
+	for(App *app in sortedApps){
+		NSArray *allReviews = [app.reviewsByUser allValues];
+		for(Review *r in allReviews){
+			r.newOrUpdatedReview = NO;
+		}
+	}
+	[self.tableView reloadData];
 }
 
 - (CGSize)contentSizeForViewInPopover

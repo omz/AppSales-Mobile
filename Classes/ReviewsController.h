@@ -21,5 +21,6 @@
 @property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
 
 - (void)reload;
+- (void)markAllAsRead:(id)sender;
 
 @end

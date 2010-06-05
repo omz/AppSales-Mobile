@@ -69,6 +69,29 @@
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
 	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	
+	//insert the weeks older than the oldest daily report
+	NSMutableArray *allDays = [[sortedDays mutableCopy] autorelease];
+	Day *oldestDayReport = [sortedDays objectAtIndex:0];
+	// we don't want to calculate this each time in the following loop
+	NSTimeInterval oldestDayReportInterval = [oldestDayReport.date timeIntervalSince1970];	
+	NSSortDescriptor *weekSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
+	NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:weekSorter]]; 
+	BOOL weeksInserite = NO;
+	for (Day *w in sortedWeeks) {
+		if ([w.date timeIntervalSince1970] < oldestDayReportInterval) {
+			if(!weeksInserite){ //delete the days that is in the week
+				NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
+				[comp setHour:167];
+				NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:w.date options:0];
+				while ([((Day *)[allDays objectAtIndex:0]).date timeIntervalSince1970] < [dateWeekLater timeIntervalSince1970]) {
+					[allDays removeObjectAtIndex:0];
+				}				
+			}
+			[allDays insertObject:w atIndex:0];
+			weeksInserite = YES;
+		}
+	}
+	
 	self.days = sortedDays;
 }
 
