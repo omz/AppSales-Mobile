@@ -42,6 +42,11 @@
 @synthesize transactionType;
 @synthesize royalties;
 @synthesize units;
+@dynamic purchase;
+-(Boolean) purchase
+{
+	return transactionType == 1 || transactionType == 2 || transactionType == 9;
+}
 
 
 - (id)initWithProductName:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry

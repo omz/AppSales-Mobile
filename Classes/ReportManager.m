@@ -567,7 +567,8 @@
 					App *app = [self.appsByID objectForKey:appID];
 					if(app) {
 						app.appName = appName;
-					}else{
+					}else
+					{
 						App *app = [[App new] autorelease];
 						app.appID = appID;
 						app.appName = appName;
@@ -735,7 +736,8 @@
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
 	NSMutableDictionary *appIDs = [NSMutableDictionary dictionary];
-	for (NSString *appID in [self.appsByID allKeys]) {
+	for (NSString *appID in [self.appsByID allKeys]) 
+	{
 		App *a = [appsByID objectForKey:appID];
 		[appIDs setObject:a.appName forKey:appID];
 	}

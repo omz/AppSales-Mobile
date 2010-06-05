@@ -49,6 +49,7 @@
 @property (assign) int transactionType;
 @property (assign) float royalties;
 @property (assign) int units;
+@property (readonly) Boolean purchase;
 
 - (id)initWithProductName:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry;
 - (float)totalRevenueInBaseCurrency;

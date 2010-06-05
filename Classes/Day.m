@@ -91,8 +91,11 @@
 			//IA1: In-App Purchase
 			//IA7: In-App Free Upgrade / Repurchase (?)
 			//IA9: In-App Subscription
-			if ([transactionType isEqualToString:@"IA1"] || [transactionType isEqualToString:@"IA9"]) transactionType = @"1";
-			if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
+			if ([transactionType isEqualToString:@"IA1"]) transactionType = @"2";
+			else
+				if([transactionType isEqualToString:@"IA9"])) transactionType = @"9";
+			else
+				if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
 			
 			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
 			Entry *entry = [[[Entry alloc] initWithProductName:productName 
@@ -114,7 +117,7 @@
 	NSMutableDictionary *salesByApp = [NSMutableDictionary dictionary];
 	for (Country *country in [self.countries allValues]) {
 		for (Entry *entry in country.entries) {
-			if (entry.transactionType == 1) {
+			if (entry.transactionType == 1 ) {
 				NSNumber *newCount = [NSNumber numberWithInt:[[salesByApp objectForKey:entry.productName] intValue] + entry.units];
 				[salesByApp setObject:newCount forKey:entry.productName];
 				NSNumber *newRevenue = [NSNumber numberWithFloat:[[revenueByCurrency objectForKey:entry.currency] floatValue] + entry.royalties * entry.units];

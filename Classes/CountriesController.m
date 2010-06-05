@@ -91,7 +91,7 @@
 	NSMutableDictionary *productInfos = [NSMutableDictionary dictionary];
 	for (Country *c in countries) {
 		for (Entry *e in c.entries) {
-			if ([e transactionType] == 1) {
+			if (e.purchase) {
 				NSString *name = [(App *)[[ReportManager sharedManager].appsByID objectForKey:[[ReportManager sharedManager] appIDForAppName:[e productName]]] appName];
 				NSMutableDictionary *productInfo = [productInfos objectForKey:name];
 				if (!productInfo) {
