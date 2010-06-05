@@ -44,8 +44,14 @@
 	float totalRevenue = 0.0;
 	for (Day *d in self.days) {
 		float revenue = (showUnits) ? (float)[d totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:self.app]] : [d totalRevenueInBaseCurrencyForAppWithID:[[ReportManager sharedManager] appIDForAppName:self.app]];
-		[revenues addObject:[NSNumber numberWithFloat:revenue]];
 		totalRevenue += revenue;
+		if(d.isWeek){
+			revenue /= 7.0;
+			for(int i = 0; i < 7; i++)
+				[revenues addObject:[NSNumber numberWithFloat:revenue]];
+		}else{
+			[revenues addObject:[NSNumber numberWithFloat:revenue]];
+		}
 		if (revenue > maxRevenue) maxRevenue = revenue;
 	}
 	if (maxRevenue == 0.0) {

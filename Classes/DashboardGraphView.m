@@ -316,8 +316,14 @@
 				revenue = [d totalRevenueInBaseCurrency];
 			}
 		}
-		[revenues addObject:[NSNumber numberWithFloat:revenue]];
 		totalRevenue += revenue;
+		if(!showsWeeklyReports && d.isWeek){
+			revenue /= 7.0;
+			for(int i = 0; i < 7; i++)
+				[revenues addObject:[NSNumber numberWithFloat:revenue]];
+		}else{
+			[revenues addObject:[NSNumber numberWithFloat:revenue]];
+		}
 		if (revenue > maxRevenue) maxRevenue = revenue;
 	}
 	if (maxRevenue == 0.0) {

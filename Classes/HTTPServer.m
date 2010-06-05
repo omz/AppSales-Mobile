@@ -5,7 +5,7 @@
 
 @implementation HTTPServer
 
-@synthesize uploadPath;
+@synthesize uploadPath, asyncSocket;
 
 /**
  * Standard Constructor.

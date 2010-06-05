@@ -29,6 +29,7 @@
 }
 
 @property (nonatomic, retain) NSString *uploadPath;
+@property (nonatomic, readonly) AsyncSocket *asyncSocket;
 
 - (id)delegate;
 - (void)setDelegate:(id)newDelegate;
