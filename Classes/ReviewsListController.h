@@ -15,5 +15,6 @@
 }
 
 @property (nonatomic, retain) NSArray *reviews;
+-(void) readall;
 
 @end
