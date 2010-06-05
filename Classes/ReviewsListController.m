@@ -20,6 +20,11 @@
 	self.tableView.rowHeight = 85.0;
 }
 
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
+}
+
 #pragma mark Table view methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
@@ -56,7 +61,9 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
 	SingleReviewController *reviewController = [[[SingleReviewController alloc] init] autorelease];
-	reviewController.review = [reviews objectAtIndex:indexPath.row];
+	Review *review = [reviews objectAtIndex:indexPath.row];
+	reviewController.review = review;
+	review.newOrUpdatedReview = NO;
 	[self.navigationController pushViewController:reviewController animated:YES];
 }
 

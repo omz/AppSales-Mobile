@@ -9,6 +9,7 @@
 #import "TrendGraphView.h"
 #import "Day.h"
 #import "CurrencyManager.h"
+#import "ReportManager.h"
 
 @implementation TrendGraphView
 
@@ -42,7 +43,7 @@
 	float maxRevenue = 0.0;
 	float totalRevenue = 0.0;
 	for (Day *d in self.days) {
-		float revenue = (showUnits) ? (float)[d totalUnitsForApp:self.app] : [d totalRevenueInBaseCurrencyForApp:self.app];
+		float revenue = (showUnits) ? (float)[d totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:self.app]] : [d totalRevenueInBaseCurrencyForAppWithID:[[ReportManager sharedManager] appIDForAppName:self.app]];
 		[revenues addObject:[NSNumber numberWithFloat:revenue]];
 		totalRevenue += revenue;
 		if (revenue > maxRevenue) maxRevenue = revenue;

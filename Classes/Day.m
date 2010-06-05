@@ -266,27 +266,26 @@
 	}
 }
 
-- (float)totalRevenueInBaseCurrencyForApp:(NSString *)app
-{
-	if (app == nil)
+- (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID {
+	if (appID == nil)
 		return [self totalRevenueInBaseCurrency];
 	float sum = 0.0;
 	for (Country *c in [self.countries allValues]) {
-		sum += [c totalRevenueInBaseCurrencyForApp:app];
+		sum += [c totalRevenueInBaseCurrencyForAppWithID:appID];
 	}
 	return sum;
 }
 
-- (int)totalUnitsForApp:(NSString *)app
-{
-	if (app == nil)
+- (int)totalUnitsForAppWithID:(NSString *)appID {
+	if (appID == nil)
 		return [self totalUnits];
 	int sum = 0;
 	for (Country *c in [self.countries allValues]) {
-		sum += [c totalUnitsForApp:app];
+		sum += [c totalUnitsForAppWithID:appID];
 	}
 	return sum;
 }
+
 
 - (int)totalUnits
 {
@@ -313,7 +312,8 @@
 
 - (NSString *)totalRevenueStringForApp:(NSString *)appName
 {
-	return [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:[self totalRevenueInBaseCurrencyForApp:appName]] withFraction:YES];
+	NSString *appID = [[ReportManager sharedManager] appIDForAppName:appName];
+	return [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:[self totalRevenueInBaseCurrencyForAppWithID:appID]] withFraction:YES];
 }
 
 - (NSString *)dayString
@@ -383,6 +383,16 @@
 	} else {
 		return [NSString stringWithFormat:@"day_%@.dat", dateString];
 	}
+}
+
+- (NSString *)appIDForApp:(NSString *)appName {
+	NSString *appID = nil;
+	for(Country *c in [self.countries allValues]){
+		appID = [c appIDForApp:appName];
+		if(appID)
+			break;
+	}
+	return appID;
 }
 
 - (void)dealloc

@@ -99,6 +99,8 @@
 
 - (void)setAppIcon:(UIImage *)newIcon
 {
+	if(!newIcon)
+		newIcon = [UIImage imageNamed:@"Product.png"];
 	iconView.image = newIcon;
 }
 

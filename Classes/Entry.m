@@ -31,6 +31,7 @@
 #import "Entry.h"
 #import "Country.h"
 #import "CurrencyManager.h"
+#import "ReportManager.h"
 
 @implementation Entry
 
@@ -67,7 +68,9 @@
 	self.units = [coder decodeIntForKey:@"units"];
 	self.royalties = [coder decodeFloatForKey:@"royalties"];
 	self.productIdentifier = [coder decodeObjectForKey:@"productIdentifier"];
-	
+	if(!productIdentifier)
+		self.productIdentifier = [[ReportManager sharedManager] appIDForAppName:self.productName];
+
 	return self;
 }
 
