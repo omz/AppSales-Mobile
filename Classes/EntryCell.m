@@ -63,7 +63,7 @@
 	
 	descriptionLabel.text = [self.entry description];
 	UIImage *icon;
-	if (self.entry.transactionType == 1) {
+	if (self.entry.purchase) {
 		if (self.entry.units >= 0)
 			icon = [UIImage imageNamed:@"Purchase.png"];
 		else

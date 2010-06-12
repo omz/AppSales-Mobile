@@ -93,7 +93,7 @@
 
 - (float)totalRevenueInBaseCurrency
 {
-	if (transactionType == 1) {
+	if (self.purchase) {
 		float revenueInLocalCurrency = self.royalties * self.units;
 		float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenueInLocalCurrency fromCurrency:self.currency];
 		return revenueInBaseCurrency;
@@ -105,7 +105,7 @@
 
 - (NSString *)description
 {
-	if (self.transactionType == 1) {
+	if (self.purchase) {
 		NSNumberFormatter *numberFormatter = [[NSNumberFormatter new] autorelease];
 		[numberFormatter setMinimumFractionDigits:2];
 		[numberFormatter setMaximumFractionDigits:2];

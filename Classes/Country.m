@@ -51,7 +51,7 @@
 {
 	NSMutableDictionary *salesByProduct = [NSMutableDictionary dictionary];
 	for (Entry *e in self.entries) {
-		if ([e transactionType] == 1) {
+		if (e.purchase) {
 			NSNumber *unitsOfProduct = [salesByProduct objectForKey:[e productName]];
 			int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
 			u += [e units];
@@ -117,7 +117,7 @@
 		return [self totalUnits];
 	int sum = 0;
 	for (Entry *e in self.entries) {
-		if ((e.transactionType == 1) && ([e.productIdentifier isEqual:appID]))
+		if ((e.purchase) && ([e.productIdentifier isEqual:appID]))
 			sum += [e units];
 	}
 	return sum;
@@ -127,7 +127,7 @@
 {
 	int sum = 0;
 	for (Entry *e in self.entries) {
-		if (e.transactionType == 1)
+		if (e.purchase)
 			sum += [e units];
 	}
 	return sum;

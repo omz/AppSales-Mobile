@@ -93,7 +93,7 @@
 			//IA9: In-App Subscription
 			if ([transactionType isEqualToString:@"IA1"]) transactionType = @"2";
 			else
-				if([transactionType isEqualToString:@"IA9"])) transactionType = @"9";
+				if([transactionType isEqualToString:@"IA9"]) transactionType = @"9";
 			else
 				if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
 			
@@ -117,7 +117,7 @@
 	NSMutableDictionary *salesByApp = [NSMutableDictionary dictionary];
 	for (Country *country in [self.countries allValues]) {
 		for (Entry *entry in country.entries) {
-			if (entry.transactionType == 1 ) {
+			if (entry.purchase ) {
 				NSNumber *newCount = [NSNumber numberWithInt:[[salesByApp objectForKey:entry.productName] intValue] + entry.units];
 				[salesByApp setObject:newCount forKey:entry.productName];
 				NSNumber *newRevenue = [NSNumber numberWithFloat:[[revenueByCurrency objectForKey:entry.currency] floatValue] + entry.royalties * entry.units];
@@ -221,7 +221,7 @@
 		NSMutableDictionary *salesByProduct = [NSMutableDictionary dictionary];
 		for (Country *c in [self.countries allValues]) {
 			for (Entry *e in [c entries]) {
-				if ([e transactionType] == 1) {
+				if (e.purchase) {
 					NSNumber *unitsOfProduct = [salesByProduct objectForKey:[e productName]];
 					int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
 					u += [e units];
