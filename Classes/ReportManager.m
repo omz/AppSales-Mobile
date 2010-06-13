@@ -392,18 +392,18 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 			NSString *downloadActionName;
 			if (i==0) {
 				downloadType = @"Daily";
-				downloadActionName = @"17.13.1";
+				downloadActionName = @"19.15.1";
 			}
 			else {
 				downloadType = @"Weekly";
-				downloadActionName = @"17.15.1";
+				downloadActionName = @"19.17.1";
 			}
 			
 			NSString *dateTypeSelectionURLString = [ittsBaseURL stringByAppendingString:dateTypeAction]; 
 			NSDictionary *dateTypeDict = [NSDictionary dictionaryWithObjectsAndKeys:
-										  downloadType, @"17.11", 
-										  downloadType, @"hiddenDayOrWeekSelection", 
-										  @"Summary", @"17.9", 
+										  downloadType, @"19.13",
+										  downloadType, @"hiddenDayOrWeekSelection",
+										  @"Summary", @"19.11",
 										  @"ShowDropDown", @"hiddenSubmitTypeName", nil];
 			NSString *encodedDateTypeDict = [dateTypeDict formatForHTTP];
 			NSData *httpBody = [encodedDateTypeDict dataUsingEncoding:NSASCIIStringEncoding];
@@ -456,11 +456,11 @@ static NSString* decompressAsGzipString(NSData *dayData) // could be a method on
 				int dayNumber = 1;
 				for (NSString *dayString in availableDays) {
 					NSDictionary *dayDownloadDict = [NSDictionary dictionaryWithObjectsAndKeys:
-													 downloadType, @"17.11", 
+													 downloadType, @"19.13",
 													 dayString, @"hiddenDayOrWeekSelection",
 													 @"Download", @"hiddenSubmitTypeName",
 													 @"ShowDropDown", @"hiddenSubmitTypeName",
-													 @"Summary", @"17.9",
+													 @"Summary", @"19.11",
 													 dayString, downloadActionName,
 													 @"Download", @"download", nil];
 					NSString *encodedDayDownloadDict = [dayDownloadDict formatForHTTP];
