@@ -31,6 +31,8 @@ NSString* getPrefetchedPath();
 - (id) initWithID:(NSString*)identifier name:(NSString*)name;
 - (void) addOrReplaceReview:(Review*)review;
 
+- (void) resetNewReviewCount;
+
 - (void) updateApplicationName:(NSString*)newAppName; // application names can change with new updates
 
 @end

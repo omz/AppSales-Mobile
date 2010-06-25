@@ -426,8 +426,13 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	}
 	isDownloadingReviews = YES;
 	[self resetCacelRequested];
-	[UIApplication sharedApplication].idleTimerDisabled = YES;	
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
+	
+	// reset new review count
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
+	for (App *app in appsByID.objectEnumerator) {
+		[app resetNewReviewCount];
+	}
 	
 	[self performSelectorInBackground:@selector(updateReviews) withObject:nil];
 }
@@ -435,10 +440,6 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 - (void) finishDownloadingReviews {
 	NSAssert([NSThread isMainThread], nil);	
 	isDownloadingReviews = NO;
-	[UIApplication sharedApplication].idleTimerDisabled = NO;
-	if ([self cancelWasRequested]) {
-		return; // stop here
-	}
 	
 	NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
 	[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];

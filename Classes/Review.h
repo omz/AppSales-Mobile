@@ -33,12 +33,13 @@
 @property (retain, readonly) NSString *countryCode;
 @property (retain, readonly) NSString *title;
 @property (retain, readonly) NSString *text;
-@property (assign, readonly) BOOL newOrUpdatedReview;
 @property (assign, readonly) NSUInteger stars;
 @property (readonly) NSString *translatedTitle;
 @property (readonly) NSString *translatedText;
 @property (readonly) NSString *presentationTitle; // either translated, or non translated text (depending on user preference) 
 @property (readonly) NSString *presentationText;
+
+@property (assign, readwrite) BOOL newOrUpdatedReview; // only mutable field
 
 - (id) initWithUser:(NSString*)userName reviewDate:(NSDate*)rDate downloadDate:(NSDate*)dDate version:(NSString*)reviewVersion 
 		countryCode:(NSString*)reviewCountryCode title:(NSString*)reviewTitle text:(NSString*)reviewText stars:(NSUInteger)numStars;
