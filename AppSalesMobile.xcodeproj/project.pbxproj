@@ -363,6 +363,7 @@
 		7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5B3F105B6CD2000A12E6 /* ReviewTemplate.html */; };
 		7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */; };
 		7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */; };
+		F280E07B11DCF1920058FB57 /* Icon114.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E07A11DCF1920058FB57 /* Icon114.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -792,6 +793,7 @@
 		7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleReviewController.m; sourceTree = "<group>"; };
 		7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5stars_gray.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F280E07A11DCF1920058FB57 /* Icon114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon114.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -916,66 +918,67 @@
 		7F4C217510230EF200F17F7D /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				7F4696191196458A00E82747 /* CalculatorBackground.png */,
-				7F4695B8119644B500E82747 /* CalculatorButtonNormal.png */,
-				7F4695B9119644B500E82747 /* CalculatorButton2Highlighted.png */,
-				7F4695BA119644B500E82747 /* CalculatorButton2Normal.png */,
-				7F4695BB119644B500E82747 /* CalculatorButtonHighlighted.png */,
-				7F4695BC119644B500E82747 /* CalculatorButton3Normal.png */,
-				7F4695BD119644B500E82747 /* CalculatorButton3Highlighted.png */,
-				7F4695BE119644B500E82747 /* CalculatorButton4Normal.png */,
-				7F4695BF119644B500E82747 /* CalculatorButton4Highlighted.png */,
-				7F4C217E10230EF200F17F7D /* Icon57.png */,
-				7F82E747116C044D00D5F228 /* Icon72.png */,
-				7F82E924116C322D00D5F228 /* GraphDetailTop.png */,
-				7F82E925116C322D00D5F228 /* GraphDetailBottom.png */,
-				7F82E848116C1F5800D5F228 /* CalendarButtonNormal.png */,
-				7F82E849116C1F5800D5F228 /* CalendarButtonHighlighted.png */,
-				7F82E71A116C03DA00D5F228 /* Default-Portrait.png */,
-				7F82E71B116C03DA00D5F228 /* Default-Landscape.png */,
-				7F06B8EA11714FBF00AFB66D /* TB_About.png */,
-				7F82E764116C0C3900D5F228 /* TB_Filter.png */,
-				7F82E6D1116BF8BC00D5F228 /* TB_Graphs.png */,
-				7F4A5799116BF1D900FA2019 /* TB_ImportExport.png */,
-				7F4695691196403700E82747 /* TB_Calculator.png */,
-				7F4A54DF116ACAEE00FA2019 /* Background.png */,
-				7F4A54B8116AC88B00FA2019 /* ReviewBackground.png */,
-				7F4A51DC116A952600FA2019 /* PaneButtonNormal.png */,
-				7F4A5207116A97A900FA2019 /* PaneButtonHighlighted.png */,
-				7F4A5168116A869E00FA2019 /* PaneBackground.png */,
-				7F4A51A7116A8BAA00FA2019 /* PickerOverlay.png */,
-				7F4A5193116A87CD00FA2019 /* TB_Settings.png */,
-				7FE3139111528920004DEA7C /* HUDFrame.png */,
-				7FE3131A11527CC0004DEA7C /* Default.png */,
-				7FE3134C115282EE004DEA7C /* Blue.png */,
-				7FE3134D115282EE004DEA7C /* Green.png */,
-				7FE3134E115282EE004DEA7C /* White.png */,
-				7FE3135A115284A5004DEA7C /* LightGray.png */,
-				7FE3135B115284A5004DEA7C /* Gray.png */,
-				7FE3135C115284A5004DEA7C /* Blueish.png */,
-				7FE311171152133D004DEA7C /* Day.png */,
-				7FE311691152369F004DEA7C /* Week.png */,
-				7FE3111E115213AC004DEA7C /* Star.png */,
-				7FE310FC11521272004DEA7C /* ImportExport.png */,
-				7FE310FA1152126C004DEA7C /* Graphs.png */,
-				7FE310F811521254004DEA7C /* Settings2.png */,
-				7FE3155C1152E117004DEA7C /* Star_Highlighted.png */,
-				7FE3155D1152E117004DEA7C /* Day_Highlighted.png */,
-				7FE3155E1152E117004DEA7C /* Settings2_Highlighted.png */,
-				7FE3155F1152E117004DEA7C /* ImportExport_Highlighted.png */,
-				7FE315601152E117004DEA7C /* Week_Highlighted.png */,
-				7FE315611152E117004DEA7C /* Graphs_Highlighted.png */,
 				7FEA5AA8105B61CD000A12E6 /* 5stars.png */,
 				7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */,
+				7F4A54DF116ACAEE00FA2019 /* Background.png */,
+				7FE3134C115282EE004DEA7C /* Blue.png */,
+				7FE3135C115284A5004DEA7C /* Blueish.png */,
+				7F4696191196458A00E82747 /* CalculatorBackground.png */,
+				7F4695B9119644B500E82747 /* CalculatorButton2Highlighted.png */,
+				7F4695BA119644B500E82747 /* CalculatorButton2Normal.png */,
+				7F4695BD119644B500E82747 /* CalculatorButton3Highlighted.png */,
+				7F4695BC119644B500E82747 /* CalculatorButton3Normal.png */,
+				7F4695BF119644B500E82747 /* CalculatorButton4Highlighted.png */,
+				7F4695BE119644B500E82747 /* CalculatorButton4Normal.png */,
+				7F4695BB119644B500E82747 /* CalculatorButtonHighlighted.png */,
+				7F4695B8119644B500E82747 /* CalculatorButtonNormal.png */,
+				7F82E849116C1F5800D5F228 /* CalendarButtonHighlighted.png */,
+				7F82E848116C1F5800D5F228 /* CalendarButtonNormal.png */,
 				7F4C217810230EF200F17F7D /* DateButtonHighlight.png */,
 				7F4C217910230EF200F17F7D /* DateButtonNormal.png */,
+				7FE311171152133D004DEA7C /* Day.png */,
+				7FE3155D1152E117004DEA7C /* Day_Highlighted.png */,
+				7F82E71B116C03DA00D5F228 /* Default-Landscape.png */,
+				7F82E71A116C03DA00D5F228 /* Default-Portrait.png */,
+				7FE3131A11527CC0004DEA7C /* Default.png */,
+				7FE311B511523E45004DEA7C /* Download.png */,
 				7F4C217C10230EF200F17F7D /* GraphBackground.png */,
+				7F82E925116C322D00D5F228 /* GraphDetailBottom.png */,
+				7F82E924116C322D00D5F228 /* GraphDetailTop.png */,
+				7FE310FA1152126C004DEA7C /* Graphs.png */,
+				7FE315611152E117004DEA7C /* Graphs_Highlighted.png */,
 				7F4C217D10230EF200F17F7D /* GraphScrollBackground.png */,
+				7FE3135B115284A5004DEA7C /* Gray.png */,
+				7FE3134D115282EE004DEA7C /* Green.png */,
+				7FE3139111528920004DEA7C /* HUDFrame.png */,
+				7F4C217E10230EF200F17F7D /* Icon57.png */,
+				7F82E747116C044D00D5F228 /* Icon72.png */,
+				F280E07A11DCF1920058FB57 /* Icon114.png */,
+				7FE310FC11521272004DEA7C /* ImportExport.png */,
+				7FE3155F1152E117004DEA7C /* ImportExport_Highlighted.png */,
+				7FE3135A115284A5004DEA7C /* LightGray.png */,
+				7F4A5168116A869E00FA2019 /* PaneBackground.png */,
+				7F4A5207116A97A900FA2019 /* PaneButtonHighlighted.png */,
+				7F4A51DC116A952600FA2019 /* PaneButtonNormal.png */,
+				7F4A51A7116A8BAA00FA2019 /* PickerOverlay.png */,
 				7F4C217F10230EF200F17F7D /* Product.png */,
 				7F4C218010230EF200F17F7D /* ProductMask.png */,
 				7FE311B311523E3D004DEA7C /* Purchase.png */,
-				7FE311B511523E45004DEA7C /* Download.png */,
 				7FE311B711523E90004DEA7C /* Return.png */,
+				7F4A54B8116AC88B00FA2019 /* ReviewBackground.png */,
+				7FE310F811521254004DEA7C /* Settings2.png */,
+				7FE3155E1152E117004DEA7C /* Settings2_Highlighted.png */,
+				7FE3111E115213AC004DEA7C /* Star.png */,
+				7FE3155C1152E117004DEA7C /* Star_Highlighted.png */,
+				7F06B8EA11714FBF00AFB66D /* TB_About.png */,
+				7F4695691196403700E82747 /* TB_Calculator.png */,
+				7F82E764116C0C3900D5F228 /* TB_Filter.png */,
+				7F82E6D1116BF8BC00D5F228 /* TB_Graphs.png */,
+				7F4A5799116BF1D900FA2019 /* TB_ImportExport.png */,
+				7F4A5193116A87CD00FA2019 /* TB_Settings.png */,
+				7FE311691152369F004DEA7C /* Week.png */,
+				7FE315601152E117004DEA7C /* Week_Highlighted.png */,
+				7FE3134E115282EE004DEA7C /* White.png */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -1776,6 +1779,7 @@
 				7F4695C7119644B500E82747 /* CalculatorButton4Normal.png in Resources */,
 				7F4695C8119644B500E82747 /* CalculatorButton4Highlighted.png in Resources */,
 				7F46961A1196458A00E82747 /* CalculatorBackground.png in Resources */,
+				F280E07B11DCF1920058FB57 /* Icon114.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1925,13 +1929,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = AppSales;
-				SDKROOT = iphoneos3.0;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos4.0;
 			};
 			name = Distribution;
 		};
@@ -1959,6 +1965,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
@@ -1975,14 +1982,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Benoit Cerrina (8HB65782FE)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = AppSales;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "EF7DAD51-18A4-4690-889B-B4E6FE90CD28";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos4.0;
 			};
 			name = Release;
