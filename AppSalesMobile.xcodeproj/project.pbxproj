@@ -37,7 +37,6 @@
 		7F4695C7119644B500E82747 /* CalculatorButton4Normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BE119644B500E82747 /* CalculatorButton4Normal.png */; };
 		7F4695C8119644B500E82747 /* CalculatorButton4Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BF119644B500E82747 /* CalculatorButton4Highlighted.png */; };
 		7F46961A1196458A00E82747 /* CalculatorBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4696191196458A00E82747 /* CalculatorBackground.png */; };
-		7F47897810661CBD002415A2 /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F47897710661CBD002415A2 /* Entitlements.plist */; };
 		7F4A4FE9116A648000FA2019 /* PadRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A4FE8116A648000FA2019 /* PadRootViewController.m */; };
 		7F4A50DC116A781D00FA2019 /* DashboardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A50DB116A781D00FA2019 /* DashboardView.m */; };
 		7F4A5169116A869E00FA2019 /* PaneBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4A5168116A869E00FA2019 /* PaneBackground.png */; };
@@ -1724,7 +1723,6 @@
 				7FEA5AA9105B61CD000A12E6 /* 5stars.png in Resources */,
 				7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */,
 				7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */,
-				7F47897810661CBD002415A2 /* Entitlements.plist in Resources */,
 				7FE310F911521254004DEA7C /* Settings2.png in Resources */,
 				7FE310FB1152126C004DEA7C /* Graphs.png in Resources */,
 				7FE310FD11521272004DEA7C /* ImportExport.png in Resources */,
@@ -1916,6 +1914,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_ENTITLEMENTS = "";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;

@@ -15,7 +15,7 @@
 		<string>Icon57.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>com.bcerrina.${PRODUCT_NAME:identifier}</string>
+	<string>de.omzsoftware.${PRODUCT_NAME:identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
