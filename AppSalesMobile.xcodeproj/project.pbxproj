@@ -362,7 +362,11 @@
 		7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5B3F105B6CD2000A12E6 /* ReviewTemplate.html */; };
 		7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */; };
 		7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */; };
+		F22984BC11DD32700067EFD2 /* Graphs_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F22984BA11DD32700067EFD2 /* Graphs_Highlighted@2x.png */; };
+		F22984BD11DD32700067EFD2 /* Graphs@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F22984BB11DD32700067EFD2 /* Graphs@2x.png */; };
 		F280E07B11DCF1920058FB57 /* Icon114.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E07A11DCF1920058FB57 /* Icon114.png */; };
+		F280E0ED11DD2DCA0058FB57 /* Star_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E0EB11DD2DCA0058FB57 /* Star_Highlighted@2x.png */; };
+		F280E0EE11DD2DCA0058FB57 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E0EC11DD2DCA0058FB57 /* Star@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -792,7 +796,11 @@
 		7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleReviewController.m; sourceTree = "<group>"; };
 		7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5stars_gray.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F22984BA11DD32700067EFD2 /* Graphs_Highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphs_Highlighted@2x.png"; sourceTree = "<group>"; };
+		F22984BB11DD32700067EFD2 /* Graphs@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphs@2x.png"; sourceTree = "<group>"; };
 		F280E07A11DCF1920058FB57 /* Icon114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon114.png; sourceTree = "<group>"; };
+		F280E0EB11DD2DCA0058FB57 /* Star_Highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Star_Highlighted@2x.png"; sourceTree = "<group>"; };
+		F280E0EC11DD2DCA0058FB57 /* Star@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Star@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -946,6 +954,8 @@
 				7F82E924116C322D00D5F228 /* GraphDetailTop.png */,
 				7FE310FA1152126C004DEA7C /* Graphs.png */,
 				7FE315611152E117004DEA7C /* Graphs_Highlighted.png */,
+				F22984BA11DD32700067EFD2 /* Graphs_Highlighted@2x.png */,
+				F22984BB11DD32700067EFD2 /* Graphs@2x.png */,
 				7F4C217D10230EF200F17F7D /* GraphScrollBackground.png */,
 				7FE3135B115284A5004DEA7C /* Gray.png */,
 				7FE3134D115282EE004DEA7C /* Green.png */,
@@ -969,6 +979,8 @@
 				7FE3155E1152E117004DEA7C /* Settings2_Highlighted.png */,
 				7FE3111E115213AC004DEA7C /* Star.png */,
 				7FE3155C1152E117004DEA7C /* Star_Highlighted.png */,
+				F280E0EB11DD2DCA0058FB57 /* Star_Highlighted@2x.png */,
+				F280E0EC11DD2DCA0058FB57 /* Star@2x.png */,
 				7F06B8EA11714FBF00AFB66D /* TB_About.png */,
 				7F4695691196403700E82747 /* TB_Calculator.png */,
 				7F82E764116C0C3900D5F228 /* TB_Filter.png */,
@@ -1778,6 +1790,10 @@
 				7F4695C8119644B500E82747 /* CalculatorButton4Highlighted.png in Resources */,
 				7F46961A1196458A00E82747 /* CalculatorBackground.png in Resources */,
 				F280E07B11DCF1920058FB57 /* Icon114.png in Resources */,
+				F280E0ED11DD2DCA0058FB57 /* Star_Highlighted@2x.png in Resources */,
+				F280E0EE11DD2DCA0058FB57 /* Star@2x.png in Resources */,
+				F22984BC11DD32700067EFD2 /* Graphs_Highlighted@2x.png in Resources */,
+				F22984BD11DD32700067EFD2 /* Graphs@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
