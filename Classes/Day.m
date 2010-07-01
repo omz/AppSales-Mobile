@@ -120,7 +120,8 @@
 			if (entry.purchase ) {
 				NSNumber *newCount = [NSNumber numberWithInt:[[salesByApp objectForKey:entry.productName] intValue] + entry.units];
 				[salesByApp setObject:newCount forKey:entry.productName];
-				NSNumber *newRevenue = [NSNumber numberWithFloat:[[revenueByCurrency objectForKey:entry.currency] floatValue] + entry.royalties * entry.units];
+				NSNumber *oldRevenue = [revenueByCurrency objectForKey:entry.currency];
+				NSNumber *newRevenue = [NSNumber numberWithFloat:(oldRevenue ? [oldRevenue floatValue] : 0.0) + entry.royalties * entry.units];
 				[revenueByCurrency setObject:newRevenue forKey:entry.currency];
 			}
 		}
