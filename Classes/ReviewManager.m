@@ -27,8 +27,11 @@
 			appsByID = [[NSMutableDictionary alloc] init];
 		}
 		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancel) 
-													 name:UIApplicationDidEnterBackgroundNotification object:nil];
+		NSString *notification = UIApplicationWillTerminateNotification;
+		if (&UIApplicationDidEnterBackgroundNotification) {
+			notification = UIApplicationDidEnterBackgroundNotification;
+		}
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancel) name:notification object:nil];
 	}
 	return self;
 }
