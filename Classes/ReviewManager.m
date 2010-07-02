@@ -26,8 +26,9 @@
 		} else {
 			appsByID = [[NSMutableDictionary alloc] init];
 		}
+		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancel) 
-													 name:UIApplicationWillTerminateNotification object:nil];
+													 name:UIApplicationDidEnterBackgroundNotification object:nil];
 	}
 	return self;
 }
@@ -42,21 +43,7 @@
 #if APPSALES_DEBUG
 	if (isDownloadingReviews) NSLog(@"cancel requested");
 #endif	
-	@synchronized (self) {
-		cancelRequested = YES;
-	}
-}
-- (void) resetCacelRequested {
-	@synchronized (self) {
-		cancelRequested = NO;
-	}
-}
-- (BOOL) cancelWasRequested {
-	BOOL value; // GCC is stupid
-	@synchronized (self) {
-		value = cancelRequested;
-	}
-	return value;
+	cancelRequested = YES;
 }
 
 - (NSDictionary*) getNextStoreToFetch {
@@ -146,7 +133,7 @@
 				[request setURL:[NSURL URLWithString:reviewsURLString]];
 				
 				NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
-				if ([self cancelWasRequested]) { // check after making slow network call
+				if (cancelRequested) { // check after making slow network call
 					return;
 				}
 				NSString *xml = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
@@ -203,10 +190,6 @@
 																title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
 																 stars:[reviewStars intValue]] autorelease];
 						[self addOrUpdatedReviewIfNeeded:review appID:appID];
-						
-						if ([self cancelWasRequested]) { // check again after potentially making another network call  
-							return;
-						}
 					}
 					i++;
 				} while (![scanner isAtEnd]);
@@ -425,7 +408,7 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 		return;
 	}
 	isDownloadingReviews = YES;
-	[self resetCacelRequested];
+	cancelRequested = NO;
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
 	// reset new review count
