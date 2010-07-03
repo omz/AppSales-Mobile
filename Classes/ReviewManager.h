@@ -10,10 +10,11 @@
 @interface ReviewManager : NSObject {
 	@private
 	NSMutableDictionary *appsByID;
-	float percentComplete, progressIncrement; // for presentation
+	float percentComplete, progressIncrement; // for presentation.  can only be accessed on main thread
 	
 	BOOL isDownloadingReviews;
 	volatile BOOL cancelRequested; // used by multile threads without synchronization, hence volatile
+	volatile BOOL saveToDiskNeeded; 
 	NSString *reviewDownloadStatus;
 	
 	// used by worker threads

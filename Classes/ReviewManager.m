@@ -60,16 +60,6 @@
 	return storeInfo;
 }
 
-- (void) incrementStatusPercentage {
-	float currentPercentComplete;
-	@synchronized (self) {
-		percentComplete += progressIncrement;
-		currentPercentComplete = percentComplete;
-	}
-	NSString *status = [NSString stringWithFormat:@"%2.0f%% complete", currentPercentComplete];
-	[self performSelectorOnMainThread:@selector(updateReviewDownloadProgress:) withObject:status waitUntilDone:NO];
-}
-
 - (void) workerDone {
 	[condition lock];
 	NSAssert(numThreadsActive > 0, nil);
@@ -80,27 +70,29 @@
 }
 
 - (void) notifyOfNewReviews {
+	NSAssert([NSThread isMainThread], nil);
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
 
 - (void) addOrUpdatedReviewIfNeeded:(Review*)review appID:(NSString*)appID {
-	App *app = [appsByID objectForKey:appID];
-	NSAssert(app, nil);
+	App *app = [appsByID objectForKey:appID]; // read only, no synchronization needed
 	
+	Review *oldReview;
 	@synchronized (app) {
 		NSDictionary *existingReviews = app.reviewsByUser;
-		Review *oldReview = [existingReviews objectForKey:review.user];
-		if  ((oldReview != nil) && ([oldReview.text isEqual:review.text]) 
-			 && (oldReview.translatedText != nil)) {
-			return; // up to date
-		}
+		oldReview = [existingReviews objectForKey:review.user];
 	}
+	if  (oldReview != nil && [oldReview.text isEqual:review.text]) {
+		return; // up to date
+	}
+		
 	[review updateTranslations]; // network call, done outside of synchronized block
 
 	@synchronized (app) {
 		[app addOrReplaceReview:review];
 	}
-	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:YES];
+	saveToDiskNeeded = YES;
+	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:NO];
 }
 
 - (void) workerThreadFetch { // called by worker threads
@@ -131,7 +123,7 @@
 			[request setAllHTTPHeaderFields:headers];
 			[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
 					
-			for (NSString *appID in [appsByID keyEnumerator]) {
+			for (NSString *appID in appsByID.keyEnumerator) {
 				NSString *reviewsURLString = [NSString stringWithFormat:@"http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=4&type=Purple+Software", appID];
 				[request setURL:[NSURL URLWithString:reviewsURLString]];
 				
@@ -188,16 +180,17 @@
 					[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewText];
 					
 					if (reviewUser && reviewTitle && reviewText && reviewStars) {
-						Review *review = [[[Review alloc] initWithUser:[reviewUser removeHtmlEscaping] reviewDate:reviewDate
+						Review *review = [[Review alloc] initWithUser:[reviewUser removeHtmlEscaping] reviewDate:reviewDate
 														 downloadDate:downloadDate version:reviewVersion countryCode:countryCode
 																title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
-																 stars:[reviewStars intValue]] autorelease];
+																 stars:[reviewStars intValue]];
 						[self addOrUpdatedReviewIfNeeded:review appID:appID];
+						[review release];
 					}
 					i++;
 				} while (![scanner isAtEnd]);
 			}
-			[self incrementStatusPercentage];
+			[self performSelectorOnMainThread:@selector(incrementDownloadProgress) withObject:nil waitUntilDone:NO];
 		}
 	} @finally {
 		[self workerDone];
@@ -228,6 +221,12 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 							   countryName, @"countryName",
 							   formatter, @"dateFormatter", // formatter may be nil, so this pair must be last
 							   nil];
+}
+
+- (void) resetProgressIncrement:(NSNumber*)increment {
+	NSAssert([NSThread isMainThread], nil);
+	percentComplete = 0;
+	progressIncrement = increment.floatValue;
 }
 
 - (void) updateReviews {
@@ -365,9 +364,10 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 		}
 	}
 	[storeInfos sortUsingFunction:&numStoreReviewsComparator context:numExistingReviews];
-		
-	percentComplete = 0;
-	progressIncrement = 100.0f / storeInfos.count;
+	
+	// increment field can only be accessed on main thread
+	NSNumber *increment = [NSNumber numberWithFloat:100.0f / storeInfos.count];
+	[self performSelectorOnMainThread:@selector(resetProgressIncrement:) withObject:increment waitUntilDone:NO];
 	downloadDate = [NSDate new];
 	
 	condition = [[NSCondition alloc] init];
@@ -397,12 +397,19 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	[pool release];
 }
 
-- (void) updateReviewDownloadProgress:(NSString *)status {
-	NSAssert([NSThread isMainThread], nil);
-	[status retain];
+- (void) updateReviewDownloadProgress:(NSString*)status {
+//	NSAssert([NSThread isMainThread], nil);
+	[status retain]; // must retain first
 	[reviewDownloadStatus release];
 	reviewDownloadStatus = status;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerUpdatedReviewDownloadProgressNotification object:self];
+}
+
+- (void) incrementDownloadProgress {
+	percentComplete += progressIncrement;
+	NSString *status = [[NSString alloc] initWithFormat:@"%2.0f%% complete", percentComplete];
+	[self updateReviewDownloadProgress:status];
+	[status release];
 }
 
 - (void) downloadReviews {
@@ -415,10 +422,10 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
 	// reset new review count
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 	for (App *app in appsByID.objectEnumerator) {
 		[app resetNewReviewCount];
 	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 	
 	[self performSelectorInBackground:@selector(updateReviews) withObject:nil];
 }
@@ -427,8 +434,11 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	NSAssert([NSThread isMainThread], nil);	
 	isDownloadingReviews = NO;
 	
-	NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
-	[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
+	if (saveToDiskNeeded) {
+		saveToDiskNeeded = NO;
+		NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
+		[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
+	}
 	[self updateReviewDownloadProgress:@""];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
