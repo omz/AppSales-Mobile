@@ -74,7 +74,7 @@
 	
 	[[UIImage imageNamed:@"5stars_gray.png"] drawInRect:CGRectMake(200, 15, 90, 15)];
 	UIImage *starsImage = [UIImage imageNamed:@"5stars.png"];
-	UIGraphicsBeginImageContext(CGSizeMake(90,15));
+	UIGraphicsBeginImageContextWithOptions(CGSizeMake(90,15), NO, UIScreen.mainScreen.scale);
 	CGContextRef ctx = UIGraphicsGetCurrentContext();
 	[starsImage drawInRect:CGRectMake(0,0,90,15)];
 	float averageStars = [app averageStars];
