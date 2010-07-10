@@ -11,8 +11,9 @@
 #import "RegionsGraphView.h"
 #import "Day.h"
 #import "ReportManager.h"
+#import "CurrencyManager.h"
 
-#define GRAPH_MODE_ALERT_TAG	123
+
 
 @implementation StatisticsViewController
 
@@ -63,7 +64,8 @@
 	[self.view addSubview:dateButton];
 	[dateButton addTarget:self action:@selector(selectDate:) forControlEvents:UIControlEventTouchUpInside];
 	
-	UIBarButtonItem *graphModeButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mode...",nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectGraphMode)] autorelease];
+	graphModeButton = [[[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStyleBordered target:self action:@selector(toggleGraphMode)] autorelease];
+	[self updateGraphModeButton];
 	self.navigationItem.rightBarButtonItem = graphModeButton;
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
@@ -108,11 +110,33 @@
 	[self reload];
 }
 
-- (void)selectGraphMode
+- (void)toggleGraphMode
 {
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:NSLocalizedString(@"Sales",nil), NSLocalizedString(@"Revenue",nil), nil] autorelease];
-	alert.tag = GRAPH_MODE_ALERT_TAG;
-	[alert show];
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"ShowUnitsInGraphs"]) { //sales
+		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"ShowUnitsInGraphs"];
+	}
+	else { //revenue
+		[[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"ShowUnitsInGraphs"];
+	}
+	[self updateGraphModeButton];
+	[allAppsTrendView setNeedsDisplay];
+	[regionsGraphView setNeedsDisplay];
+	for (UIView *v in trendViewsForApps) {
+		[v setNeedsDisplay];
+	}
+}
+
+- (void)updateGraphModeButton
+{
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"ShowUnitsInGraphs"]) {
+		[graphModeButton setTitle:@"#"];
+	}
+	else {
+		//[graphModeButton setTitle:@"$"];
+		[graphModeButton setTitle:[[CurrencyManager sharedManager] baseCurrencyDescription]];
+		
+	}
+
 }
 
 - (void)reload
@@ -230,21 +254,6 @@
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-	if (alertView.tag == GRAPH_MODE_ALERT_TAG) {
-		if (buttonIndex == 1) { //sales
-			[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"ShowUnitsInGraphs"];
-		}
-		else if (buttonIndex == 2) { //revenue
-			[[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"ShowUnitsInGraphs"];
-		}
-		[allAppsTrendView setNeedsDisplay];
-		[regionsGraphView setNeedsDisplay];
-		for (UIView *v in trendViewsForApps) {
-			[v setNeedsDisplay];
-		}
-		return;
-	}
-	
 	//TODO: This is really messy, got to clean it up sometime...
 	int fromIndex = 0;
 	int toIndex = 0;

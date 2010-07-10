@@ -21,6 +21,7 @@
 	UIPickerView *datePicker;
 	NSArray *days;
 	NSDateFormatter *dateFormatter;
+	UIBarButtonItem *graphModeButton;
 }
 
 @property (retain) NSArray *days;
@@ -33,5 +34,6 @@
 @property (retain) NSDateFormatter *dateFormatter;
 
 - (void)reload;
+- (void)updateGraphModeButton;
 
 @end
