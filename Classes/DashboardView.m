@@ -331,9 +331,16 @@
 		
 		//insert the weeks older than the oldest daily report
 		NSMutableArray *allDays = [[sortedReports mutableCopy] autorelease];
-		Day *oldestDayReport = [sortedReports objectAtIndex:0];
-		// we don't want to calculate this each time in the following loop
-		NSTimeInterval oldestDayReportInterval = [oldestDayReport.date timeIntervalSince1970];	
+		
+		Day *oldestDayReport = nil;
+		
+		// This was crashing before because it ignored that some user's
+		// may not have a report downloaded, default to 0, the oldest date possible
+		NSTimeInterval oldestDayReportInterval = 0;
+		if([sortedReports count]>0) {
+			oldestDayReport = [sortedReports objectAtIndex:0];
+		}
+		
 		NSSortDescriptor *weekSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 		NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:weekSorter]]; 
 		BOOL weeksInserite = NO;
