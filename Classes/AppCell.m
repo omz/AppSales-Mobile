@@ -74,7 +74,12 @@
 	
 	[[UIImage imageNamed:@"5stars_gray.png"] drawInRect:CGRectMake(200, 15, 90, 15)];
 	UIImage *starsImage = [UIImage imageNamed:@"5stars.png"];
-	UIGraphicsBeginImageContextWithOptions(CGSizeMake(90,15), NO, UIScreen.mainScreen.scale);
+	CGSize size = CGSizeMake(90,15);
+	if (&UIGraphicsBeginImageContextWithOptions) {
+		UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
+	} else { // ipad
+		UIGraphicsBeginImageContext(size);
+	}
 	CGContextRef ctx = UIGraphicsGetCurrentContext();
 	[starsImage drawInRect:CGRectMake(0,0,90,15)];
 	float averageStars = [app averageStars];

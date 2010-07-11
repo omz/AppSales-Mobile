@@ -127,7 +127,11 @@
 
 - (UIImage *)sparklineForReports:(NSArray *)days
 {
-	UIGraphicsBeginImageContextWithOptions(CGSizeMake(120, 30),NO,[UIScreen mainScreen].scale);
+	if (&UIGraphicsBeginImageContextWithOptions) {
+		UIGraphicsBeginImageContextWithOptions(CGSizeMake(120, 30),NO,UIScreen.mainScreen.scale);
+	} else { // ipad
+		UIGraphicsBeginImageContext(CGSizeMake(120, 30));
+	}
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
