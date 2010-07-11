@@ -42,9 +42,9 @@
 		UIView *calendarBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(0,0,45,44)] autorelease];
 		calendarBackgroundView.backgroundColor = calendarBackgroundColor;
 		
-		flagView = [[UIImageView alloc] initWithFrame:CGRectMake(6, 0, 32, 32)];
+		flagView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 4, 24, 24)];
 		
-		countryLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 33, 44, 9)];
+		countryLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 30, 44, 9)];
 		countryLabel.font = [UIFont systemFontOfSize:9.0];
 		countryLabel.textAlignment = UITextAlignmentCenter;
 		countryLabel.text = @"N/A";
