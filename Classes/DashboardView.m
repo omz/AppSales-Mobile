@@ -339,6 +339,7 @@
 		NSTimeInterval oldestDayReportInterval = 0;
 		if([sortedReports count]>0) {
 			oldestDayReport = [sortedReports objectAtIndex:0];
+			oldestDayReportInterval = [oldestDayReport.date timeIntervalSince1970];
 		}
 		
 		NSSortDescriptor *weekSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
