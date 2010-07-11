@@ -12,13 +12,14 @@
 
 @implementation Review
 
+#define TRANSLATE_REVIEWS_SETTINGS_KEY @"translateReviews"
 static BOOL showTranslations;
 + (BOOL) showTranslatedReviews {
 	return showTranslations;
 }
 + (void) setShowTranslatedReviews:(BOOL)showTranslatedReviews {
 	showTranslations = showTranslatedReviews;
-	[[NSUserDefaults standardUserDefaults] setBool:showTranslations forKey:@"translateReviews"];
+	[[NSUserDefaults standardUserDefaults] setBool:showTranslations forKey:TRANSLATE_REVIEWS_SETTINGS_KEY];
 }
 
 static NSString *presentationLanguage, *defaultCountryCode;
@@ -31,7 +32,7 @@ static NSString *presentationLanguage, *defaultCountryCode;
 		defaultCountryCode = [defaultLocale objectForKey:NSLocaleCountryCode];
 		
 		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-		showTranslations = [defaults boolForKey:@"translateReviews"];
+		showTranslations = [defaults boolForKey:TRANSLATE_REVIEWS_SETTINGS_KEY];
 	}
 }
 

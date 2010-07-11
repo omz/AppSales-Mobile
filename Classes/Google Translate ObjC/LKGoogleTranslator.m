@@ -12,6 +12,8 @@
 #define MAX_INPUT_TEXT_LENGTH 1900 // size after url encoding, and arbitrarily set by Google 
 #define URL_STRING @"http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&langpair="
 #define TEXT_VAR @"&q="
+// api key is not required, but seems to prevent excessive translation requests while doing development work
+#define APPSALES_GOOGLE_API_KEY @"ABQIAAAAOsoivIE0DZ2IaaWJfN6eaxTOf_JKXOhUlrp88MCNXGV04gvo5BRA7GwYN8vlPOWdV7SjmUT8cAqSqQ"
 
 @implementation LKGoogleTranslator
 
@@ -39,6 +41,8 @@
 	[urlString appendString: sourceLanguage];
 	[urlString appendString: @"%7C"];
 	[urlString appendString: targetLanguage];
+	[urlString appendString: @"&key="];
+	[urlString appendString: APPSALES_GOOGLE_API_KEY];
 	[urlString appendString: TEXT_VAR];
 	[urlString appendString: urlEncodedSource];
 	NSURL *url = [NSURL URLWithString: urlString];
@@ -52,6 +56,9 @@
 	NSString* contents = [[[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding] autorelease];
 	id responseData = [[contents JSONValue] objectForKey:@"responseData"];
 	if (responseData == [NSNull null]) {
+		#if APPSALES_DEBUG
+			NSLog(@"translation error:%@", contents);
+		#endif
 		return sourceText;
 	}
 	NSString *translatedText = [responseData objectForKey: @"translatedText"];
