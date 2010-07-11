@@ -40,10 +40,10 @@
 
 - (id)init
 {
-	[super init];
-	
-	self.title = NSLocalizedString(@"Daily Reports",nil);
-	
+	self = [super init];
+	if (self) {	
+		self.title = NSLocalizedString(@"Daily Reports",nil);
+	}
 	return self;
 }
 

@@ -15,7 +15,7 @@
 - (id)initWithFrame:(CGRect)frame 
 {
     if ((self = [super initWithFrame:frame])) {
-		UIPanGestureRecognizer *recognizer = [[[NSClassFromString(@"UIPanGestureRecognizer") alloc] initWithTarget:self action:@selector(pan:)] autorelease];
+		UIPanGestureRecognizer *recognizer = [[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)] autorelease];
 		[self addGestureRecognizer:recognizer];
     }
     return self;

@@ -1,4 +1,4 @@
-    //
+//
 //  PadRootViewController.m
 //  AppSalesMobile
 //
@@ -25,9 +25,9 @@
 
 @synthesize toolbar, statusLabel, activityIndicator, settingsPopover, dailyDashboardView, weeklyDashboardView, reviewsPane, importExportPopover, graphTypeSheet, filterSheet, filterItem, aboutPopover;
 
-- (void)loadView 
+- (void) viewDidLoad 
 {
-	[super loadView];
+	[super viewDidLoad];
 	CGRect bounds = self.view.bounds;
 	
 	self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"Background.png"]];
@@ -67,13 +67,12 @@
 	dailyDashboardView = [DashboardViewController new];
 	dailyDashboardView.view.frame = CGRectMake(0, 47, 748, 320);
 	dailyDashboardView.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	[dailyDashboardView reloadData];
 	//[dailyDashboardView resetDatePicker];
 	
 	DaysController *daysViewController = [[[DaysController alloc] init] autorelease];
 	UINavigationController *daysNavigationController = [[[UINavigationController alloc] initWithRootViewController:daysViewController] autorelease];
 	daysViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
-	UIPopoverController *daysPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:daysNavigationController] autorelease];
+	UIPopoverController *daysPopover = [[[UIPopoverController alloc] initWithContentViewController:daysNavigationController] autorelease];
 	dailyDashboardView.reportsPopover = daysPopover;
 	dailyDashboardView.showsWeeklyReports = NO;
 	[self.view addSubview:dailyDashboardView.view];
@@ -82,21 +81,21 @@
 	weeklyDashboardView.view.frame = CGRectMake(0, 365, 748, 320);
 	weeklyDashboardView.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	weeklyDashboardView.showsWeeklyReports = YES;
-	[weeklyDashboardView reloadData];
 	//[weeklyDashboardView resetDatePicker];
 	
 	WeeksController *weeksViewController = [[[WeeksController alloc] init] autorelease];
 	UINavigationController *weeksNavigationController = [[[UINavigationController alloc] initWithRootViewController:weeksViewController] autorelease];
 	weeksViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
-	UIPopoverController *weeksPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:weeksNavigationController] autorelease];
+	UIPopoverController *weeksPopover = [[[UIPopoverController alloc] initWithContentViewController:weeksNavigationController] autorelease];
 	weeklyDashboardView.reportsPopover = weeksPopover;
 	[self.view addSubview:weeklyDashboardView.view];
-	
-	SettingsViewController *settingsViewController = [[[SettingsViewController alloc] initWithNibName:@"SettingsViewController" bundle:nil] autorelease];
+			
+	SettingsViewController *settingsViewController = [[SettingsViewController new] autorelease];
 	settingsViewController.contentSizeForViewInPopover = CGSizeMake(320, 440);
-	self.settingsPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:settingsViewController] autorelease];
+	self.settingsPopover = [[[UIPopoverController alloc] initWithContentViewController:settingsViewController] autorelease];
 	
 	reviewsPane = [ReviewsPaneController new];
+	reviewsPane.view.frame = CGRectMake(0, 683, 768, 320);
 	reviewsPane.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	[self.view insertSubview:reviewsPane.view belowSubview:weeklyDashboardView.view];
 }
@@ -105,12 +104,22 @@
 	[super viewWillAppear:animated];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) name:ReportManagerUpdatedDownloadProgressNotification object:nil];
+	
+	// HACK ATTACK: somehow the viewWillAppear method is not automatically called on the iPad
+	[dailyDashboardView viewWillAppear:animated];
+	[weeklyDashboardView viewWillAppear:animated];
+	[reviewsPane viewWillAppear:animated];
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	// HACK HACK
+	[dailyDashboardView viewWillDisappear:animated];
+	[weeklyDashboardView viewWillDisappear:animated];
+	[reviewsPane viewWillDisappear:animated];	
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
@@ -259,7 +268,7 @@
 	if (!aboutPopover) {
 		UIViewController *aboutViewController = [[[HelpBrowser alloc] initWithNibName:nil bundle:nil] autorelease];
 		aboutViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
-		self.aboutPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:aboutViewController] autorelease];
+		self.aboutPopover = [[[UIPopoverController alloc] initWithContentViewController:aboutViewController] autorelease];
 	}
 	if (!aboutPopover.popoverVisible) {
 		[aboutPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
@@ -275,7 +284,7 @@
 	} else {
 		ImportExportViewController *vc = [[[ImportExportViewController alloc] initWithNibName:nil bundle:nil] autorelease];
 		vc.contentSizeForViewInPopover = CGSizeMake(320, 460);
-		self.importExportPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:vc] autorelease];
+		self.importExportPopover = [[[UIPopoverController alloc] initWithContentViewController:vc] autorelease];
 		[importExportPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 	}
 }

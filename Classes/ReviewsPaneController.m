@@ -20,9 +20,8 @@
 
 @synthesize scrollView, statusLabel, activityIndicator, reviewsPopover;
 
-- (void) loadView {
-	[super loadView];
-	self.view.frame = CGRectMake(0, 683, 768, 320);
+- (void) viewDidLoad {
+	[super viewDidLoad];
 	UIImageView *backgroundImageView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PaneBackground.png"]] autorelease];
 	backgroundImageView.contentStretch = CGRectMake(0.1, 0.1, 0.8, 0.8);
 	backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
@@ -122,7 +121,7 @@
 	listController.hidesBottomBarWhenPushed = YES;
 	listController.title = app.appName;
 	UINavigationController *reviewListNavigationController = [[[UINavigationController alloc] initWithRootViewController:listController] autorelease];
-	self.reviewsPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:reviewListNavigationController] autorelease];
+	self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:reviewListNavigationController] autorelease];
 	
 	CGRect reviewSummaryFrame = [(UIView *)sender frame];
 	CGRect fromRect = CGRectMake(reviewSummaryFrame.origin.x, reviewSummaryFrame.origin.y + 20, reviewSummaryFrame.size.width, 10);
@@ -148,7 +147,7 @@
 {
 	ReviewsController *reviewsController = [[[ReviewsController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 	UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:reviewsController] autorelease];
-	self.reviewsPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:nav] autorelease];
+	self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
 	
 	CGRect fromRect = [(UIView *)sender frame];
 	[reviewsPopover presentPopoverFromRect:fromRect inView:[sender superview] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
