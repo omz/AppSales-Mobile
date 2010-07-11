@@ -49,7 +49,8 @@
 		return;
 	}
 	if (appID.length < 4) {
-		[NSException raise:NSInvalidArgumentException format:@"invalid appID: %@", appID];
+		NSLog(@"invalid appID: %@", appID);
+		return;
 	}
 	NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.png", [appID substringToIndex:3], [appID substringFromIndex:3]]]];
 	if (!imageData) imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.jpg", [appID substringToIndex:3], [appID substringFromIndex:3]]]];
