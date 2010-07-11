@@ -74,7 +74,12 @@
 - (NSArray*) appNamesSorted {
 	NSArray *allApps = appsByID.allValues;
 	NSSortDescriptor *appSorter = [[[NSSortDescriptor alloc] initWithKey:@"appName" ascending:YES] autorelease];
-	return [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
+	NSArray *sortedApps = [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
+	NSMutableArray *sortedNames = [NSMutableArray arrayWithCapacity:allApps.count];
+	for (App *app in sortedApps) {
+		[sortedNames addObject:app.appName];
+	}
+	return sortedNames;
 }
 
 - (void) saveToDisk {
