@@ -7,35 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <MessageUI/MFMailComposeViewController.h>
 
 #define ReportManagerDownloadedDailyReportsNotification				@"ReportManagerDownloadedDailyReportsNotification"
 #define ReportManagerDownloadedWeeklyReportsNotification			@"ReportManagerDownloadedWeeklyReportsNotification"
 #define ReportManagerUpdatedDownloadProgressNotification			@"ReportManagerUpdatedDownloadProgressNotification"
 
-// only needed if using backup feature.  See comments in upload_appsales.php file.
-//#define BACKUP_HOSTNAME \
-//	@"http://<computer-name>.local/~<username>/upload_appsales.php"
-
 @class Day;
 
-@interface ReportManager : NSObject <MFMailComposeViewControllerDelegate> {
+@interface ReportManager : NSObject {
 	NSMutableDictionary *days;
 	NSMutableDictionary *weeks;
-	NSMutableArray      *backupList;
 	
 	BOOL isRefreshing;
 	BOOL needsDataSavedToDisk;
 	NSString *reportDownloadStatus;
 	
-	int retryIfBackupFailure;
-	BOOL backupReviewsFile;
-	
-	// temporary fields, used while fetching reports
-	NSString *username;
-	NSString *password;
-	NSArray *weeksToSkip;
-	NSArray *daysToSkip;
+	BOOL cacheChanged;
 }
 
 @property (readonly) NSDictionary *days;
@@ -44,16 +31,21 @@
 
 + (ReportManager *)sharedManager;
 
+- (BOOL)loadReportCache;
+- (void)generateReportCache:(NSString *)reportCacheFile;
+
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
-- (void)loadSavedFiles;
 
 - (void)deleteDay:(Day *)dayToDelete;
 
-// backup files through email.  requiring the view controller is kinda hacky, but could easily refactor later
-- (void) backupRawCSVToEmail:(UIViewController*)viewController;
-- (void)backupData; // backup to a remote host
+- (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
+- (void)saveData;
+- (NSString *)originalReportsPath;
+- (NSString *)reportCachePath;
 
+- (void)importReport:(Day *)report;
+- (void)deleteDay:(Day *)dayToDelete;
 
 
 @end

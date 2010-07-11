@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+	<title>AppSales</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			line-height: 130%;
+			text-align: center;
+			color: black;
+			background-color: #c5ccd2;
+			font-size: 16px; font-family: Helvetica, Arial;
+		}
+		.container {
+			margin: 1em auto;
+			margin-top: 50px;
+			padding: 15px;
+			width: 600px;
+			text-align: left;
+			border: solid 1px #a8abad;
+			-webkit-border-radius: 10px;
+			background-color: white;
+		}
+		.title {
+			margin-top: 40px;
+			color: #4d576b;
+			text-shadow: 0px 1px white;
+			text-align: center;
+		}
+		</style>
+</head>
+
+<body>
+	<h1 class="title">AppSales Import / Export</h1>
+<div class="container">
+	<p>You can import report files that you downloaded manually from iTunes Connect or with a different application to AppSales.</p>
+	<p>Report files must be stored in a zip archive without subdirectories and have a txt extension. Only daily and weekly reports are supported.</p>
+	
+	<form action="" method="post" enctype="multipart/form-data" name="form1" id="form1">
+	<input type="file" name="file" id="file" />
+	<label><input type="submit" name="button" id="button" value="Import" /></label>
+	</form>
+</div>
+<div class="container">
+	<p>These are the original report files that you downloaded with AppSales. Please note that older versions of AppSales did not store the original report files, so that this list may not be complete.</p>
+	<p>[[[REPORTFILES]]]</p>
+</div>
+</body>
+</html>

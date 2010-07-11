@@ -40,10 +40,10 @@
 
 - (id)init
 {
-	self = [super init];
-	if (self) {
-		self.title = NSLocalizedString(@"Daily",nil);
-	}
+	[super init];
+	
+	self.title = NSLocalizedString(@"Daily Reports",nil);
+	
 	return self;
 }
 
@@ -67,17 +67,17 @@
 	[self.tableView reloadData];
 }
 
-- (void) viewDidLoad
+- (void) viewWillAppear:(BOOL)animated
 {
-	[super viewDidLoad];
-	[self reload];	
+	[super viewWillAppear:animated];
+	[self reload];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload)
 												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
 }
 
-- (void) viewDidUnload
+- (void) viewWillDisappear:(BOOL)animated
 {
-	[super viewDidUnload];
+	[super viewWillDisappear:animated];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

@@ -34,8 +34,6 @@
 @implementation CountryCell
 
 @synthesize totalRevenue;
-@synthesize country;
-@synthesize graphColor;
 
 - (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier
 {
@@ -44,38 +42,43 @@
 		UIView *calendarBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(0,0,45,44)] autorelease];
 		calendarBackgroundView.backgroundColor = calendarBackgroundColor;
 		
-		flagView = [[[UIImageView alloc] initWithFrame:CGRectMake(6, 0, 32, 32)] autorelease];
+		flagView = [[UIImageView alloc] initWithFrame:CGRectMake(6, 0, 32, 32)];
 		
-		countryLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 33, 44, 9)] autorelease];
+		countryLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 33, 44, 9)];
 		countryLabel.font = [UIFont systemFontOfSize:9.0];
 		countryLabel.textAlignment = UITextAlignmentCenter;
 		countryLabel.text = @"N/A";
 		countryLabel.backgroundColor = calendarBackgroundColor;
+		countryLabel.highlightedTextColor = [UIColor whiteColor];
 		
-		detailsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 15)] autorelease];
+		detailsLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 15)];
 		detailsLabel.textColor = [UIColor grayColor];
 		detailsLabel.font = [UIFont systemFontOfSize:12.0]; 
 		detailsLabel.textAlignment = UITextAlignmentCenter;
+		detailsLabel.highlightedTextColor = [UIColor whiteColor];
 		
-		revenueLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 0, 100, 30)] autorelease];
+		revenueLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 100, 30)];
 		revenueLabel.font = [UIFont boldSystemFontOfSize:20.0];
 		revenueLabel.textAlignment = UITextAlignmentRight;
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
+		revenueLabel.highlightedTextColor = [UIColor whiteColor];
 		
-		graphLabel = [[[UILabel alloc] initWithFrame:CGRectMake(160, 4, 130, 21)] autorelease];
+		graphLabel = [[UILabel alloc] initWithFrame:CGRectMake(160, 4, 130, 21)];
 		graphLabel.textAlignment = UITextAlignmentRight;
 		graphLabel.font = [UIFont boldSystemFontOfSize:12.0];
 		graphLabel.backgroundColor = [UIColor clearColor];
 		graphLabel.textColor = [UIColor whiteColor];
 		graphLabel.text = @"## %";
 		
-		UIView *graphBackground = [[[UIView alloc] initWithFrame:CGRectMake(160, 4, 130, 21)] autorelease];
-		graphBackground.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
+		UIImageView *graphBackground = [[[UIImageView alloc] initWithFrame:CGRectMake(160, 4, 130, 21)] autorelease];
+		graphBackground.image = [UIImage imageNamed:@"Gray.png"];
+		//graphBackground.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 		
-		self.graphColor = [UIColor colorWithRed:0.54 green:0.61 blue:0.67 alpha:1.0];
+		graphColor = [[UIColor alloc] initWithRed:0.54 green:0.61 blue:0.67 alpha:1.0];
 		
-		graphView = [[[UIView alloc] initWithFrame:CGRectMake(160, 4, 130, 21)] autorelease];
-		graphView.backgroundColor = self.graphColor;
+		graphView = [[UIImageView alloc] initWithFrame:CGRectMake(160, 4, 130, 21)];
+		//graphView.backgroundColor = self.graphColor;
+		graphView.image = [UIImage imageNamed:@"Blueish.png"];
 		
 		[self.contentView addSubview:calendarBackgroundView];
 		[self.contentView addSubview:revenueLabel];
@@ -90,9 +93,13 @@
 		[percentFormatter setMaximumFractionDigits:1];
 		[percentFormatter setMinimumIntegerDigits:1];
 				
-		self.totalRevenue = 1.0;
+		totalRevenue = 1.0;
     }
     return self;
+}
+
+- (Country*) country {
+	return country;
 }
 
 - (void)setCountry:(Country *)newCountry
@@ -114,7 +121,7 @@
 	float revenue = [self.country totalRevenueInBaseCurrency];
 	float percent;
 	if (revenue > 0)
-		percent = [self.country totalRevenueInBaseCurrency] / self.totalRevenue;
+		percent = [self.country totalRevenueInBaseCurrency] / totalRevenue;
 	else
 		percent = 0.0;
 	NSString *percentString = [NSString stringWithFormat:@"%@ %% ", [percentFormatter stringFromNumber:[NSNumber numberWithFloat:percent*100]]];
@@ -124,30 +131,17 @@
 	
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-
-    [super setSelected:selected animated:animated];
-	if (selected) {
-		revenueLabel.textColor = [UIColor whiteColor];
-		graphView.backgroundColor = [UIColor whiteColor];
-		detailsLabel.textColor = [UIColor whiteColor];
-		countryLabel.textColor = [UIColor whiteColor];
-	}
-	else {
-		revenueLabel.textColor = [UIColor blackColor];
-		graphView.backgroundColor = self.graphColor;
-		detailsLabel.textColor = [UIColor grayColor];
-		countryLabel.textColor = [UIColor blackColor];
-	}
-}
-
-
-- (void)dealloc 
-{
-	self.graphColor = nil;
+- (void) dealloc {
+	[flagView release];
+	[revenueLabel release];
+	[countryLabel release];
+	[detailsLabel release];
+	[graphView release];
+	[graphLabel release];
+	[country release];
+	[graphColor release];
 	[percentFormatter release];
 	[super dealloc];
 }
-
 
 @end

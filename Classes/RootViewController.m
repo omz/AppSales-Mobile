@@ -39,13 +39,15 @@
 #import "SettingsViewController.h"
 #import "DaysController.h"
 #import "WeeksController.h"
-#import "TotalController.h"
 #import "HelpBrowser.h"
 #import "SFHFKeychainUtils.h"
 #import "StatisticsViewController.h"
 #import "ReportManager.h"
+#import "AppManager.h"
 #import "ReviewsController.h"
 #import "ReviewManager.h"
+#import "ImportExportViewController.h"
+#import "UIDevice+iPad.h"
 
 @implementation RootViewController
 
@@ -66,8 +68,13 @@
 	UIBarButtonItem *flexSpaceItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
 	
 	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 32)] autorelease];
-	statusLabel.textColor = [UIColor whiteColor];
+	
+	if ([UIDevice currentDevice].isPad)
+		statusLabel.textColor = [UIColor darkGrayColor];
+	else
+		statusLabel.textColor = [UIColor whiteColor];
 	statusLabel.shadowColor = [UIColor darkGrayColor];
+
 	statusLabel.shadowOffset = CGSizeMake(0, 1);
 	statusLabel.font = [UIFont systemFontOfSize:12.0];
 	statusLabel.numberOfLines = 2;
@@ -87,17 +94,17 @@
 	self.navigationItem.rightBarButtonItem = infoButtonItem;
 	
 	self.tableView.contentInset = UIEdgeInsetsMake(22, 0, 0, 0);
-	[self.tableView setScrollEnabled:NO];	
+	[self.tableView setScrollEnabled:NO];
 }
-
-
-- (void)viewDidLoad 
-{
-	[super viewDidLoad];
 	
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+
 	[self refreshDailyTrend];
 	[self refreshWeeklyTrend];
-	
+	[self updateProgress];
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) 
 												 name:ReportManagerUpdatedDownloadProgressNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) 
@@ -106,7 +113,8 @@
 												 name:ReportManagerDownloadedWeeklyReportsNotification object:nil];	
 }
 
-- (void) viewDidUnload {
+- (void) viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -119,7 +127,7 @@
 
 - (UIImage *)sparklineForReports:(NSArray *)days
 {
-	UIGraphicsBeginImageContext(CGSizeMake(120, 30));
+	UIGraphicsBeginImageContextWithOptions(CGSizeMake(120, 30),NO,[UIScreen mainScreen].scale);
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
@@ -228,11 +236,6 @@
 	[self.tableView reloadData];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-	[self updateProgress];
-}
-
 - (void)downloadReports
 {
 	[[ReportManager sharedManager] downloadReports];
@@ -244,11 +247,6 @@
 	UINavigationController *browserNavController = [[[UINavigationController alloc] initWithRootViewController:browser] autorelease];
 	browserNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 	[self.navigationController presentModalViewController:browserNavController animated:YES];
-}
-
-- (void)visitIconDrawer
-{
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://icondrawer.com"]];
 }
 
 - (void)updateProgress
@@ -272,9 +270,11 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
 	if (section == 0)
-		return 4; //daily + weekly + total + graphs
+		return 3;
+	else if (section == 1)
+		return 1;
 	else
-		return 1; //reviews / settings
+		return 2;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -289,30 +289,36 @@
 	int row = [indexPath row];
 	int section = [indexPath section];
 	if ((row == 0) && (section == 0)) {
-		cell.imageView.image = [UIImage imageNamed:@"Daily.png"];
+		cell.imageView.image = [UIImage imageNamed:@"Day.png"];
+		cell.imageView.highlightedImage = [UIImage imageNamed:@"Day_Highlighted.png"];
 		cell.textLabel.text = NSLocalizedString(@"Daily",nil);
 		cell.accessoryView = self.dailyTrendView;
 	}
 	else if ((row == 1) && (section == 0)) {
-		cell.imageView.image = [UIImage imageNamed:@"Weekly.png"];
+		cell.imageView.image = [UIImage imageNamed:@"Week.png"];
+		cell.imageView.highlightedImage = [UIImage imageNamed:@"Week_Highlighted.png"];
 		cell.textLabel.text = NSLocalizedString(@"Weekly",nil);
 		cell.accessoryView = self.weeklyTrendView;
 	}
 	else if ((row == 2) && (section == 0)) {
-		cell.imageView.image = [UIImage imageNamed:@"Cash.png"];
-		cell.textLabel.text = NSLocalizedString(@"Total",nil);
-	}
-	else if ((row == 3) && (section == 0)) {
-		cell.imageView.image = [UIImage imageNamed:@"Statistics.png"];
+		cell.imageView.image = [UIImage imageNamed:@"Graphs.png"];
+		cell.imageView.highlightedImage = [UIImage imageNamed:@"Graphs_Highlighted.png"];
 		cell.textLabel.text = NSLocalizedString(@"Graphs",nil);
 	}
 	else if ((row == 0) && (section == 1)) {
-		cell.imageView.image = [UIImage imageNamed:@"Reviews.png"];
+		cell.imageView.image = [UIImage imageNamed:@"Star.png"];
+		cell.imageView.highlightedImage = [UIImage imageNamed:@"Star_Highlighted.png"];
 		cell.textLabel.text = NSLocalizedString(@"Reviews",nil);
 	}
 	else if ((row == 0) && (section == 2)) {
-		cell.imageView.image = [UIImage imageNamed:@"Settings.png"];
+		cell.imageView.image = [UIImage imageNamed:@"Settings2.png"];
+		cell.imageView.highlightedImage = [UIImage imageNamed:@"Settings2_Highlighted.png"];
 		cell.textLabel.text = NSLocalizedString(@"Settings",nil);
+	}
+	else if ((row == 1) && (section == 2)) {
+		cell.imageView.image = [UIImage imageNamed:@"ImportExport.png"];
+		cell.imageView.highlightedImage = [UIImage imageNamed:@"ImportExport_Highlighted.png"];
+		cell.textLabel.text = NSLocalizedString(@"Import / Export",nil);
 	}
     return cell;
 }
@@ -336,13 +342,6 @@
 		[self.navigationController pushViewController:weeksController animated:YES];
 	}
 	else if ((row == 2) && (section == 0)) {
-		if (!self.totalController) {
-			self.totalController = [[[TotalController alloc] init] autorelease];
-			totalController.hidesBottomBarWhenPushed = YES;		
-		}
-		[self.navigationController pushViewController:totalController animated:YES];
-	}
-	else if ((row == 3) && (section == 0)) {
 		if (!self.statisticsController) {
 			self.statisticsController = [[StatisticsViewController new] autorelease];
 			statisticsController.hidesBottomBarWhenPushed = YES;
@@ -350,7 +349,7 @@
 		[self.navigationController pushViewController:statisticsController animated:YES];
 	}
 	else if ((row == 0) && (section == 1)) {
-		if ([ReviewManager sharedManager].numberOfApps == 0) {
+		if ([AppManager sharedManager].numberOfApps == 0) {
 			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) 
 										delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) 
 							   otherButtonTitles:nil] autorelease] show];
@@ -366,6 +365,11 @@
 	}
 	else if ((row == 0) && (section == 2)) {
 		[self.navigationController pushViewController:settingsController animated:YES];
+	}
+	else if ((row == 1) && (section == 2)) {
+		ImportExportViewController *vc = [[[ImportExportViewController alloc] initWithNibName:nil bundle:nil] autorelease];
+		[self.navigationController pushViewController:vc animated:YES];
+		
 	}
 	
 	[aTableView deselectRowAtIndexPath:indexPath animated:YES];

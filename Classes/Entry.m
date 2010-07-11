@@ -31,6 +31,7 @@
 #import "Entry.h"
 #import "Country.h"
 #import "CurrencyManager.h"
+#import "ReportManager.h"
 
 @implementation Entry
 
@@ -41,6 +42,11 @@
 @synthesize transactionType;
 @synthesize royalties;
 @synthesize units;
+
+- (BOOL) purchase
+{
+	return transactionType == 1 || transactionType == 2 || transactionType == 9;
+}
 
 
 - (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry
@@ -55,7 +61,7 @@
 		transactionType = type;
 		units = u;
 		royalties = r;
-		[country.entries addObject:self];
+		[country addEntry:self];
 	}
 	return self;
 }
@@ -64,15 +70,14 @@
 {
 	self = [super init];
 	if (self) {
-		productIdentifier = [[coder decodeObjectForKey:@"productIdentifier"] retain];
-		productName = [[coder decodeObjectForKey:@"productName"] retain];
 		country = [[coder decodeObjectForKey:@"country"] retain];
+		[country addEntry:self];
+		productName = [[coder decodeObjectForKey:@"productName"] retain];
 		currency = [[coder decodeObjectForKey:@"currency"] retain];
-		
 		transactionType = [coder decodeIntForKey:@"transactionType"];
 		units = [coder decodeIntForKey:@"units"];
 		royalties = [coder decodeFloatForKey:@"royalties"];
-		[country.entries addObject:self];
+		productIdentifier = [[coder decodeObjectForKey:@"productIdentifier"] retain];
 	}
 	return self;
 }
@@ -92,9 +97,9 @@
 
 - (float)totalRevenueInBaseCurrency
 {
-	if (transactionType == 1) {
-		const float revenueInLocalCurrency = self.royalties * self.units;
-		const float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenueInLocalCurrency fromCurrency:self.currency];
+	if (self.purchase) {
+		float revenueInLocalCurrency = self.royalties * self.units;
+		float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenueInLocalCurrency fromCurrency:self.currency];
 		return revenueInBaseCurrency;
 	}
 	return 0;
@@ -102,7 +107,7 @@
 
 - (NSString *)description
 {
-	if (self.transactionType == 1) {
+	if (self.purchase) {
 		NSNumberFormatter *numberFormatter = [[NSNumberFormatter new] autorelease];
 		[numberFormatter setMinimumFractionDigits:2];
 		[numberFormatter setMaximumFractionDigits:2];
@@ -111,7 +116,8 @@
 		NSString *totalRevenueString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:[self totalRevenueInBaseCurrency]]];
 		NSString *royaltiesSumString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:self.royalties * self.units]];
 		
-		return [NSString stringWithFormat:@"%@ : %i × %@ %@ = %@ %@ ≈ %@", self.productName, self.units, royaltiesString, self.currency, royaltiesSumString, self.currency, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:totalRevenueString]];
+		return [NSString stringWithFormat:@"%@ : %i × %@ %@ = %@ %@ ≈ %@", self.productName, self.units, royaltiesString, 
+				self.currency, royaltiesSumString, self.currency, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:totalRevenueString]];
 	}
 	return [NSString stringWithFormat:NSLocalizedString(@"%@ : %i free downloads",nil), self.productName, self.units];
 }

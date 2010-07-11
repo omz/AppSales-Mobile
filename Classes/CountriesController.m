@@ -35,10 +35,11 @@
 #import "Entry.h"
 #import "Country.h"
 #import "AppIconManager.h"
+#import "ReportManager.h"
+#import "App.h"
 
 @implementation CountriesController
 
-@synthesize countries;
 @synthesize products;
 @synthesize totalRevenue;
 @synthesize displayMode;
@@ -48,6 +49,11 @@
 	self.products = nil;
 	self.countries = nil;
     [super dealloc];
+}
+
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
 }
 
 - (void)viewDidLoad
@@ -72,6 +78,10 @@
 	[self.tableView reloadData];
 }
 
+- (NSArray*) countries {
+	return countries;
+}
+
 - (void)setCountries:(NSArray *)newCountries
 {
 	[newCountries retain];
@@ -84,7 +94,7 @@
 	NSMutableDictionary *productInfos = [NSMutableDictionary dictionary];
 	for (Country *c in countries) {
 		for (Entry *e in c.entries) {
-			if (e.transactionType == 1) {
+			if (e.purchase) {
 				NSMutableDictionary *productInfo = [productInfos objectForKey:e.productIdentifier];
 				if (!productInfo) {
 					productInfo = [NSMutableDictionary dictionary];
@@ -141,19 +151,21 @@
 		cell.country = [self.countries objectAtIndex:[indexPath row]];
 		return cell;
 	}
-	static NSString *ProductCellIdentifier = @"ProductCell";
-	ProductCell *cell = (ProductCell *)[tableView dequeueReusableCellWithIdentifier:ProductCellIdentifier];
-	if (cell == nil) {
-		cell = [[[ProductCell alloc] initWithFrame:CGRectZero reuseIdentifier:ProductCellIdentifier] autorelease];
+	else {
+		static NSString *ProductCellIdentifier = @"ProductCell";
+		ProductCell *cell = (ProductCell *)[tableView dequeueReusableCellWithIdentifier:ProductCellIdentifier];
+		if (cell == nil) {
+			cell = [[[ProductCell alloc] initWithFrame:CGRectZero reuseIdentifier:ProductCellIdentifier] autorelease];
+		}
+		cell.selectionStyle = UITableViewCellSelectionStyleNone;
+		cell.totalRevenue = self.totalRevenue;
+		NSDictionary *productInfo = [products objectAtIndex:[indexPath row]];
+		NSString *appID = [productInfo objectForKey:@"appID"];
+		cell.productInfo = productInfo;
+		UIImage *appIcon = [[AppIconManager sharedManager] iconForAppID:appID];
+		[cell setAppIcon:appIcon];
+		return cell;
 	}
-	cell.selectionStyle = UITableViewCellSelectionStyleNone;
-	cell.totalRevenue = self.totalRevenue;
-	NSDictionary *productInfo = [products objectAtIndex:[indexPath row]];
-	NSString *appID = [productInfo objectForKey:@"appID"];
-	cell.productInfo = productInfo;
-	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppID:appID];
-	if (appIcon != nil) [cell setAppIcon:appIcon];
-	return cell;
 }
 
 

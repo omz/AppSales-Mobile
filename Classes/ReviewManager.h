@@ -9,7 +9,6 @@
 
 @interface ReviewManager : NSObject {
 	@private
-	NSMutableDictionary *appsByID;
 	float percentComplete, progressIncrement; // for presentation.  can only be accessed on main thread
 	
 	BOOL isDownloadingReviews;
@@ -28,14 +27,10 @@
 + (ReviewManager*) sharedManager;
 
 @property (readonly) NSString *reviewDownloadStatus;
-@property (readonly) NSUInteger numberOfApps;
 @property (readonly) BOOL isDownloadingReviews;
-@property (readonly) NSArray* appNamesSorted;
 
 - (void) downloadReviews;
-- (App*) appWithID:(NSString*)appID;
-- (BOOL) createOrUpdateAppIfNeededWithID:(NSString*)appID name:(NSString*)appName;
-- (void) addApp:(App*)app;
+- (void) markAllReviewsAsRead;
 
 @end
 

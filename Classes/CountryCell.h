@@ -37,7 +37,7 @@
 	UILabel *revenueLabel;
 	UILabel *countryLabel;
 	UILabel *detailsLabel;
-	UIView *graphView;
+	UIImageView *graphView;
 	UILabel *graphLabel;
 	float totalRevenue;
 	Country *country;	
@@ -46,7 +46,6 @@
 }
 
 @property (retain) Country *country;
-@property (retain) UIColor *graphColor;
 @property (assign) float totalRevenue;
 
 @end

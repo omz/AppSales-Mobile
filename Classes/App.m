@@ -18,31 +18,20 @@ NSString* getDocPath() {
 	return documentsDirectory;
 }
 
-NSString* getPrefetchedPath() {
-	static NSString *prefetchedPath = nil;
-	if (!prefetchedPath) {
-		NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
-		prefetchedPath = [[NSString stringWithFormat:@"%@/Prefetched/", bundlePath] retain];
-	}
-	return prefetchedPath;
-}
-
-
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, newReviewsCount;
+@synthesize appID, appName, reviewsByUser, newReviewsCount, allAppNames;
 
-- (void) updateAverageStars {
-	if (reviewsByUser.count == 0) {
-		averageStars = 0;
-		return;
+- (id)initWithCoder:(NSCoder *)coder {
+	self = [super init];
+	if (self) {
+		appID = [[coder decodeObjectForKey:@"appID"] retain];
+		appName = [[coder decodeObjectForKey:@"appName"] retain];
+		reviewsByUser = [[coder decodeObjectForKey:@"reviewsByUser"] retain];
+		allAppNames = [[coder decodeObjectForKey:@"allAppNames"] retain];
+		averageStars = [coder decodeFloatForKey:@"averageStars"];
 	}
-	
-	float sum = 0;
-	for (Review *r in [reviewsByUser allValues]) {
-		sum += r.stars;
-	}
-	averageStars = sum / reviewsByUser.count;
+	return self;
 }
 
 - (void) resetNewReviewCount {
@@ -50,13 +39,26 @@ NSString* getPrefetchedPath() {
 	
 	for (Review *review in reviewsByUser.objectEnumerator) {
 		review.newOrUpdatedReview = NO;
-	}	
+	}
 }
 
-- (void) updateApplicationName:(NSString*)newAppName {
-	[newAppName retain];
-	[appName release];
-	appName = newAppName;
+- (NSMutableArray *)allAppNames {
+	if(! allAppNames){
+		allAppNames = [[NSMutableArray alloc] initWithObjects:self.appName, nil];
+	}
+	return allAppNames;
+}
+
+- (void) updateApplicationName:(NSString*)n {
+	if(![n isEqualToString:appName]){
+		[appName release];
+		appName = [n retain];
+	}
+	for(NSString *name in self.allAppNames){
+		if([name isEqualToString:n])
+			return;
+	}
+	[self.allAppNames addObject:n];
 }
 
 - (float) averageStars {
@@ -73,22 +75,14 @@ NSString* getPrefetchedPath() {
 	return self;
 }
 
-- (id)initWithCoder:(NSCoder *)coder {
-	self = [super init];
-	if (self) {
-		appID = [[coder decodeObjectForKey:@"appID"] retain];
-		appName = [[coder decodeObjectForKey:@"appName"] retain];
-		reviewsByUser = [[coder decodeObjectForKey:@"reviewsByUser"] retain];
-		averageStars = [coder decodeFloatForKey:@"averageStars"];
-	}
-	return self;
-}
 
-- (void) encodeWithCoder:(NSCoder *)coder {
+- (void)encodeWithCoder:(NSCoder *)coder
+{
 	[coder encodeObject:self.appID forKey:@"appID"];
 	[coder encodeObject:self.appName forKey:@"appName"];
 	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
 	[coder encodeFloat:self.averageStars forKey:@"averageStars"];
+	[coder encodeObject:self.allAppNames forKey:@"allAppNames"];
 }
 
 - (NSString *) description {
@@ -97,14 +91,23 @@ NSString* getPrefetchedPath() {
 
 - (void) addOrReplaceReview:(Review*)review {
 	[reviewsByUser setObject:review forKey:review.user];
-	[self updateAverageStars];
-	newReviewsCount++;
+	newReviewsCount = 0;
+	
+	double sum = 0;
+	for (Review *r in reviewsByUser.allValues) {
+		sum += r.stars;
+		if (r.newOrUpdatedReview) {
+			newReviewsCount++;
+		}
+	}
+	averageStars = sum / reviewsByUser.count;
 }
 
 - (void) dealloc {
 	[appID release];
 	[appName release];
 	[reviewsByUser release];
+	[allAppNames release];
 	[super dealloc];
 }
 

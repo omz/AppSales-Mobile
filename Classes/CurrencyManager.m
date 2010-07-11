@@ -33,7 +33,6 @@
 
 @implementation CurrencyManager
 
-@synthesize baseCurrency;
 @synthesize lastRefresh;
 @synthesize exchangeRates;
 @synthesize availableCurrencies;
@@ -127,6 +126,9 @@
 	return self;
 }
 
+- (NSString*) baseCurrency {
+	return baseCurrency;
+}
 - (void)setBaseCurrency:(NSString *)newBaseCurrency
 {
 	[self.conversionDict removeAllObjects];

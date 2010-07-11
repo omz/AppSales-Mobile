@@ -35,17 +35,25 @@
 	[self.tableView reloadData];
 }
 
-- (id)initWithApp:(App*)appToUse {
-	self = [self initWithStyle:UITableViewStylePlain];
+- (id)initWithApp:(App*)appToUse style:(UITableViewStyle)style {
+	self = [self initWithStyle:style];
 	if (self) {
 		app = [appToUse retain];
 	}
 	return self;
 }
 
-- (void)viewDidLoad {
-	[super viewDidLoad];
+- (void)viewDidLoad
+{
 	self.tableView.rowHeight = 85;
+	UIBarButtonItem * lAllRead = [[UIBarButtonItem alloc] initWithTitle:@"Read all" style:UIBarButtonItemStylePlain target:self action:@selector(readall)];
+	self.navigationItem.rightBarButtonItem = lAllRead ;
+	[lAllRead release];
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	
 	[self loadReviews];
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(loadReviews) 
@@ -53,9 +61,25 @@
 											   object:nil];
 }
 
-- (void)viewDidUnload {
-	[super viewDidUnload];
-	[[NSNotificationCenter defaultCenter] removeObserver:self];	
+- (void) viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
+}
+
+-(void) readall
+{
+	NSUInteger lCurIdx, lNbReviews = [reviews count];
+	for (lCurIdx = 0; lCurIdx < lNbReviews; lCurIdx++)
+	{
+		Review * lCurReview = [reviews objectAtIndex:lCurIdx];
+		lCurReview.newOrUpdatedReview = NO;
+	}
+	[self.tableView reloadData];
 }
 
 #pragma mark Table view methods
@@ -88,7 +112,9 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
 	SingleReviewController *reviewController = [[[SingleReviewController alloc] init] autorelease];
-	reviewController.review = [reviews objectAtIndex:indexPath.row];
+	Review *review = [reviews objectAtIndex:indexPath.row];
+	reviewController.review = review;
+	review.newOrUpdatedReview = NO;
 	[self.navigationController pushViewController:reviewController animated:YES];
 }
 

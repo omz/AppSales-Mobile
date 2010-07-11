@@ -3,8 +3,7 @@
 #import "Review.h"
 #import "NSString+UnescapeHtml.h"
 #import "ReportManager.h"
-
-#define REVIEW_SAVED_FILE_NAME @"ReviewApps.rev"
+#import "AppManager.h"
 
 @implementation ReviewManager
 
@@ -20,13 +19,6 @@
 
 - (id) init {
 	if (self = [super init]) {
-		NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
-		if ([[NSFileManager defaultManager] fileExistsAtPath:reviewsFile]) {
-			appsByID = [[NSKeyedUnarchiver unarchiveObjectWithFile:reviewsFile] retain];
-		} else {
-			appsByID = [[NSMutableDictionary alloc] init];
-		}
-		
 		NSString *notification = UIApplicationWillTerminateNotification;
 		if (&UIApplicationDidEnterBackgroundNotification) {
 			notification = UIApplicationDidEnterBackgroundNotification;
@@ -36,9 +28,14 @@
 	return self;
 }
 
+- (void) markAllReviewsAsRead {
+	for(App *app in [AppManager sharedManager].allApps){
+		[app resetNewReviewCount];
+	}
+}
+
 - (void) dealloc {
 	[[NSNotificationCenter defaultCenter] removeObject:self];
-	[appsByID release];
 	[super dealloc];
 }
 
@@ -75,7 +72,7 @@
 }
 
 - (void) addOrUpdatedReviewIfNeeded:(Review*)review appID:(NSString*)appID {
-	App *app = [appsByID objectForKey:appID]; // read only, no synchronization needed
+	App *app = [[AppManager sharedManager] appWithID:appID]; // read only, no synchronization needed
 	
 	Review *oldReview;
 	@synchronized (app) {
@@ -85,7 +82,7 @@
 	if  (oldReview != nil && [oldReview.text isEqual:review.text]) {
 		return; // up to date
 	}
-		
+	
 	[review updateTranslations]; // network call, done outside of synchronized block
 
 	@synchronized (app) {
@@ -123,7 +120,7 @@
 			[request setAllHTTPHeaderFields:headers];
 			[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
 					
-			for (NSString *appID in appsByID.keyEnumerator) {
+			for (NSString *appID in [AppManager sharedManager].allAppIDs) {
 				NSString *reviewsURLString = [NSString stringWithFormat:@"http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=0&sortOrdering=4&type=Purple+Software", appID];
 				[request setURL:[NSURL URLWithString:reviewsURLString]];
 				
@@ -356,7 +353,7 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	
 	// sort regions by its number of existing reviews, so the less active regions are downloaded last
 	NSMutableDictionary *numExistingReviews = [NSMutableDictionary dictionary];
-	for (App *app in [appsByID objectEnumerator]) {
+	for (App *app in [AppManager sharedManager].allApps) {
 		for (Review *review in [app.reviewsByUser objectEnumerator]) {
 			NSNumber *object = [numExistingReviews objectForKey:review.countryCode];
 			const NSUInteger count = (object ? object.intValue + 1 : 1);
@@ -422,7 +419,7 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
 	
 	// reset new review count
-	for (App *app in appsByID.objectEnumerator) {
+	for (App *app in [[AppManager sharedManager] allApps]) {
 		[app resetNewReviewCount];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
@@ -436,44 +433,13 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	
 	if (saveToDiskNeeded) {
 		saveToDiskNeeded = NO;
-		NSString *reviewsFile = [getDocPath() stringByAppendingPathComponent:REVIEW_SAVED_FILE_NAME];
-		[NSKeyedArchiver archiveRootObject:appsByID toFile:reviewsFile];
+		[[AppManager sharedManager] saveToDisk];
 	}
 	[self updateReviewDownloadProgress:@""];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
 
-- (App*) appWithID:(NSString*)appID {
-	return [appsByID objectForKey:appID];
-}
 
-- (void) addApp:(App*)app {
-	[appsByID setObject:app forKey:app.appID];
-}
-
-- (BOOL) createOrUpdateAppIfNeededWithID:(NSString*)appID name:(NSString*)appName {
-	App *app = [self appWithID:appID];
-	if (app == nil) {
-		App *app = [[App alloc] initWithID:appID name:appName];
-		[self addApp:app];
-		[app release];
-		return YES;
-	}
-	if (! [app.appName isEqualToString:appName]) {
-		[app updateApplicationName:appName]; // name of app has changed
-	}
-	return NO; // was already present
-}
-
-- (NSUInteger) numberOfApps {
-	return appsByID.count;
-}
-
-- (NSArray*) appNamesSorted {
-	NSArray *allApps = appsByID.allValues;
-	NSSortDescriptor *appSorter = [[[NSSortDescriptor alloc] initWithKey:@"appName" ascending:YES] autorelease];
-	return [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
-}
 
 
 @end

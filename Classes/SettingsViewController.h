@@ -32,14 +32,12 @@ AppSalesMobile
 
 
 @interface SettingsViewController : UIViewController <UITextFieldDelegate> {
-	
 	IBOutlet UILabel *explanationsLabel;
 	IBOutlet UILabel *copyrightLabel;
 	IBOutlet UITextField *usernameTextField;
 	IBOutlet UITextField *passwordTextField;
 	IBOutlet UILabel *translationLabel;
 	IBOutlet UISwitch *translationSwitch;
-	IBOutlet UILabel *backupReportsLabel;
 	IBOutlet UISegmentedControl *currencySelectionControl;
 	IBOutlet UILabel *loginSectionLabel;
 	IBOutlet UILabel *usernameLabel;
@@ -47,13 +45,11 @@ AppSalesMobile
 	IBOutlet UILabel *currencySectionLabel;
 	IBOutlet UISegmentedControl *refreshNowLabel;
 	IBOutlet UILabel *lastRefreshLabel;
-	IBOutlet UISegmentedControl *backupButton;
 }
 
 - (IBAction)refreshExchangeRates:(id)sender;
 - (IBAction)changeCurrency:(id)sender;
-- (IBAction)uploadBackups:(id)sender;
-- (IBAction)emailCSVReports:(id)sender;
+
 - (void)currencyRatesDidUpdate;
 - (void)currencyRatesFailedToUpdate;
 - (void)baseCurrencyChanged;

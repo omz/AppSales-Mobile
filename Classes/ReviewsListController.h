@@ -15,6 +15,7 @@
 	NSArray *reviews;
 }
 
-- (id) initWithApp:(App*)appToUse;
+- (id) initWithApp:(App*)appToUse style:(UITableViewStyle)style;
+- (void) readall;
 
 @end

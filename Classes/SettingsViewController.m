@@ -34,6 +34,7 @@ AppSalesMobile
 #import "SFHFKeychainUtils.h"
 #import "ReportManager.h"
 #import "Review.h"
+#import "UIDevice+iPad.h"
 
 @implementation SettingsViewController
 
@@ -45,28 +46,45 @@ AppSalesMobile
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
+
 	self.navigationItem.title = NSLocalizedString(@"Settings",nil);
-	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
-	translationLabel.text = NSLocalizedString(@"Translate foreign reviews",nil);
-	loginSectionLabel.text = NSLocalizedString(@"iTunes Connect Login",nil);
-	usernameLabel.text = NSLocalizedString(@"User Name:",nil);
-	passwordLabel.text = NSLocalizedString(@"Password:",nil);
-	backupReportsLabel.text = NSLocalizedString(@"Backup reports", nil);
-	currencySectionLabel.text =  NSLocalizedString(@"Currency",nil);
-	[refreshNowLabel setTitle:[NSString stringWithFormat:NSLocalizedString(@"Refresh Now",nil)] forSegmentAtIndex:0];
-	explanationsLabel.text = NSLocalizedString(@"Exchange rates automatically refreshed every 6 hours.",nil);
+
+	if ([[UIDevice currentDevice] isPad]) {
+		/* On the iPad, groupTableViewBackgroundColor displays black, not the correct iPad-gray color, for us.
+		 * However, a minimal application which just uses the color as a view background doesn't show the same problem.
+		 * Something funky is here. We'll just work around it for now. -evands */
+		
+		UITableView *backgroundTableView = [[[UITableView alloc] initWithFrame:self.view.bounds
+																		 style:UITableViewStyleGrouped] autorelease];
+		backgroundTableView.autoresizingMask = (UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth);
+		[self.view addSubview:backgroundTableView];
+		[self.view sendSubviewToBack:backgroundTableView];		
+	} else {
+		self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+	}
+	
+//	NSLog(@"%@", [UIColor groupTableViewBackgroundColor]);
+
+	explanationsLabel.font = [UIFont systemFontOfSize:12.0];
+	explanationsLabel.text = NSLocalizedString(@"Exchange rates are automatically refreshed every 6 hours.\n\nAll information is presented without any warranties.\n\nThe presented market trend reports should not be considered to be your monthly royalty reports.",nil);
+	copyrightLabel.font = [UIFont systemFontOfSize:12.0];
+	currencySectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
+	loginSectionLabel.font = [UIFont boldSystemFontOfSize:16.0];
+	lastRefreshLabel.font = [UIFont systemFontOfSize:12.0];
 	
 	NSString *username = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
 	if (username) {
 		usernameTextField.text = username;
-		NSError *error = nil;
 		NSString *password = [SFHFKeychainUtils getPasswordForUsername:username
 														andServiceName:@"omz:software AppSales Mobile Service"
-																 error:&error];
+																 error:nil];
 		if (password) passwordTextField.text = password;
 	}
 	translationSwitch.on = [Review showTranslatedReviews];
-	
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
 	[self baseCurrencyChanged]; //set proper currency button title
 	[self currencyRatesDidUpdate]; //set proper refresh date in label
 	
@@ -75,24 +93,17 @@ AppSalesMobile
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(currencyRatesFailedToUpdate) 
 												 name:CurrencyManagerErrorNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(baseCurrencyChanged) 
-												 name:CurrencyManagerDidChangeBaseCurrencyNotification object:nil];
-#ifndef BACKUP_HOSTNAME
-	backupButton.hidden = YES;
-#endif
+												 name:CurrencyManagerDidChangeBaseCurrencyNotification object:nil];	
 }
 
-- (void) viewDidUnload
-{
-	[super viewDidUnload];
+- (void) viewDidDisappear:(BOOL)animated {
+	[super viewDidDisappear:animated];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-}
 
-- (void)viewWillDisappear:(BOOL)animated
-{
 	if (usernameTextField.text.length) {
 		[[NSUserDefaults standardUserDefaults] setObject:usernameTextField.text
 												  forKey:@"iTunesConnectUsername"];
-
+		
 		if (passwordTextField.text.length) {
 			[SFHFKeychainUtils storeUsername:usernameTextField.text
 								 andPassword:passwordTextField.text
@@ -101,7 +112,7 @@ AppSalesMobile
 									   error:nil];
 		}
 	}
-	[Review setShowTranslatedReviews:translationSwitch.on];
+	[Review setShowTranslatedReviews:translationSwitch.on];	
 }
 
 #pragma mark Text Field Delegate 
@@ -143,35 +154,15 @@ AppSalesMobile
 {
 	CurrencySelectionDialog *currencySelectionDialog = [[CurrencySelectionDialog new] autorelease];
 	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:currencySelectionDialog] autorelease];
+	if ([[UIDevice currentDevice] isPad]) {
+		navController.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
 	[self presentModalViewController:navController animated:YES];
 }
 
 - (IBAction)refreshExchangeRates:(id)sender
 {
 	[[CurrencyManager sharedManager] forceRefresh];
-}
-
-- (IBAction)uploadBackups:(id)sender
-{
-#ifdef BACKUP_HOSTNAME
-	backupButton.hidden = YES;
-	[[ReportManager sharedManager] backupData];
-#else 
-	NSString *message = [NSLocalizedString(@"See documentation in source header of: ", nil) 
-						 stringByAppendingString:[[ReportManager class] description]];
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"error: BACKUP_HOSTNAME is not set", nil)
-													message:message
-												   delegate:self
-										  cancelButtonTitle:NSLocalizedString(@"ok", nil)
-										  otherButtonTitles:nil];
-	[alert show];
-	[alert release];
-#endif
-}
-
-- (IBAction)emailCSVReports:(id)sender
-{
-	[[ReportManager sharedManager] backupRawCSVToEmail:self];	
 }
 
 @end

@@ -29,12 +29,13 @@
  */
 
 #import "Day.h"
+#import "App.h"
 #import "Country.h"
 #import "Entry.h"
 #import "CurrencyManager.h"
 #import "AppIconManager.h"
 #import "ReportManager.h"
-#import "App.h"
+#import "AppManager.h"
 
 static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
@@ -68,200 +69,233 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 @implementation Day
 
-@synthesize date;
-@synthesize countries;
-@synthesize isWeek;
-@synthesize name;
+@synthesize date, countries, isWeek, wasLoadedFromDisk, summary, isFault;
 
-+ (NSString*) fileNameForString:(NSString*)name extension:(NSString*)fileExtension isWeek:(BOOL)isWeek {
-	return [NSString stringWithFormat:@"%@_%@.%@",  (isWeek ? @"week" : @"day"), 
-			[name stringByReplacingOccurrencesOfString:@"/" withString:@"_"], 
-			fileExtension];
-}
+//+ (NSString*) fileNameForString:(NSString*)name extension:(NSString*)fileExtension isWeek:(BOOL)isWeek {
+//	return [NSString stringWithFormat:@"%@_%@.%@",  (isWeek ? @"week" : @"day"), 
+//			[name stringByReplacingOccurrencesOfString:@"/" withString:@"_"], 
+//			fileExtension];
+//}
 
 - (id)initWithCSV:(NSString *)csv
 {
-	[self init];
-		
+	[super init];
+	
+	wasLoadedFromDisk = NO;	
 	countries = [[NSMutableDictionary alloc] init];
 	
-	NSArray *lines = [csv componentsSeparatedByString:@"\n"];
-	if (lines.count == 0) {
-		NSLog(@"unrecognized CSV text: %@", csv);
+	NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
+	if ([lines count] > 0)
+		[lines removeObjectAtIndex:0];
+	if ([lines count] == 0) {
 		[self release];
-		return nil;
+		return nil; // sanity check
 	}
-	lines = [lines subarrayWithRange:NSMakeRange(1, lines.count-1)];
+//	lines = [lines subarrayWithRange:NSMakeRange(1, lines.count-1)];
 	
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
 		if (containsOnlyWhiteSpace(columns)) {
 			continue;
 		}
-		if (columns.count < 19) {
-			NSLog(@"unknown column format: %@", columns.description); // instead should stop parsing and return nil?
-			continue;
-		}
-		NSString *productName = [columns objectAtIndex:6];
-		NSString *transactionType = [columns objectAtIndex:8];
-		NSString *units = [columns objectAtIndex:9];
-		NSString *royalties = [columns objectAtIndex:10];
-		NSString *dateStartColumn = [columns objectAtIndex:11];
-		NSString *dateEndColumn = [columns objectAtIndex:12];
-		NSString *appId = [columns objectAtIndex:19];
-		[[AppIconManager sharedManager] downloadIconForAppID:appId];
-		isWeek = ![dateStartColumn isEqualToString:dateEndColumn];
-		
-		int startYear, startMonth, startDay;
-		if (! parseDateString(dateStartColumn, &startYear, &startMonth, &startDay)) {
-			NSLog(@"invalid startDate: %@", dateStartColumn);
-			[self release];
-			return nil;
-		}
-		
-		int endYear, endMonth, endDay;
-		if (! parseDateString(dateEndColumn, &endYear, &endMonth, &endDay)) {
-			NSLog(@"invalid endDate: %@", dateEndColumn);
-			[self release];
-			return nil;
-		}
-		
-		NSCalendar *calendar = [NSCalendar currentCalendar];
-		NSDateComponents *components = [[NSDateComponents new] autorelease];
-		[components setYear:startYear];
-		[components setMonth:startMonth];
-		[components setDay:startDay];
-		date = [[calendar dateFromComponents:components] retain];
-		name = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", startMonth, startDay, startYear];
-		weekEndDateString = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", endMonth, endDay, endYear];
-
-		NSString *countryString = [columns objectAtIndex:14];
-		if (countryString.length != 2) { // country code has two characters
-			[NSException raise:@"invalid country code" format:countryString];
-		}
-		NSString *royaltyCurrency = [columns objectAtIndex:15];
-		
-		/* Treat in-app purchases as regular purchases for our purposes.
-		 * IA1: In-App Purchase
-		 * Presumably, IA7: In-App Free Upgrade / Repurchase.
-		 */
-		if ([transactionType isEqualToString:@"IA1"]) {
-			transactionType = @"1";
-		}
-
-		Country *country = [self countryNamed:countryString]; // will be created on-the-fly if needed.
-		[[[Entry alloc] initWithProductIdentifier:appId
-											 name:productName 
-								  transactionType:[transactionType intValue] 
-											units:[units intValue] 
-										royalties:[royalties floatValue] 
-										 currency:royaltyCurrency
-										  country:country] release]; // gets added to the countries entry list automatically
-	}
-	if (name == nil || date == nil) {
-		NSLog(@"coulnd't parse CSV: %@", csv);
-		[self release];
-		return nil;
-	}
-	return self;
-}
-
-- (id) initAsAllOfTime { // not intended to be used by anyone except TotalController
-	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
-	NSArray *sortingDescriptors = [NSArray arrayWithObject:dateSorter];
-	NSArray *sortedDays = [[ReportManager sharedManager].days.allValues sortedArrayUsingDescriptors:sortingDescriptors];
-	NSArray *sortedWeeks = [[ReportManager sharedManager].weeks.allValues sortedArrayUsingDescriptors:sortingDescriptors];
-	if (sortedWeeks.count == 0) { // no data has been downloaded yet
-		[self dealloc];
-		return nil;
-	}
-
-	self = [self init];
-	if (self) {		
-		Day *latestWeek = [sortedWeeks objectAtIndex:0];
-		
-		countries = [[NSMutableDictionary alloc] init];
-		isWeek = TRUE;
-		name = weekEndDateString = @"total";
-		date = [latestWeek.date retain];
-		
-		NSDate *startOfDay = [date addTimeInterval:(24*7-1)*3600];
-		NSMutableArray *additionalDays = [NSMutableArray array];
-		for (Day *d in sortedDays) {
-			if ([d.date compare:startOfDay] == NSOrderedDescending) {
-				[additionalDays addObject:d];
-			}
-		}
-		
-		if (sortedDays.count > 0) {
-			[date release];
-			date = [[[sortedDays objectAtIndex:0] date] retain];
-		}
-		
-		NSArray *days = [sortedWeeks arrayByAddingObjectsFromArray:additionalDays];
-		for (Day *w in days) {
-			for (Country *c in w.countries.allValues) {
-				Country *country = [self countryNamed:c.name];
-				Entry *totalEntry = nil;
-				
-				for (Entry *e in c.entries) {
-					for (Entry *totalE in country.entries) {
-						if ([e.productName isEqualToString:totalE.productName] &&
-							e.royalties == totalE.royalties &&
-							e.transactionType == totalE.transactionType) {
-							totalEntry = totalE;
-							break;
-						}
-					}
-					if (totalEntry == nil) {
-						[[[Entry alloc] initWithProductIdentifier:e.productIdentifier 
-															name:e.productName 
-												 transactionType:e.transactionType 
-														   units:e.units 
-													   royalties:e.royalties
-														currency:e.currency
-														  country:country] release];
-					} else {
-						totalEntry.units += e.units;
-						totalEntry = nil;
+		if ([columns count] >= 19) {
+			NSString *productName = [columns objectAtIndex:6];
+			NSString *transactionType = [columns objectAtIndex:8];
+			NSString *units = [columns objectAtIndex:9];
+			NSString *royalties = [columns objectAtIndex:10];
+			NSString *dateColumn = [columns objectAtIndex:11];
+			NSString *toDateColumn = [columns objectAtIndex:12];
+			NSString *appId = [columns objectAtIndex:19];
+			[[AppIconManager sharedManager] downloadIconForAppID:appId];
+			if (!self.date) {
+				NSDate *fromDate = [self reportDateFromString:dateColumn];
+				NSDate *toDate = [self reportDateFromString:toDateColumn];
+				if (!fromDate) {
+					NSLog(@"Date is invalid: %@", dateColumn);
+					[self release];
+					return nil;
+				} else {
+					date = [fromDate retain];
+					if (![fromDate isEqualToDate:toDate]) {
+						isWeek = YES;
 					}
 				}
 			}
+			NSString *countryString = [columns objectAtIndex:14];
+			if ([countryString length] != 2) {
+				NSLog(@"Country code is invalid");
+				[self release];
+				return nil; //sanity check, country code has to have two characters
+			}
+			NSString *royaltyCurrency = [columns objectAtIndex:15];
+			
+			//Treat in-app purchases as regular purchases for our purposes.
+			//IA1: In-App Purchase
+			//IA7: In-App Free Upgrade / Repurchase (?)
+			//IA9: In-App Subscription
+			if ([transactionType isEqualToString:@"IA1"]) transactionType = @"2";
+			else
+				if([transactionType isEqualToString:@"IA9"]) transactionType = @"9";
+			else
+				if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
+			
+			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
+			[[[Entry alloc] initWithProductIdentifier:appId
+												name:productName
+									 transactionType:transactionType.intValue
+											   units:units.intValue
+										   royalties:royalties.floatValue
+											currency:royaltyCurrency
+											 country:country] autorelease]; //gets added to the countries entry list automatically
 		}
+	}
+
+	// local version
+	//
+//		if (columns.count < 19) {
+//			NSLog(@"unknown column format: %@", columns.description); // instead should stop parsing and return nil?
+//			continue;
+//		}
+//		NSString *productName = [columns objectAtIndex:6];
+//		NSString *transactionType = [columns objectAtIndex:8];
+//		NSString *units = [columns objectAtIndex:9];
+//		NSString *royalties = [columns objectAtIndex:10];
+//		NSString *dateStartColumn = [columns objectAtIndex:11];
+//		NSString *dateEndColumn = [columns objectAtIndex:12];
+//		NSString *appId = [columns objectAtIndex:19];
+//		[[AppIconManager sharedManager] downloadIconForAppID:appId];
+//		isWeek = ![dateStartColumn isEqualToString:dateEndColumn];
+//		
+//		int startYear, startMonth, startDay;
+//		if (! parseDateString(dateStartColumn, &startYear, &startMonth, &startDay)) {
+//			NSLog(@"invalid startDate: %@", dateStartColumn);
+//			[self release];
+//			return nil;
+//		}
+//		
+//		int endYear, endMonth, endDay;
+//		if (! parseDateString(dateEndColumn, &endYear, &endMonth, &endDay)) {
+//			NSLog(@"invalid endDate: %@", dateEndColumn);
+//			[self release];
+//			return nil;
+//		}
+//		
+//		NSCalendar *calendar = [NSCalendar currentCalendar];
+//		NSDateComponents *components = [[NSDateComponents new] autorelease];
+//		[components setYear:startYear];
+//		[components setMonth:startMonth];
+//		[components setDay:startDay];
+//		date = [[calendar dateFromComponents:components] retain];
+//		name = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", startMonth, startDay, startYear];
+//		weekEndDateString = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", endMonth, endDay, endYear];
+//
+//		NSString *countryString = [columns objectAtIndex:14];
+//		if (countryString.length != 2) { // country code has two characters
+//			[NSException raise:@"invalid country code" format:countryString];
+//		}
+//		NSString *royaltyCurrency = [columns objectAtIndex:15];
+//		
+//		/* Treat in-app purchases as regular purchases for our purposes.
+//		 * IA1: In-App Purchase
+//		 * Presumably, IA7: In-App Free Upgrade / Repurchase.
+//		 */
+//		if ([transactionType isEqualToString:@"IA1"]) {
+//			transactionType = @"1";
+//		}
+//
+//		Country *country = [self countryNamed:countryString]; // will be created on-the-fly if needed.
+//		[[[Entry alloc] initWithProductIdentifier:appId
+//											 name:productName 
+//								  transactionType:[transactionType intValue] 
+//											units:[units intValue] 
+//										royalties:[royalties floatValue] 
+//										 currency:royaltyCurrency
+//										  country:country] release]; // gets added to the countries entry list automatically
+//	}
+//	if (name == nil || date == nil) {
+//		NSLog(@"coulnd't parse CSV: %@", csv);
+//		[self release];
+//		return nil;
+//	}
+
+
+	[self generateSummary];
+	return self;
+}
+
+- (void)generateSummary
+{
+	NSMutableDictionary *revenueByCurrency = [NSMutableDictionary dictionary];
+	NSMutableDictionary *salesByApp = [NSMutableDictionary dictionary];
+	for (Country *country in [self.countries allValues]) {
+		for (Entry *entry in country.entries) {
+			if (entry.purchase ) {
+				NSNumber *newCount = [NSNumber numberWithInt:[[salesByApp objectForKey:entry.productName] intValue] + entry.units];
+				[salesByApp setObject:newCount forKey:entry.productName];
+				NSNumber *oldRevenue = [revenueByCurrency objectForKey:entry.currency];
+				NSNumber *newRevenue = [NSNumber numberWithFloat:(oldRevenue ? [oldRevenue floatValue] : 0.0) + entry.royalties * entry.units];
+				[revenueByCurrency setObject:newRevenue forKey:entry.currency];
+			}
+		}
+	}
+	[summary release];
+	summary = [[NSDictionary alloc] initWithObjectsAndKeys: 
+									self.date, kSummaryDate,
+									revenueByCurrency, kSummaryRevenue,
+									salesByApp, kSummarySales,
+									[NSNumber numberWithBool:self.isWeek], kSummaryIsWeek,
+									nil];
+}
+
+
+- (id) initWithSummary:(NSDictionary*)summaryToUse date:(NSDate*)dateToUse isWeek:(BOOL)week isFault:(BOOL)fault
+{
+	self = [super init];
+	if (self) {
+		summary = [summaryToUse retain];
+		date = [dateToUse retain];
+		isWeek = week;
+		isFault = fault;
+		wasLoadedFromDisk = YES;
 	}
 	return self;
 }
+
++ (Day *)dayWithSummary:(NSDictionary *)reportSummary
+{
+	return [[[Day alloc] initWithSummary:reportSummary date:[reportSummary objectForKey:kSummaryDate]
+								  isWeek:[[reportSummary objectForKey:kSummaryIsWeek] boolValue] isFault:YES] autorelease];
+}
+
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	if ([self init]) {
-		name = [[coder decodeObjectForKey:@"name"] retain];
+	self = [self init];
+	if (self) {
 		date = [[coder decodeObjectForKey:@"date"] retain];
 		countries = [[coder decodeObjectForKey:@"countries"] retain];
 		isWeek = [coder decodeBoolForKey:@"isWeek"];
-		
-		// lazily computed values, which may be nil
-		dayString = [[coder decodeObjectForKey:@"dayString"] retain];
-		weekEndDateString = [[coder decodeObjectForKey:@"weekEndDateString"] retain];
+		wasLoadedFromDisk = YES;
 	}
 	return self;
 }
 
-- (void)encodeWithCoder:(NSCoder *)coder
-{
-	[coder encodeObject:self.name forKey:@"name"];
-	[coder encodeObject:self.date forKey:@"date"];
-	[coder encodeObject:self.countries forKey:@"countries"];
-	[coder encodeBool:self.isWeek forKey:@"isWeek"];
-	
-	[coder encodeObject:self.dayString forKey:@"dayString"];
-	[coder encodeObject:self.weekEndDateString forKey:@"weekEndDateString"];
-}
 
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // serialized data 
-{
-	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
-	return [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+//+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // serialized data 
+//{
+//	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
+//	return [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+	
+- (NSMutableDictionary *)countries
+{	
+	if (isFault) {
+		NSString *filename = [self proposedFilename];
+		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:filename];
+		Day *fulfilledFault = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+		countries = [fulfilledFault.countries retain];
+		isFault = NO;
+	}
+	return countries;
 }
 
 + (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
@@ -277,7 +311,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	BOOL isDirectory = false;
 	if ([manager fileExistsAtPath:fullPath isDirectory:&isDirectory]) {
 		if (isDirectory) {
-			[NSException raise:@"found unexpected directory at Day path" format:fullPath];
+			[NSException raise:NSGenericException format:@"found unexpected directory at Day path: %@", fullPath];
 		}
 		return FALSE;
 	}
@@ -287,6 +321,13 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 		return FALSE;
 	}
 	return TRUE;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+	[coder encodeObject:self.countries forKey:@"countries"];
+	[coder encodeObject:self.date forKey:@"date"];
+	[coder encodeBool:self.isWeek forKey:@"isWeek"];
 }
 
 - (Country *)countryNamed:(NSString *)countryName
@@ -300,71 +341,110 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	return country;
 }
 
+- (NSDate *)reportDateFromString:(NSString *)dateString
+{
+	if ((([dateString rangeOfString:@"/"].location != NSNotFound) && ([dateString length] == 10))
+		|| (([dateString rangeOfString:@"/"].location == NSNotFound) && ([dateString length] == 8))) {
+		int year, month, day;
+		if ([dateString rangeOfString:@"/"].location == NSNotFound) { //old date format
+			year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
+			month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
+			day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
+		}
+		else { //new date format
+			year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
+			month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
+			day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
+		}
+		
+		NSCalendar *calendar = [NSCalendar currentCalendar];
+		NSDateComponents *components = [[NSDateComponents new] autorelease];
+		[components setYear:year];
+		[components setMonth:month];
+		[components setDay:day];
+		
+		return [calendar dateFromComponents:components];
+	}
+	return nil;
+}
+
+
 - (NSString *)description
 {
-	NSMutableDictionary *salesByProduct = [NSMutableDictionary dictionary];
-	for (Country *c in self.countries.allValues) {
-		for (Entry *e in c.entries) {
-			if (e.transactionType == 1) {
-				NSNumber *unitsOfProduct = [salesByProduct objectForKey:[e productName]];
-				int u = (unitsOfProduct != nil) ? (unitsOfProduct.intValue) : 0;
-				u += e.units;
-				[salesByProduct setObject:[NSNumber numberWithInt:u] forKey:e.productName];
+	NSDictionary *salesByProduct = nil;
+	if (!self.summary) {
+		NSMutableDictionary *temp = [NSMutableDictionary dictionary];
+		for (Country *c in [self.countries allValues]) {
+			for (Entry *e in [c entries]) {
+				if (e.purchase) {
+					NSNumber *unitsOfProduct = [temp objectForKey:[e productName]];
+					int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
+					u += [e units];
+					[temp setObject:[NSNumber numberWithInt:u] forKey:[e productName]];
+				}
 			}
 		}
+		salesByProduct = temp;
+	} else {
+		salesByProduct = [summary objectForKey:kSummarySales];
 	}
+		
 	NSMutableString *productSummary = [NSMutableString stringWithString:@"("];
+	
 	NSEnumerator *reverseEnum = [[salesByProduct keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
 	NSString *productName;
-	while (productName = reverseEnum.nextObject) {
+	while ((productName = reverseEnum.nextObject) != nil) {
 		NSNumber *productSales = [salesByProduct objectForKey:productName];
 		[productSummary appendFormat:@"%@ × %@, ", productSales, productName];
 	}
 	if (productSummary.length >= 2)
 		[productSummary deleteCharactersInRange:NSMakeRange(productSummary.length - 2, 2)];
 	[productSummary appendString:@")"];
-	
-	if ([productSummary isEqual:@"()"])
+	if ([productSummary isEqual:@"()"]) {
 		return NSLocalizedString(@"No sales",nil);
-	
+	}
 	return productSummary;
 }
 
 - (float)totalRevenueInBaseCurrency
 {
-	float sum = 0;
-	for (Country *c in self.countries.allValues) {
-		sum += [c totalRevenueInBaseCurrency];
+	if (self.summary) {
+		float sum = 0.0;
+		NSDictionary *revenueByCurrency = [summary objectForKey:kSummaryRevenue];
+		for (NSString *currency in revenueByCurrency) {
+			float revenue = [[CurrencyManager sharedManager] convertValue:[[revenueByCurrency objectForKey:currency] floatValue] fromCurrency:currency];
+			sum += revenue;
+		}
+		return sum;
+	} else {
+		float sum = 0.0;
+		for (Country *c in [self.countries allValues]) {
+			sum += [c totalRevenueInBaseCurrency];
+		}
+		return sum;
 	}
-	return sum;
 }
 
-- (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app
-{
-	if (app == nil) {
-		// FIXME this behavior is strange and may indicate a mistake by the caller
-		// should instead throw an exception
+- (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID {
+	if (appID == nil)
 		return [self totalRevenueInBaseCurrency];
-	}
-	float sum = 0;
-	for (Country *c in self.countries.allValues) {
-		sum += [c totalRevenueInBaseCurrencyForAppID:app];
+	float sum = 0.0;
+	for (Country *c in [self.countries allValues]) {
+		sum += [c totalRevenueInBaseCurrencyForAppWithID:appID];
 	}
 	return sum;
 }
 
-- (int)totalUnitsForAppID:(NSString *)appID
-{
-	if (appID == nil) {
-		// FIXME: instead throw an exception
+- (int)totalUnitsForAppWithID:(NSString *)appID {
+	if (appID == nil)
 		return [self totalUnits];
-	}
 	int sum = 0;
-	for (Country *c in self.countries.allValues) {
-		sum += [c totalUnitsForAppID:appID];
+	for (Country *c in [self.countries allValues]) {
+		sum += [c totalUnitsForAppWithID:appID];
 	}
 	return sum;
 }
+
 
 - (int)totalUnits
 {
@@ -384,19 +464,31 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	return names.allObjects;
 }
 
+//- (NSArray *)allProductNames
+//{
+//	NSMutableSet *names = [NSMutableSet set];
+//	for (Country *c in [self.countries allValues]) {
+//		[names addObjectsFromArray:[c allProductNames]];
+//	}
+//	return [names allObjects];
+//}
+
 - (NSString *)totalRevenueString
 {
 	return [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:
 			[NSNumber numberWithFloat:self.totalRevenueInBaseCurrency] withFraction:YES];
 }
 
+- (NSString *)totalRevenueStringForApp:(NSString *)appName
+{
+	NSString *appID = [[AppManager sharedManager] appIDForAppName:appName];
+	return [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:[self totalRevenueInBaseCurrencyForAppWithID:appID]] withFraction:YES];
+}
+
 - (NSString *)dayString
 {
-	if (!dayString) {
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:self.date];
-		dayString = [[NSString alloc] initWithFormat:@"%i", [components day]];
-	}
-	return dayString;
+	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:self.date];
+	return [NSString stringWithFormat:@"%i", [components day]];
 }
 
 - (NSString *)weekdayString
@@ -408,21 +500,23 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 - (UIColor *)weekdayColor
 {
-	if (!weekDayColor) {
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
-		int weekday = [components weekday];
-		if (weekday == 1) { // show sundays in red
-			weekDayColor = [[UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0] retain];
-		} else {
-			weekDayColor = [[UIColor blackColor] retain];
-		}
+	NSDateComponents *components = [[NSCalendar currentCalendar] components:NSWeekdayCalendarUnit fromDate:self.date];
+	int weekday = [components weekday];
+	if (weekday == 1) {
+		return [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
 	}
-	return weekDayColor;
+	return [UIColor blackColor];
 }
 
 - (NSString *)weekEndDateString
 {
-	return weekEndDateString;
+	NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
+	[comp setHour:167];
+	NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:self.date options:0];
+	NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
+	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
+	return [dateFormatter stringFromDate:dateWeekLater];
 }
 
 
@@ -433,32 +527,44 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	return sortedChildren;
 }
 
+
 - (NSString *)proposedFilename
 {
-	if (proposedFileName == nil) {
-		// use year/month/day, so serialized files are sortable by date
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit
-																				| NSMonthCalendarUnit 
-																				| NSDayCalendarUnit
-																	   fromDate:self.date];
-		NSString *sortableName = [NSString stringWithFormat:@"%d/%02d/%02d", components.year, components.month, components.day];
-		proposedFileName = [[Day fileNameForString:sortableName extension:@"dat" isWeek:isWeek] retain];
+//	if (proposedFileName == nil) {
+//		// use year/month/day, so serialized files are sortable by date
+//		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit
+//																				| NSMonthCalendarUnit 
+//																				| NSDayCalendarUnit
+//																	   fromDate:self.date];
+//		NSString *sortableName = [NSString stringWithFormat:@"%d/%02d/%02d", components.year, components.month, components.day];
+//		proposedFileName = [[Day fileNameForString:sortableName extension:@"dat" isWeek:isWeek] retain];
+//	}
+//	return proposedFileName;
+	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	[dateFormatter setDateFormat:@"MM_dd_yyyy"];
+	NSString *dateString = [dateFormatter stringFromDate:self.date];
+	if (self.isWeek) {
+		return [NSString stringWithFormat:@"week_%@.dat", dateString];
+	} else {
+		return [NSString stringWithFormat:@"day_%@.dat", dateString];
 	}
-	return proposedFileName;
+}
+
+- (NSString *)appIDForApp:(NSString *)appName {
+	NSString *appID = nil;
+	for(Country *c in [self.countries allValues]){
+		appID = [c appIDForApp:appName];
+		if(appID)
+			break;
+	}
+	return appID;
 }
 
 - (void)dealloc
 {
-	[name release];
-	[date release];
 	[countries release];
-
-	[dayString release];
-	[weekEndDateString release];
-
-	[weekDayString release];
-	[weekDayColor release];
-	[proposedFileName release];
+	[date release];
+	[summary release];
 	
 	[super dealloc];
 }

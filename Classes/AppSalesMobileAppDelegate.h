@@ -31,10 +31,13 @@
 #import <UIKit/UIKit.h>
 
 @interface AppSalesMobileAppDelegate : NSObject <UIApplicationDelegate> {
+    
     UIWindow *window;
-	UINavigationController *navigationController;
-	UILabel *loadingLabel;
+	UIViewController *rootViewController;
 }
+
+@property (nonatomic, retain) UIWindow *window;
+@property (nonatomic, retain) UIViewController *rootViewController;
 
 @end
 

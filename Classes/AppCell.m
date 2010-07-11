@@ -31,7 +31,6 @@
 	[cellView setNeedsDisplay];
 }
 
-
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated 
 {
 	[super setSelected:selected animated:animated];
@@ -75,7 +74,7 @@
 	
 	[[UIImage imageNamed:@"5stars_gray.png"] drawInRect:CGRectMake(200, 15, 90, 15)];
 	UIImage *starsImage = [UIImage imageNamed:@"5stars.png"];
-	UIGraphicsBeginImageContext(CGSizeMake(90,15));
+	UIGraphicsBeginImageContextWithOptions(CGSizeMake(90,15), NO, UIScreen.mainScreen.scale);
 	CGContextRef ctx = UIGraphicsGetCurrentContext();
 	[starsImage drawInRect:CGRectMake(0,0,90,15)];
 	float averageStars = [app averageStars];
@@ -89,14 +88,19 @@
 	[averageStarsImage drawInRect:CGRectMake(200, 15, 90, 15)];
 	//[[UIImage imageNamed:@"5stars.png"] drawInRect:CGRectMake(200, 15, 88, 15)];
 	
-	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
+	if(cell.highlighted)
+		[[UIColor whiteColor] set];
+	else if(app.newReviewsCount)
+		[[UIColor redColor] set];
+	else
+		[[UIColor darkGrayColor] set];
+	
 	int numberOfReviews = [app.reviewsByUser count];
 	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i reviews",nil), numberOfReviews];
 	if (app.newReviewsCount) {
-		numberOfReviewsDescription = [numberOfReviewsDescription stringByAppendingFormat:
-									  NSLocalizedString(@" (%i new)",nil), app.newReviewsCount];
+		numberOfReviewsDescription = [numberOfReviewsDescription stringByAppendingFormat:NSLocalizedString(@" (%i new)",nil), app.newReviewsCount];
 	}
 	[numberOfReviewsDescription drawInRect:CGRectMake(50, 25, 140, 15) withFont:[UIFont systemFontOfSize:12.0]];
-}	
+}
 
 @end

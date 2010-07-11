@@ -11,8 +11,6 @@
 
 @implementation GraphView
 
-@synthesize days;
-
 - (id)initWithFrame:(CGRect)frame 
 {
     if (self = [super initWithFrame:frame]) {
@@ -22,6 +20,11 @@
 		backgroundImage = [[UIImage imageNamed:@"GraphBackground.png"] retain];
     }
     return self;
+}
+
+
+- (NSArray*) days {
+	return days;
 }
 
 - (void)setDays:(NSArray *)newDays

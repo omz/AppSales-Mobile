@@ -14,18 +14,11 @@
 #import "AppCell.h"
 #import "ReviewsListController.h"
 #import "ReviewManager.h"
+#import "AppManager.h"
 
 @implementation ReviewsController
 
 @synthesize sortedApps, statusLabel, activityIndicator;
-
-- (id)initWithStyle:(UITableViewStyle)style 
-{
-	if (self = [super initWithStyle:style]) {
-		[self reload];
-	}
-    return self;
-}
 
 - (void)updateStatus
 {
@@ -41,7 +34,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	self.sortedApps = [[ReviewManager sharedManager] appNamesSorted];
+	self.sortedApps = [AppManager sharedManager].appNamesSorted;
 	
 	self.tableView.rowHeight = 45;
 	self.title = NSLocalizedString(@"Reviews",nil);
@@ -67,6 +60,15 @@
 	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
 	
 	self.toolbarItems = [NSArray arrayWithObjects:downloadButton, flexSpace, statusItem, flexSpace, activityItem, nil];
+	
+	UIBarButtonItem *b = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark all as read", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)];
+	self.navigationItem.rightBarButtonItem = b;
+	[b release];
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	[self reload];
 	[self updateStatus];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) 
@@ -74,14 +76,22 @@
 											   object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatus) 
 												 name:ReviewManagerUpdatedReviewDownloadProgressNotification 
-											   object:nil];
+											   object:nil];	
 }
 
-- (void) viewDidUnload {
-	[super viewDidUnload];
-	
+- (void) viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	
+}
+
+- (void)markAllAsRead:(id)sender {
+	[[ReviewManager sharedManager] markAllReviewsAsRead];
+	[self reload];
+}
+
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
 }
 
 - (void)reload
@@ -129,7 +139,7 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
 	App *app = [sortedApps objectAtIndex:indexPath.row];		
-	ReviewsListController *listController = [[[ReviewsListController alloc] initWithApp:app] autorelease];
+	ReviewsListController *listController = [[[ReviewsListController alloc] initWithApp:app style:UITableViewStylePlain] autorelease];
 	listController.hidesBottomBarWhenPushed = YES;
 	listController.title = app.appName;
 	[self.navigationController pushViewController:listController animated:YES];

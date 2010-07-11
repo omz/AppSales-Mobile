@@ -33,12 +33,12 @@
 
 @implementation EntryCell
 
-@synthesize entry;
-
 - (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier 
 {
     if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
 		iconView = [[[UIImageView alloc] initWithFrame:CGRectMake(6,6,32,32)] autorelease];
+		iconView.contentMode = UIViewContentModeCenter;
+		
 		descriptionLabel = [[[UILabel alloc] initWithFrame:CGRectMake(45, 0, 270, 44)] autorelease];
 		descriptionLabel.font = [UIFont systemFontOfSize:15.0];
 		descriptionLabel.lineBreakMode = UILineBreakModeWordWrap;
@@ -51,6 +51,10 @@
     return self;
 }
 
+- (Entry*) entry {
+	return entry;
+}
+
 - (void)setEntry:(Entry *)newEntry
 {
 	[newEntry retain];
@@ -61,7 +65,7 @@
 	
 	descriptionLabel.text = [self.entry description];
 	UIImage *icon;
-	if (self.entry.transactionType == 1) {
+	if (self.entry.purchase) {
 		if (self.entry.units >= 0)
 			icon = [UIImage imageNamed:@"Purchase.png"];
 		else

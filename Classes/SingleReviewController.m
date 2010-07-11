@@ -23,6 +23,11 @@
 	self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 }
 
+- (CGSize)contentSizeForViewInPopover
+{
+	return CGSizeMake(320, 480);
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
 	NSString *templatePath = [[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"];
@@ -34,7 +39,7 @@
 	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
 	NSString *dateString = [dateFormatter stringFromDate:review.reviewDate];
 	NSMutableString *starsString = [NSMutableString string];
-	for (int i=0; i<review.stars; i++) {
+	for (NSUInteger i=0; i<review.stars; i++) {
 		[starsString appendString:@"✭"];
 	}
 	NSString *variousInfo = [NSString stringWithFormat:@"%@<br/>(%@) – %@ – %@", starsString, review.version, [review.user encodeIntoBasicHtml], dateString];

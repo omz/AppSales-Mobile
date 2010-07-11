@@ -30,53 +30,64 @@
 
 #import <UIKit/UIKit.h>
 
+#define kSummaryDate	@"date"
+#define kSummarySales	@"sales"
+#define kSummaryRevenue	@"revenue"
+#define kSummaryIsWeek	@"isWeek"
+
 @class Country;
 
-@interface Day : NSObject {
-	NSMutableDictionary *countries;
+@interface Day : NSObject<NSCoding> {
 	NSDate *date;
+	NSMutableDictionary *countries;
 	BOOL isWeek;
-	NSString *name;
-
-	// lazily generated as needed, and serialized out to disk
-	NSString *dayString;
-	NSString *weekEndDateString;
 	
-	// lazyily generated, and never saved out to disk as they may change in the future
-	NSString *proposedFileName;
-	NSString *weekDayString;
-	UIColor *weekDayColor;
+	BOOL isFault;
+	NSDictionary *summary;
 }
 
-@property (readonly) NSString *name; // the date as a full string, and typically used as a primary key
 @property (readonly) NSDate *date;
 @property (readonly) NSMutableDictionary *countries;
-@property (readonly) NSString *weekEndDateString;
-@property (readonly) UIColor *weekdayColor;
-@property (readonly) NSString *dayString;
-@property (readonly) NSString *weekdayString;
-@property (readonly) NSString *totalRevenueString;
 @property (readonly) BOOL isWeek;
+@property (readonly) BOOL wasLoadedFromDisk;
+@property (readonly) BOOL isFault;
+@property (readonly) NSDictionary *summary;
 
-@property (readonly) NSArray *allProductIDs;
-@property (readonly) NSString *proposedFilename;
-@property (readonly) NSArray *children;
-
-+ (NSString*) fileNameForString:(NSString*)fileName extension:(NSString*)fileExtension isWeek:(BOOL)isWeek;
-
-+ (Day *)dayFromFile:(NSString *)filename atPath:(NSString *)docPath; // from serialized data
+//+ (NSString*) fileNameForString:(NSString*)fileName extension:(NSString*)fileExtension isWeek:(BOOL)isWeek;
 + (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
-- (id)initAsAllOfTime; // fragile hack used by TotalController
 
 // returns true if instances was serialized out to docPath
 - (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath;
 
+
+- (void)generateSummary;
++ (Day *)dayWithSummary:(NSDictionary *)reportSummary;
+
 - (Country *)countryNamed:(NSString *)countryName;
+
+- (NSDate *)reportDateFromString:(NSString *)dateString;
+
 - (float)totalRevenueInBaseCurrency;
-- (float)totalRevenueInBaseCurrencyForAppID:(NSString *)app;
-- (int)totalUnitsForAppID:(NSString *)appID;
+- (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
+- (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
+
+- (NSArray *)allProductIDs;
+
+- (NSString *)dayString;
+- (NSString *)weekdayString;
+- (NSString *)weekEndDateString;
+- (UIColor *)weekdayColor;
+
+- (NSString *)totalRevenueString;
+- (NSString *)totalRevenueStringForApp:(NSString *)appName;
+
+- (NSString *)proposedFilename;
+
+- (NSArray *)children;
+
+- (NSString *)appIDForApp:(NSString *)appName; // TODO: rename
 
 @end
