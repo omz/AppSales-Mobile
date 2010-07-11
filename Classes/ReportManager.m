@@ -181,54 +181,6 @@
 	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo:) withObject:userInfo];
 }
 
-//- (void)finishDownloadingReports {
-//	[self saveDataIfNeeded];
-//	isRefreshing = NO;
-//	[UIApplication sharedApplication].idleTimerDisabled = NO;
-//}
-//- (void)saveDataIfNeeded
-//{
-//	if (! needsDataSavedToDisk) {
-//		return; // everythings up to date
-//	}
-//	needsDataSavedToDisk = NO;
-//	
-//	// save all days/weeks in separate files
-//	NSString *docPath = getDocPath();
-//	for (Day *d in days.allValues) {
-//		[d archiveToDocumentPathIfNeeded:docPath];
-//	}
-//	for (Day *w in weeks.allValues) {
-//		[w archiveToDocumentPathIfNeeded:docPath];
-//	}
-//}
-//- (void) addDay:(Day*)day
-//{
-//	if ([days objectForKey:day.date] == nil) {
-//		[days setObject:day forKey:day.date];
-//		needsDataSavedToDisk = YES;
-//	}
-//	
-//	// check with review manager since the app name may have recently changed
-//	ReviewManager *reviewManager = [ReviewManager sharedManager];
-//	for (Country *c in day.countries.allValues) {
-//		for (Entry *e in c.entries) {
-//			[reviewManager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
-//		}
-//	}
-//}
-//
-//- (void) addWeek:(Day*)week
-//{
-//	if ([weeks objectForKey:week.date] == nil) {
-//		[weeks setObject:week forKey:week.date];
-//		needsDataSavedToDisk = YES;	
-//	}
-//}
-// NSSortDescriptor *desc = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES selector:@selector(localizedCompare:)];
-//	fileNames = [fileNames sortedArrayUsingDescriptors:[NSArray arrayWithObject:desc]];
-
-
 - (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
@@ -508,6 +460,7 @@
 		NSString *dayDownloadActionURLString = [ittsBaseURL stringByAppendingString:dayDownloadAction];
 		int dayNumber = 1;
 		for (NSString *dayString in availableDays) {
+			NSAutoreleasePool *innerPool = [NSAutoreleasePool new];
 			NSString *status;
 			if (i != 0) {
 				status = [NSString stringWithFormat:NSLocalizedString(@"Weekly Report %i of %i", nil), dayNumber, numberOfDays];
@@ -539,6 +492,7 @@
 			
 			if (dayData == nil) {
 				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not download raw day data" waitUntilDone:NO];
+				[innerPool release];
 				[pool release];
 				return;
 			}
@@ -549,6 +503,7 @@
 			}
 			
 			dayNumber++;
+			[innerPool release];
 		}
 		numberOfNewReports += [downloadedDays count];
 		if (i == 0) {
@@ -563,21 +518,22 @@
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:NO];
 	} else {
 		cacheChanged = YES;
-		[self performSelectorOnMainThread:@selector(finishFetchingReports) withObject:nil waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(saveData) withObject:nil waitUntilDone:NO];
 	} 
 	if (errorMessageString) {
 		[self performSelectorOnMainThread:@selector(presentErrorMessage:) withObject:errorMessageString waitUntilDone:NO];
 	}
+	[self performSelectorOnMainThread:@selector(finishFetchingReports) withObject:nil waitUntilDone:NO];
 	[pool release];
 }
 
 - (void) finishFetchingReports {
 	NSAssert([NSThread isMainThread], nil);
-	[self setProgress:@""];
-	[self saveData];
 	
-	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	isRefreshing = NO;
+	[UIApplication sharedApplication].idleTimerDisabled = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
 }
 
 
@@ -624,14 +580,12 @@
 			}
 		}
 	}
-//	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
 }
 
 - (void)successfullyDownloadedWeeks:(NSDictionary *)newDays
 {
 	[weeks addEntriesFromDictionary:newDays];
-//	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 }
 
