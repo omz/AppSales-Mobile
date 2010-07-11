@@ -5,6 +5,29 @@
 #import "ReportManager.h"
 #import "AppManager.h"
 
+// used to pass stuff between background worker threads and main thread
+@interface ReviewUpdateBundle : NSObject {
+	// fields are not retained
+	Review *review;
+	NSString *appID;
+	volatile BOOL needsUpdating; // must be volatile as it's used without synchronization
+}
+- (id) initWithReview:(Review*)rev appID:(NSString*)appID;
+@property (readonly) Review *review;
+@property (readonly) NSString *appID;
+@property (readwrite) BOOL needsUpdating;
+@end
+@implementation ReviewUpdateBundle
+@synthesize review, appID, needsUpdating;
+- (id) initWithReview:(Review*)rev appID:(NSString*)idTouse {
+	self = [super init];
+	review = rev;
+	appID = idTouse;
+	return self;
+}
+@end
+
+
 @implementation ReviewManager
 
 @synthesize reviewDownloadStatus, isDownloadingReviews;
@@ -71,23 +94,24 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
 
-- (void) addOrUpdatedReviewIfNeeded:(Review*)review appID:(NSString*)appID {
-	App *app = [[AppManager sharedManager] appWithID:appID]; // read only, no synchronization needed
+- (void) checkIfReviewUpToDate:(ReviewUpdateBundle*)bundle {
+	NSAssert([NSThread isMainThread], nil);
+	App *app = [[AppManager sharedManager] appWithID:bundle.appID];
 	
-	Review *oldReview;
-	@synchronized (app) {
-		NSDictionary *existingReviews = app.reviewsByUser;
-		oldReview = [existingReviews objectForKey:review.user];
-	}
-	if  (oldReview != nil && [oldReview.text isEqual:review.text]) {
+	NSDictionary *existingReviews = app.reviewsByUser;
+	Review *oldReview = [existingReviews objectForKey:bundle.review.user];
+
+	if  (oldReview != nil && [oldReview.text isEqual:bundle.review.text]) {
 		return; // up to date
 	}
-	
-	[review updateTranslations]; // network call, done outside of synchronized block
+	bundle.needsUpdating = YES;
+}
 
-	@synchronized (app) {
-		[app addOrReplaceReview:review];
-	}
+// called after translating new or updated reviews
+- (void) addReview:(ReviewUpdateBundle*)bundle {
+	NSAssert([NSThread isMainThread], nil);
+	App *app = [[AppManager sharedManager] appWithID:bundle.appID];
+	[app addOrReplaceReview:bundle.review];
 	saveToDiskNeeded = YES;
 	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:NO];
 }
@@ -181,9 +205,15 @@
 						Review *review = [[Review alloc] initWithUser:[reviewUser removeHtmlEscaping] reviewDate:reviewDate
 														 downloadDate:downloadDate version:reviewVersion countryCode:countryCode
 																title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
-																 stars:[reviewStars intValue]];
-						[self addOrUpdatedReviewIfNeeded:review appID:appID];
+																stars:[reviewStars intValue]];
+						ReviewUpdateBundle *bundle = [[ReviewUpdateBundle alloc] initWithReview:review appID:appID];
+						[self performSelectorOnMainThread:@selector(checkIfReviewUpToDate:) withObject:bundle waitUntilDone:YES];
+						if (bundle.needsUpdating) {
+							[review updateTranslations];
+							[self performSelectorOnMainThread:@selector(addReview:) withObject:bundle waitUntilDone:YES];							
+						}
 						[review release];
+						[bundle release];
 					}
 					i++;
 				} while (![scanner isAtEnd]);

@@ -16,12 +16,7 @@
 @implementation ReviewsListController
 
 - (void) loadReviews {	
-	// must synchronize on app, since ReviewManager might be mutating the users reviews.
-	// this is a bit hacky and gross, but it's simple and works for now
-	NSArray *allReviews;
-	@synchronized (app) {
-		allReviews = app.reviewsByUser.allValues;
-	}
+	NSArray *allReviews = app.reviewsByUser.allValues;
 	if (allReviews.count == reviews.count) {
 		return; // up to date
 	}
