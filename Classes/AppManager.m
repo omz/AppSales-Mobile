@@ -71,11 +71,15 @@
 	return appsByID.count;
 }
 
-- (NSArray*) appNamesSorted {
+- (NSArray*) allAppsSorted {
 	NSArray *allApps = appsByID.allValues;
 	NSSortDescriptor *appSorter = [[[NSSortDescriptor alloc] initWithKey:@"appName" ascending:YES] autorelease];
-	NSArray *sortedApps = [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
-	NSMutableArray *sortedNames = [NSMutableArray arrayWithCapacity:allApps.count];
+	return [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
+}
+
+- (NSArray*) allAppNamesSorted {
+	NSArray *sortedApps = self.allAppsSorted;
+	NSMutableArray *sortedNames = [NSMutableArray arrayWithCapacity:sortedApps.count];
 	for (App *app in sortedApps) {
 		[sortedNames addObject:app.appName];
 	}

@@ -34,7 +34,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	self.sortedApps = [AppManager sharedManager].appNamesSorted;
+	self.sortedApps = [AppManager sharedManager].allAppsSorted;
 	
 	self.tableView.rowHeight = 45;
 	self.title = NSLocalizedString(@"Reviews",nil);

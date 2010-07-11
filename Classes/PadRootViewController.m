@@ -191,7 +191,7 @@
 											   cancelButtonTitle:nil 
 										  destructiveButtonTitle:nil 
 											   otherButtonTitles:NSLocalizedString(@"All Apps",nil), nil] autorelease];
-		NSArray *sortedApps = [AppManager sharedManager].appNamesSorted;
+		NSArray *sortedApps = [AppManager sharedManager].allAppNamesSorted;
 		for (NSString *appName in sortedApps) {
 			[filterSheet addButtonWithTitle:appName];
 		}
