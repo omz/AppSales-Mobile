@@ -37,7 +37,7 @@
 		7F4695C8119644B500E82747 /* CalculatorButton4Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BF119644B500E82747 /* CalculatorButton4Highlighted.png */; };
 		7F46961A1196458A00E82747 /* CalculatorBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4696191196458A00E82747 /* CalculatorBackground.png */; };
 		7F4A4FE9116A648000FA2019 /* PadRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A4FE8116A648000FA2019 /* PadRootViewController.m */; };
-		7F4A50DC116A781D00FA2019 /* DashboardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A50DB116A781D00FA2019 /* DashboardView.m */; };
+		7F4A50DC116A781D00FA2019 /* DashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A50DB116A781D00FA2019 /* DashboardViewController.m */; };
 		7F4A5169116A869E00FA2019 /* PaneBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4A5168116A869E00FA2019 /* PaneBackground.png */; };
 		7F4A5194116A87CD00FA2019 /* TB_Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4A5193116A87CD00FA2019 /* TB_Settings.png */; };
 		7F4A51A8116A8BAA00FA2019 /* PickerOverlay.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4A51A7116A8BAA00FA2019 /* PickerOverlay.png */; };
@@ -45,7 +45,7 @@
 		7F4A5208116A97A900FA2019 /* PaneButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4A5207116A97A900FA2019 /* PaneButtonHighlighted.png */; };
 		7F4A525B116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A525A116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m */; };
 		7F4A526B116A9FDA00FA2019 /* DashboardGraphView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A526A116A9FDA00FA2019 /* DashboardGraphView.m */; };
-		7F4A5467116AC58200FA2019 /* ReviewsPane.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A5466116AC58200FA2019 /* ReviewsPane.m */; };
+		7F4A5467116AC58200FA2019 /* ReviewsPaneController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A5466116AC58200FA2019 /* ReviewsPaneController.m */; };
 		7F4A54B9116AC88B00FA2019 /* ReviewBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4A54B8116AC88B00FA2019 /* ReviewBackground.png */; };
 		7F4A54E0116ACAEE00FA2019 /* Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4A54DF116ACAEE00FA2019 /* Background.png */; };
 		7F4A54F6116ACF3A00FA2019 /* ReviewSummaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A54F5116ACF3A00FA2019 /* ReviewSummaryView.m */; };
@@ -432,8 +432,8 @@
 		7F47897710661CBD002415A2 /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
 		7F4A4FE7116A648000FA2019 /* PadRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PadRootViewController.h; sourceTree = "<group>"; };
 		7F4A4FE8116A648000FA2019 /* PadRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PadRootViewController.m; sourceTree = "<group>"; };
-		7F4A50DA116A781D00FA2019 /* DashboardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardView.h; sourceTree = "<group>"; };
-		7F4A50DB116A781D00FA2019 /* DashboardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardView.m; sourceTree = "<group>"; };
+		7F4A50DA116A781D00FA2019 /* DashboardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardViewController.h; sourceTree = "<group>"; };
+		7F4A50DB116A781D00FA2019 /* DashboardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardViewController.m; sourceTree = "<group>"; };
 		7F4A5168116A869E00FA2019 /* PaneBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PaneBackground.png; sourceTree = "<group>"; };
 		7F4A5193116A87CD00FA2019 /* TB_Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TB_Settings.png; sourceTree = "<group>"; };
 		7F4A51A7116A8BAA00FA2019 /* PickerOverlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PickerOverlay.png; sourceTree = "<group>"; };
@@ -443,8 +443,8 @@
 		7F4A525A116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+SharedInstances.m"; sourceTree = "<group>"; };
 		7F4A5269116A9FDA00FA2019 /* DashboardGraphView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardGraphView.h; sourceTree = "<group>"; };
 		7F4A526A116A9FDA00FA2019 /* DashboardGraphView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashboardGraphView.m; sourceTree = "<group>"; };
-		7F4A5465116AC58200FA2019 /* ReviewsPane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsPane.h; sourceTree = "<group>"; };
-		7F4A5466116AC58200FA2019 /* ReviewsPane.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsPane.m; sourceTree = "<group>"; };
+		7F4A5465116AC58200FA2019 /* ReviewsPaneController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsPaneController.h; sourceTree = "<group>"; };
+		7F4A5466116AC58200FA2019 /* ReviewsPaneController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsPaneController.m; sourceTree = "<group>"; };
 		7F4A54B8116AC88B00FA2019 /* ReviewBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ReviewBackground.png; sourceTree = "<group>"; };
 		7F4A54DF116ACAEE00FA2019 /* Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Background.png; sourceTree = "<group>"; };
 		7F4A54F4116ACF3A00FA2019 /* ReviewSummaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewSummaryView.h; sourceTree = "<group>"; };
@@ -953,12 +953,12 @@
 			children = (
 				7F4A4FE7116A648000FA2019 /* PadRootViewController.h */,
 				7F4A4FE8116A648000FA2019 /* PadRootViewController.m */,
-				7F4A50DA116A781D00FA2019 /* DashboardView.h */,
-				7F4A50DB116A781D00FA2019 /* DashboardView.m */,
+				7F4A50DA116A781D00FA2019 /* DashboardViewController.h */,
+				7F4A50DB116A781D00FA2019 /* DashboardViewController.m */,
 				7F4A5269116A9FDA00FA2019 /* DashboardGraphView.h */,
 				7F4A526A116A9FDA00FA2019 /* DashboardGraphView.m */,
-				7F4A5465116AC58200FA2019 /* ReviewsPane.h */,
-				7F4A5466116AC58200FA2019 /* ReviewsPane.m */,
+				7F4A5465116AC58200FA2019 /* ReviewsPaneController.h */,
+				7F4A5466116AC58200FA2019 /* ReviewsPaneController.m */,
 				7F4A54F4116ACF3A00FA2019 /* ReviewSummaryView.h */,
 				7F4A54F5116ACF3A00FA2019 /* ReviewSummaryView.m */,
 				7F46957D1196436200E82747 /* MovableView.h */,
@@ -1982,10 +1982,10 @@
 				34DDA8BD116A199D00F5BA8C /* UIDevice+iPad.m in Sources */,
 				34DDA919116A1EDF00F5BA8C /* DayOrWeekCell.m in Sources */,
 				7F4A4FE9116A648000FA2019 /* PadRootViewController.m in Sources */,
-				7F4A50DC116A781D00FA2019 /* DashboardView.m in Sources */,
+				7F4A50DC116A781D00FA2019 /* DashboardViewController.m in Sources */,
 				7F4A525B116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m in Sources */,
 				7F4A526B116A9FDA00FA2019 /* DashboardGraphView.m in Sources */,
-				7F4A5467116AC58200FA2019 /* ReviewsPane.m in Sources */,
+				7F4A5467116AC58200FA2019 /* ReviewsPaneController.m in Sources */,
 				7F4A54F6116ACF3A00FA2019 /* ReviewSummaryView.m in Sources */,
 				7F4695811196436200E82747 /* MovableView.m in Sources */,
 				7F4695821196436200E82747 /* CalculatorView.m in Sources */,

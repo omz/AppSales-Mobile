@@ -7,14 +7,14 @@
 //
 
 #import "PadRootViewController.h"
-#import "DashboardView.h"
+#import "DashboardViewController.h"
 #import "DashboardGraphView.h"
 #import "SettingsViewController.h"
 #import "ImportExportViewController.h"
 #import "DaysController.h"
 #import "WeeksController.h"
 #import "ReportManager.h"
-#import "ReviewsPane.h"
+#import "ReviewsPaneController.h"
 #import "App.h"
 #import "HelpBrowser.h"
 #import "CalculatorView.h"
@@ -64,8 +64,9 @@
 	toolbar.items = [NSArray arrayWithObjects:refreshItem, flexItem, activityIndicatorItem, statusItem, flexItem, calculatorItem, spaceItem, spaceItem, graphTypeItem, spaceItem, filterItem, spaceItem, spaceItem, spaceItem, importExportItem, spaceItem, settingsItem, spaceItem, aboutItem, nil];
 	[self.view addSubview:toolbar];
 	
-	self.dailyDashboardView = [[[DashboardView alloc] initWithFrame:CGRectMake(0, 47, 748, 320)] autorelease];
-	dailyDashboardView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	dailyDashboardView = [DashboardViewController new];
+	dailyDashboardView.view.frame = CGRectMake(0, 47, 748, 320);
+	dailyDashboardView.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	[dailyDashboardView reloadData];
 	//[dailyDashboardView resetDatePicker];
 	
@@ -75,10 +76,11 @@
 	UIPopoverController *daysPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:daysNavigationController] autorelease];
 	dailyDashboardView.reportsPopover = daysPopover;
 	dailyDashboardView.showsWeeklyReports = NO;
-	[self.view addSubview:dailyDashboardView];
+	[self.view addSubview:dailyDashboardView.view];
 	
-	self.weeklyDashboardView = [[[DashboardView alloc] initWithFrame:CGRectMake(0, 365, 748, 320)] autorelease];
-	weeklyDashboardView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	weeklyDashboardView = [DashboardViewController new];
+	weeklyDashboardView.view.frame = CGRectMake(0, 365, 748, 320);
+	weeklyDashboardView.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	weeklyDashboardView.showsWeeklyReports = YES;
 	[weeklyDashboardView reloadData];
 	//[weeklyDashboardView resetDatePicker];
@@ -88,15 +90,15 @@
 	weeksViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
 	UIPopoverController *weeksPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:weeksNavigationController] autorelease];
 	weeklyDashboardView.reportsPopover = weeksPopover;
-	[self.view addSubview:weeklyDashboardView];
+	[self.view addSubview:weeklyDashboardView.view];
 	
 	SettingsViewController *settingsViewController = [[[SettingsViewController alloc] initWithNibName:@"SettingsViewController" bundle:nil] autorelease];
 	settingsViewController.contentSizeForViewInPopover = CGSizeMake(320, 440);
 	self.settingsPopover = [[[NSClassFromString(@"UIPopoverController") alloc] initWithContentViewController:settingsViewController] autorelease];
 	
-	self.reviewsPane = [[[ReviewsPane alloc] initWithFrame:CGRectMake(0, 683, 768, 320)] autorelease];
-	reviewsPane.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	[self.view insertSubview:reviewsPane belowSubview:weeklyDashboardView];
+	reviewsPane = [ReviewsPaneController new];
+	reviewsPane.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	[self.view insertSubview:reviewsPane.view belowSubview:weeklyDashboardView.view];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
@@ -114,24 +116,24 @@
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
 	if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
-		CGRect dailyFrame = dailyDashboardView.frame;
+		CGRect dailyFrame = dailyDashboardView.view.frame;
 		dailyFrame.origin.y = 47;
-		dailyDashboardView.frame = dailyFrame;
-		CGRect weeklyFrame = dailyDashboardView.frame;
+		dailyDashboardView.view.frame = dailyFrame;
+		CGRect weeklyFrame = dailyDashboardView.view.frame;
 		weeklyFrame.origin.y = 365;
-		weeklyDashboardView.frame = weeklyFrame;
+		weeklyDashboardView.view.frame = weeklyFrame;
 		
-		reviewsPane.frame = CGRectMake(0, 683, 768, 320);
+		reviewsPane.view.frame = CGRectMake(0, 683, 768, 320);
 		
 	} else {
-		CGRect dailyFrame = dailyDashboardView.frame;
+		CGRect dailyFrame = dailyDashboardView.view.frame;
 		dailyFrame.origin.y = 47 + 19;
-		dailyDashboardView.frame = dailyFrame;
-		CGRect weeklyFrame = dailyDashboardView.frame;
+		dailyDashboardView.view.frame = dailyFrame;
+		CGRect weeklyFrame = dailyDashboardView.view.frame;
 		weeklyFrame.origin.y = 365 + 38;
-		weeklyDashboardView.frame = weeklyFrame;
+		weeklyDashboardView.view.frame = weeklyFrame;
 		
-		reviewsPane.frame = CGRectMake(0, 683+320, 768, 320);
+		reviewsPane.view.frame = CGRectMake(0, 683+320, 768, 320);
 	}
 }
 

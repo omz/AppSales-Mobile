@@ -10,7 +10,7 @@
 
 @class DashboardGraphView;
 
-@interface DashboardView : UIView <UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate> {
+@interface DashboardViewController : UIViewController <UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate> {
 
 	UIPickerView *dateRangePicker;
 	NSArray *reports;

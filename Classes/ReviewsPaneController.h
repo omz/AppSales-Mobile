@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface ReviewsPane : UIView {  // should this be a UIViewController?
+@interface ReviewsPaneController : UIViewController {
 
 	UIScrollView *scrollView;
 	UILabel *statusLabel;

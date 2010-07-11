@@ -6,70 +6,75 @@
 //  Copyright 2010 omz:software. All rights reserved.
 //
 
-#import "DashboardView.h"
+#import "DashboardViewController.h"
 #import "NSDateFormatter+SharedInstances.h"
 #import "Day.h"
 #import "DashboardGraphView.h"
 #import "ReportManager.h"
 
 
-@implementation DashboardView
+@implementation DashboardViewController
 
 @synthesize dateRangePicker, reports, graphView, reportsPopover, showsWeeklyReports, calendarButton, viewReportsButton;
 
-- (id)initWithFrame:(CGRect)frame 
-{
-	if ((self = [super initWithFrame:frame])) {
-		self.backgroundColor = [UIColor clearColor];
-		
-		UIImageView *backgroundImageView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PaneBackground.png"]] autorelease];
-		backgroundImageView.contentStretch = CGRectMake(0.1, 0.1, 0.8, 0.8);
-		backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-		[self addSubview:backgroundImageView];
-		
-		self.dateRangePicker = [[[UIPickerView alloc] initWithFrame:CGRectMake(21, 17, 215, 215)] autorelease];
-		dateRangePicker.showsSelectionIndicator = YES;
-		dateRangePicker.delegate = self;
-		dateRangePicker.dataSource = self;
-		[self addSubview:dateRangePicker];
-		
-		UIImageView *pickerOverlay = [[[UIImageView alloc] initWithFrame:CGRectInset(dateRangePicker.frame, -7, -7)] autorelease];
-		pickerOverlay.image = [UIImage imageNamed:@"PickerOverlay.png"];
-		[self addSubview:pickerOverlay];
-		
-		self.viewReportsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		viewReportsButton.frame = CGRectMake(84, 250, 149, 47);
-		UIImage *buttonImageNormal = [[UIImage imageNamed:@"PaneButtonNormal.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0];
-		UIImage *buttonImageHighlighted = [[UIImage imageNamed:@"PaneButtonHighlighted.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0];
-		[viewReportsButton setBackgroundImage:buttonImageNormal forState:UIControlStateNormal];
-		[viewReportsButton setBackgroundImage:buttonImageHighlighted forState:UIControlStateHighlighted];
-		[viewReportsButton setTitle:NSLocalizedString(@"View Reports",nil) forState:UIControlStateNormal];
-		[viewReportsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-		[viewReportsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateHighlighted];
-		[viewReportsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
-		[viewReportsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-		viewReportsButton.titleLabel.frame = viewReportsButton.bounds;
-		viewReportsButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
-		viewReportsButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
-		[viewReportsButton addTarget:self action:@selector(viewReports:) forControlEvents:UIControlEventTouchUpInside];
-		[self addSubview:viewReportsButton];
-		
-		self.calendarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		calendarButton.frame = CGRectMake(24, 250, 49, 47);
-		[calendarButton setImage:[UIImage imageNamed:@"CalendarButtonNormal.png"] forState:UIControlStateNormal];
-		[calendarButton setImage:[UIImage imageNamed:@"CalendarButtonHighlighted.png"] forState:UIControlStateHighlighted];
-		[calendarButton addTarget:self action:@selector(selectQuickDateRange:) forControlEvents:UIControlEventTouchUpInside];
-		[self addSubview:calendarButton];
-		
-		self.graphView = [[[DashboardGraphView alloc] initWithFrame:CGRectMake(246, 17, 500, 282)] autorelease];
-		graphView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-		[self addSubview:graphView];
-		
-		shouldAutomaticallyShowNewReports = YES;
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ReportManagerDownloadedDailyReportsNotification object:nil];		
-	}
-	return self;
+- (void) loadView {
+	[super loadView];
+	self.view.backgroundColor = [UIColor clearColor];
+	
+	UIImageView *backgroundImageView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PaneBackground.png"]] autorelease];
+	backgroundImageView.contentStretch = CGRectMake(0.1, 0.1, 0.8, 0.8);
+	backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	[self.view addSubview:backgroundImageView];
+	
+	self.dateRangePicker = [[[UIPickerView alloc] initWithFrame:CGRectMake(21, 17, 215, 215)] autorelease];
+	dateRangePicker.showsSelectionIndicator = YES;
+	dateRangePicker.delegate = self;
+	dateRangePicker.dataSource = self;
+	[self.view addSubview:dateRangePicker];
+	
+	UIImageView *pickerOverlay = [[[UIImageView alloc] initWithFrame:CGRectInset(dateRangePicker.frame, -7, -7)] autorelease];
+	pickerOverlay.image = [UIImage imageNamed:@"PickerOverlay.png"];
+	[self.view addSubview:pickerOverlay];
+	
+	self.viewReportsButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	viewReportsButton.frame = CGRectMake(84, 250, 149, 47);
+	UIImage *buttonImageNormal = [[UIImage imageNamed:@"PaneButtonNormal.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0];
+	UIImage *buttonImageHighlighted = [[UIImage imageNamed:@"PaneButtonHighlighted.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0];
+	[viewReportsButton setBackgroundImage:buttonImageNormal forState:UIControlStateNormal];
+	[viewReportsButton setBackgroundImage:buttonImageHighlighted forState:UIControlStateHighlighted];
+	[viewReportsButton setTitle:NSLocalizedString(@"View Reports",nil) forState:UIControlStateNormal];
+	[viewReportsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+	[viewReportsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateHighlighted];
+	[viewReportsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+	[viewReportsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
+	viewReportsButton.titleLabel.frame = viewReportsButton.bounds;
+	viewReportsButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
+	viewReportsButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
+	[viewReportsButton addTarget:self action:@selector(viewReports:) forControlEvents:UIControlEventTouchUpInside];
+	[self.view addSubview:viewReportsButton];
+	
+	self.calendarButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	calendarButton.frame = CGRectMake(24, 250, 49, 47);
+	[calendarButton setImage:[UIImage imageNamed:@"CalendarButtonNormal.png"] forState:UIControlStateNormal];
+	[calendarButton setImage:[UIImage imageNamed:@"CalendarButtonHighlighted.png"] forState:UIControlStateHighlighted];
+	[calendarButton addTarget:self action:@selector(selectQuickDateRange:) forControlEvents:UIControlEventTouchUpInside];
+	[self.view addSubview:calendarButton];
+	
+	self.graphView = [[[DashboardGraphView alloc] initWithFrame:CGRectMake(246, 17, 500, 282)] autorelease];
+	graphView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	[self.view addSubview:graphView];
+	
+	shouldAutomaticallyShowNewReports = YES;
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ReportManagerDownloadedDailyReportsNotification object:nil];
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)selectQuickDateRange:(id)sender
@@ -80,7 +85,7 @@
 		UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil] autorelease];
 		[sheet addButtonWithTitle:NSLocalizedString(@"Last 8 Weeks",nil)];
 		[sheet addButtonWithTitle:NSLocalizedString(@"All time",nil)];
-		[sheet showFromRect:[sender frame] inView:self animated:YES];
+		[sheet showFromRect:[sender frame] inView:self.view animated:YES];
 	}else{
 		NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
 		Day *d = nil;
@@ -107,7 +112,7 @@
 		}
 		[sheet addButtonWithTitle:NSLocalizedString(@"Last year", nil)];
 		[sheet addButtonWithTitle:NSLocalizedString(@"All time", nil)];
-		[sheet showFromRect:[sender frame] inView:self animated:YES];
+		[sheet showFromRect:[sender frame] inView:self.view animated:YES];
 	}
 }
 
