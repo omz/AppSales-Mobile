@@ -93,7 +93,7 @@
 }
 
 - (void) workerThreadFetch { // called by worker threads
-	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];		
+	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];
 	@try {
 		NSAssert(! [NSThread isMainThread], nil);
 		NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
@@ -107,6 +107,7 @@
 		
 		NSDictionary *storeInfo;
 		while ((storeInfo = [self getNextStoreToFetch]) != nil) {
+			NSAutoreleasePool *innerPool = [NSAutoreleasePool new];
 			NSString *countryCode = [storeInfo objectForKey:@"countryCode"];
 			NSDateFormatter *dateFormatter = [storeInfo objectForKey:@"dateFormatter"];
 			if (dateFormatter == nil) {
@@ -188,6 +189,7 @@
 				} while (![scanner isAtEnd]);
 			}
 			[self performSelectorOnMainThread:@selector(incrementDownloadProgress) withObject:nil waitUntilDone:NO];
+			[innerPool release];
 		}
 	} @finally {
 		[self workerDone];
