@@ -20,7 +20,7 @@ NSString* getDocPath() {
 
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, newReviewsCount, allAppNames;
+@synthesize appID, appName, reviewsByUser, averageStars;
 
 - (id)initWithCoder:(NSCoder *)coder {
 	self = [super init];
@@ -35,14 +35,12 @@ NSString* getDocPath() {
 }
 
 - (void) resetNewReviewCount {
-	newReviewsCount = 0;
-	
 	for (Review *review in reviewsByUser.objectEnumerator) {
 		review.newOrUpdatedReview = NO;
 	}
 }
 
-- (NSMutableArray *)allAppNames {
+- (NSArray*) allAppNames {
 	if(! allAppNames){
 		allAppNames = [[NSMutableArray alloc] initWithObjects:self.appName, nil];
 	}
@@ -58,11 +56,7 @@ NSString* getDocPath() {
 		if([name isEqualToString:n])
 			return;
 	}
-	[self.allAppNames addObject:n];
-}
-
-- (float) averageStars {
-	return averageStars;
+	[allAppNames addObject:n];
 }
 
 - (id) initWithID:(NSString*)identifier name:(NSString*)name {
@@ -91,16 +85,22 @@ NSString* getDocPath() {
 
 - (void) addOrReplaceReview:(Review*)review {
 	[reviewsByUser setObject:review forKey:review.user];
-	newReviewsCount = 0;
 	
 	double sum = 0;
 	for (Review *r in reviewsByUser.allValues) {
 		sum += r.stars;
+	}
+	averageStars = sum / reviewsByUser.count;
+}
+
+- (NSUInteger) newReviewsCount {
+	NSUInteger newReviewsCount = 0;
+	for (Review *r in reviewsByUser.allValues) {
 		if (r.newOrUpdatedReview) {
 			newReviewsCount++;
 		}
 	}
-	averageStars = sum / reviewsByUser.count;
+	return newReviewsCount;
 }
 
 - (void) dealloc {
