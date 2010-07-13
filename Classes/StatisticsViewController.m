@@ -17,7 +17,7 @@
 
 @implementation StatisticsViewController
 
-@synthesize allAppsTrendView, regionsGraphView, trendViewsForApps, scrollView, datePicker, days, selectedDays, dateFormatter;
+@synthesize allAppsTrendView, regionsGraphView, trendViewsForApps, scrollView, pageControl, datePicker, days, selectedDays, dateFormatter;
 
 - (void)loadView 
 {
@@ -35,6 +35,12 @@
 	scrollBackground.image = [UIImage imageNamed:@"GraphScrollBackground.png"];
 	[self.view addSubview:scrollBackground];
 	
+	self.pageControl = [[[UIPageControl alloc] initWithFrame:CGRectMake(0, 197, 320, 10)] autorelease];
+	pageControl.numberOfPages = 1;
+	pageControl.backgroundColor = [UIColor colorWithHue:0.6527f saturation:0.13 brightness:0.35 alpha:1.0f];
+	[pageControl addTarget:self action:@selector(changePage:) forControlEvents:UIControlEventValueChanged];
+	[self.view addSubview:pageControl];
+	
 	self.scrollView = [[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 200)] autorelease];
 	scrollView.backgroundColor = [UIColor clearColor];
 	scrollView.pagingEnabled = YES;
@@ -51,14 +57,14 @@
 	
 	[self.view addSubview:scrollView];
 	
-	self.datePicker = [[[UIPickerView alloc] initWithFrame:CGRectMake(0, 200, 320, 100)] autorelease];
+	self.datePicker = [[[UIPickerView alloc] initWithFrame:CGRectMake(0, 207, 320, 100)] autorelease];
 	datePicker.showsSelectionIndicator = YES;
 	datePicker.delegate = self;
 	datePicker.dataSource = self;
 	[self.view addSubview:datePicker];
 	
 	UIButton *dateButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	dateButton.frame = CGRectMake(272, 287, 30, 45);
+	dateButton.frame = CGRectMake(272, 293, 30, 45);
 	[dateButton setImage:[UIImage imageNamed:@"DateButtonNormal.png"] forState:UIControlStateNormal];
 	[dateButton setImage:[UIImage imageNamed:@"DateButtonHighlight.png"] forState:UIControlStateHighlighted];
 	[self.view addSubview:dateButton];
@@ -178,6 +184,8 @@
 	}
 	self.scrollView.contentSize = CGSizeMake(640.0 + [trendViewsForApps count] * 320.0, 200);
 	
+	self.pageControl.numberOfPages = [allAppsSorted count] + 2;
+	
 	[self scrollViewDidEndDecelerating:scrollView];
 }
 
@@ -185,6 +193,13 @@
 {
 	if (!self.days || [self.days count] == 0)
 		return; 
+
+	if (!pageControlUsed) {	
+		CGFloat pageWidth = aScrollView.frame.size.width;
+		int page = floor((aScrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+		pageControl.currentPage = page;
+	}
+	pageControlUsed = NO;
 	
 	CGPoint offset = scrollView.contentOffset;
 	
@@ -217,6 +232,16 @@
 			visibleChart.days = self.selectedDays;
 		}
 	}
+}
+
+- (void)changePage:(id)sender{
+	pageControlUsed = YES;
+	int page = pageControl.currentPage;
+	CGRect frame = scrollView.frame;
+	frame.origin.x = frame.size.width * page;
+	frame.origin.y = 0;
+	[scrollView scrollRectToVisible:frame animated:YES];
+	[self scrollViewDidEndDecelerating:scrollView];
 }
 
 - (void)selectDate:(id)sender
