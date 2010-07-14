@@ -328,7 +328,7 @@
 		sortedReports = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	} else {
 		sortedReports = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-		
+		/*
 		//insert the weeks older than the oldest daily report
 		NSMutableArray *allDays = [[sortedReports mutableCopy] autorelease];
 		
@@ -360,6 +360,7 @@
 			}
 		}
 		sortedReports = [[allDays copy] autorelease];
+		 */
 	}
 	self.reports = sortedReports;
 	[dateRangePicker reloadAllComponents];
