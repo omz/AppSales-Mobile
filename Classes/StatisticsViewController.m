@@ -77,6 +77,7 @@
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
 	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	
+	/*
 	//insert the weeks older than the oldest daily report
 	NSMutableArray *allDays = [[sortedDays mutableCopy] autorelease];
 	Day *oldestDayReport = [sortedDays objectAtIndex:0];
@@ -99,6 +100,7 @@
 			weeksInserite = YES;
 		}
 	}
+	*/
 	
 	self.days = sortedDays;
 }
