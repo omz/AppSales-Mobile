@@ -149,6 +149,8 @@
 		return @"¥";
 	else if ([baseCurrency isEqual:@"GBP"])
 		return @"£";
+	else if ([baseCurrency isEqual:@"ILS"])
+		return @"₪";
 	
 	return baseCurrency;
 }
