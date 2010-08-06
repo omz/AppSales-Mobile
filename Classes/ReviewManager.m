@@ -6,24 +6,34 @@
 #import "AppManager.h"
 
 // used to pass stuff between background worker threads and main thread
+// could refactor this so this object is doing the update work
 @interface ReviewUpdateBundle : NSObject {
-	// fields are not retained
-	Review *review;
 	NSString *appID;
-	volatile BOOL needsUpdating; // must be volatile as it's used without synchronization
+    NSArray *input;
+	NSMutableArray *needsUpdating;
 }
-- (id) initWithReview:(Review*)rev appID:(NSString*)appID;
-@property (readonly) Review *review;
-@property (readonly) NSString *appID;
-@property (readwrite) BOOL needsUpdating;
+- (id) initWithAppID:(NSString*)idTouse reviews:(NSArray*)reviews;
+@property (retain, readonly) NSString *appID;
+@property (retain, readonly) NSArray *input;
+@property (retain, readonly) NSMutableArray *needsUpdating;
 @end
+
 @implementation ReviewUpdateBundle
-@synthesize review, appID, needsUpdating;
-- (id) initWithReview:(Review*)rev appID:(NSString*)idTouse {
+@synthesize appID, input, needsUpdating;
+- (id) initWithAppID:(NSString*)idTouse reviews:(NSArray*)reviews {
 	self = [super init];
-	review = rev;
-	appID = idTouse;
+    if (self) {
+        input = [reviews retain];
+        appID = [idTouse retain];
+        needsUpdating = [[NSMutableArray alloc] init];        
+    }
 	return self;
+}
+- (void) dealloc {
+    [appID release];
+    [input release];
+    [needsUpdating release];
+    [super dealloc];
 }
 @end
 
@@ -94,26 +104,29 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
 }
 
-- (void) checkIfReviewUpToDate:(ReviewUpdateBundle*)bundle {
+- (void) checkIfReviewsUpToDate:(ReviewUpdateBundle*)bundle {
 	NSAssert([NSThread isMainThread], nil);
 	App *app = [[AppManager sharedManager] appWithID:bundle.appID];
 	
 	NSDictionary *existingReviews = app.reviewsByUser;
-	Review *oldReview = [existingReviews objectForKey:bundle.review.user];
-
-	if  (oldReview != nil && [oldReview.text isEqual:bundle.review.text]) {
-		return; // up to date
-	}
-	bundle.needsUpdating = YES;
+    for (Review *fetchedReview in bundle.input) {
+        Review *oldReview = [existingReviews objectForKey:fetchedReview.user];
+        if  (oldReview == nil || ![oldReview.text isEqual:fetchedReview.text]) {
+            // fetched review is new or different than what's stored
+            [bundle.needsUpdating addObject:fetchedReview]; // needs translation and updating
+        }
+    }
 }
 
 // called after translating new or updated reviews
-- (void) addReview:(ReviewUpdateBundle*)bundle {
+- (void) addReviews:(ReviewUpdateBundle*)bundle {
 	NSAssert([NSThread isMainThread], nil);
 	App *app = [[AppManager sharedManager] appWithID:bundle.appID];
-	[app addOrReplaceReview:bundle.review];
+    for (Review *fetchedReivew in bundle.needsUpdating) {
+        [app addOrReplaceReview:fetchedReivew];        
+    }
+    [self notifyOfNewReviews];
 	saveToDiskNeeded = YES;
-	[self performSelectorOnMainThread:@selector(notifyOfNewReviews) withObject:nil waitUntilDone:NO];
 }
 
 - (void) workerThreadFetch { // called by worker threads
@@ -137,7 +150,7 @@
 			if (dateFormatter == nil) {
 				dateFormatter = threadDefaultDateFormatter;
 			}
-						
+            
 			NSString *storeFrontID = [storeInfo objectForKey:@"storeFrontID"];
 			NSString *storeFront = [storeFrontID stringByAppendingFormat:@"-1"];
 			[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
@@ -154,9 +167,9 @@
 					return;
 				}
 				NSString *xml = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-							
+                
 				NSScanner *scanner = [NSScanner scannerWithString:xml];
-				int i = 0;
+                NSMutableArray *input = [NSMutableArray array];
 				do {
 					NSString *reviewTitle = nil;
 					NSString *reviewDateAndVersion = nil;
@@ -206,17 +219,22 @@
 														 downloadDate:downloadDate version:reviewVersion countryCode:countryCode
 																title:[reviewTitle removeHtmlEscaping] text:[reviewText removeHtmlEscaping]
 																stars:[reviewStars intValue]];
-						ReviewUpdateBundle *bundle = [[ReviewUpdateBundle alloc] initWithReview:review appID:appID];
-						[self performSelectorOnMainThread:@selector(checkIfReviewUpToDate:) withObject:bundle waitUntilDone:YES];
-						if (bundle.needsUpdating) {
-							[review updateTranslations];
-							[self performSelectorOnMainThread:@selector(addReview:) withObject:bundle waitUntilDone:YES];							
-						}
+                        [input addObject:review];
 						[review release];
-						[bundle release];
 					}
-					i++;
-				} while (![scanner isAtEnd]);
+				} while (! [scanner isAtEnd]);
+                
+                // check if any reviews are new or updated and need further processing
+                if (input.count) {
+                    ReviewUpdateBundle *bundle = [[[ReviewUpdateBundle alloc] initWithAppID:appID reviews:input] autorelease];
+                    [self performSelectorOnMainThread:@selector(checkIfReviewsUpToDate:) withObject:bundle waitUntilDone:YES];
+                    if (bundle.needsUpdating.count) {
+                        for (Review *fetchedReview in bundle.needsUpdating) {
+                            [fetchedReview updateTranslations];
+                        }
+                        [self performSelectorOnMainThread:@selector(addReviews:) withObject:bundle waitUntilDone:YES];							
+                    }
+                }
 			}
 			[self performSelectorOnMainThread:@selector(incrementDownloadProgress) withObject:nil waitUntilDone:NO];
 			[innerPool release];
