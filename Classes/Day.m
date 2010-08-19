@@ -64,7 +64,10 @@
 			NSString *dateColumn = [columns objectAtIndex:11];
 			NSString *toDateColumn = [columns objectAtIndex:12];
 			NSString *appId = [columns objectAtIndex:19];
-			NSString *parentID = [columns objectAtIndex:26];
+			NSString *parentID;
+			if ([columns count] >=26) {
+				 parentID = [columns objectAtIndex:26];
+			}
 			[[AppIconManager sharedManager] downloadIconForAppID:appId appName:productName];
 			if (!self.date) {
 				NSDate *fromDate = [self reportDateFromString:dateColumn];
