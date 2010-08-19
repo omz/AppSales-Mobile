@@ -11,7 +11,7 @@
 
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, allAppNames;
+@synthesize appID, appName, reviewsByUser, allAppNames,inAppPurchase;
 
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -20,6 +20,7 @@
 	self.allAppNames = [coder decodeObjectForKey:@"allAppNames"];
 	self.appName = [coder decodeObjectForKey:@"appName"];
 	self.reviewsByUser = [coder decodeObjectForKey:@"reviewsByUser"];
+	self.inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
 	return self;
 }
 
@@ -74,6 +75,8 @@
 	[coder encodeObject:self.appName forKey:@"appName"];
 	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
 	[coder encodeObject:self.allAppNames forKey:@"allAppNames"];
+	[coder encodeBool:self.isInAppPurchase forKey:@"inAppPurchase"];
+
 }
 
 - (void)dealloc

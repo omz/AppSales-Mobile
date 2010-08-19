@@ -14,6 +14,7 @@
 	NSString *appID;
 	NSString *appName;
 	NSMutableDictionary *reviewsByUser;
+	BOOL inAppPurchase;
 }
 
 @property (nonatomic, retain) NSString *appID;
@@ -21,7 +22,7 @@
 @property (nonatomic, retain) NSMutableArray *allAppNames;
 @property (nonatomic, retain) NSMutableDictionary *reviewsByUser;
 @property (readonly) int newReviewsCount;
-
+@property (assign,getter=isInAppPurchase) BOOL inAppPurchase;
 - (float)averageStars;
 
 @end

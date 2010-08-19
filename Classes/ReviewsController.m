@@ -32,8 +32,16 @@
 - (void)reload
 {
 	NSArray *allApps = [[ReportManager sharedManager].appsByID allValues];
+	NSMutableArray *appsWhichArentInAppPurchases = [NSMutableArray array];
+	NSEnumerator *enumerator = [allApps objectEnumerator];
+	App *app;
+	while (app = [enumerator nextObject]) {
+		if (!app.isInAppPurchase) {
+			[appsWhichArentInAppPurchases addObject:app];
+		}
+	}
 	NSSortDescriptor *appSorter = [[[NSSortDescriptor alloc] initWithKey:@"appName" ascending:YES] autorelease];
-	self.sortedApps = [allApps sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
+	self.sortedApps = [appsWhichArentInAppPurchases sortedArrayUsingDescriptors:[NSArray arrayWithObject:appSorter]];
 	[self.tableView reloadData];
 }
 

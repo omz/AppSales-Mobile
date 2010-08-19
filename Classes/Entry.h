@@ -40,6 +40,7 @@
 	int units;
 	float royalties;
 	NSString *currency;
+	BOOL inAppPurchase;
 }
 
 @property (retain) Country *country;
@@ -50,6 +51,7 @@
 @property (assign) float royalties;
 @property (assign) int units;
 @property (readonly) Boolean purchase;
+@property (assign,getter=isInAppPurchase) BOOL inAppPurchase;
 
 - (id)initWithProductName:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry;
 - (float)totalRevenueInBaseCurrency;

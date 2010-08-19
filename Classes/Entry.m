@@ -42,6 +42,7 @@
 @synthesize transactionType;
 @synthesize royalties;
 @synthesize units;
+@synthesize inAppPurchase;
 @dynamic purchase;
 -(Boolean) purchase
 {
@@ -73,6 +74,8 @@
 	self.units = [coder decodeIntForKey:@"units"];
 	self.royalties = [coder decodeFloatForKey:@"royalties"];
 	self.productIdentifier = [coder decodeObjectForKey:@"productIdentifier"];
+	self.inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
+
 	if(!productIdentifier)
 		self.productIdentifier = [[ReportManager sharedManager] appIDForAppName:self.productName];
 
@@ -88,6 +91,7 @@
 	[coder encodeInt:self.units forKey:@"units"];
 	[coder encodeFloat:self.royalties forKey:@"royalties"];
 	[coder encodeObject:self.productIdentifier forKey:@"productIdentifier"];
+	[coder encodeBool:self.isInAppPurchase forKey:@"inAppPurchase"];
 }
 
 

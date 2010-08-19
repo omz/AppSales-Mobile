@@ -564,6 +564,7 @@
 			for (Entry *e in c.entries) {
 				NSString *appID = e.productIdentifier;
 				NSString *appName = e.productName;
+				BOOL inAppPurchase = e.isInAppPurchase;
 				if (appID){
 					App *app = [self.appsByID objectForKey:appID];
 					if(app) {
@@ -574,6 +575,7 @@
 						app.appID = appID;
 						app.appName = appName;
 						app.reviewsByUser = [NSMutableDictionary dictionary];
+						app.inAppPurchase = inAppPurchase;
 						[appsByID setObject:app forKey:appID];
 					}
 				}
@@ -628,7 +630,10 @@
 					app.appID = appID;
 					app.appName = appName;
 					app.reviewsByUser = [NSMutableDictionary dictionary];
+					app.inAppPurchase = e.isInAppPurchase;
 					[appsByID setObject:app forKey:appID];
+					NSLog(@"App Name = %@",appName);
+					NSLog(@"Is In App Purchase: %i",e.isInAppPurchase);
 				}
 			}
 		}
@@ -740,7 +745,9 @@
 	for (NSString *appID in [self.appsByID allKeys]) 
 	{
 		App *a = [appsByID objectForKey:appID];
-		[appIDs setObject:a.appName forKey:appID];
+		if (!a.isInAppPurchase) {
+			[appIDs setObject:a.appName forKey:appID];
+		}
 	}
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:appIDs, @"appIDs", [NSNumber numberWithBool:topCountriesOnly], @"downloadOnlyTopCountries", nil];
 	[self performSelectorInBackground:@selector(fetchReviewsWithInfo:) withObject:info];

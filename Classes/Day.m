@@ -64,6 +64,7 @@
 			NSString *dateColumn = [columns objectAtIndex:11];
 			NSString *toDateColumn = [columns objectAtIndex:12];
 			NSString *appId = [columns objectAtIndex:19];
+			NSString *parentID = [columns objectAtIndex:26];
 			[[AppIconManager sharedManager] downloadIconForAppID:appId appName:productName];
 			if (!self.date) {
 				NSDate *fromDate = [self reportDateFromString:dateColumn];
@@ -105,6 +106,7 @@
 									   currency:royaltyCurrency
 										country:country] autorelease]; //gets added to the countries entry list automatically
 			entry.productIdentifier = appId;
+			entry.inAppPurchase = ![parentID isEqualToString:@" "];
 		}
 	}
 	[self generateSummary];
