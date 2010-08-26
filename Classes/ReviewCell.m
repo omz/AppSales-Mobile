@@ -87,7 +87,7 @@
 	}
 	
 	[[UIColor colorWithRed:1.0 green:0.8 blue:0.0 alpha:1.0] set];
-	[starsString drawInRect:CGRectMake(CELL_COUNTRY_WIDTH+5, 0, CELL_COUNTRY_HEIGHT-11, 14) withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentLeft];
+	[starsString drawInRect:CGRectMake(CELL_COUNTRY_WIDTH+5, 0, 100, 14) withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentLeft];
 	
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
 	NSString *userAndDate = [NSString stringWithFormat:@"%@  –  %@", review.user, [dateFormatter stringFromDate:review.reviewDate]];
