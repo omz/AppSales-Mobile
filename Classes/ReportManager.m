@@ -1226,7 +1226,11 @@
 		App *app = [appsByID objectForKey:appID];
 		NSArray *allReviewsForApp = [reviews objectForKey:appID];
 		for (Review *review in allReviewsForApp) {
-			review.newOrUpdatedReview = YES;
+			if ([app.reviewsByUser objectForKey:review.user]) {
+				review.newOrUpdatedReview = NO;
+			} else {
+				review.newOrUpdatedReview = YES;
+			}
 			[app.reviewsByUser setObject:review forKey:review.user];
 		}
 	}
