@@ -13,7 +13,7 @@
 
 @implementation TrendGraphView
 
-@synthesize app;
+@synthesize appName, appID;
 
 - (id)initWithFrame:(CGRect)rect
 {
@@ -25,9 +25,7 @@
 - (void)drawRect:(CGRect)rect 
 {
 	[super drawRect:rect];
-	
-	CGContextRef c = UIGraphicsGetCurrentContext();
-	
+		
 	BOOL showUnits = [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowUnitsInGraphs"];
 		
 	//draw background:
@@ -36,14 +34,11 @@
 	float minY = 30.0;
 	float maxY = 170;
 	
-	if (!self.days || [self.days count] == 0)
-		return;
-	
 	NSMutableArray *revenues = [NSMutableArray array];
 	float maxRevenue = 0.0;
 	float totalRevenue = 0.0;
 	for (Day *d in self.days) {
-		float revenue = (showUnits) ? (float)[d totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:self.app]] : [d totalRevenueInBaseCurrencyForAppWithID:[[ReportManager sharedManager] appIDForAppName:self.app]];
+		float revenue = (showUnits) ? (float)[d totalUnitsForAppWithID:appID] : [d totalRevenueInBaseCurrencyForAppWithID:appID];
 		totalRevenue += revenue;
 		if(d.isWeek){
 			revenue /= 7.0;
@@ -54,11 +49,11 @@
 		}
 		if (revenue > maxRevenue) maxRevenue = revenue;
 	}
-	if (maxRevenue == 0.0) {
-		return;
-	}
 	
-	UIColor *graphColor = (self.app) ? [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0] : [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0];
+	UIColor *graphColor = (self.appName) ? [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0] : [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0];
+	
+	CGContextRef c = UIGraphicsGetCurrentContext();
+	CGContextSaveGState(c); // push contet
 	
 	//draw grid and captions:
 	CGContextBeginPath(c);
@@ -84,37 +79,47 @@
 	[[UIColor darkGrayColor] set];
 	
 	NSString *caption;
-	if (showUnits)
+	if (showUnits) {
 		caption = NSLocalizedString(@"Sales",nil);
-	else
+	} else {
 		caption = [NSString stringWithFormat:NSLocalizedString(@"Revenue (in %@)",nil), [[CurrencyManager sharedManager] baseCurrencyDescription]];
-	
+	}
 	[caption drawInRect:CGRectMake(10, 10, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
-	NSString *subtitle;
-	if (showUnits)
-		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %i sales",nil), [revenues count], (int)totalRevenue];
-	else
-		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %@",nil), [revenues count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+
 	
-	[subtitle drawInRect:CGRectMake(10, maxY + 5, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
-	
-	NSString *appName = (self.app != nil) ? (self.app) : NSLocalizedString(@"All Apps",nil);
+	NSString *appNameToShow = (self.appName != nil) ? (self.appName) : NSLocalizedString(@"All Apps",nil);
 	float actualFontSize = 10.0;
-	[appName sizeWithFont:[UIFont boldSystemFontOfSize:100.0] minFontSize:10.0 actualFontSize:&actualFontSize forWidth:(maxX - minX) lineBreakMode:UILineBreakModeClip];
-	CGSize actualSize = [appName sizeWithFont:[UIFont boldSystemFontOfSize:actualFontSize]];
+	[appNameToShow sizeWithFont:[UIFont boldSystemFontOfSize:100.0] minFontSize:10.0 actualFontSize:&actualFontSize forWidth:(maxX - minX) lineBreakMode:UILineBreakModeClip];
+	CGSize actualSize = [appNameToShow sizeWithFont:[UIFont boldSystemFontOfSize:actualFontSize]];
 	[[UIColor colorWithWhite:0.8 alpha:1.0] set];
 	CGRect appNameRect = CGRectMake(minX, maxY - actualSize.height, maxX - minX, actualSize.height);
-	if (averageY > 100)
+	if (averageY > 100) {
 		appNameRect = CGRectMake(minX, minY, maxX - minX, actualSize.height);
-	[appName drawInRect:appNameRect withFont:[UIFont boldSystemFontOfSize:actualFontSize] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
-		
+	}
+	[appNameToShow drawInRect:appNameRect withFont:[UIFont boldSystemFontOfSize:actualFontSize] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
+	
+	if (maxRevenue == 0) {
+		// nothing of interest to display, stop here
+		CGContextRestoreGState(c); // pop context before returning
+		return;
+	}
+	
+	NSString *subtitle;
+	if (showUnits) {
+		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %i sales",nil), [revenues count], (int)totalRevenue];
+	} else {
+		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %@",nil), [revenues count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+	}
+	[subtitle drawInRect:CGRectMake(10, maxY + 5, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
+
+	
 	//draw weekend background:
 	if ([days count] <= 31) {
 		CGContextSetAllowsAntialiasing(c, NO);
 		float weekendWidth = (maxX - minX) / ([days count] - 1);
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 		UIColor *shade;
-		if (self.app == nil)
+		if (self.appID == nil)
 			shade = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:0.1];
 		else
 			shade = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:0.1];
@@ -171,13 +176,14 @@
 	CGContextDrawPath(c, kCGPathStroke);
 	CGContextSetLineDash(c, 0.0, NULL, 0);
 	
+	CGContextRestoreGState(c); // pop context
 }
 
 
 - (void)dealloc 
 {
-	self.app = nil;
-	
+	self.appID = nil;
+	self.appName = nil;
     [super dealloc];
 }
 

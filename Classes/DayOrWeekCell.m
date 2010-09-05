@@ -12,7 +12,6 @@
 
 @implementation DayOrWeekCell
 
-@synthesize day;
 @synthesize maxRevenue;
 @synthesize graphColor;
 
@@ -104,6 +103,10 @@
 	
 	availableGraphWidth = width;
 	[self updateGraphWidth];
+}
+
+- (Day*) day {
+	return day;
 }
 
 - (void)setDay:(Day *)newDay

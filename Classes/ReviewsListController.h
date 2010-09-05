@@ -8,13 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@class App;
 
 @interface ReviewsListController : UITableViewController {
-
+	App *app;
 	NSArray *reviews;
 }
 
-@property (nonatomic, retain) NSArray *reviews;
--(void) readall;
+- (id) initWithApp:(App*)appToUse style:(UITableViewStyle)style;
+- (void) readall;
 
 @end

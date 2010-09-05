@@ -33,8 +33,6 @@
 
 @implementation EntryCell
 
-@synthesize entry;
-
 - (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier 
 {
     if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
@@ -51,6 +49,10 @@
 		
     }
     return self;
+}
+
+- (Entry*) entry {
+	return entry;
 }
 
 - (void)setEntry:(Entry *)newEntry

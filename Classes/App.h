@@ -8,6 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+NSString* getDocPath(); // utility methods that belong in some other file
+NSString* getPrefetchedPath(); 
+
+@class Review;
 
 @interface App : NSObject <NSCoding> {
 	NSMutableArray *allAppNames;
@@ -15,14 +19,22 @@
 	NSString *appName;
 	NSMutableDictionary *reviewsByUser;
 	BOOL inAppPurchase;
+	float averageStars;
 }
 
-@property (nonatomic, retain) NSString *appID;
-@property (nonatomic, retain) NSString *appName;
-@property (nonatomic, retain) NSMutableArray *allAppNames;
-@property (nonatomic, retain) NSMutableDictionary *reviewsByUser;
-@property (readonly) int newReviewsCount;
+@property (readonly) NSString *appID;
+@property (readonly) NSString *appName;
+@property (readonly) NSDictionary *reviewsByUser;
+@property (readonly) NSUInteger newReviewsCount;
+@property (readonly) NSArray *allAppNames;
+@property (readonly) float averageStars;
 @property (assign,getter=isInAppPurchase) BOOL inAppPurchase;
-- (float)averageStars;
+
+- (id) initWithID:(NSString*)identifier name:(NSString*)name;
+- (void) addOrReplaceReview:(Review*)review;
+
+- (void) resetNewReviewCount;
+
+- (void) updateApplicationName:(NSString*)newAppName; // application names can change with new updates
 
 @end

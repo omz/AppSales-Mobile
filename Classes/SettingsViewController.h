@@ -32,19 +32,24 @@ AppSalesMobile
 
 
 @interface SettingsViewController : UIViewController <UITextFieldDelegate> {
-	
 	IBOutlet UILabel *explanationsLabel;
 	IBOutlet UILabel *copyrightLabel;
 	IBOutlet UITextField *usernameTextField;
 	IBOutlet UITextField *passwordTextField;
+	IBOutlet UILabel *translationLabel;
+	IBOutlet UISwitch *translationSwitch;
 	IBOutlet UISegmentedControl *currencySelectionControl;
 	IBOutlet UILabel *loginSectionLabel;
+	IBOutlet UILabel *usernameLabel;
+	IBOutlet UILabel *passwordLabel;
 	IBOutlet UILabel *currencySectionLabel;
+	IBOutlet UISegmentedControl *refreshNowLabel;
 	IBOutlet UILabel *lastRefreshLabel;
 }
 
 - (IBAction)refreshExchangeRates:(id)sender;
 - (IBAction)changeCurrency:(id)sender;
+
 - (void)currencyRatesDidUpdate;
 - (void)currencyRatesFailedToUpdate;
 - (void)baseCurrencyChanged;

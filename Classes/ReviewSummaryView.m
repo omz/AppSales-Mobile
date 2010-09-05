@@ -24,7 +24,7 @@
 		self.app = anApp;
 		
 		UIImageView *iconView = [[[UIImageView alloc] initWithFrame:CGRectMake(84, 13, 57, 57)] autorelease];
-		iconView.image = [[AppIconManager sharedManager] iconForAppNamed:app.appName];
+		iconView.image = [[AppIconManager sharedManager] iconForAppID:app.appID];
 		[self addSubview:iconView];
 		
 		UILabel *nameLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, 76, 205, 20)] autorelease];
@@ -71,7 +71,7 @@
 			barView.userInteractionEnabled = NO;
 			[self addSubview:barView];
 			
-			UILabel *numberOfReviewsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(barView.frame.origin.x + barView.frame.size.width + 5, 122 + (i*18), 35, 15)] autorelease];
+			numberOfReviewsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(barView.frame.origin.x + barView.frame.size.width + 5, 122 + (i*18), 35, 15)] autorelease];
 			numberOfReviewsLabel.text = [NSString stringWithFormat:@"%i", numberOfReviews];
 			numberOfReviewsLabel.font = [UIFont systemFontOfSize:13.0];
 			numberOfReviewsLabel.textColor = [UIColor grayColor];

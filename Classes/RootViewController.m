@@ -43,13 +43,15 @@
 #import "SFHFKeychainUtils.h"
 #import "StatisticsViewController.h"
 #import "ReportManager.h"
+#import "AppManager.h"
 #import "ReviewsController.h"
+#import "ReviewManager.h"
 #import "ImportExportViewController.h"
 #import "UIDevice+iPad.h"
 
 @implementation RootViewController
 
-@synthesize activityIndicator, statusLabel, daysController, weeksController, settingsController, statisticsController, reviewsController;
+@synthesize activityIndicator, statusLabel, daysController, weeksController, totalController, settingsController, statisticsController, reviewsController;
 @synthesize dailyTrendView, weeklyTrendView;
 
 - (void)loadView
@@ -84,15 +86,6 @@
 	
 	self.toolbarItems = [NSArray arrayWithObjects:refreshItem, flexSpaceItem, statusItem, flexSpaceItem, progressItem, nil];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) name:ReportManagerUpdatedDownloadProgressNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
-}
-
-
-- (void)viewDidLoad 
-{
-	[super viewDidLoad];
 	self.navigationItem.title = @"AppSales";
 	
 	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
@@ -102,9 +95,27 @@
 	
 	self.tableView.contentInset = UIEdgeInsetsMake(22, 0, 0, 0);
 	[self.tableView setScrollEnabled:NO];
+}
 	
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+
 	[self refreshDailyTrend];
 	[self refreshWeeklyTrend];
+	[self updateProgress];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateProgress) 
+												 name:ReportManagerUpdatedDownloadProgressNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshDailyTrend) 
+												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) 
+												 name:ReportManagerDownloadedWeeklyReportsNotification object:nil];	
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)refreshDailyTrend
@@ -116,7 +127,11 @@
 
 - (UIImage *)sparklineForReports:(NSArray *)days
 {
-	UIGraphicsBeginImageContextWithOptions(CGSizeMake(120, 30),NO,[UIScreen mainScreen].scale);
+	if (&UIGraphicsBeginImageContextWithOptions) {
+		UIGraphicsBeginImageContextWithOptions(CGSizeMake(120, 30),NO,UIScreen.mainScreen.scale);
+	} else { // ipad
+		UIGraphicsBeginImageContext(CGSizeMake(120, 30));
+	}
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
@@ -223,11 +238,6 @@
 	UIImage *sparkline = [self sparklineForReports:[[ReportManager sharedManager].weeks allValues]];
 	self.weeklyTrendView = [[[UIImageView alloc] initWithImage:sparkline] autorelease];
 	[self.tableView reloadData];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-	[self updateProgress];
 }
 
 - (void)downloadReports
@@ -343,8 +353,10 @@
 		[self.navigationController pushViewController:statisticsController animated:YES];
 	}
 	else if ((row == 0) && (section == 1)) {
-		if ([[ReportManager sharedManager].appsByID count] == 0) {
-			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) otherButtonTitles:nil] autorelease] show];
+		if ([AppManager sharedManager].numberOfApps == 0) {
+			[[[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"Before you can download reviews, you have to download at least one daily report with this version. If you already have today's report, you can delete it and download it again.",nil) 
+										delegate:nil cancelButtonTitle:NSLocalizedString(@"OK",nil) 
+							   otherButtonTitles:nil] autorelease] show];
             [[self tableView ] deselectRowAtIndexPath:indexPath animated:YES];
 			return;
 		}

@@ -32,6 +32,7 @@
 #import "Country.h"
 #import "CurrencyManager.h"
 #import "ReportManager.h"
+#import "AppManager.h"
 
 @implementation Entry
 
@@ -44,53 +45,61 @@
 @synthesize units;
 @synthesize inAppPurchase;
 @dynamic purchase;
--(Boolean) purchase
+
+- (BOOL) purchase
 {
 	return transactionType == 1 || transactionType == 2 || transactionType == 9;
 }
 
 
-- (id)initWithProductName:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry
+- (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry
 {
-	[super init];
-	self.country = aCountry;
-	self.productName = name;
-	self.currency = currencyCode;
-	self.transactionType = type;
-	self.units = u;
-	self.royalties = r;
-	[country.entries addObject:self];
+	self = [super init];
+	if (self) {
+		productIdentifier = [identifier retain];
+		productName = [name retain];
+		country = [aCountry retain];
+		currency = [currencyCode retain];
+		
+		transactionType = type;
+		units = u;
+		royalties = r;
+		[country addEntry:self];
+	}
 	return self;
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	[super init];
-	self.country = [coder decodeObjectForKey:@"country"];
-	[country.entries addObject:self];
-	self.productName = [coder decodeObjectForKey:@"productName"];
-	self.currency = [coder decodeObjectForKey:@"currency"];
-	self.transactionType = [coder decodeIntForKey:@"transactionType"];
-	self.units = [coder decodeIntForKey:@"units"];
-	self.royalties = [coder decodeFloatForKey:@"royalties"];
-	self.productIdentifier = [coder decodeObjectForKey:@"productIdentifier"];
-	self.inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
-
-	if(!productIdentifier)
-		self.productIdentifier = [[ReportManager sharedManager] appIDForAppName:self.productName];
+	self = [super init];
+	if (self) {
+		self.country = [coder decodeObjectForKey:@"country"];
+		[country addEntry:self];
+		self.productName = [coder decodeObjectForKey:@"productName"];
+		self.currency = [coder decodeObjectForKey:@"currency"];
+		self.transactionType = [coder decodeIntForKey:@"transactionType"];
+		self.units = [coder decodeIntForKey:@"units"];
+		self.royalties = [coder decodeFloatForKey:@"royalties"];
+		self.productIdentifier = [coder decodeObjectForKey:@"productIdentifier"];
+		self.inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
+		
+		if(!productIdentifier)
+			self.productIdentifier = [[AppManager sharedManager] appIDForAppName:self.productName];
+	}
 
 	return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-	[coder encodeObject:self.country forKey:@"country"];
+	[coder encodeObject:self.productIdentifier forKey:@"productIdentifier"];
 	[coder encodeObject:self.productName forKey:@"productName"];
+	[coder encodeObject:self.country forKey:@"country"];
 	[coder encodeObject:self.currency forKey:@"currency"];
+	
 	[coder encodeInt:self.transactionType forKey:@"transactionType"];
 	[coder encodeInt:self.units forKey:@"units"];
 	[coder encodeFloat:self.royalties forKey:@"royalties"];
-	[coder encodeObject:self.productIdentifier forKey:@"productIdentifier"];
 	[coder encodeBool:self.isInAppPurchase forKey:@"inAppPurchase"];
 }
 
@@ -102,9 +111,7 @@
 		float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenueInLocalCurrency fromCurrency:self.currency];
 		return revenueInBaseCurrency;
 	}
-	else {
-		return 0.0;
-	}
+	return 0;
 }
 
 - (NSString *)description
@@ -118,19 +125,18 @@
 		NSString *totalRevenueString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:[self totalRevenueInBaseCurrency]]];
 		NSString *royaltiesSumString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:self.royalties * self.units]];
 		
-		return [NSString stringWithFormat:@"%@ : %i × %@ %@ = %@ %@ ≈ %@", self.productName, self.units, royaltiesString, self.currency, royaltiesSumString, self.currency, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:totalRevenueString]];
+		return [NSString stringWithFormat:@"%@ : %i × %@ %@ = %@ %@ ≈ %@", self.productName, self.units, royaltiesString, 
+				self.currency, royaltiesSumString, self.currency, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:totalRevenueString]];
 	}
-	else {
-		return [NSString stringWithFormat:NSLocalizedString(@"%@ : %i free downloads",nil), self.productName, self.units];
-	}
+	return [NSString stringWithFormat:NSLocalizedString(@"%@ : %i free downloads",nil), self.productName, self.units];
 }
 
 - (void)dealloc
 {
-	self.country = nil;
-	self.productName = nil;
-	self.currency = nil;
-	self.productIdentifier = nil;
+	[country release];
+	[productName release];
+	[currency release];
+	[productIdentifier release];
 	
 	[super dealloc];
 }

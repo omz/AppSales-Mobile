@@ -31,7 +31,6 @@
 #import "AppSalesMobileAppDelegate.h"
 #import "RootViewController.h"
 #import "PadRootViewController.h"
-#import "Day.h"
 #import "UIDevice+iPad.h"
 
 @implementation AppSalesMobileAppDelegate
@@ -54,7 +53,6 @@
 	[window addSubview:rootViewController.view];
 	[window makeKeyAndVisible];
 }
-
 
 - (void)dealloc 
 {

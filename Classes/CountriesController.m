@@ -40,7 +40,6 @@
 
 @implementation CountriesController
 
-@synthesize countries;
 @synthesize products;
 @synthesize totalRevenue;
 @synthesize displayMode;
@@ -79,6 +78,10 @@
 	[self.tableView reloadData];
 }
 
+- (NSArray*) countries {
+	return countries;
+}
+
 - (void)setCountries:(NSArray *)newCountries
 {
 	[newCountries retain];
@@ -92,23 +95,23 @@
 	for (Country *c in countries) {
 		for (Entry *e in c.entries) {
 			if (e.purchase) {
-				NSString *name = [(App *)[[ReportManager sharedManager].appsByID objectForKey:[[ReportManager sharedManager] appIDForAppName:[e productName]]] appName];
-				NSMutableDictionary *productInfo = [productInfos objectForKey:name];
+				NSMutableDictionary *productInfo = [productInfos objectForKey:e.productIdentifier];
 				if (!productInfo) {
 					productInfo = [NSMutableDictionary dictionary];
-					[productInfo setObject:[NSNumber numberWithFloat:0.0] forKey:@"revenue"];
+					[productInfo setObject:[NSNumber numberWithFloat:0] forKey:@"revenue"];
 					[productInfo setObject:[NSNumber numberWithInt:0] forKey:@"units"];
-					[productInfo setObject:[e productName] forKey:@"name"];
-					[productInfos setObject:productInfo forKey:name];
+					[productInfo setObject:e.productIdentifier forKey:@"appID"];
+					[productInfo setObject:e.productName forKey:@"name"];
+					[productInfos setObject:productInfo forKey:e.productIdentifier];
 				}
 				NSNumber *revenueOfProduct = [productInfo objectForKey:@"revenue"];
 				NSNumber *unitsOfProduct = [productInfo objectForKey:@"units"];
 						
-				float revenue = [revenueOfProduct floatValue];
-				int units = [unitsOfProduct intValue];
+				float revenue = revenueOfProduct.floatValue;
+				int units = unitsOfProduct.intValue;
 				
-				revenue += [e totalRevenueInBaseCurrency];
-				units += [e units];
+				revenue += e.totalRevenueInBaseCurrency;
+				units += e.units;
 				
 				[productInfo setObject:[NSNumber numberWithFloat:revenue] forKey:@"revenue"];
 				[productInfo setObject:[NSNumber numberWithInt:units] forKey:@"units"];
@@ -127,13 +130,12 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
 	if (self.displayMode == 0) {
-		if (!self.countries)
+		if (!self.countries) {
 			return 0;
-		return [self.countries count];
+		}
+		return self.countries.count;
 	}
-	else {
-		return [self.products count];
-	}
+	return self.products.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -158,9 +160,9 @@
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		cell.totalRevenue = self.totalRevenue;
 		NSDictionary *productInfo = [products objectAtIndex:[indexPath row]];
-		NSString *appName = [productInfo objectForKey:@"name"];
+		NSString *appID = [productInfo objectForKey:@"appID"];
 		cell.productInfo = productInfo;
-		UIImage *appIcon = [[AppIconManager sharedManager] iconForAppNamed:appName];
+		UIImage *appIcon = [[AppIconManager sharedManager] iconForAppID:appID];
 		[cell setAppIcon:appIcon];
 		return cell;
 	}

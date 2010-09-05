@@ -65,7 +65,7 @@
 	[[UIColor colorWithWhite:0.95 alpha:1.0] set];
 	CGContextFillRect(c, CGRectMake(0,0,45,44));
 	
-	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppNamed:app.appName];
+	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppID:app.appID];
 	[appIcon drawInRect:CGRectMake(6, 7, 28, 28)];
 	[[UIImage imageNamed:@"ProductMask.png"] drawInRect:CGRectMake(4, 6, 32, 32)];
 	
@@ -74,7 +74,12 @@
 	
 	[[UIImage imageNamed:@"5stars_gray.png"] drawInRect:CGRectMake(200, 15, 90, 15)];
 	UIImage *starsImage = [UIImage imageNamed:@"5stars.png"];
-	UIGraphicsBeginImageContextWithOptions(CGSizeMake(90,15), NO, UIScreen.mainScreen.scale);
+	CGSize size = CGSizeMake(90,15);
+	if (&UIGraphicsBeginImageContextWithOptions) {
+		UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
+	} else { // ipad
+		UIGraphicsBeginImageContext(size);
+	}
 	CGContextRef ctx = UIGraphicsGetCurrentContext();
 	[starsImage drawInRect:CGRectMake(0,0,90,15)];
 	float averageStars = [app averageStars];
@@ -96,7 +101,7 @@
 		[[UIColor darkGrayColor] set];
 	
 	int numberOfReviews = [app.reviewsByUser count];
-	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i Reviews",nil), numberOfReviews];
+	NSString *numberOfReviewsDescription = [NSString stringWithFormat:NSLocalizedString(@"%i reviews",nil), numberOfReviews];
 	if (app.newReviewsCount) {
 		numberOfReviewsDescription = [numberOfReviewsDescription stringByAppendingFormat:NSLocalizedString(@" (%i new)",nil), app.newReviewsCount];
 	}

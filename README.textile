@@ -2,7 +2,7 @@ h1. AppSales Mobile
 
 AppSales Mobile allows iPhone developers to download and analyze their daily and weekly sales reports from iTunes Connect.
 
-The current (universal) version has to be built with the iPhone SDK 3.2
+The current (universal) version has to be built with the iPhone SDK 4.0
 
 Features:
 * Automatic download of daily and weekly sales reports from iTunes Connect

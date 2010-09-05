@@ -30,7 +30,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class Day;
+@class Day, Entry;
 
 @interface Country : NSObject {
 	Day *day;
@@ -38,18 +38,20 @@
 	NSString *name;
 }
 
-@property (retain) NSString *name;
-@property (retain) Day *day;
-@property (retain) NSMutableArray *entries;
+@property (readonly) NSString *name;
+@property (readonly) Day *day;
+@property (readonly) NSArray *entries;
 
 - (id)initWithName:(NSString *)countryName day:(Day *)aDay;
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
 - (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
-- (NSArray *)allProductNames;
+- (NSArray *)allProductIDs;
 - (NSString *)totalRevenueString;
 - (NSArray *)children;
+
+- (void) addEntry:(Entry*)entry;
 
 - (NSString *)appIDForApp:(NSString *)appName;
 

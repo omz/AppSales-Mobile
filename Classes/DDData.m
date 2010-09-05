@@ -55,7 +55,7 @@ static char encodingTable[64] = {
 	NSMutableString *stringBuffer = [NSMutableString stringWithCapacity:([self length] * 2)];
 	
     const unsigned char *dataBuffer = [self bytes];
-    int i;
+    unsigned int i;
     
     for (i = 0; i < [self length]; ++i)
 	{

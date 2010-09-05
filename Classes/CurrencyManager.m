@@ -33,7 +33,6 @@
 
 @implementation CurrencyManager
 
-@synthesize baseCurrency;
 @synthesize lastRefresh;
 @synthesize exchangeRates;
 @synthesize availableCurrencies;
@@ -66,7 +65,7 @@
 	isRefreshing = NO;
 	self.baseCurrency = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerBaseCurrency"];
 	if (!self.baseCurrency)
-		self.baseCurrency = @"EUR";
+		self.baseCurrency = @"USD";
 	
 	self.lastRefresh = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerLastRefresh"];
 	if (!self.lastRefresh)
@@ -127,6 +126,9 @@
 	return self;
 }
 
+- (NSString*) baseCurrency {
+	return baseCurrency;
+}
 - (void)setBaseCurrency:(NSString *)newBaseCurrency
 {
 	[self.conversionDict removeAllObjects];
@@ -136,18 +138,18 @@
 	baseCurrency = newBaseCurrency;
 	[[NSUserDefaults standardUserDefaults] setObject:baseCurrency forKey:@"CurrencyManagerBaseCurrency"];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"CurrencyManagerDidChangeBaseCurrency" object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:CurrencyManagerDidChangeBaseCurrencyNotification object:self];
 }
 
 - (NSString *)baseCurrencyDescription
 {
 	if ([baseCurrency isEqual:@"EUR"])
 		return @"€";
-	else if ([baseCurrency isEqual:@"USD"])
+	if ([baseCurrency isEqual:@"USD"])
 		return @"$";
-	else if ([baseCurrency isEqual:@"JPY"])
+	if ([baseCurrency isEqual:@"JPY"])
 		return @"¥";
-	else if ([baseCurrency isEqual:@"GBP"])
+	if ([baseCurrency isEqual:@"GBP"])
 		return @"£";
 	
 	return baseCurrency;
@@ -188,7 +190,7 @@
 {
 	isRefreshing = NO;
 	[self.conversionDict removeAllObjects];
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"CurrencyManagerError" object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:CurrencyManagerErrorNotification object:self];
 }
 
 - (void)finishRefreshWithExchangeRates:(NSMutableDictionary *)newExchangeRates
@@ -203,7 +205,7 @@
 	[[NSUserDefaults standardUserDefaults] setObject:self.exchangeRates forKey:@"CurrencyManagerExchangeRates"];
 	[[NSUserDefaults standardUserDefaults] setObject:self.lastRefresh forKey:@"CurrencyManagerLastRefresh"];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"CurrencyManagerDidUpdate" object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:CurrencyManagerDidUpdateNotification object:self];
 }
 
 - (void)refreshExchangeRates

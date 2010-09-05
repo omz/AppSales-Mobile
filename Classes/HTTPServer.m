@@ -88,7 +88,7 @@
 	BOOL isDir;
 	BOOL uploadPathExists = [[NSFileManager defaultManager] fileExistsAtPath:uploadPath isDirectory:&isDir];
 	if (!isDir || !uploadPathExists) {
-		[[NSFileManager defaultManager] createDirectoryAtPath:uploadPath attributes:nil];
+		[[NSFileManager defaultManager] createDirectoryAtPath:uploadPath withIntermediateDirectories:YES attributes:nil error:nil];
 	}
 }
 

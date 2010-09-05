@@ -10,8 +10,8 @@
 
 
 @interface GraphView : UIView {
-
 	NSArray *days;
+	UIImage *backgroundImage;
 }
 
 @property (nonatomic, retain) NSArray *days;

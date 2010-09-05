@@ -132,7 +132,6 @@
 					if (importedDays % 10 == 0)
 						NSLog(@"Imported day %i", importedDays);
 				}
-				report.wasLoadedFromDisk = NO;
 				[report generateSummary];
 				[[ReportManager sharedManager] importReport:report];
 			}

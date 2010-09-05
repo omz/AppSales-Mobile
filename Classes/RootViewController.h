@@ -29,7 +29,7 @@ AppSalesMobile
 */
 
 #import <UIKit/UIKit.h>
-@class Day, DaysController, WeeksController, SettingsViewController, StatisticsViewController, ReviewsController;
+@class Day, DaysController, WeeksController, TotalController, SettingsViewController, StatisticsViewController, ReviewsController;
 
 @interface RootViewController : UITableViewController {
 	
@@ -38,6 +38,7 @@ AppSalesMobile
 	
 	DaysController *daysController;
 	WeeksController *weeksController;
+	TotalController *totalController;
 	SettingsViewController *settingsController;
 	StatisticsViewController *statisticsController;
 	ReviewsController *reviewsController;
@@ -50,6 +51,7 @@ AppSalesMobile
 @property (nonatomic, retain) UILabel *statusLabel;
 @property (nonatomic, retain) DaysController *daysController;
 @property (nonatomic, retain) WeeksController *weeksController;
+@property (nonatomic, retain) TotalController *totalController;
 @property (nonatomic, retain) SettingsViewController *settingsController;
 @property (nonatomic, retain) StatisticsViewController *statisticsController;
 @property (nonatomic, retain) ReviewsController *reviewsController;
