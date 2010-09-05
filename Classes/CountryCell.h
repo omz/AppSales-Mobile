@@ -45,8 +45,8 @@
 	NSNumberFormatter *percentFormatter;
 }
 
-@property (retain) Country *country;
-@property (retain) UIColor *graphColor;
-@property (assign) float totalRevenue;
+@property (nonatomic, retain) Country *country;
+@property (nonatomic, retain) UIColor *graphColor;
+@property (nonatomic, assign) float totalRevenue;
 
 @end

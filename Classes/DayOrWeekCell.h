@@ -24,7 +24,7 @@
 	NSInteger availableGraphWidth;
 }
 
-@property (retain) Day *day;
+@property (nonatomic, retain) Day *day;
 @property (assign) float maxRevenue;
 @property (retain) UIColor *graphColor;
 

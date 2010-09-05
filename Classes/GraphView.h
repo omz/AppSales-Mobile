@@ -14,6 +14,6 @@
 	NSArray *days;
 }
 
-@property (retain) NSArray *days;
+@property (nonatomic, retain) NSArray *days;
 
 @end
