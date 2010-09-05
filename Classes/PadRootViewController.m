@@ -220,7 +220,7 @@
 		}
 		[dailyDashboardView.graphView setNeedsDisplay];
 		[weeklyDashboardView.graphView setNeedsDisplay];
-	} else if (actionSheet = self.filterSheet) {
+	} else if (actionSheet == self.filterSheet) {
 		if (buttonIndex == 0) {
 			dailyDashboardView.graphView.appFilter = nil;
 			weeklyDashboardView.graphView.appFilter = nil;
