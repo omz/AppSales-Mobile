@@ -33,7 +33,7 @@
 
 @implementation CountryCell
 
-@synthesize totalRevenue;
+@synthesize totalRevenue, graphColor;
 
 - (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier
 {
