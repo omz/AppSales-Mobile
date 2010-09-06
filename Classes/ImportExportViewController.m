@@ -98,6 +98,8 @@
 	NSFileManager *fm = [NSFileManager defaultManager];
 	NSArray *files = [fm contentsOfDirectoryAtPath:unzipPath error:NULL];
 	for (NSString *file in files) {
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		
 		if ([[file pathExtension] isEqual:@"txt"]) {
 			NSString *reportPath = [unzipPath stringByAppendingPathComponent:file];
 			NSString *fileContents = [[[NSString alloc] initWithContentsOfFile:reportPath] autorelease];
@@ -136,6 +138,7 @@
 				[[ReportManager sharedManager] importReport:report];
 			}
 		}
+		[pool release];
 	}
 	
 	[[ReportManager sharedManager] saveData];
