@@ -106,10 +106,8 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 			NSString *dateColumn = [columns objectAtIndex:11];
 			NSString *toDateColumn = [columns objectAtIndex:12];
 			NSString *appId = [columns objectAtIndex:19];
-			NSString *parentID;
-			if ([columns count] >=26) {
-				 parentID = [columns objectAtIndex:26];
-			}
+			NSString *parentID = (([columns count] >= 26) ? [columns objectAtIndex:26] : nil);
+			
 			[[AppIconManager sharedManager] downloadIconForAppID:appId];
 			if (!self.date) {
 				NSDate *fromDate = [self reportDateFromString:dateColumn];
