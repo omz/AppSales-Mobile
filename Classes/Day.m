@@ -84,29 +84,69 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	wasLoadedFromDisk = NO;	
 	countries = [[NSMutableDictionary alloc] init];
 	
+	int colProductName = -1;
+	int colTransactionType = -1;
+	int colUnits = -1;
+	int colRoyalties = -1;
+	int colDate = -1;
+	int colToDate = -1;
+	int colAppId = -1;
+	int colParentID = -1;
+	int colCountry = -1;
+	int colCurrency = -1;
+
+	
 	NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
-	if ([lines count] > 0)
-		[lines removeObjectAtIndex:0];
 	if ([lines count] == 0) {
 		[self release];
 		return nil; // sanity check
 	}
-//	lines = [lines subarrayWithRange:NSMakeRange(1, lines.count-1)];
+	
+	if ([lines count] > 0)
+	{
+		NSArray *columns = [[lines objectAtIndex:0] componentsSeparatedByString:@"\t"];
+		for (int i=0;i<columns.count;i++)
+		{
+			if ([[columns objectAtIndex:i] hasPrefix:@"Title"]) colProductName = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Product Type Identifier"]) colTransactionType = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Units"]) colUnits = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Royalty Price"]) colRoyalties = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Developer Proceeds"]) colRoyalties = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Begin Date"]) colDate = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"End Date"]) colToDate = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Apple Identifier"]) colAppId = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Parent Identifier"]) colParentID = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Country Code"]) colCountry = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Royalty Currency"]) colCurrency = i;
+			if ([[columns objectAtIndex:i] isEqualToString:@"Currency of Proceeds"]) colCurrency = i;
+			
+		}
+		[lines removeObjectAtIndex:0];
+		if ((colProductName == -1) || (colTransactionType == -1) || (colUnits == -1) || 
+			(colRoyalties == -1) || (colDate == -1) || (colToDate == -1) || (colAppId == -1) ||
+			(colCountry == -1) || (colCurrency == -1))
+		{
+			[self release];
+			return nil;
+		}
+	}
+	
 	
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
 		if (containsOnlyWhiteSpace(columns)) {
 			continue;
 		}
-		if ([columns count] >= 19) {
-			NSString *productName = [columns objectAtIndex:6];
-			NSString *transactionType = [columns objectAtIndex:8];
-			NSString *units = [columns objectAtIndex:9];
-			NSString *royalties = [columns objectAtIndex:10];
-			NSString *dateColumn = [columns objectAtIndex:11];
-			NSString *toDateColumn = [columns objectAtIndex:12];
-			NSString *appId = [columns objectAtIndex:19];
-			NSString *parentID = (([columns count] >= 26) ? [columns objectAtIndex:26] : nil);
+		if ([columns count] >= colAppId) {
+			
+			NSString *productName = [columns objectAtIndex:colProductName];
+			NSString *transactionType = [columns objectAtIndex:colTransactionType];
+			NSString *units = [columns objectAtIndex:colUnits];
+			NSString *royalties = [columns objectAtIndex:colRoyalties];
+			NSString *dateColumn = [[columns objectAtIndex:colDate] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+			NSString *toDateColumn = [[columns objectAtIndex:colToDate] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+			NSString *appId = [columns objectAtIndex:colAppId];
+			NSString *parentID = ((colParentID != -1) ? [columns objectAtIndex:colParentID] : nil);
 			
 			[[AppIconManager sharedManager] downloadIconForAppID:appId];
 			if (!self.date) {
@@ -123,13 +163,13 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 					}
 				}
 			}
-			NSString *countryString = [columns objectAtIndex:14];
+			NSString *countryString = [columns objectAtIndex:colCountry];
 			if ([countryString length] != 2) {
 				NSLog(@"Country code is invalid");
 				[self release];
 				return nil; //sanity check, country code has to have two characters
 			}
-			NSString *royaltyCurrency = [columns objectAtIndex:15];
+			NSString *royaltyCurrency = [columns objectAtIndex:colCurrency];
 			
 			//Treat in-app purchases as regular purchases for our purposes.
 			//IA1: In-App Purchase
