@@ -14,8 +14,8 @@
 }
 - (id) initWithAppID:(NSString*)idTouse reviews:(NSArray*)reviews;
 @property (retain, readonly) NSString *appID;
-@property (retain, readonly) NSArray *input;
-@property (retain, readonly) NSMutableArray *needsUpdating;
+@property (retain, readonly) NSArray *input; // reviews to check
+@property (retain, readonly) NSMutableArray *needsUpdating; // new or updated reviews that need further processing
 @end
 
 @implementation ReviewUpdateBundle
@@ -111,9 +111,24 @@
 	NSDictionary *existingReviews = app.reviewsByUser;
     for (Review *fetchedReview in bundle.input) {
         Review *oldReview = [existingReviews objectForKey:fetchedReview.user];
-        if  (oldReview == nil || ![oldReview.text isEqual:fetchedReview.text]) {
-            // fetched review is new or different than what's stored
+        if (oldReview == nil) { // new review
             [bundle.needsUpdating addObject:fetchedReview]; // needs translation and updating
+        } else if (! [oldReview.text isEqual:fetchedReview.text]) { // fetched review is new or different than what's stored
+            const NSTimeInterval ageOfStaleReviewsToIgnore = 24 * 60 * 60; // 1 day
+            if ([fetchedReview.reviewDate isEqualToDate:oldReview.reviewDate] 
+                    && ageOfStaleReviewsToIgnore < -1*[fetchedReview.reviewDate timeIntervalSinceNow]) {
+                // if a user writes a review then immediately submits a different review, 
+                // occasionally Apples web servers won't propagate the updated review to all it's webservers,
+                // leaving different reviews on different web servers.
+                // When fetching the reviews, the review will switch back and forth between the 
+                // old and updated review (and reporting as 'new' in AppSales), when it's really just inconsistent data from Apple. 
+                // we'll stop this by ignoring the stale data after downloading
+#if APPSALES_DEBUG
+                NSLog(@"ignoring stale review %@", fetchedReview);
+#endif
+            } else {
+                [bundle.needsUpdating addObject:fetchedReview];
+            }
         }
     }
 }
