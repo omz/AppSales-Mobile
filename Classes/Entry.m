@@ -52,7 +52,7 @@
 }
 
 
-- (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry
+- (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry inAppPurchase:(BOOL)inApp
 {
 	self = [super init];
 	if (self) {
@@ -73,18 +73,18 @@
 {
 	self = [super init];
 	if (self) {
-		self.country = [coder decodeObjectForKey:@"country"];
+		country = [[coder decodeObjectForKey:@"country"] retain];
 		[country addEntry:self];
-		self.productName = [coder decodeObjectForKey:@"productName"];
-		self.currency = [coder decodeObjectForKey:@"currency"];
-		self.transactionType = [coder decodeIntForKey:@"transactionType"];
-		self.units = [coder decodeIntForKey:@"units"];
-		self.royalties = [coder decodeFloatForKey:@"royalties"];
-		self.productIdentifier = [coder decodeObjectForKey:@"productIdentifier"];
-		self.inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
+		productName = [[coder decodeObjectForKey:@"productName"] retain];
+		currency = [[coder decodeObjectForKey:@"currency"] retain];
+		transactionType = [coder decodeIntForKey:@"transactionType"];
+		units = [coder decodeIntForKey:@"units"];
+		royalties = [coder decodeFloatForKey:@"royalties"];
+		productIdentifier = [[coder decodeObjectForKey:@"productIdentifier"] retain];
+		inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
 		
 		if(!productIdentifier)
-			self.productIdentifier = [[AppManager sharedManager] appIDForAppName:self.productName];
+			productIdentifier = [[AppManager sharedManager] appIDForAppName:self.productName];
 	}
 
 	return self;
