@@ -104,13 +104,6 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	return translated;
 }
 
-- (void) setTitle:(NSString*)titleToSet {
-	[titleToSet retain]; // must retain before releasing old
-	[title release];
-	title = titleToSet;
-	[translatedTitle release];
-	translatedTitle = nil;
-}
 - (NSString*) title {
 	return title;
 }
@@ -118,14 +111,6 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	return translatedTitle;
 }
 
-
-- (void) setText:(NSString*)textToSet {
-	[textToSet retain];
-	[text release];
-	text = textToSet;
-	[translatedText release];
-	translatedText = nil;
-}
 - (NSString*) text {
 	return text;
 }
