@@ -141,15 +141,16 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 			else
 				if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
 			
+            const BOOL inAppPurchase = ![parentID isEqualToString:@" "];
 			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
-			Entry *entry = [[[Entry alloc] initWithProductIdentifier:appId
-																name:productName 
-													 transactionType:[transactionType intValue] 
-															   units:[units intValue] 
-														   royalties:[royalties floatValue] 
-															currency:royaltyCurrency
-															 country:country] autorelease]; //gets added to the countries entry list automatically
-			entry.inAppPurchase = ![parentID isEqualToString:@" "];
+			[[[Entry alloc] initWithProductIdentifier:appId
+                                                 name:productName 
+                                      transactionType:[transactionType intValue] 
+                                                units:[units intValue] 
+                                            royalties:[royalties floatValue] 
+                                             currency:royaltyCurrency
+                                              country:country
+                                        inAppPurchase:inAppPurchase] autorelease]; //gets added to the countries entry list automatically
 		}
 	}
 
