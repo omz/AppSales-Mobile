@@ -115,43 +115,6 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 		[self release];
 		return nil; // sanity check
 	}
-
-    /*
-	int colProductName = -1;
-	int colTransactionType = -1;
-	int colUnits = -1;
-	int colRoyalties = -1;
-	int colDate = -1;
-	int colToDate = -1;
-	int colAppId = -1;
-	int colParentID = -1;
-	int colCountry = -1;
-	int colCurrency = -1;
-    
-    NSArray *columns = [[lines objectAtIndex:0] componentsSeparatedByString:@"\t"];
-    for (int i=0; i<columns.count; i++) {
-        NSString *column = [columns objectAtIndex:i];
-        if ([column hasPrefix:@"Title"]) colProductName = i;
-        else if ([column isEqualToString:@"Product Type Identifier"]) colTransactionType = i;
-        else if ([column isEqualToString:@"Units"]) colUnits = i;
-        else if ([column isEqualToString:@"Royalty Price"]) colRoyalties = i;
-        else if ([column isEqualToString:@"Developer Proceeds"]) colRoyalties = i;
-        else if ([column isEqualToString:@"Begin Date"]) colDate = i;
-        else if ([column isEqualToString:@"End Date"]) colToDate = i;
-        else if ([column isEqualToString:@"Apple Identifier"]) colAppId = i;
-        else if ([column isEqualToString:@"Parent Identifier"]) colParentID = i;
-        else if ([column isEqualToString:@"Country Code"]) colCountry = i;
-        else if ([column isEqualToString:@"Royalty Currency"]) colCurrency = i;
-        else if ([column isEqualToString:@"Currency of Proceeds"]) colCurrency = i;
-        
-    }
-    if ((colProductName == -1) || (colTransactionType == -1) || (colUnits == -1)
-        || (colRoyalties == -1) || (colDate == -1) || (colToDate == -1) || (colAppId == -1)
-        || (colCountry == -1) || (colCurrency == -1)) {
-        [self release];
-        return nil;
-    }
-	*/
     
     [lines removeObjectAtIndex:0]; // remove column header
     
