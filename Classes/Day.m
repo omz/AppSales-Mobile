@@ -77,6 +77,32 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 //			fileExtension];
 //}
 
++ (NSDate*) adjustDateToLocalTimeZone:(NSDate *)inDate
+{
+    /* All dates should be set to midnight. If set otherwise, they were created in a different time zone.
+     * We want the date corresponding to that midnight; using NSCalendar directly would give us the date in 
+     * our local time zone.
+     */
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:NSHourCalendarUnit
+                                               fromDate:inDate];
+    NSInteger hour = components.hour;
+    if (hour) {
+        NSCalendar *otherCal = [NSCalendar currentCalendar];
+        otherCal.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:[NSTimeZone defaultTimeZone].secondsFromGMT + hour*60*60];
+        
+        /* Get the day/month/year as seen in the original time zone */
+        components = [otherCal components:(NSDayCalendarUnit | NSMonthCalendarUnit| NSYearCalendarUnit)
+                                 fromDate:inDate];
+        
+        /* Now set to the date with that day/month/year in our own time zone */
+        return [calendar dateFromComponents:components];
+    } else {
+        return inDate;
+    }
+}
+
+
 - (id)initWithCSV:(NSString *)csv
 {
 	[super init];
@@ -157,7 +183,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 					[self release];
 					return nil;
 				} else {
-					date = [fromDate retain];
+					date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
 					if (![fromDate isEqualToDate:toDate]) {
 						isWeek = YES;
 					}
@@ -193,75 +219,6 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
                                         inAppPurchase:inAppPurchase] autorelease]; //gets added to the countries entry list automatically
 		}
 	}
-
-	// local version
-	//
-//		if (columns.count < 19) {
-//			NSLog(@"unknown column format: %@", columns.description); // instead should stop parsing and return nil?
-//			continue;
-//		}
-//		NSString *productName = [columns objectAtIndex:6];
-//		NSString *transactionType = [columns objectAtIndex:8];
-//		NSString *units = [columns objectAtIndex:9];
-//		NSString *royalties = [columns objectAtIndex:10];
-//		NSString *dateStartColumn = [columns objectAtIndex:11];
-//		NSString *dateEndColumn = [columns objectAtIndex:12];
-//		NSString *appId = [columns objectAtIndex:19];
-//		[[AppIconManager sharedManager] downloadIconForAppID:appId];
-//		isWeek = ![dateStartColumn isEqualToString:dateEndColumn];
-//		
-//		int startYear, startMonth, startDay;
-//		if (! parseDateString(dateStartColumn, &startYear, &startMonth, &startDay)) {
-//			NSLog(@"invalid startDate: %@", dateStartColumn);
-//			[self release];
-//			return nil;
-//		}
-//		
-//		int endYear, endMonth, endDay;
-//		if (! parseDateString(dateEndColumn, &endYear, &endMonth, &endDay)) {
-//			NSLog(@"invalid endDate: %@", dateEndColumn);
-//			[self release];
-//			return nil;
-//		}
-//		
-//		NSCalendar *calendar = [NSCalendar currentCalendar];
-//		NSDateComponents *components = [[NSDateComponents new] autorelease];
-//		[components setYear:startYear];
-//		[components setMonth:startMonth];
-//		[components setDay:startDay];
-//		date = [[calendar dateFromComponents:components] retain];
-//		name = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", startMonth, startDay, startYear];
-//		weekEndDateString = [[NSString alloc] initWithFormat:@"%02d/%02d/%d", endMonth, endDay, endYear];
-//
-//		NSString *countryString = [columns objectAtIndex:14];
-//		if (countryString.length != 2) { // country code has two characters
-//			[NSException raise:@"invalid country code" format:countryString];
-//		}
-//		NSString *royaltyCurrency = [columns objectAtIndex:15];
-//		
-//		/* Treat in-app purchases as regular purchases for our purposes.
-//		 * IA1: In-App Purchase
-//		 * Presumably, IA7: In-App Free Upgrade / Repurchase.
-//		 */
-//		if ([transactionType isEqualToString:@"IA1"]) {
-//			transactionType = @"1";
-//		}
-//
-//		Country *country = [self countryNamed:countryString]; // will be created on-the-fly if needed.
-//		[[[Entry alloc] initWithProductIdentifier:appId
-//											 name:productName 
-//								  transactionType:[transactionType intValue] 
-//											units:[units intValue] 
-//										royalties:[royalties floatValue] 
-//										 currency:royaltyCurrency
-//										  country:country] release]; // gets added to the countries entry list automatically
-//	}
-//	if (name == nil || date == nil) {
-//		NSLog(@"coulnd't parse CSV: %@", csv);
-//		[self release];
-//		return nil;
-//	}
-
 
 	[self generateSummary];
 	return self;
@@ -325,35 +282,6 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 }
 
 
-- (void)setDate:(NSDate *)inDate
-{
-	if (inDate != date) {
-		[date release];
-
-		/* All dates should be set to midnight. If set otherwise, they were created in a different time zone.
-		 * We want the date corresponding to that midnight; using NSCalendar directly would give us the date in 
-		 * our local time zone.
-		 */
-		NSCalendar *calendar = [NSCalendar currentCalendar];
-		NSDateComponents *components = [calendar components:NSHourCalendarUnit
-												   fromDate:inDate];
-		NSInteger hour = components.hour;
-		if (hour) {
-			NSCalendar *otherCal = [NSCalendar currentCalendar];
-			otherCal.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:[NSTimeZone defaultTimeZone].secondsFromGMT + hour*60*60];
-
-			/* Get the day/month/year as seen in the original time zone */
-			components = [otherCal components:(NSDayCalendarUnit | NSMonthCalendarUnit| NSYearCalendarUnit)
-									 fromDate:inDate];
-			
-			/* Now set to the date with that day/month/year in our own time zone */
-			date = [[calendar dateFromComponents:components] retain];			
-		} else {
-			date = [inDate retain];
-		}
-	}
-	
-}
 - (NSMutableDictionary *)countries
 {	
 	if (isFault) {
@@ -598,16 +526,6 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 
 - (NSString *)proposedFilename
 {
-//	if (proposedFileName == nil) {
-//		// use year/month/day, so serialized files are sortable by date
-//		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSYearCalendarUnit
-//																				| NSMonthCalendarUnit 
-//																				| NSDayCalendarUnit
-//																	   fromDate:self.date];
-//		NSString *sortableName = [NSString stringWithFormat:@"%d/%02d/%02d", components.year, components.month, components.day];
-//		proposedFileName = [[Day fileNameForString:sortableName extension:@"dat" isWeek:isWeek] retain];
-//	}
-//	return proposedFileName;
 	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	[dateFormatter setDateFormat:@"MM_dd_yyyy"];
 	NSString *dateString = [dateFormatter stringFromDate:self.date];
