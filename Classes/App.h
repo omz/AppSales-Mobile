@@ -18,7 +18,6 @@ NSString* getPrefetchedPath();
 	NSString *appID;
 	NSString *appName;
 	NSMutableDictionary *reviewsByUser;
-	BOOL inAppPurchase;
 	float averageStars;
 }
 
@@ -28,7 +27,6 @@ NSString* getPrefetchedPath();
 @property (readonly) NSUInteger newReviewsCount;
 @property (readonly) NSArray *allAppNames;
 @property (readonly) float averageStars;
-@property (assign,getter=isInAppPurchase) BOOL inAppPurchase;
 
 - (id) initWithID:(NSString*)identifier name:(NSString*)name;
 - (void) addOrReplaceReview:(Review*)review;

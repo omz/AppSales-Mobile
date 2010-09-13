@@ -20,7 +20,7 @@ NSString* getDocPath() {
 
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, averageStars, inAppPurchase;
+@synthesize appID, appName, reviewsByUser, averageStars;
 
 - (id)initWithCoder:(NSCoder *)coder {
 	self = [super init];
@@ -30,7 +30,6 @@ NSString* getDocPath() {
 		reviewsByUser = [[coder decodeObjectForKey:@"reviewsByUser"] retain];
 		allAppNames = [[coder decodeObjectForKey:@"allAppNames"] retain];
 		averageStars = [coder decodeFloatForKey:@"averageStars"];
-		self.inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
 	}
 	return self;
 }
@@ -78,7 +77,6 @@ NSString* getDocPath() {
 	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
 	[coder encodeFloat:self.averageStars forKey:@"averageStars"];
 	[coder encodeObject:self.allAppNames forKey:@"allAppNames"];
-	[coder encodeBool:self.isInAppPurchase forKey:@"inAppPurchase"];
 }
 
 - (NSString *) description {
