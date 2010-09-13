@@ -109,7 +109,14 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	
 	wasLoadedFromDisk = NO;	
 	countries = [[NSMutableDictionary alloc] init];
-	
+    
+    NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
+	if ([lines count] == 0) {
+		[self release];
+		return nil; // sanity check
+	}
+
+    /*
 	int colProductName = -1;
 	int colTransactionType = -1;
 	int colUnits = -1;
@@ -120,104 +127,121 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	int colParentID = -1;
 	int colCountry = -1;
 	int colCurrency = -1;
-
-	
-	NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
-	if ([lines count] == 0) {
-		[self release];
-		return nil; // sanity check
-	}
-	
-	if ([lines count] > 0)
-	{
-		NSArray *columns = [[lines objectAtIndex:0] componentsSeparatedByString:@"\t"];
-		for (int i=0;i<columns.count;i++)
-		{
-			if ([[columns objectAtIndex:i] hasPrefix:@"Title"]) colProductName = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Product Type Identifier"]) colTransactionType = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Units"]) colUnits = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Royalty Price"]) colRoyalties = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Developer Proceeds"]) colRoyalties = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Begin Date"]) colDate = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"End Date"]) colToDate = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Apple Identifier"]) colAppId = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Parent Identifier"]) colParentID = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Country Code"]) colCountry = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Royalty Currency"]) colCurrency = i;
-			if ([[columns objectAtIndex:i] isEqualToString:@"Currency of Proceeds"]) colCurrency = i;
-			
-		}
-		[lines removeObjectAtIndex:0];
-		if ((colProductName == -1) || (colTransactionType == -1) || (colUnits == -1) || 
-			(colRoyalties == -1) || (colDate == -1) || (colToDate == -1) || (colAppId == -1) ||
-			(colCountry == -1) || (colCurrency == -1))
-		{
-			[self release];
-			return nil;
-		}
-	}
-	
-	
+    
+    NSArray *columns = [[lines objectAtIndex:0] componentsSeparatedByString:@"\t"];
+    for (int i=0; i<columns.count; i++) {
+        NSString *column = [columns objectAtIndex:i];
+        if ([column hasPrefix:@"Title"]) colProductName = i;
+        else if ([column isEqualToString:@"Product Type Identifier"]) colTransactionType = i;
+        else if ([column isEqualToString:@"Units"]) colUnits = i;
+        else if ([column isEqualToString:@"Royalty Price"]) colRoyalties = i;
+        else if ([column isEqualToString:@"Developer Proceeds"]) colRoyalties = i;
+        else if ([column isEqualToString:@"Begin Date"]) colDate = i;
+        else if ([column isEqualToString:@"End Date"]) colToDate = i;
+        else if ([column isEqualToString:@"Apple Identifier"]) colAppId = i;
+        else if ([column isEqualToString:@"Parent Identifier"]) colParentID = i;
+        else if ([column isEqualToString:@"Country Code"]) colCountry = i;
+        else if ([column isEqualToString:@"Royalty Currency"]) colCurrency = i;
+        else if ([column isEqualToString:@"Currency of Proceeds"]) colCurrency = i;
+        
+    }
+    if ((colProductName == -1) || (colTransactionType == -1) || (colUnits == -1)
+        || (colRoyalties == -1) || (colDate == -1) || (colToDate == -1) || (colAppId == -1)
+        || (colCountry == -1) || (colCurrency == -1)) {
+        [self release];
+        return nil;
+    }
+	*/
+    
+    [lines removeObjectAtIndex:0]; // remove column header
+    
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
 		if (containsOnlyWhiteSpace(columns)) {
 			continue;
 		}
-		if ([columns count] >= colAppId) {
+        NSString *productName;
+        NSString *transactionType;
+        NSString *units;
+        NSString *royalties;
+        NSString *dateColumn;
+        NSString *toDateColumn;
+        NSString *appId;
+        NSString *parentID;
+        NSString *countryString;
+        NSString *royaltyCurrency;
+
+		if ([columns count] >= 19) {
+            // old format
+            productName = [columns objectAtIndex:6];
+            transactionType = [columns objectAtIndex:8];
+            units = [columns objectAtIndex:9];
+            royalties = [columns objectAtIndex:10];
+            dateColumn = [columns objectAtIndex:11];
+            toDateColumn = [columns objectAtIndex:12];
+            countryString = [columns objectAtIndex:14];
+            royaltyCurrency = [columns objectAtIndex:15];
+            appId = [columns objectAtIndex:19];
+            parentID = (([columns count] >= 26) ? [columns objectAtIndex:26] : nil);
+        } else if ([columns count] == 18) {
+            // Sept 2010 format
+            productName = [columns objectAtIndex:4];
+            transactionType = [columns objectAtIndex:6];
+            units = [columns objectAtIndex:7];
+            royalties = [columns objectAtIndex:8];
+            dateColumn = [[columns objectAtIndex:9] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            toDateColumn = [[columns objectAtIndex:10] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            countryString = [columns objectAtIndex:12];
+            royaltyCurrency = [columns objectAtIndex:13];
+            appId = [columns objectAtIndex:14];
+            parentID = [columns objectAtIndex:17];
+        } else {
+            NSLog(@"unknown CSV format: %@", line);
+            [self release];
+            return nil;
+        }
 			
-			NSString *productName = [columns objectAtIndex:colProductName];
-			NSString *transactionType = [columns objectAtIndex:colTransactionType];
-			NSString *units = [columns objectAtIndex:colUnits];
-			NSString *royalties = [columns objectAtIndex:colRoyalties];
-			NSString *dateColumn = [[columns objectAtIndex:colDate] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-			NSString *toDateColumn = [[columns objectAtIndex:colToDate] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-			NSString *appId = [columns objectAtIndex:colAppId];
-			NSString *parentID = ((colParentID != -1) ? [columns objectAtIndex:colParentID] : nil);
-			
-			[[AppIconManager sharedManager] downloadIconForAppID:appId];
-			if (!self.date) {
-				NSDate *fromDate = [self reportDateFromString:dateColumn];
-				NSDate *toDate = [self reportDateFromString:toDateColumn];
-				if (!fromDate) {
-					NSLog(@"Date is invalid: %@", dateColumn);
-					[self release];
-					return nil;
-				} else {
-					date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
-					if (![fromDate isEqualToDate:toDate]) {
-						isWeek = YES;
-					}
-				}
-			}
-			NSString *countryString = [columns objectAtIndex:colCountry];
-			if ([countryString length] != 2) {
-				NSLog(@"Country code is invalid");
-				[self release];
-				return nil; //sanity check, country code has to have two characters
-			}
-			NSString *royaltyCurrency = [columns objectAtIndex:colCurrency];
-			
-			//Treat in-app purchases as regular purchases for our purposes.
-			//IA1: In-App Purchase
-			//IA7: In-App Free Upgrade / Repurchase (?)
-			//IA9: In-App Subscription
-			if ([transactionType isEqualToString:@"IA1"]) transactionType = @"2";
-			else
-				if([transactionType isEqualToString:@"IA9"]) transactionType = @"9";
-			else
-				if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
-			
-            const BOOL inAppPurchase = ![parentID isEqualToString:@" "];
-			Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
-			[[[Entry alloc] initWithProductIdentifier:appId
-                                                 name:productName 
-                                      transactionType:[transactionType intValue] 
-                                                units:[units intValue] 
-                                            royalties:[royalties floatValue] 
-                                             currency:royaltyCurrency
-                                              country:country
-                                        inAppPurchase:inAppPurchase] autorelease]; //gets added to the countries entry list automatically
-		}
+        [[AppIconManager sharedManager] downloadIconForAppID:appId];
+        if (!self.date) {
+            NSDate *fromDate = [self reportDateFromString:dateColumn];
+            NSDate *toDate = [self reportDateFromString:toDateColumn];
+            if (!fromDate) {
+                NSLog(@"Date is invalid: %@", dateColumn);
+                [self release];
+                return nil;
+            } else {
+                date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
+                if (![fromDate isEqualToDate:toDate]) {
+                    isWeek = YES;
+                }
+            }
+        }
+        if ([countryString length] != 2) {
+            NSLog(@"Country code is invalid: %@", countryString);
+            [self release];
+            return nil; //sanity check, country code has to have two characters
+        }
+        
+        //Treat in-app purchases as regular purchases for our purposes.
+        //IA1: In-App Purchase
+        //IA7: In-App Free Upgrade / Repurchase (?)
+        //IA9: In-App Subscription
+        if ([transactionType isEqualToString:@"IA1"]) transactionType = @"2";
+        else
+            if([transactionType isEqualToString:@"IA9"]) transactionType = @"9";
+        else
+            if ([transactionType isEqualToString:@"IA7"]) transactionType = @"7";
+        
+        const BOOL inAppPurchase = ![parentID isEqualToString:@" "];
+        Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
+        [[[Entry alloc] initWithProductIdentifier:appId
+                                             name:productName
+                                  transactionType:[transactionType intValue]
+                                            units:[units intValue]
+                                        royalties:[royalties floatValue]
+                                         currency:royaltyCurrency
+                                          country:country
+                                    inAppPurchase:inAppPurchase] autorelease]; //gets added to the countries entry list automatically
 	}
 
 	[self generateSummary];
