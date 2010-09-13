@@ -53,7 +53,6 @@
 @property (readonly) BOOL isFault;
 @property (readonly) NSDictionary *summary;
 
-//+ (NSString*) fileNameForString:(NSString*)fileName extension:(NSString*)fileExtension isWeek:(BOOL)isWeek;
 + (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
 
 - (id)initWithCSV:(NSString *)csv;
