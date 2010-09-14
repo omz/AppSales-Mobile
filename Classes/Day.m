@@ -134,7 +134,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
         NSString *countryString;
         NSString *royaltyCurrency;
 
-		if ([columns count] >= 19) {
+		if ([columns count] > 19) {
             // old format
             productName = [columns objectAtIndex:6];
             transactionType = [columns objectAtIndex:8];
