@@ -146,7 +146,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
             royaltyCurrency = [columns objectAtIndex:15];
             appId = [columns objectAtIndex:19];
             parentID = (([columns count] >= 26) ? [columns objectAtIndex:26] : nil);
-        } else if ([columns count] == 18) {
+        } else if ([columns count] == 18 || [columns count] == 19) { // a quick & dirty fix for a dummy tab character
             // Sept 2010 format
             productName = [columns objectAtIndex:4];
             transactionType = [columns objectAtIndex:6];
@@ -159,7 +159,7 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
             appId = [columns objectAtIndex:14];
             parentID = [columns objectAtIndex:17];
         } else {
-            NSLog(@"unknown CSV format: %@", line);
+            NSLog(@"unknown CSV format: %@ <--- %d columns", line, [columns count]); // show the number of columns for the future reference
             [self release];
             return nil;
         }
