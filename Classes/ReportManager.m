@@ -301,9 +301,28 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 	
     NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
 	NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
-	    
+    NSString *ittsSignOutAction = @"/WebObjects/iTunesConnect.woa/wo/4.2.5";
+    
     NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
     NSString *loginPage = [NSString stringWithContentsOfURL:loginURL usedEncoding:NULL error:NULL];
+    if ([loginPage rangeOfString:ittsSignOutAction].location == NSNotFound) {
+        [self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Logging in...",nil) waitUntilDone:NO];
+    } else {
+        // already logged in. log out and start over, otherwise risk backtracking errors and other hassles
+        [self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Re-logging in...",nil) waitUntilDone:NO];
+        NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsSignOutAction]];
+        NSString *logoutPage = [NSString stringWithContentsOfURL:logoutURL usedEncoding:NULL error:NULL];
+        if ([logoutPage rangeOfString:@"class=\"instruct_text\""].location == NSNotFound) {
+            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:
+                                @"could not re-login to iTunes Connect.  Try stopping and restarting AppSales" 
+                                waitUntilDone:NO];
+            [pool release];
+            return;            
+        }
+        loginPage = [NSString stringWithContentsOfURL:loginURL usedEncoding:NULL error:NULL];        
+    }
+    
+    // find the login action
     NSScanner *scanner = [NSScanner scannerWithString:loginPage];
     [scanner scanUpToString:@"action=\"" intoString:nil];
     if (! [scanner scanString:@"action=\"" intoString:nil]) {
@@ -314,8 +333,6 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSString *loginAction = nil;
     [scanner scanUpToString:@"\"" intoString:&loginAction];
 
-    // login
-	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Logging in...",nil) waitUntilDone:NO];
     NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
                               username, @"theAccountName",
                               password, @"theAccountPW", 
@@ -328,7 +345,6 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         [pool release];
         return;
     }
-    
     
     // load sales/trends page
     NSString *salesAction = @"/WebObjects/iTunesConnect.woa/wo/2.0.9.7.2.9.1.0.0.3";
