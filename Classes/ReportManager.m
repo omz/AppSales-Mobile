@@ -182,6 +182,32 @@
 
 #define ITTS_SALES_PAGE_URL @"https://reportingitc.apple.com/sales.faces"
 
+static NSMutableArray* extractFormOptions(NSString *htmlPage, NSString *formID) {
+    NSScanner *scanner = [NSScanner scannerWithString:htmlPage];
+    NSString *selectionForm = nil;
+    [scanner scanUpToString:formID intoString:nil];
+    if (! [scanner scanString:formID intoString:nil]) {
+        return nil;
+    }
+    [scanner scanUpToString:@"</select>" intoString:&selectionForm];
+    if (! [scanner scanString:@"</select>" intoString:nil]) {
+        return nil;
+    }
+    
+    NSMutableArray *options = [NSMutableArray array];
+    NSScanner *selectionScanner = [NSScanner scannerWithString:selectionForm];
+    while ([selectionScanner scanUpToString:@"<option value=\"" intoString:nil] && [selectionScanner scanString:@"<option value=\"" intoString:nil]) {
+        NSString *selectorValue = nil;
+        [selectionScanner scanUpToString:@"\"" intoString:&selectorValue];
+        if (! [selectionScanner scanString:@"\"" intoString:nil]) {
+            return nil;
+        }
+        
+        [options addObject:selectorValue];
+    }
+    return options;
+}
+
 static NSData* getPostRequestAsData(NSString *urlString, NSDictionary *postDict, NSHTTPURLResponse **downloadResponse) {
     NSString *postDictString = [postDict formatForHTTP];
     NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
@@ -326,67 +352,22 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_30"];
     NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_35"];
     
-    // figure out which reports are available
-    scanner = [NSScanner scannerWithString:salesPage];
-    NSString *selectionForm = nil;     // extract the date selection form
-    [scanner scanUpToString:@"datePickerSourceSelectElement" intoString:nil];
-    if (! [scanner scanString:@"datePickerSourceSelectElement" intoString:nil]) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not parse date source selector element" waitUntilDone:NO];
-        [pool release];
-        return;
-    }
-    [scanner scanUpToString:@"</select>" intoString:&selectionForm];
-    if (! [scanner scanString:@"</select>" intoString:nil]) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not parse date source selector values" waitUntilDone:NO];
-        [pool release];
-        return;
-    }
-    
     // parse days available
-    NSScanner *selectionScanner = [NSScanner scannerWithString:selectionForm];
-    NSMutableArray *availableDays = [NSMutableArray array];
-    
-    while ([selectionScanner scanUpToString:@"<option value=\"" intoString:nil] && [selectionScanner scanString:@"<option value=\"" intoString:nil]) {
-        NSString *selectorValue = nil;
-        [selectionScanner scanUpToString:@"\"" intoString:&selectorValue];
-        if (! [selectionScanner scanString:@"\"" intoString:nil]) {
-            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"unexpected date selector html options" waitUntilDone:NO];
-            [pool release];
-            return;
-        }
-        
-        [availableDays addObject:selectorValue];
+    NSMutableArray *availableDays = extractFormOptions(salesPage, @"theForm:datePickerSourceSelectElement");
+    if (availableDays == nil) {
+        NSLog(@"cannot find selection form: %@", salesPage);
+        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"unexpected date selector html form" waitUntilDone:NO];
+        [pool release];
     }
     NSString *arbitraryDay = [availableDays objectAtIndex:0];
     [availableDays removeObjectsInArray:daysToSkip];
     
-    
     // parse weeks available
-    [scanner scanUpToString:@"weekPickerSourceSelectElement" intoString:nil];
-    if (! [scanner scanString:@"weekPickerSourceSelectElement" intoString:nil]) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not parse week source selector element" waitUntilDone:NO];
+    NSMutableArray *availableWeeks = extractFormOptions(salesPage, @"theForm:weekPickerSourceSelectElement");
+    if (availableWeeks == nil) {
+        NSLog(@"cannot find selection form: %@", salesPage);
+        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"unexpected week selector html form" waitUntilDone:NO];
         [pool release];
-        return;
-    }
-    [scanner scanUpToString:@"</select>" intoString:&selectionForm];
-    if (! [scanner scanString:@"</select>" intoString:nil]) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not parse week source selector values" waitUntilDone:NO];
-        [pool release];
-        return;
-    }
-    selectionScanner = [NSScanner scannerWithString:selectionForm];
-    NSMutableArray *availableWeeks = [NSMutableArray array];
-    
-    while ([selectionScanner scanUpToString:@"<option value=\"" intoString:nil] && [selectionScanner scanString:@"<option value=\"" intoString:nil]) {
-        NSString *selectorValue = nil;
-        [selectionScanner scanUpToString:@"\"" intoString:&selectorValue];
-        if (! [selectionScanner scanString:@"\"" intoString:nil]) {
-            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"unexpected week selector html options" waitUntilDone:NO];
-            [pool release];
-            return;
-        }
-        
-        [availableWeeks addObject:selectorValue];
     }
     NSString *arbitraryWeek = [availableWeeks objectAtIndex:0];
     [availableWeeks removeObjectsInArray:weeksToSkip];
@@ -423,8 +404,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     }
     
     // change to weeks instead of days
-    // this currently does not appear to be needed
-    if (false) {
+    if (false) { // this currently does not appear to be needed
         postDict = [NSDictionary dictionaryWithObjectsAndKeys:
                     ajaxName, @"AJAXREQUEST",
                     @"theForm", @"theForm",
