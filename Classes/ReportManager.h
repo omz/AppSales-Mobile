@@ -39,7 +39,6 @@
 
 - (void)deleteDay:(Day *)dayToDelete;
 
-- (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 - (void)saveData;
 - (NSString *)originalReportsPath;
 - (NSString *)reportCachePath;

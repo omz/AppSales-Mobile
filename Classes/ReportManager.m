@@ -17,7 +17,6 @@
 #import "SFHFKeychainUtils.h"
 #import "App.h"
 #import "Review.h"
-#import "NSData+Compression.h"
 #import "ProgressHUD.h"
 #import "AppManager.h"
 #import "RegexKitLite.h"
@@ -182,6 +181,62 @@
 	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo:) withObject:userInfo];
 }
 
+#define ITTS_SALES_PAGE_URL @"https://reportingitc.apple.com/sales.faces"
+
+// code path shared for both day and week downloads
+static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NSString *dayString, 
+                           NSString *weekString, NSString *selectName, NSString **viewState)  {
+    // set the date within the web page
+    NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                              ajaxName, @"AJAXREQUEST",
+                              @"theForm", @"theForm",
+                              @"theForm:xyz", @"notnormal",
+                              @"Y", @"theForm:vendorType",
+                              dayString, @"theForm:datePickerSourceSelectElementSales",
+                              weekString, @"theForm:weekPickerSourceSelectElement",
+                              *viewState, @"javax.faces.ViewState",
+                              selectName, selectName,
+                              nil];
+    NSString *postDictString = [postDict formatForHTTP];
+    NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
+    [urlRequest setHTTPMethod:@"POST"];
+    [urlRequest setHTTPBody:httpBody];
+    NSData *requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
+    NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+    *viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+    if (*viewState == nil) {
+        return nil;
+    }
+    
+    // and finally...we're ready to download the report
+    postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                @"theForm", @"theForm",
+                @"notnormal", @"theForm:xyz",
+                @"Y", @"theForm:vendorType",
+                dayString, @"theForm:datePickerSourceSelectElementSales",
+                weekString, @"theForm:weekPickerSourceSelectElement",
+                *viewState, @"javax.faces.ViewState",
+                @"theForm:downloadLabel2", @"theForm:downloadLabel2",
+                nil];
+    postDictString = [postDict formatForHTTP];
+    httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
+    urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
+    [urlRequest setHTTPMethod:@"POST"];
+    [urlRequest setHTTPBody:httpBody];
+    NSHTTPURLResponse *downloadResponse = nil;
+    requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&downloadResponse error:NULL];
+    NSString *originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"Filename"];
+    if (originalFilename) {
+        [requestResponseData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
+        return[Day dayWithData:requestResponseData compressed:YES];
+    } else {
+        responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+        NSLog(@"unexpected response: %@", responseString);
+        return nil;
+    }   
+}
+
 - (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
@@ -257,8 +312,7 @@
         return;
     }
     
-    NSString *ittsSalesPageURL = @"https://reportingitc.apple.com/sales.faces";
-    NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ittsSalesPageURL] usedEncoding:NULL error:NULL];
+    NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL] usedEncoding:NULL error:NULL];
 	
 //	XXX this likely doesn't work with the Sept 2010 changes, and needs updating
 //	// check if page is "choose vendor" page (Patch by Christian Beer, thanks!)
@@ -433,7 +487,7 @@
                 nil];
     postDictString = [postDict formatForHTTP];
     httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-    urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ittsSalesPageURL]];
+    urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
     [urlRequest setHTTPMethod:@"POST"];
     [urlRequest setHTTPBody:httpBody];
     NSHTTPURLResponse *downloadResponse = nil;
@@ -443,82 +497,46 @@
     viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
     
     // download the reports
-    const NSInteger numberOfNewReports = availableDays.count + availableWeeks.count;
-    NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];
-    
+    NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];    
     int count = 1;
     for (NSString *dayString in availableDays) {
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %d of %d",nil), count, availableDays.count];
         count++;
         [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
-        
-        // set the date within the web page
-        postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                    ajaxName, @"AJAXREQUEST",
-                    @"theForm", @"theForm",
-                    @"theForm:xyz", @"notnormal",
-                    @"Y", @"theForm:vendorType",
-                    dayString, @"theForm:datePickerSourceSelectElementSales",
-                    arbitraryWeek, @"theForm:weekPickerSourceSelectElement",
-                    viewState, @"javax.faces.ViewState",
-                    selectName, selectName,
-                    nil];
-        postDictString = [postDict formatForHTTP];
-        httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-        urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ittsSalesPageURL]];
-        [urlRequest setHTTPMethod:@"POST"];
-        [urlRequest setHTTPBody:httpBody];
-        requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
-        responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-        
-        viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
-        if (viewState == nil) {
-            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not parse viewState" waitUntilDone:NO];
+        Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, selectName, &viewState);
+        if (day == nil) {
+            NSString *message = [@"could not download " stringByAppendingString:dayString];
+            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
             [pool release];
             return;
         }
-        
-        // and finally...we're ready to download the report
-        postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                    @"theForm", @"theForm",
-                    @"notnormal", @"theForm:xyz",
-                    @"Y", @"theForm:vendorType",
-                    dayString, @"theForm:datePickerSourceSelectElementSales",
-                    arbitraryWeek, @"theForm:weekPickerSourceSelectElement",
-                    viewState, @"javax.faces.ViewState",
-                    @"theForm:downloadLabel2", @"theForm:downloadLabel2",
-                    nil];
-        postDictString = [postDict formatForHTTP];
-        httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-        urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ittsSalesPageURL]];
-        [urlRequest setHTTPMethod:@"POST"];
-        [urlRequest setHTTPBody:httpBody];
-        requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&downloadResponse error:NULL];
-        NSString *originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"Filename"];
-        if (originalFilename) {
-            [requestResponseData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
-            Day *day = [self dayWithData:requestResponseData compressed:YES];
-            [downloadedDays setObject:day forKey:day.date];
-        } else {
-            responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-            NSLog(@"unexpected response: %@", responseString);
-            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not download report (unexpected server response)" waitUntilDone:NO];
-            [pool release];
-            return;
-        }
+        [downloadedDays setObject:day forKey:day.date];
+    }
+    if (downloadedDays.count) {
+        [self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays waitUntilDone:NO];
     }
     
-    [self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:[[downloadedDays copy] autorelease] waitUntilDone:NO];
-
-//		if (i == 0) {
-//			// must make a copy, since we're still using the collection and we're not waiting until done
-//			[self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:[[downloadedDays copy] autorelease] waitUntilDone:NO];
-//			[downloadedDays removeAllObjects];
-//		} else {
-//			[self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedDays waitUntilDone:NO];
-//		}
     
-	if (numberOfNewReports == 0) {
+    NSMutableDictionary *downloadedWeeks = [NSMutableDictionary dictionary];    
+    count = 1;
+    for (NSString *weekString in availableWeeks) {
+        NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading week %d of %d",nil), count, availableWeeks.count];
+        count++;
+        [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
+        Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, selectName, &viewState);
+        if (week == nil) {
+            NSString *message = [@"could not download " stringByAppendingString:weekString];
+            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
+            [pool release];
+            return;
+        }
+        [downloadedWeeks setObject:week forKey:week.date];
+    }
+    if (downloadedWeeks.count) {
+        [self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedWeeks waitUntilDone:NO];
+    }
+
+	if (downloadedDays.count == 0 && downloadedWeeks.count == 0) {
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:NO];
 	} else {
 		cacheChanged = YES;
@@ -591,20 +609,6 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 }
 
-
-- (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed
-{
-	NSString *text = nil;
-	if (compressed) {
-		NSData *uncompressedData = [dayData gzipInflate];
-		text = [[NSString alloc] initWithData:uncompressedData encoding:NSUTF8StringEncoding];
-	} else {
-		text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
-	}
-	Day *day = [[[Day alloc] initWithCSV:text] autorelease];
-	[text release];
-	return day;
-}
 
 - (void)importReport:(Day *)report
 {

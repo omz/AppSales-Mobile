@@ -36,6 +36,7 @@
 #import "AppIconManager.h"
 #import "ReportManager.h"
 #import "AppManager.h"
+#import "NSData+Compression.h"
 
 static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
@@ -76,6 +77,21 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 //			[name stringByReplacingOccurrencesOfString:@"/" withString:@"_"], 
 //			fileExtension];
 //}
+
++ (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed {
+	NSString *text = nil;
+	if (compressed) {
+		NSData *uncompressedData = [dayData gzipInflate];
+		text = [[NSString alloc] initWithData:uncompressedData encoding:NSUTF8StringEncoding];
+	} else {
+		text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
+	}
+	Day *day = [[[Day alloc] initWithCSV:text] autorelease];
+	[text release];
+	return day;
+}
+
+
 
 + (NSDate*) adjustDateToLocalTimeZone:(NSDate *)inDate
 {

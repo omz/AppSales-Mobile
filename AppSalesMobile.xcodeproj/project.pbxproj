@@ -159,7 +159,7 @@
 		F280E0EE11DD2DCA0058FB57 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E0EC11DD2DCA0058FB57 /* Star@2x.png */; };
 		FA009F1211E93E8200242DFF /* AppManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FA009F1111E93E8200242DFF /* AppManager.m */; };
 		FA027E6E12407BF500067812 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = FA027E6D12407BF500067812 /* RegexKitLite.m */; };
-		FA027E7812407F2800067812 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FA027E7712407F2800067812 /* libicucore.dylib */; };
+		FA027ECA124099AF00067812 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FA027EC9124099AF00067812 /* libicucore.dylib */; };
 		FA0B2FD811EA312E00BB8B01 /* ad.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DEB11EA312E00BB8B01 /* ad.png */; };
 		FA0B2FD911EA312E00BB8B01 /* ad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DEC11EA312E00BB8B01 /* ad@2x.png */; };
 		FA0B2FDA11EA312E00BB8B01 /* ae.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DED11EA312E00BB8B01 /* ae.png */; };
@@ -891,6 +891,7 @@
 		FA027E6C12407BF500067812 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
 		FA027E6D12407BF500067812 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
 		FA027E7712407F2800067812 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = Xcode4/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.1.sdk/usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		FA027EC9124099AF00067812 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		FA0B2DEB11EA312E00BB8B01 /* ad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ad.png; sourceTree = "<group>"; };
 		FA0B2DEC11EA312E00BB8B01 /* ad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ad@2x.png"; sourceTree = "<group>"; };
 		FA0B2DED11EA312E00BB8B01 /* ae.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ae.png; sourceTree = "<group>"; };
@@ -1424,7 +1425,7 @@
 				7FE30E141150C8B7004DEA7C /* CFNetwork.framework in Frameworks */,
 				7F4695941196439900E82747 /* QuartzCore.framework in Frameworks */,
 				7F4695AA119643CE00E82747 /* AudioToolbox.framework in Frameworks */,
-				FA027E7812407F2800067812 /* libicucore.dylib in Frameworks */,
+				FA027ECA124099AF00067812 /* libicucore.dylib in Frameworks */,
 				FAED3B2011E7F5B9003061C4 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1457,6 +1458,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				FA027EC9124099AF00067812 /* libicucore.dylib */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -3178,6 +3180,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
@@ -3205,6 +3208,7 @@
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
