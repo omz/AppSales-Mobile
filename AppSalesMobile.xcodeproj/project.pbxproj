@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -158,6 +158,8 @@
 		F280E0ED11DD2DCA0058FB57 /* Star_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E0EB11DD2DCA0058FB57 /* Star_Highlighted@2x.png */; };
 		F280E0EE11DD2DCA0058FB57 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E0EC11DD2DCA0058FB57 /* Star@2x.png */; };
 		FA009F1211E93E8200242DFF /* AppManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FA009F1111E93E8200242DFF /* AppManager.m */; };
+		FA027E6E12407BF500067812 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = FA027E6D12407BF500067812 /* RegexKitLite.m */; };
+		FA027E7812407F2800067812 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FA027E7712407F2800067812 /* libicucore.dylib */; };
 		FA0B2FD811EA312E00BB8B01 /* ad.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DEB11EA312E00BB8B01 /* ad.png */; };
 		FA0B2FD911EA312E00BB8B01 /* ad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DEC11EA312E00BB8B01 /* ad@2x.png */; };
 		FA0B2FDA11EA312E00BB8B01 /* ae.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DED11EA312E00BB8B01 /* ae.png */; };
@@ -886,6 +888,9 @@
 		F280E0EC11DD2DCA0058FB57 /* Star@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Star@2x.png"; sourceTree = "<group>"; };
 		FA009F1011E93E8200242DFF /* AppManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppManager.h; sourceTree = "<group>"; };
 		FA009F1111E93E8200242DFF /* AppManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppManager.m; sourceTree = "<group>"; };
+		FA027E6C12407BF500067812 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
+		FA027E6D12407BF500067812 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
+		FA027E7712407F2800067812 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		FA0B2DEB11EA312E00BB8B01 /* ad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ad.png; sourceTree = "<group>"; };
 		FA0B2DEC11EA312E00BB8B01 /* ad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ad@2x.png"; sourceTree = "<group>"; };
 		FA0B2DED11EA312E00BB8B01 /* ae.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ae.png; sourceTree = "<group>"; };
@@ -1419,6 +1424,7 @@
 				7FE30E141150C8B7004DEA7C /* CFNetwork.framework in Frameworks */,
 				7F4695941196439900E82747 /* QuartzCore.framework in Frameworks */,
 				7F4695AA119643CE00E82747 /* AudioToolbox.framework in Frameworks */,
+				FA027E7812407F2800067812 /* libicucore.dylib in Frameworks */,
 				FAED3B2011E7F5B9003061C4 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1451,6 +1457,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				FA027E7712407F2800067812 /* libicucore.dylib */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -2144,6 +2151,8 @@
 		7FB0C5830EBA3431005E2C45 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				FA027E6C12407BF500067812 /* RegexKitLite.h */,
+				FA027E6D12407BF500067812 /* RegexKitLite.m */,
 				7F4A5259116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.h */,
 				7F4A525A116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m */,
 				7FB0C4400EB97BC1005E2C45 /* NSDictionary+HTTP.h */,
@@ -2411,7 +2420,8 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "AppSalesMobile" */;
-			compatibilityVersion = "Xcode 3.1";
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -3107,6 +3117,7 @@
 				FAED39BC11E7E86E003061C4 /* NSString+UnescapeHtml.m in Sources */,
 				FAED39BD11E7E86E003061C4 /* ReviewManager.m in Sources */,
 				FA009F1211E93E8200242DFF /* AppManager.m in Sources */,
+				FA027E6E12407BF500067812 /* RegexKitLite.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3149,6 +3160,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -3156,7 +3168,8 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = "APPSALES_DEBUG=1";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_THUMB_SUPPORT = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_PEDANTIC = NO;
@@ -3166,7 +3179,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = AppSalesMobile;
-				RUN_CLANG_STATIC_ANALYZER = YES;
+				PROVISIONING_PROFILE = "";
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = iphoneos4.1;
+				"TARGETED_DEVICE_FAMILY[arch=*]" = "1,2";
 			};
 			name = Debug;
 		};
@@ -3177,22 +3193,23 @@
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = "NS_BLOCK_ASSERTIONS=1";
 				GCC_THUMB_SUPPORT = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_SHADOW = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = Info.plist;
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
-				RUN_CLANG_STATIC_ANALYZER = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = iphoneos4.1;
+				"TARGETED_DEVICE_FAMILY[arch=*]" = "1,2";
 			};
 			name = Release;
 		};
@@ -3202,13 +3219,16 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				PREBINDING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				PREBINDING = YES;
 				PRODUCT_NAME = AppSales;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos4.0;
+				SDKROOT = iphoneos4.1;
 			};
 			name = Distribution;
 		};
@@ -3219,14 +3239,15 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
-				ONLY_ACTIVE_ARCH = YES;
-				PREBINDING = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
+				PREBINDING = YES;
 				PRODUCT_NAME = AppSales;
-				SDKROOT = iphoneos4.0;
+				SDKROOT = iphoneos4.1;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -3238,14 +3259,18 @@
 				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				PREBINDING = NO;
+				PREBINDING = YES;
 				PRODUCT_NAME = AppSales;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos4.0;
+				SDKROOT = iphoneos4.1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
