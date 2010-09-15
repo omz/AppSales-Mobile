@@ -54,6 +54,7 @@
 @property (readonly) NSDictionary *summary;
 
 + (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
++ (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 
 - (id)initWithCSV:(NSString *)csv;
 
