@@ -300,52 +300,40 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 	
     NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
 	NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
-    NSString *ittsSignOutAction = @"/WebObjects/iTunesConnect.woa/wo/4.2.5";
+    NSString *signoutSentinel = @"name=\"signOutForm\"";
     
     NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
     NSString *loginPage = [NSString stringWithContentsOfURL:loginURL usedEncoding:NULL error:NULL];
-    if ([loginPage rangeOfString:ittsSignOutAction].location == NSNotFound) {
+    if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
         [self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Logging in...",nil) waitUntilDone:NO];
-    } else {
-        // already logged in. log out and start over, otherwise risk backtracking errors and other hassles
-        [self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Re-logging in...",nil) waitUntilDone:NO];
-        NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsSignOutAction]];
-        NSString *logoutPage = [NSString stringWithContentsOfURL:logoutURL usedEncoding:NULL error:NULL];
-        if ([logoutPage rangeOfString:@"class=\"instruct_text\""].location == NSNotFound) {
-            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:
-                                @"could not re-login to iTunes Connect.  Try stopping and restarting AppSales" 
-                                waitUntilDone:NO];
+        
+        // find the login action
+        NSScanner *scanner = [NSScanner scannerWithString:loginPage];
+        [scanner scanUpToString:@"action=\"" intoString:nil];
+        if (! [scanner scanString:@"action=\"" intoString:nil]) {
+            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not parse iTunes Connect login page" waitUntilDone:NO];
             [pool release];
-            return;            
+            return;
         }
-        loginPage = [NSString stringWithContentsOfURL:loginURL usedEncoding:NULL error:NULL];        
-    }
-    
-    // find the login action
-    NSScanner *scanner = [NSScanner scannerWithString:loginPage];
-    [scanner scanUpToString:@"action=\"" intoString:nil];
-    if (! [scanner scanString:@"action=\"" intoString:nil]) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not parse iTunes Connect login page" waitUntilDone:NO];
-        [pool release];
-        return;
-    }
-    NSString *loginAction = nil;
-    [scanner scanUpToString:@"\"" intoString:&loginAction];
-
-    NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                              username, @"theAccountName",
-                              password, @"theAccountPW", 
-                              @"0", @"1.Continue.x",
-                              @"0", @"1.Continue.y",
-                              nil];
-    NSData *requestResponseData = getPostRequestAsData([ittsBaseURL stringByAppendingString:loginAction], postDict, nil);
-    if (requestResponseData == nil) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not load iTunes Connect login page" waitUntilDone:NO];
-        [pool release];
-        return;
-    }
+        NSString *loginAction = nil;
+        [scanner scanUpToString:@"\"" intoString:&loginAction];
+        
+        NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  username, @"theAccountName",
+                                  password, @"theAccountPW", 
+                                  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
+                                  @"7", @"1.Continue.y",
+                                  nil];
+        loginPage = getPostRequestAsString([ittsBaseURL stringByAppendingString:loginAction], postDict);
+        if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
+            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not load iTunes Connect login page" waitUntilDone:NO];
+            [pool release];
+            return;
+        }
+    } // else, already logged in
     
     // load sales/trends page
+    // if already logged in, sometimes this loads a vendor selection page?  Downloding still works if we ignore this and march onward...
     NSString *salesAction = @"/WebObjects/iTunesConnect.woa/wo/2.0.9.7.2.9.1.0.0.3";
     NSError *error = nil;
     NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:salesAction]]
@@ -391,14 +379,14 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 
     
     // click though from the dashboard to the sales page
-    postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                ajaxName, @"AJAXREQUEST",
-                @"theForm", @"theForm",
-                @"notnormal", @"theForm:xyz",
-                @"Y", @"theForm:vendorType",
-                viewState, @"javax.faces.ViewState",
-                dailyName, dailyName,
-                nil];
+    NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                              ajaxName, @"AJAXREQUEST",
+                              @"theForm", @"theForm",
+                              @"notnormal", @"theForm:xyz",
+                              @"Y", @"theForm:vendorType",
+                              viewState, @"javax.faces.ViewState",
+                              dailyName, dailyName,
+                              nil];
     NSString *responseString = getPostRequestAsString(ITTS_SALES_PAGE_URL, postDict);
     viewState = parseViewState(responseString);
     
