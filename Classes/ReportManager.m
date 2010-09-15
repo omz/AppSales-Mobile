@@ -358,6 +358,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         NSLog(@"cannot find selection form: %@", salesPage);
         [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"unexpected date selector html form" waitUntilDone:NO];
         [pool release];
+        return;
     }
     NSString *arbitraryDay = [availableDays objectAtIndex:0];
     [availableDays removeObjectsInArray:daysToSkip];
@@ -368,6 +369,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         NSLog(@"cannot find selection form: %@", salesPage);
         [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"unexpected week selector html form" waitUntilDone:NO];
         [pool release];
+        return;
     }
     NSString *arbitraryWeek = [availableWeeks objectAtIndex:0];
     [availableWeeks removeObjectsInArray:weeksToSkip];
