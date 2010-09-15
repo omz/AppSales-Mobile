@@ -241,7 +241,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 - (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
-	
+    [self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:NO];
+    
 	NSArray *daysToSkipDates = [userInfo objectForKey:@"daysToSkip"];
 	NSArray *weeksToSkipDates = [userInfo objectForKey:@"weeksToSkip"];
 	NSMutableArray *daysToSkip = [NSMutableArray array];
@@ -257,8 +258,6 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 		NSString *weekName = [nameFormatter stringFromDate:toDate];
 		[weeksToSkip addObject:weekName];
 	}
-		
-	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download...",nil) waitUntilDone:NO];
 	
 	NSString *originalReportsPath = [userInfo objectForKey:@"originalReportsPath"];
 	NSString *username = [userInfo objectForKey:@"username"];
@@ -339,6 +338,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         return;
     }
     
+    // parse days available
     NSScanner *selectionScanner = [NSScanner scannerWithString:selectionForm];
     NSMutableArray *availableDays = [NSMutableArray array];
     
@@ -357,7 +357,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     [availableDays removeObjectsInArray:daysToSkip];
     
     
-    // parse the weeks available
+    // parse weeks available
     [scanner scanUpToString:@"weekPickerSourceSelectElement" intoString:nil];
     if (! [scanner scanString:@"weekPickerSourceSelectElement" intoString:nil]) {
         [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not parse week source selector element" waitUntilDone:NO];
@@ -406,8 +406,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
     viewState = parseViewState(responseString);
     
-    // download the reports
-    NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];    
+    // download daily reports
     int count = 1;
     for (NSString *dayString in availableDays) {
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %d of %d",nil), count, availableDays.count];
@@ -420,12 +419,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
             [pool release];
             return;
         }
-        [downloadedDays setObject:day forKey:day.date];
+        [self performSelectorOnMainThread:@selector(successfullyDownloadedDay:) withObject:day waitUntilDone:NO];
     }
-    if (downloadedDays.count) {
-        [self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:downloadedDays waitUntilDone:NO];
-    }
-    
     
     // change to weeks instead of days
     postDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -445,7 +440,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
     viewState = parseViewState(responseString);
     
-    NSMutableDictionary *downloadedWeeks = [NSMutableDictionary dictionary];    
+    // download weekly reports
     count = 1;
     for (NSString *weekString in availableWeeks) {
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading week %d of %d",nil), count, availableWeeks.count];
@@ -458,13 +453,10 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
             [pool release];
             return;
         }
-        [downloadedWeeks setObject:week forKey:week.date];
-    }
-    if (downloadedWeeks.count) {
-        [self performSelectorOnMainThread:@selector(successfullyDownloadedWeeks:) withObject:downloadedWeeks waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(successfullyDownloadedWeek:) withObject:week waitUntilDone:NO];
     }
 
-	if (downloadedDays.count == 0 && downloadedWeeks.count == 0) {
+	if (availableDays.count == 0 && availableWeeks.count == 0) {
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:NO];
 	} else {
 		cacheChanged = YES;
@@ -506,34 +498,21 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 }
 
 
-- (void)presentErrorMessage:(NSString *)message
+- (void) successfullyDownloadedDay:(Day*)day
 {
-	UIAlertView *errorAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Note",nil) 
-														  message:message 
-														 delegate:nil 
-												cancelButtonTitle:NSLocalizedString(@"OK",nil) 
-												otherButtonTitles:nil] autorelease];
-	[errorAlert show];
-}
-
-- (void)successfullyDownloadedDays:(NSDictionary *)newDays
-{
-	[days addEntriesFromDictionary:newDays];
-	
+    [days setObject:day forKey:day.date];
 	AppManager *manager = [AppManager sharedManager];
-	for (Day *d in [newDays allValues]) {
-		for (Country *c in [d.countries allValues]) {
-			for (Entry *e in c.entries) {
-				[manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
-			}
-		}
-	}
+    for (Country *c in [day.countries allValues]) {
+        for (Entry *e in c.entries) {
+            [manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
+        }
+    }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
 }
 
-- (void)successfullyDownloadedWeeks:(NSDictionary *)newDays
+- (void) successfullyDownloadedWeek:(Day*)week
 {
-	[weeks addEntriesFromDictionary:newDays];
+    [weeks setObject:week forKey:week.date];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 }
 
