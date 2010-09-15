@@ -387,6 +387,7 @@
         
         [availableDays addObject:selectorValue];
     }
+    NSString *arbitraryDay = [availableDays objectAtIndex:0];
     [availableDays removeObjectsInArray:daysToSkip];
     
     
@@ -417,6 +418,7 @@
         
         [availableWeeks addObject:selectorValue];
     }
+    NSString *arbitraryWeek = [availableWeeks objectAtIndex:0];
     [availableWeeks removeObjectsInArray:weeksToSkip];
 
     
@@ -446,7 +448,6 @@
     
     int count = 1;
     for (NSString *dayString in availableDays) {
-        NSAutoreleasePool *innerPool = [NSAutoreleasePool new];
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %d of %d",nil), count, availableDays.count];
         count++;
         [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
@@ -458,7 +459,7 @@
                     @"theForm:xyz", @"notnormal",
                     @"Y", @"theForm:vendorType",
                     dayString, @"theForm:datePickerSourceSelectElementSales",
-                    dayString, @"theForm:weekPickerSourceSelectElement",
+                    arbitraryWeek, @"theForm:weekPickerSourceSelectElement",
                     viewState, @"javax.faces.ViewState",
                     selectName, selectName,
                     nil];
@@ -467,11 +468,15 @@
         urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ittsSalesPageURL]];
         [urlRequest setHTTPMethod:@"POST"];
         [urlRequest setHTTPBody:httpBody];
-        NSHTTPURLResponse *downloadResponse = nil;
-        requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&downloadResponse error:NULL];
+        requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
         responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
         
         viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+        if (viewState == nil) {
+            [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"Could not parse viewState" waitUntilDone:NO];
+            [pool release];
+            return;
+        }
         
         // and finally...we're ready to download the report
         postDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -479,7 +484,7 @@
                     @"notnormal", @"theForm:xyz",
                     @"Y", @"theForm:vendorType",
                     dayString, @"theForm:datePickerSourceSelectElementSales",
-                    dayString, @"theForm:weekPickerSourceSelectElement",
+                    arbitraryWeek, @"theForm:weekPickerSourceSelectElement",
                     viewState, @"javax.faces.ViewState",
                     @"theForm:downloadLabel2", @"theForm:downloadLabel2",
                     nil];
@@ -488,22 +493,19 @@
         urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ittsSalesPageURL]];
         [urlRequest setHTTPMethod:@"POST"];
         [urlRequest setHTTPBody:httpBody];
-        downloadResponse = nil;
         requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&downloadResponse error:NULL];
         NSString *originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"Filename"];
         if (originalFilename) {
-            Day *day = [self dayWithData:requestResponseData compressed:YES];
             [requestResponseData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
+            Day *day = [self dayWithData:requestResponseData compressed:YES];
             [downloadedDays setObject:day forKey:day.date];
         } else {
             responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
             NSLog(@"unexpected response: %@", responseString);
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not download report (unexpected server response)" waitUntilDone:NO];
-            [innerPool release];
             [pool release];
             return;
         }
-        [innerPool release];
     }
     
     [self performSelectorOnMainThread:@selector(successfullyDownloadedDays:) withObject:[[downloadedDays copy] autorelease] waitUntilDone:NO];
