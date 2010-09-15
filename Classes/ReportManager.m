@@ -182,6 +182,18 @@
 
 #define ITTS_SALES_PAGE_URL @"https://reportingitc.apple.com/sales.faces"
 
+static NSData* getPostRequestAsData(NSString *urlString, NSDictionary *postDict, NSHTTPURLResponse **downloadResponse) {
+    NSString *postDictString = [postDict formatForHTTP];
+    NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+    [urlRequest setHTTPMethod:@"POST"];
+    [urlRequest setHTTPBody:httpBody];
+    return [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:downloadResponse error:NULL];
+}
+static NSString* getPostRequestAsString(NSString *urlString, NSDictionary *postDict) {
+    return [[[NSString alloc] initWithData:getPostRequestAsData(urlString, postDict, nil) encoding:NSUTF8StringEncoding] autorelease];
+}
+
 static NSString* parseViewState(NSString *htmlPage) {
     return [htmlPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
 }
@@ -200,18 +212,12 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
                               *viewState, @"javax.faces.ViewState",
                               selectName, selectName,
                               nil];
-    NSString *postDictString = [postDict formatForHTTP];
-    NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
-    [urlRequest setHTTPMethod:@"POST"];
-    [urlRequest setHTTPBody:httpBody];
-    NSData *requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
-    NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+    NSString *responseString = getPostRequestAsString(ITTS_SALES_PAGE_URL, postDict);
     *viewState = parseViewState(responseString);
     
     // iTC shows a (fixed?) number of date ranges in the form, even if all of them are not available 
     // if trying to download a report that doesn't exist, it'll return an error page instead of the report
-    if ([responseString rangeOfString:@"theForm:slsERRtable"].location != NSNotFound) {
+    if ([responseString rangeOfString:@"theForm:errorPanel"].location != NSNotFound) {
 #if APPSALES_DEBUG
         NSLog(@"report not available for @% @%", dayString, weekString);
 #endif
@@ -228,13 +234,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
                 *viewState, @"javax.faces.ViewState",
                 @"theForm:downloadLabel2", @"theForm:downloadLabel2",
                 nil];
-    postDictString = [postDict formatForHTTP];
-    httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-    urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
-    [urlRequest setHTTPMethod:@"POST"];
-    [urlRequest setHTTPBody:httpBody];
     NSHTTPURLResponse *downloadResponse = nil;
-    requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&downloadResponse error:NULL];
+    NSData *requestResponseData = getPostRequestAsData(ITTS_SALES_PAGE_URL, postDict, &downloadResponse);
     NSString *originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"Filename"];
     if (originalFilename) {
         [requestResponseData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
@@ -289,19 +290,13 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 
     // login
 	[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Logging in...",nil) waitUntilDone:NO];
-    loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]];
     NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
                               username, @"theAccountName",
                               password, @"theAccountPW", 
                               @"0", @"1.Continue.x",
                               @"0", @"1.Continue.y",
                               nil];
-    NSString *postDictString = [postDict formatForHTTP];
-    NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:loginURL];
-    [urlRequest setHTTPMethod:@"POST"];
-    [urlRequest setHTTPBody:httpBody];
-    NSData *requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:NULL error:NULL];
+    NSData *requestResponseData = getPostRequestAsData([ittsBaseURL stringByAppendingString:loginAction], postDict, nil);
     if (requestResponseData == nil) {
         [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not load iTunes Connect login page" waitUntilDone:NO];
         [pool release];
@@ -406,13 +401,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
                 viewState, @"javax.faces.ViewState",
                 dailyName, dailyName,
                 nil];
-    postDictString = [postDict formatForHTTP];
-    httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-    urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
-    [urlRequest setHTTPMethod:@"POST"];
-    [urlRequest setHTTPBody:httpBody];
-    requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
-    NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+    NSString *responseString = getPostRequestAsString(ITTS_SALES_PAGE_URL, postDict);
     viewState = parseViewState(responseString);
     
     // download daily reports
@@ -444,13 +433,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
                     viewState, @"javax.faces.ViewState",
                     weeklyName, weeklyName,
                     nil];
-        postDictString = [postDict formatForHTTP];
-        httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-        urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
-        [urlRequest setHTTPMethod:@"POST"];
-        [urlRequest setHTTPBody:httpBody];
-        requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
-        responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+        responseString = getPostRequestAsString(ITTS_SALES_PAGE_URL, postDict);
         viewState = parseViewState(responseString);
     }
     
