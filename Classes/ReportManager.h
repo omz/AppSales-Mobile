@@ -21,8 +21,6 @@
 	BOOL isRefreshing;
 	BOOL needsDataSavedToDisk;
 	NSString *reportDownloadStatus;
-	
-	BOOL cacheChanged;
 }
 
 @property (readonly) NSDictionary *days;

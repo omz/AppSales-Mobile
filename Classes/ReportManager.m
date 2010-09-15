@@ -6,8 +6,6 @@
 //  Copyright 2009 omz:software. All rights reserved.
 //
 
-#import <zlib.h>
-
 #import "ReportManager.h"
 #import "NSDictionary+HTTP.h"
 #import "Day.h"
@@ -177,7 +175,8 @@
 							  password, @"password", 
 							  weeksToSkip, @"weeksToSkip", 
 							  daysToSkip, @"daysToSkip", 
-							  [self originalReportsPath], @"originalReportsPath", nil];
+							  [self originalReportsPath], @"originalReportsPath",
+                              nil];
 	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo:) withObject:userInfo];
 }
 
@@ -189,7 +188,7 @@ static NSString* parseViewState(NSString *htmlPage) {
 
 // code path shared for both day and week downloads
 static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NSString *dayString, 
-                           NSString *weekString, NSString *selectName, NSString **viewState)  {
+                           NSString *weekString, NSString *selectName, NSString **viewState, BOOL *error)  {
     // set the date within the web page
     NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
                               ajaxName, @"AJAXREQUEST",
@@ -209,6 +208,15 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSData *requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
     NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
     *viewState = parseViewState(responseString);
+    
+    // iTC shows a (fixed?) number of date ranges in the form, even if all of them are not available 
+    // if trying to download a report that doesn't exist, it'll return an error page instead of the report
+    if ([responseString rangeOfString:@"theForm:slsERRtable"].location != NSNotFound) {
+#if APPSALES_DEBUG
+        NSLog(@"report not available for @% @%", dayString, weekString);
+#endif
+        return nil;
+    }
     
     // and finally...we're ready to download the report
     postDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -234,6 +242,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     } else {
         responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
         NSLog(@"unexpected response: %@", responseString);
+        *error = YES;
         return nil;
     }   
 }
@@ -412,33 +421,38 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %d of %d",nil), count, availableDays.count];
         count++;
         [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
-        Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, daySelectName, &viewState);
-        if (day == nil) {
+        BOOL error = false;
+        Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, daySelectName, &viewState, &error);
+        if (day) {
+            [self performSelectorOnMainThread:@selector(successfullyDownloadedDay:) withObject:day waitUntilDone:NO];            
+        } else if (error) {
             NSString *message = [@"could not download " stringByAppendingString:dayString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
             [pool release];
-            return;
+            return;            
         }
-        [self performSelectorOnMainThread:@selector(successfullyDownloadedDay:) withObject:day waitUntilDone:NO];
     }
     
     // change to weeks instead of days
-    postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                ajaxName, @"AJAXREQUEST",
-                @"theForm", @"theForm",
-                @"notnormal", @"theForm:xyz",
-                @"Y", @"theForm:vendorType",
-                viewState, @"javax.faces.ViewState",
-                weeklyName, weeklyName,
-                nil];
-    postDictString = [postDict formatForHTTP];
-    httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-    urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
-    [urlRequest setHTTPMethod:@"POST"];
-    [urlRequest setHTTPBody:httpBody];
-    requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
-    responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-    viewState = parseViewState(responseString);
+    // this currently does not appear to be needed
+    if (false) {
+        postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                    ajaxName, @"AJAXREQUEST",
+                    @"theForm", @"theForm",
+                    @"notnormal", @"theForm:xyz",
+                    @"Y", @"theForm:vendorType",
+                    viewState, @"javax.faces.ViewState",
+                    weeklyName, weeklyName,
+                    nil];
+        postDictString = [postDict formatForHTTP];
+        httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
+        urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
+        [urlRequest setHTTPMethod:@"POST"];
+        [urlRequest setHTTPBody:httpBody];
+        requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
+        responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+        viewState = parseViewState(responseString);
+    }
     
     // download weekly reports
     count = 1;
@@ -446,20 +460,21 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading week %d of %d",nil), count, availableWeeks.count];
         count++;
         [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
-        Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, weekSelectName, &viewState);
-        if (week == nil) {
+        BOOL error = false;
+        Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, weekSelectName, &viewState, &error);
+        if (week) {
+            [self performSelectorOnMainThread:@selector(successfullyDownloadedWeek:) withObject:week waitUntilDone:NO];   
+        } else if (error) {
             NSString *message = [@"could not download " stringByAppendingString:weekString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
             [pool release];
             return;
         }
-        [self performSelectorOnMainThread:@selector(successfullyDownloadedWeek:) withObject:week waitUntilDone:NO];
     }
 
 	if (availableDays.count == 0 && availableWeeks.count == 0) {
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"No new reports found",nil) waitUntilDone:NO];
 	} else {
-		cacheChanged = YES;
 		[self performSelectorOnMainThread:@selector(setProgress:) withObject:@"" waitUntilDone:NO];
 		[self performSelectorOnMainThread:@selector(saveData) withObject:nil waitUntilDone:NO];
 	} 
@@ -480,6 +495,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 
 - (void)downloadFailed:(NSString*)error
 {
+    NSAssert([NSThread isMainThread], nil);
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	NSString *message = NSLocalizedString(
 @"Sorry, an error occured when trying to download the report files. Please check your username, password and internet connection.",nil);
@@ -570,23 +586,21 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 		[days removeObjectForKey:dayToDelete.date];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
 	}
-	cacheChanged = YES;
 	[self saveData];
 }
 
 - (void)saveData
 {
+    NSAssert([NSThread isMainThread], nil);
 	[[AppManager sharedManager] saveToDisk];
 	
 	//save all days/weeks in separate files:
-	BOOL shouldUpdateCache = cacheChanged;
 	NSString *docPath = getDocPath();
 	for (Day *d in [self.days allValues]) {
 		NSString *fullPath = [docPath stringByAppendingPathComponent:[d proposedFilename]];
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!d.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:d toFile:fullPath];
-			shouldUpdateCache = YES;
 		}
 	}
 	for (Day *w in [self.weeks allValues]) {
@@ -594,25 +608,21 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 		//wasLoadedFromDisk is set to YES in initWithCoder: ...
 		if (!w.wasLoadedFromDisk) {
 			[NSKeyedArchiver archiveRootObject:w toFile:fullPath];
-			shouldUpdateCache = YES;
 		}
 	}
-	if (shouldUpdateCache) {
-		NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
-		NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
-		for (Day *d in [days allValues]) {
-			[daysCache setObject:d.summary forKey:d.date];
-		}
-		for (Day *w in [weeks allValues]) {
-			[weeksCache setObject:w.summary forKey:w.date];
-		}
-		NSDictionary *reportCache = [NSDictionary dictionaryWithObjectsAndKeys:
-									 weeksCache, @"weeks",
-									 daysCache, @"days", nil];
-		[NSKeyedArchiver archiveRootObject:reportCache toFile:[self reportCachePath]];
-	}
-	
-	cacheChanged = NO;
+    
+    NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
+    NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
+    for (Day *d in [days allValues]) {
+        [daysCache setObject:d.summary forKey:d.date];
+    }
+    for (Day *w in [weeks allValues]) {
+        [weeksCache setObject:w.summary forKey:w.date];
+    }
+    NSDictionary *reportCache = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 weeksCache, @"weeks",
+                                 daysCache, @"days", nil];
+    [NSKeyedArchiver archiveRootObject:reportCache toFile:[self reportCachePath]];
 }
 
 @end
