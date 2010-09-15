@@ -159,7 +159,6 @@
 		F280E0EE11DD2DCA0058FB57 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F280E0EC11DD2DCA0058FB57 /* Star@2x.png */; };
 		FA009F1211E93E8200242DFF /* AppManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FA009F1111E93E8200242DFF /* AppManager.m */; };
 		FA027E6E12407BF500067812 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = FA027E6D12407BF500067812 /* RegexKitLite.m */; };
-		FA027ECA124099AF00067812 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FA027EC9124099AF00067812 /* libicucore.dylib */; };
 		FA0B2FD811EA312E00BB8B01 /* ad.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DEB11EA312E00BB8B01 /* ad.png */; };
 		FA0B2FD911EA312E00BB8B01 /* ad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DEC11EA312E00BB8B01 /* ad@2x.png */; };
 		FA0B2FDA11EA312E00BB8B01 /* ae.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2DED11EA312E00BB8B01 /* ae.png */; };
@@ -653,6 +652,7 @@
 		FA0B31C211EA312E00BB8B01 /* zm@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2FD511EA312E00BB8B01 /* zm@2x.png */; };
 		FA0B31C311EA312E00BB8B01 /* zw.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2FD611EA312E00BB8B01 /* zw.png */; };
 		FA0B31C411EA312E00BB8B01 /* zw@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2FD711EA312E00BB8B01 /* zw@2x.png */; };
+		FA0E305A124167A90076A3EF /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FA0E3059124167A90076A3EF /* libicucore.dylib */; };
 		FAED39A511E7E810003061C4 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FAED399A11E7E810003061C4 /* NSObject+SBJSON.m */; };
 		FAED39A611E7E810003061C4 /* NSString+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FAED399C11E7E810003061C4 /* NSString+SBJSON.m */; };
 		FAED39A711E7E810003061C4 /* SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FAED399E11E7E810003061C4 /* SBJSON.m */; };
@@ -890,7 +890,6 @@
 		FA009F1111E93E8200242DFF /* AppManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppManager.m; sourceTree = "<group>"; };
 		FA027E6C12407BF500067812 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
 		FA027E6D12407BF500067812 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
-		FA027EC9124099AF00067812 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		FA0B2DEB11EA312E00BB8B01 /* ad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ad.png; sourceTree = "<group>"; };
 		FA0B2DEC11EA312E00BB8B01 /* ad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ad@2x.png"; sourceTree = "<group>"; };
 		FA0B2DED11EA312E00BB8B01 /* ae.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ae.png; sourceTree = "<group>"; };
@@ -1384,6 +1383,7 @@
 		FA0B2FD511EA312E00BB8B01 /* zm@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "zm@2x.png"; sourceTree = "<group>"; };
 		FA0B2FD611EA312E00BB8B01 /* zw.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = zw.png; sourceTree = "<group>"; };
 		FA0B2FD711EA312E00BB8B01 /* zw@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "zw@2x.png"; sourceTree = "<group>"; };
+		FA0E3059124167A90076A3EF /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		FAED399811E7E810003061C4 /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON.h; path = "Classes/Google Translate ObjC/JSON.h"; sourceTree = "<group>"; };
 		FAED399911E7E810003061C4 /* NSObject+SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+SBJSON.h"; path = "Classes/Google Translate ObjC/NSObject+SBJSON.h"; sourceTree = "<group>"; };
 		FAED399A11E7E810003061C4 /* NSObject+SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+SBJSON.m"; path = "Classes/Google Translate ObjC/NSObject+SBJSON.m"; sourceTree = "<group>"; };
@@ -1424,7 +1424,7 @@
 				7FE30E141150C8B7004DEA7C /* CFNetwork.framework in Frameworks */,
 				7F4695941196439900E82747 /* QuartzCore.framework in Frameworks */,
 				7F4695AA119643CE00E82747 /* AudioToolbox.framework in Frameworks */,
-				FA027ECA124099AF00067812 /* libicucore.dylib in Frameworks */,
+				FA0E305A124167A90076A3EF /* libicucore.dylib in Frameworks */,
 				FAED3B2011E7F5B9003061C4 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1495,7 +1495,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				FA027EC9124099AF00067812 /* libicucore.dylib */,
+				FA0E3059124167A90076A3EF /* libicucore.dylib */,
 				FAED3B1F11E7F5B9003061C4 /* libz.dylib */,
 				7F4695931196439900E82747 /* QuartzCore.framework */,
 				7F4695A9119643CE00E82747 /* AudioToolbox.framework */,
@@ -3181,6 +3181,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = iphoneos4.1;
 				"TARGETED_DEVICE_FAMILY[arch=*]" = "1,2";
@@ -3209,6 +3210,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = iphoneos4.1;
 				"TARGETED_DEVICE_FAMILY[arch=*]" = "1,2";
