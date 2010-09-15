@@ -205,9 +205,6 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSData *requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
     NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
     *viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
-    if (*viewState == nil) {
-        return nil;
-    }
     
     // and finally...we're ready to download the report
     postDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -311,105 +308,16 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         [pool release];
         return;
     }
-    
-    NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL] usedEncoding:NULL error:NULL];
-	
-//	XXX this likely doesn't work with the Sept 2010 changes, and needs updating
-//	// check if page is "choose vendor" page (Patch by Christian Beer, thanks!)
-//	if ([scanner scanUpToString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL]) {
-//		NSString *chooseVendorAction = nil;
-//		[scanner scanString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
-//		[scanner scanUpToString:@"\"" intoString:&chooseVendorAction];
-//		
-//		// get vendor Id
-//		[scanner scanUpToString:@"<option value=\"null\">" intoString:NULL];
-//		[scanner scanString:@"<option value=\"null\">" intoString:NULL];
-//		[scanner scanUpToString:@"<option value=\"" intoString:NULL];
-//		[scanner scanString:@"<option value=\"" intoString:NULL];
-//		NSString *vendorId = nil;
-//		[scanner scanUpToString:@"\"" intoString:&vendorId];
-//		
-//		if (chooseVendorAction != nil) {
-//			NSString *chooseVendorURLString = [ittsBaseURL stringByAppendingString:chooseVendorAction];
-//			NSURL *chooseVendorURL = [NSURL URLWithString:chooseVendorURLString];
-//			NSDictionary *chooseVendorDict = [NSDictionary dictionaryWithObjectsAndKeys:
-//											  vendorId, @"9.6.0", 
-//											  vendorId, @"vndrid", 
-//											  @"1", @"Select1", 
-//											  @"", @"9.18", nil];
-//			NSString *encodedChooseVendorDict = [chooseVendorDict formatForHTTP];
-//			NSData *httpBody = [encodedChooseVendorDict dataUsingEncoding:NSASCIIStringEncoding];
-//			NSMutableURLRequest *chooseVendorRequest = [NSMutableURLRequest requestWithURL:chooseVendorURL];
-//			[chooseVendorRequest setHTTPMethod:@"POST"];
-//			[chooseVendorRequest setHTTPBody:httpBody];
-//			NSData *chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:chooseVendorRequest returningResponse:NULL error:NULL];
-//			if (chooseVendorSelectionPageData == nil) {
-//				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not choose vendor" waitUntilDone:NO];
-//				[pool release];
-//				return;
-//			}
-//			NSString *chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
-//			
-//			if (!chooseVendorSelectionPage)
-//				NSLog(@"No chooseVendorSelectionPage");
-//
-//			scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
-//			[scanner scanUpToString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
-//			NSString *chooseVendorAction2 = nil;
-//			[scanner scanString:@"enctype=\"multipart/form-data\" action=\"" intoString:NULL];
-//			[scanner scanUpToString:@"\"" intoString:&chooseVendorAction2];
-//			
-//			chooseVendorURLString = [ittsBaseURL stringByAppendingString:chooseVendorAction2];
-//			chooseVendorURL = [NSURL URLWithString:chooseVendorURLString];
-//			chooseVendorDict = [NSDictionary dictionaryWithObjectsAndKeys:
-//								vendorId, @"9.6.0", 
-//								vendorId, @"vndrid", 
-//								@"999998", @"Select1", 
-//								@"", @"9.18", 
-//								@"Submit", @"SubmitBtn", nil];
-//			encodedChooseVendorDict = [chooseVendorDict formatForHTTP];
-//			httpBody = [encodedChooseVendorDict dataUsingEncoding:NSASCIIStringEncoding];
-//			chooseVendorRequest = [NSMutableURLRequest requestWithURL:chooseVendorURL];
-//			[chooseVendorRequest setHTTPMethod:@"POST"];
-//			[chooseVendorRequest setHTTPBody:httpBody];
-//			chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:chooseVendorRequest returningResponse:NULL error:NULL];
-//			if (chooseVendorSelectionPageData == nil) {;
-//				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not choose vendor page 2" waitUntilDone:NO];
-//				[pool release];
-//				return;
-//			}
-//			chooseVendorSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];	
-//			
-//			if (!chooseVendorSelectionPage)
-//				NSLog(@"No chooseVendorSelectionPage");
-//
-//			scanner = [NSScanner scannerWithString:chooseVendorSelectionPage];
-//			[scanner scanUpToString:@"<td class=\"content\">" intoString:NULL];
-//			[scanner scanUpToString:@"<a href=\"" intoString:NULL];
-//			[scanner scanString:@"<a href=\"" intoString:NULL];
-//			NSString *trendReportsAction = nil;
-//			[scanner scanUpToString:@"\"" intoString:&trendReportsAction];
-//			NSString *trendReportsURLString = [ittsBaseURL stringByAppendingString:trendReportsAction];
-//			NSURL *trendReportsURL = [NSURL URLWithString:trendReportsURLString];
-//			NSMutableURLRequest *trendReportsRequest = [NSMutableURLRequest requestWithURL:trendReportsURL];
-//			[trendReportsRequest setHTTPMethod:@"GET"];
-//			chooseVendorSelectionPageData = [NSURLConnection sendSynchronousRequest:trendReportsRequest returningResponse:NULL error:NULL];
-//			if (chooseVendorSelectionPageData == nil) {
-//				[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not open trend report page" waitUntilDone:NO];
-//				[pool release];
-//				return;
-//			}
-//			dateTypeSelectionPage = [[[NSString alloc] initWithData:chooseVendorSelectionPageData encoding:NSUTF8StringEncoding] autorelease];
-//		}
-//	}
-    
+    	
     // get the form field names needed to download the report
+    NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL] usedEncoding:NULL error:NULL];
     NSString *viewState = [salesPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];   
     
     NSString *dailyName = [salesPage stringByMatching:@"theForm:j_id_jsp_[0-9]*_21"];
+    NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_22"];
     NSString *ajaxName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_2"];
-//    NSString *dateName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_8"]
-    NSString *selectName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_30"];
+    NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_30"];
+    NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_35"];
     
     // figure out which reports are available
     scanner = [NSScanner scannerWithString:salesPage];
@@ -490,10 +398,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
     [urlRequest setHTTPMethod:@"POST"];
     [urlRequest setHTTPBody:httpBody];
-    NSHTTPURLResponse *downloadResponse = nil;
-    requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&downloadResponse error:NULL];
+    requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
     NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-
     viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
     
     // download the reports
@@ -503,7 +409,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %d of %d",nil), count, availableDays.count];
         count++;
         [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
-        Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, selectName, &viewState);
+        Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, daySelectName, &viewState);
         if (day == nil) {
             NSString *message = [@"could not download " stringByAppendingString:dayString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
@@ -517,13 +423,31 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     }
     
     
+    // change to weeks instead of days
+    postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                ajaxName, @"AJAXREQUEST",
+                @"theForm", @"theForm",
+                @"notnormal", @"theForm:xyz",
+                @"Y", @"theForm:vendorType",
+                viewState, @"javax.faces.ViewState",
+                weeklyName, weeklyName,
+                nil];
+    postDictString = [postDict formatForHTTP];
+    httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
+    urlRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL]];
+    [urlRequest setHTTPMethod:@"POST"];
+    [urlRequest setHTTPBody:httpBody];
+    requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
+    responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+    viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+    
     NSMutableDictionary *downloadedWeeks = [NSMutableDictionary dictionary];    
     count = 1;
     for (NSString *weekString in availableWeeks) {
         NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading week %d of %d",nil), count, availableWeeks.count];
         count++;
         [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
-        Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, selectName, &viewState);
+        Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, weekSelectName, &viewState);
         if (week == nil) {
             NSString *message = [@"could not download " stringByAppendingString:weekString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
