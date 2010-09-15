@@ -175,8 +175,7 @@
 							  password, @"password", 
 							  weeksToSkip, @"weeksToSkip", 
 							  daysToSkip, @"daysToSkip", 
-							  [self originalReportsPath], @"originalReportsPath",
-                              nil];
+							  [self originalReportsPath], @"originalReportsPath", nil];
 	[self performSelectorInBackground:@selector(fetchReportsWithUserInfo:) withObject:userInfo];
 }
 
