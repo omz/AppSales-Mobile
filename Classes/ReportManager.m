@@ -183,6 +183,10 @@
 
 #define ITTS_SALES_PAGE_URL @"https://reportingitc.apple.com/sales.faces"
 
+static NSString* parseViewState(NSString *htmlPage) {
+    return [htmlPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+}
+
 // code path shared for both day and week downloads
 static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NSString *dayString, 
                            NSString *weekString, NSString *selectName, NSString **viewState)  {
@@ -204,7 +208,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     [urlRequest setHTTPBody:httpBody];
     NSData *requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
     NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-    *viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+    *viewState = parseViewState(responseString);
     
     // and finally...we're ready to download the report
     postDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -311,7 +315,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     	
     // get the form field names needed to download the report
     NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL] usedEncoding:NULL error:NULL];
-    NSString *viewState = [salesPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];   
+    NSString *viewState = parseViewState(salesPage);
     
     NSString *dailyName = [salesPage stringByMatching:@"theForm:j_id_jsp_[0-9]*_21"];
     NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_22"];
@@ -400,7 +404,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     [urlRequest setHTTPBody:httpBody];
     requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
     NSString *responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-    viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+    viewState = parseViewState(responseString);
     
     // download the reports
     NSMutableDictionary *downloadedDays = [NSMutableDictionary dictionary];    
@@ -439,7 +443,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     [urlRequest setHTTPBody:httpBody];
     requestResponseData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:nil error:NULL];
     responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-    viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+    viewState = parseViewState(responseString);
     
     NSMutableDictionary *downloadedWeeks = [NSMutableDictionary dictionary];    
     count = 1;
