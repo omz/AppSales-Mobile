@@ -333,9 +333,14 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         }
     } // else, already logged in
     
-    // load sales/trends page
-    // if already logged in, sometimes this loads a vendor selection page?  Downloding still works if we ignore this and march onward...
-    NSString *salesAction = @"/WebObjects/iTunesConnect.woa/wo/2.0.9.7.2.9.1.0.0.3";
+    NSString *salesAction = [loginPage stringByMatching:@"/WebObjects/iTunesConnect.woa/wo/[0-9]\\.0\\.9\\.7\\.2\\.9\\.1\\.0\\.0\\.[0-9]"];
+    if (salesAction.length == 0) {
+        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could parse sales/trend action" waitUntilDone:NO];
+        [pool release];
+        return;
+    }
+    
+    // load sales/trends page.
     NSError *error = nil;
     NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:salesAction]]
                                                        usedEncoding:NULL error:&error];
@@ -348,8 +353,14 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     	
     // get the form field names needed to download the report
     NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL] usedEncoding:NULL error:NULL];
-    NSString *viewState = parseViewState(salesPage);
+    if (salesPage.length == 0) {
+        NSLog(@"cannot load sales page: %@", salesPage);
+        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not load sales/trends page" waitUntilDone:NO];
+        [pool release];
+        return;
+    }
     
+    NSString *viewState = parseViewState(salesPage);    
     NSString *dailyName = [salesPage stringByMatching:@"theForm:j_id_jsp_[0-9]*_21"];
     NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_22"];
     NSString *ajaxName = [dailyName stringByReplacingOccurrencesOfString:@"_21" withString:@"_2"];
