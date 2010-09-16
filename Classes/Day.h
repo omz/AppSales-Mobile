@@ -67,8 +67,6 @@
 
 - (Country *)countryNamed:(NSString *)countryName;
 
-- (NSDate *)reportDateFromString:(NSString *)dateString;
-
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
 - (int)totalUnitsForAppWithID:(NSString *)appID;

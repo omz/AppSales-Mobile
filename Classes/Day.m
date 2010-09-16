@@ -67,6 +67,35 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	return NO; // unrecognized string
 }
 
+static NSDate* reportDateFromString(NSString *dateString) {
+    const NSUInteger stringLength = dateString.length;
+    const NSRange slashRange = [dateString rangeOfString:@"/"];
+    int year, month, day;
+	if (slashRange.location == NSNotFound && stringLength == 8) {
+        //old date format
+        year = [dateString substringWithRange:NSMakeRange(0,4)].intValue;
+        month = [dateString substringWithRange:NSMakeRange(4,2)].intValue;
+        day = [dateString substringWithRange:NSMakeRange(6,2)].intValue;
+    } else if (slashRange.location != NSNotFound && stringLength == 10) {
+        // new date format
+        year = [dateString substringWithRange:NSMakeRange(6,4)].intValue;
+        month = [dateString substringWithRange:NSMakeRange(0,2)].intValue;
+        day = [dateString substringWithRange:NSMakeRange(3,2)].intValue;
+    } else {
+        NSLog(@"unknown date format: %@", dateString);
+        return nil;
+    }
+    
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [[NSDateComponents new] autorelease];
+    [components setYear:year];
+    [components setMonth:month];
+    [components setDay:day];
+    
+    return [calendar dateFromComponents:components];
+}
+
+
 
 @implementation Day
 
@@ -182,18 +211,16 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
         }
 			
         [[AppIconManager sharedManager] downloadIconForAppID:appId];
-        if (!self.date) {
-            NSDate *fromDate = [self reportDateFromString:dateColumn];
-            NSDate *toDate = [self reportDateFromString:toDateColumn];
-            if (!fromDate) {
-                NSLog(@"Date is invalid: %@", dateColumn);
-                [self release];
-                return nil;
-            } else {
-                date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
-                if (![fromDate isEqualToDate:toDate]) {
-                    isWeek = YES;
-                }
+        NSDate *fromDate = reportDateFromString(dateColumn);
+        NSDate *toDate = reportDateFromString(toDateColumn);
+        if (!fromDate) {
+            NSLog(@"Date is invalid: %@", dateColumn);
+            [self release];
+            return nil;
+        } else {
+            date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
+            if (![fromDate isEqualToDate:toDate]) {
+                isWeek = YES;
             }
         }
         if ([countryString length] != 2) {
@@ -340,34 +367,6 @@ static BOOL parseDateString(NSString *dateString, int *year, int *month, int *da
 	}
 	return country;
 }
-
-- (NSDate *)reportDateFromString:(NSString *)dateString
-{
-	if ((([dateString rangeOfString:@"/"].location != NSNotFound) && ([dateString length] == 10))
-		|| (([dateString rangeOfString:@"/"].location == NSNotFound) && ([dateString length] == 8))) {
-		int year, month, day;
-		if ([dateString rangeOfString:@"/"].location == NSNotFound) { //old date format
-			year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
-			month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
-			day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
-		}
-		else { //new date format
-			year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
-			month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
-			day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
-		}
-		
-		NSCalendar *calendar = [NSCalendar currentCalendar];
-		NSDateComponents *components = [[NSDateComponents new] autorelease];
-		[components setYear:year];
-		[components setMonth:month];
-		[components setDay:day];
-		
-		return [calendar dateFromComponents:components];
-	}
-	return nil;
-}
-
 
 - (NSString *)description
 {
