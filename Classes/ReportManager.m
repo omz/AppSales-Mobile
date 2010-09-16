@@ -366,6 +366,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     }
     NSString *arbitraryDay = [availableDays objectAtIndex:0];
     [availableDays removeObjectsInArray:daysToSkip];
+    [availableDays sortUsingSelector:@selector(compare:)]; // download older reports first
     
     // parse weeks available
     NSMutableArray *availableWeeks = extractFormOptions(salesPage, @"theForm:weekPickerSourceSelectElement");
@@ -377,6 +378,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     }
     NSString *arbitraryWeek = [availableWeeks objectAtIndex:0];
     [availableWeeks removeObjectsInArray:weeksToSkip];
+    [availableWeeks sortUsingSelector:@selector(compare:)];
 
     
     // click though from the dashboard to the sales page
