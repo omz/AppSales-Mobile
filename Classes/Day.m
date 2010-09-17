@@ -218,7 +218,8 @@ static NSDate* reportDateFromString(NSString *dateString) {
             [self release];
             return nil;
         } else {
-            date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
+//            date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
+            date = [fromDate retain];
             if (![fromDate isEqualToDate:toDate]) {
                 isWeek = YES;
             }
