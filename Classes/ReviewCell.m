@@ -45,13 +45,16 @@
 @end
 
 
+#define CELL_COUNTRY_WIDTH 37
+#define CELL_COUNTRY_HEIGHT 84
+
 @implementation ReviewCellView
 
 - (id)initWithCell:(ReviewCell *)reviewCell
 {
 	[super initWithFrame:reviewCell.bounds];
 	self.backgroundColor = [UIColor whiteColor];
-	self.frame = CGRectMake(0,0,320,84);
+	self.frame = CGRectMake(0,0,320,CELL_COUNTRY_HEIGHT);
 	cell = reviewCell;
 	dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
@@ -69,31 +72,32 @@
 	} else {
 		[[UIColor colorWithWhite:0.95 alpha:1.0] set];
 	}
-	CGContextFillRect(c, CGRectMake(0,0,45,84));
+	CGContextFillRect(c, CGRectMake(0,0,CELL_COUNTRY_WIDTH,CELL_COUNTRY_HEIGHT));
 	
 	UIImage *flagImage = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", review.countryCode]];
-	[flagImage drawInRect:CGRectMake(6, 20, 32, 32)];
+	[flagImage drawInRect:CGRectMake(6, 30, 24, 24)];
 	
 	[[UIColor blackColor] set];
-	[[review.countryCode uppercaseString] drawInRect:CGRectMake(0, 53, 44, 9) withFont:[UIFont systemFontOfSize:9.0] lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentCenter];
+	[[review.countryCode uppercaseString] drawInRect:CGRectMake(0, 54, CELL_COUNTRY_WIDTH, 9) withFont:[UIFont systemFontOfSize:9.0]
+									   lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentCenter];
 	
 	NSMutableString *starsString = [NSMutableString string];
-	for (int i = 0; i < review.stars; i++) {
+	for (NSUInteger i = 0; i < review.stars; i++) {
 		[starsString appendString:@"★"];
 	}
 	
-	[[UIColor colorWithRed:1.000 green:0.800 blue:0.000 alpha:1.0] set];
-	[starsString drawInRect:CGRectMake(50, 0, 75, 14) withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentLeft];
+	[[UIColor colorWithRed:1.0 green:0.8 blue:0.0 alpha:1.0] set];
+	[starsString drawInRect:CGRectMake(CELL_COUNTRY_WIDTH+5, 0, 100, 14) withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentLeft];
 	
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
 	NSString *userAndDate = [NSString stringWithFormat:@"%@  –  %@", review.user, [dateFormatter stringFromDate:review.reviewDate]];
 	[userAndDate drawInRect:CGRectMake(125, 2, 188, 14) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeMiddleTruncation alignment:UITextAlignmentRight];
 		
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor blackColor]) set];
-	[review.title drawInRect:CGRectMake(50, 16, 265, 18) withFont:[UIFont boldSystemFontOfSize:15.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
+	[review.presentationTitle drawInRect:CGRectMake(CELL_COUNTRY_WIDTH+5, 17, 265, 18) withFont:[UIFont boldSystemFontOfSize:15.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
 		
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
-	[review.text drawInRect:CGRectMake(50, 36, 265, 45) withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
+	[review.presentationText drawInRect:CGRectMake(CELL_COUNTRY_WIDTH+5, 36, 265, 45) withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
 	
 }	
 

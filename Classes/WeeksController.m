@@ -39,7 +39,7 @@
 
 #define BACK_GROUND_COLOR [UIColor colorWithRed:0.92 green:1.0 blue:0.92 alpha:1.0]
 
-Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
+static Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 {
 	Country *country = [countries objectForKey:countryName];
 	if (!country) {
@@ -138,11 +138,12 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 {
 	[super init];
 	
-	[self reload];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
 	self.title = NSLocalizedString(@"Weekly Reports",nil);
 	
-	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Only sum", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(onlySum:)];
+	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Only sum", nil) 
+															   style:UIBarButtonItemStyleBordered 
+															  target:self 
+															  action:@selector(onlySum:)];
 	self.navigationItem.rightBarButtonItem = button;
 	[button release];
 	
@@ -160,12 +161,12 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 	self.daysByMonth = [NSMutableArray array];
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
-	NSArray *sortedDays = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	int lastMonth = -1;
-	int firstMonth;
+	int firstMonth = -1;
 	int numeberOfMonths = 0;
 	float max = 0;
-	for (Day *d in sortedDays) {
+	for (Day *d in sortedWeeks) {
 		float revenue = [d totalRevenueInBaseCurrency];
 		if (revenue > max)
 			max = revenue;
@@ -173,7 +174,7 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSMonthCalendarUnit fromDate:date];
 		int month = [components month];
 		if (month != lastMonth) {
-			if(lastMonth == -1)
+			if (lastMonth == -1)
 				firstMonth = month;
 			[daysByMonth addObject:[NSMutableArray array]];
 			lastMonth = month;
@@ -187,13 +188,13 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 	if(numeberOfMonths > 0){
 		NSDate *firstDayLastWeek = ((Day *)[[daysByMonth objectAtIndex:0] objectAtIndex:0]).date;
 		NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-		if([((Day *)[sortedDays objectAtIndex:0]).date timeIntervalSinceDate:firstDayLastWeek] >= 691200){//8 days
+		if(sortedDays.count > 0 && [((Day *)[sortedDays objectAtIndex:0]).date timeIntervalSinceDate:firstDayLastWeek] >= 691200){ //8 days
 			//days of the current week
 			NSMutableArray *newWeekDays = [NSMutableArray array];
 			//days of the last ended week
 			NSMutableArray *lastWeekDays = [NSMutableArray array];
 			
-			NSString *dayString;
+			NSString *dayString = nil;
 			NSString *weekEndDateString;
 			BOOL newMonth = NO;
 			
@@ -206,7 +207,7 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 						dayString = [NSString stringWithFormat:@"%i", [components day]];
 												
 						int month = [components month];
-						if (month != firstMonth)
+						if (month != firstMonth) // FIXME
 							newMonth = YES;
 						
 						NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
@@ -225,9 +226,9 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 			if([newWeekDays count] > 0 && [newWeekDays count] <= 7 
 			   && [lastWeekDays count] == 7){
 				//prevision
-				float revenueNewWeek = 0.0;
-				float revenueLastWeek = 0.0;
-				for(int i = 0; i < [newWeekDays count]; i++){
+				float revenueNewWeek = 0;
+				float revenueLastWeek = 0;
+				for(NSUInteger i = 0; i < [newWeekDays count]; i++){
 					revenueNewWeek += [[newWeekDays objectAtIndex:i] totalRevenueInBaseCurrency];
 					revenueLastWeek += [[lastWeekDays objectAtIndex:i] totalRevenueInBaseCurrency];					
 				}
@@ -245,6 +246,20 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 	
 	self.maxRevenue = max;
 	[self.tableView reloadData];
+}
+
+- (void) viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+	[self reload];	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) 
+												 name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
+}
+
+- (void) viewWillDisappear:(BOOL)animated
+{
+	[super viewWillDisappear:animated];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -383,7 +398,9 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 			for(Day *d in array){
 				for(Country *c in [d children]){
 					Country *country = newCountry(c.name, countries);
-					[country.entries addObjectsFromArray:c.entries];
+					for (Entry *e in c.entries) {
+						[country addEntry:e];
+					}
 				}
 			}
 		}	
@@ -413,7 +430,9 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 		for(Day *d in selectedMonth){
 			for(Country *c in [d children]){
 				Country *country = newCountry(c.name, countries);
-				[country.entries addObjectsFromArray:c.entries];
+				for (Entry *e in c.entries) {
+					[country addEntry:e];
+				}
 			}
 		}
 		
@@ -447,13 +466,18 @@ Country *newCountry(NSString *countryName, NSMutableDictionary *countries)
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
 	NSString *formattedDate1 = [dateFormatter stringFromDate:selectedDay.date];
-	
-	NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
-	[comp setHour:167];
-	NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:selectedDay.date options:0];
-	NSString *formattedDate2 = [dateFormatter stringFromDate:dateWeekLater];
-	
-	NSString *weekDesc = [NSString stringWithFormat:@"%@ - %@", formattedDate1, formattedDate2];
+		
+	NSString *weekDesc;
+	if ([self.title isEqualToString:NSLocalizedString(@"Total",nil)]) {
+		weekDesc = NSLocalizedString(@"Total",nil);
+	}
+	else {
+		NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
+		[comp setHour:167];
+		NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:selectedDay.date options:0];
+		NSString *formattedDate2 = [dateFormatter stringFromDate:dateWeekLater];
+		weekDesc = [NSString stringWithFormat:@"%@ - %@", formattedDate1, formattedDate2];
+	}
 		
 	countriesController.title = weekDesc;
 	countriesController.countries = children;

@@ -37,31 +37,30 @@
 
 @class Country;
 
-
-@interface Day : NSObject {
-	
+@interface Day : NSObject<NSCoding> {
 	NSDate *date;
 	NSMutableDictionary *countries;
-	
 	BOOL isWeek;
-	BOOL wasLoadedFromDisk;
-	NSString *pathOnDisk;
 	
 	BOOL isFault;
 	NSDictionary *summary;
 }
 
-@property (nonatomic, retain) NSDate *date;
-@property (nonatomic, retain) NSMutableDictionary *countries;
-@property (nonatomic, assign) BOOL isWeek;
-@property (nonatomic, assign) BOOL wasLoadedFromDisk;
-@property (nonatomic, retain) NSString *pathOnDisk;
+@property (readonly) NSDate *date;
+@property (readonly) NSMutableDictionary *countries;
+@property (readonly) BOOL isWeek;
+@property (readonly) BOOL wasLoadedFromDisk;
+@property (readonly) BOOL isFault;
+@property (readonly) NSDictionary *summary;
 
-@property (nonatomic, assign) BOOL isFault;
-@property (nonatomic, retain) NSDictionary *summary;
-
++ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
++ (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 
 - (id)initWithCSV:(NSString *)csv;
+
+// returns true if instances was serialized out to docPath
+- (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath;
+
 
 - (void)generateSummary;
 + (Day *)dayWithSummary:(NSDictionary *)reportSummary;
@@ -75,7 +74,7 @@
 - (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
 
-- (NSArray *)allProductNames;
+- (NSArray *)allProductIDs;
 
 - (NSString *)dayString;
 - (NSString *)weekdayString;
@@ -89,6 +88,6 @@
 
 - (NSArray *)children;
 
-- (NSString *)appIDForApp:(NSString *)appName;
+- (NSString *)appIDForApp:(NSString *)appName; // TODO: rename
 
 @end

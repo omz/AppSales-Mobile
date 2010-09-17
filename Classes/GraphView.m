@@ -11,16 +11,20 @@
 
 @implementation GraphView
 
-@synthesize days;
-
 - (id)initWithFrame:(CGRect)frame 
 {
     if (self = [super initWithFrame:frame]) {
 		self.days = [NSArray array];
 		self.opaque = NO;
 		self.backgroundColor = [UIColor clearColor];
+		backgroundImage = [[UIImage imageNamed:@"GraphBackground.png"] retain];
     }
     return self;
+}
+
+
+- (NSArray*) days {
+	return days;
 }
 
 - (void)setDays:(NSArray *)newDays
@@ -36,13 +40,14 @@
 
 - (void)drawRect:(CGRect)rect 
 {
-	[[UIImage imageNamed:@"GraphBackground.png"] drawAtPoint:CGPointZero];
+	[backgroundImage drawAtPoint:CGPointZero];
 }
 
 
 - (void)dealloc 
 {
 	self.days = nil;
+	[backgroundImage release];
     [super dealloc];
 }
 

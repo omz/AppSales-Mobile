@@ -38,6 +38,6 @@
 	Entry *entry;
 }
 
-@property (retain) Entry *entry;
+@property (nonatomic, retain) Entry *entry;
 
 @end

@@ -97,13 +97,19 @@
 	
 	NSDictionary *apps = [[ReportManager sharedManager] appsByID];
 	int i = 0;
+	int inAppPurchaseApps = 0;
 	for (App *app in [apps allValues]) {
-		ReviewSummaryView *summaryView = [[[ReviewSummaryView alloc] initWithFrame:CGRectMake(i * 235, 0, 224, 215) app:app] autorelease];
-		[summaryView addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
-		[scrollView addSubview:summaryView];
+		if (!app.isInAppPurchase) {
+			ReviewSummaryView *summaryView = [[[ReviewSummaryView alloc] initWithFrame:CGRectMake((i- inAppPurchaseApps) * 235, 0, 224, 215) app:app] autorelease];
+			[summaryView addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
+			[scrollView addSubview:summaryView];
+		}else {
+			inAppPurchaseApps++;
+		}
+
 		i++;
 	}
-	scrollView.contentSize = CGSizeMake(235 * [apps count], 227);
+	scrollView.contentSize = CGSizeMake(235 * ([apps count] - inAppPurchaseApps), 227);
 	
 }
 

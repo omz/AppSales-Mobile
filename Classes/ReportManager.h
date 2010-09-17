@@ -11,31 +11,21 @@
 #define ReportManagerDownloadedDailyReportsNotification				@"ReportManagerDownloadedDailyReportsNotification"
 #define ReportManagerDownloadedWeeklyReportsNotification			@"ReportManagerDownloadedWeeklyReportsNotification"
 #define ReportManagerUpdatedDownloadProgressNotification			@"ReportManagerUpdatedDownloadProgressNotification"
-#define ReportManagerDownloadedReviewsNotification					@"ReportManagerDownloadedReviewsNotification"
-#define ReportManagerUpdatedReviewDownloadProgressNotification		@"ReportManagerUpdatedReviewDownloadProgressNotification"
 
 @class Day;
 
 @interface ReportManager : NSObject {
-
 	NSMutableDictionary *days;
 	NSMutableDictionary *weeks;
+	
 	BOOL isRefreshing;
+	BOOL needsDataSavedToDisk;
 	NSString *reportDownloadStatus;
-	
-	
-	NSMutableDictionary *appsByID;
-	BOOL isDownloadingReviews;
-	NSString *reviewDownloadStatus;
-	
-	BOOL cacheChanged;
 }
 
-@property (retain) NSMutableDictionary *days;
-@property (retain) NSMutableDictionary *weeks;
-@property (retain) NSMutableDictionary *appsByID;
-@property (retain) NSString *reviewDownloadStatus;
-@property (retain) NSString *reportDownloadStatus;
+@property (readonly) NSDictionary *days;
+@property (readonly) NSDictionary *weeks;
+@property (readonly) NSString *reportDownloadStatus;
 
 + (ReportManager *)sharedManager;
 
@@ -45,21 +35,14 @@
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
 
-- (void)setProgress:(NSString *)status;
+- (void)deleteDay:(Day *)dayToDelete;
 
-- (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
 - (void)saveData;
-- (NSString *)docPath;
 - (NSString *)originalReportsPath;
 - (NSString *)reportCachePath;
-- (NSString *)appIDForAppName:(NSString *)appName;
 
 - (void)importReport:(Day *)report;
 - (void)deleteDay:(Day *)dayToDelete;
 
-- (void)downloadReviewsForTopCountriesOnly:(BOOL)topCountriesOnly;
-- (void)updateReviewDownloadProgress:(NSString *)status;
-- (BOOL)isDownloadingReviews;
-- (NSString *)reviewDownloadStatus;
 
 @end

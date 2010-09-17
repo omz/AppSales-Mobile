@@ -40,9 +40,9 @@
 	int displayMode;
 }
 
-@property (retain) NSArray *countries;
-@property (retain) NSArray *products;
-@property (assign) float totalRevenue;
-@property (assign) int displayMode;
+@property (nonatomic, retain) NSArray *countries;
+@property (nonatomic, retain) NSArray *products;
+@property (nonatomic, assign) float totalRevenue;
+@property (nonatomic, assign) int displayMode;
 
 @end

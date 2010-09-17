@@ -20,12 +20,13 @@
 
 - (id)init
 {
-	[super init];
-	self.daysByMonth = [NSMutableArray array];
-	self.maxRevenue = 0;
-	self.sectionTitleFormatter = [[[NSDateFormatter alloc] init] autorelease];
-	[sectionTitleFormatter setDateFormat:@"MMMM yyyy"];
-	
+	self = [super init];
+	if (self) {
+		daysByMonth = [NSMutableArray new];
+		sectionTitleFormatter = [NSDateFormatter new];
+		[sectionTitleFormatter setDateFormat:@"MMMM yyyy"];
+		self.maxRevenue = 0;
+	}	
 	return self;
 }
 

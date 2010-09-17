@@ -28,6 +28,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define CurrencyManagerDidUpdateNotification				@"CurrencyManagerDidUpdate"
+#define CurrencyManagerErrorNotification					@"CurrencyManagerError"
+#define CurrencyManagerDidChangeBaseCurrencyNotification	@"CurrencyManagerDidChangeBaseCurrency"
+
 @interface CurrencyManager : NSObject {
 	
 	NSString *baseCurrency;

@@ -11,7 +11,7 @@
 #import "Day.h"
 #import "Country.h"
 #import "NSDateFormatter+SharedInstances.h"
-#import "ReportManager.h"
+#import "AppManager.h"
 
 @implementation DashboardGraphView
 
@@ -154,11 +154,11 @@
 	float radius = self.bounds.size.height / 2 - 25;
 	CGPoint center = CGPointMake(radius + 10, self.bounds.size.height / 2 + 15);
 	
-	CGContextRef c = UIGraphicsGetCurrentContext();
+	CGContextRef context = UIGraphicsGetCurrentContext();
 	[[UIColor grayColor] set];
-	CGContextFillEllipseInRect(c, CGRectMake(center.x - radius - 1, center.y - radius - 1, radius * 2 + 4, radius * 2 + 4));
+	CGContextFillEllipseInRect(context, CGRectMake(center.x - radius - 1, center.y - radius - 1, radius * 2 + 4, radius * 2 + 4));
 	[[UIColor whiteColor] set];
-	CGContextFillEllipseInRect(c, CGRectMake(center.x - radius - 2, center.y - radius - 2, radius * 2 + 4, radius * 2 + 4));
+	CGContextFillEllipseInRect(context, CGRectMake(center.x - radius - 2, center.y - radius - 2, radius * 2 + 4, radius * 2 + 4));
 	
 	if (!self.reports || [self.reports count] == 0)
 		return;
@@ -212,13 +212,13 @@
 	float maxY = self.bounds.size.height;
 	
 	[caption drawInRect:CGRectMake(minX, 5, maxX - minX, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
-	CGContextBeginPath(c);
-	CGContextSetLineWidth(c, 1.0);
-	CGContextSetAllowsAntialiasing(c, NO);
-	CGContextMoveToPoint(c, minX, minY - 2);
-	CGContextAddLineToPoint(c, maxX, minY - 2);
-	CGContextDrawPath(c, kCGPathStroke);
-	CGContextSetAllowsAntialiasing(c, YES);
+	CGContextBeginPath(context);
+	CGContextSetLineWidth(context, 1.0);
+	CGContextSetAllowsAntialiasing(context, NO);
+	CGContextMoveToPoint(context, minX, minY - 2);
+	CGContextAddLineToPoint(context, maxX, minY - 2);
+	CGContextDrawPath(context, kCGPathStroke);
+	CGContextSetAllowsAntialiasing(context, YES);
 	
 	//draw pie chart:
 	NSArray *colors = [NSArray arrayWithObjects:
@@ -240,13 +240,13 @@
 		
 		float units = [[unitsByRegion objectForKey:region] floatValue];
 		float percentage = units / totalUnits;
-		CGContextBeginPath(c);
-		CGContextMoveToPoint(c, center.x, center.y);
+		CGContextBeginPath(context);
+		CGContextMoveToPoint(context, center.x, center.y);
 		float angle = lastAngle + (percentage * -M_PI * 2);
-		CGContextAddArc(c, center.x, center.y, radius, lastAngle, angle, 1);
-		CGContextAddLineToPoint(c, center.x, center.y);
-		CGContextClosePath(c);
-		CGContextDrawPath(c, kCGPathFill);
+		CGContextAddArc(context, center.x, center.y, radius, lastAngle, angle, 1);
+		CGContextAddLineToPoint(context, center.x, center.y);
+		CGContextClosePath(context);
+		CGContextDrawPath(context, kCGPathFill);
 		
 		lastAngle = angle;
 	}
@@ -269,10 +269,10 @@
 		float y = (minY + 5) + i * ((maxY - minY + 10) / [sortedRegions count]);
 		CGRect shadowFrame = CGRectMake(center.x + radius + 20 + 1, y + 1, 20, 20);
 		[[UIColor grayColor] set];
-		CGContextFillEllipseInRect(c, shadowFrame);
+		CGContextFillEllipseInRect(context, shadowFrame);
 		CGRect legendFrame = CGRectMake(center.x + radius + 20, y, 20, 20);
 		[color set];
-		CGContextFillEllipseInRect(c, legendFrame);
+		CGContextFillEllipseInRect(context, legendFrame);
 		NSString *percentString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:percentage * 100]];
 		[[UIColor whiteColor] set];
 		[region drawInRect:CGRectMake(legendFrame.origin.x, legendFrame.origin.y + 4, legendFrame.size.width, legendFrame.size.height) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
@@ -305,13 +305,13 @@
 		float revenue;
 		if (showsUnits) {
 			if (appFilter) {
-				revenue = (float)[d totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]];
+				revenue = (float)[d totalUnitsForAppWithID:[[AppManager sharedManager] appIDForAppName:appFilter]];
 			} else {
 				revenue = (float)[d totalUnits];
 			}
 		} else {
 			if (appFilter) {
-				revenue = [d totalRevenueInBaseCurrencyForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]];
+				revenue = [d totalRevenueInBaseCurrencyForAppWithID:[[AppManager sharedManager] appIDForAppName:appFilter]];
 			} else {
 				revenue = [d totalRevenueInBaseCurrency];
 			}
@@ -518,13 +518,13 @@
 	NSString *detailText = nil;
 	if (showsUnits) {
 		if (appFilter) {
-			detailText = [NSString stringWithFormat:@"%i × %@", [report totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]], appFilter];
+			detailText = [NSString stringWithFormat:@"%i × %@", [report totalUnitsForAppWithID:[[AppManager sharedManager] appIDForAppName:appFilter]], appFilter];
 		} else {
 			detailText = [NSString stringWithFormat:@"%i sales %@", [report totalUnits], [report description]];
 		}
 	} else {
 		if (appFilter) {
-			detailText = [NSString stringWithFormat:@"%@ (%i × %@)", [report totalRevenueStringForApp:appFilter], [report totalUnitsForAppWithID:[[ReportManager sharedManager] appIDForAppName:appFilter]], appFilter];
+			detailText = [NSString stringWithFormat:@"%@ (%i × %@)", [report totalRevenueStringForApp:appFilter], [report totalUnitsForAppWithID:[[AppManager sharedManager] appIDForAppName:appFilter]], appFilter];
 		} else {
 			detailText = [NSString stringWithFormat:@"%@ %@", [report totalRevenueString], [report description]];
 		}

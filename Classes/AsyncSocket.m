@@ -948,13 +948,13 @@ Failed:;
 	if(theDelegate == NULL)
 	{
 		NSString *message = @"Attempting to connect without a delegate. Set a delegate first.";
-		[NSException raise:AsyncSocketException format:message];
+		[NSException raise:AsyncSocketException format:@"%@", message];
 	}
 
 	if(theSocket != NULL || theSocket6 != NULL)
 	{
 		NSString *message = @"Attempting to connect while connected or accepting connections. Disconnect first.";
-		[NSException raise:AsyncSocketException format:message];
+		[NSException raise:AsyncSocketException format:@"%@", message];
 	}
 	
 	BOOL pass = YES;
@@ -1001,13 +1001,13 @@ Failed:;
 	if (theDelegate == NULL)
 	{
 		NSString *message = @"Attempting to connect without a delegate. Set a delegate first.";
-		[NSException raise:AsyncSocketException format:message];
+		[NSException raise:AsyncSocketException format:@"%@", message];
 	}
 	
 	if (theSocket != NULL || theSocket6 != NULL)
 	{
 		NSString *message = @"Attempting to connect while connected or accepting connections. Disconnect first.";
-		[NSException raise:AsyncSocketException format:message];
+		[NSException raise:AsyncSocketException format:@"%@", message];
 	}
 	
 	BOOL pass = YES;
@@ -2806,7 +2806,7 @@ Failed:;
 			[self doAcceptWithSocket: *((CFSocketNativeHandle *)pData)];
 			break;
 		default:
-			NSLog (@"AsyncSocket %p received unexpected CFSocketCallBackType %d.", self, type);
+			NSLog (@"AsyncSocket %p received unexpected CFSocketCallBackType %lu.", self, type);
 			break;
 	}
 }
@@ -2834,7 +2834,7 @@ Failed:;
 			[self closeWithError: [self errorFromCFStreamError:err]];
 			break;
 		default:
-			NSLog (@"AsyncSocket %p received unexpected CFReadStream callback, CFStreamEventType %d.", self, type);
+			NSLog (@"AsyncSocket %p received unexpected CFReadStream callback, CFStreamEventType %lu.", self, type);
 	}
 }
 
@@ -2861,7 +2861,7 @@ Failed:;
 			[self closeWithError: [self errorFromCFStreamError:err]];
 			break;
 		default:
-			NSLog (@"AsyncSocket %p received unexpected CFWriteStream callback, CFStreamEventType %d.", self, type);
+			NSLog (@"AsyncSocket %p received unexpected CFWriteStream callback, CFStreamEventType %lu.", self, type);
 	}
 }
 

@@ -12,7 +12,8 @@
 #import "Day.h"
 #import "ReportManager.h"
 #import "CurrencyManager.h"
-
+#import "Entry.h"
+#import "Country.h"
 
 
 @implementation StatisticsViewController
@@ -107,6 +108,7 @@
 
 - (void)viewDidLoad
 {
+	[super viewDidLoad];
 	//show last 7 days by default:
 	int fromRow = [days count] - 7;
 	if (fromRow < 0) fromRow = 0;
@@ -114,7 +116,10 @@
 	
 	[datePicker selectRow:fromRow inComponent:0 animated:NO];
 	[datePicker selectRow:toRow inComponent:1 animated:NO];
-	
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
 	[self reload];
 }
 
@@ -144,7 +149,6 @@
 		[graphModeButton setTitle:[[CurrencyManager sharedManager] baseCurrencyDescription]];
 		
 	}
-
 }
 
 - (void)reload
@@ -166,20 +170,28 @@
 	NSRange selectedRange = NSMakeRange(fromIndex, toIndex - fromIndex + 1);
 	self.selectedDays = [self.days subarrayWithRange:selectedRange];
 	
-	NSMutableSet *allApps = [NSMutableSet set];
+	// this is gross!  There should be a way to lookup an app name by it's id, and the converse
+	NSMutableDictionary *appNamesByAppId = [NSMutableDictionary dictionary];
+	NSMutableDictionary *appIdByAppName = [NSMutableDictionary dictionary];
 	for (Day *d in selectedDays) {
-		[allApps addObjectsFromArray:[d allProductNames]];
+		for (Country *c in d.countries.allValues) {
+			for (Entry *e in c.entries) { // O(N^3) for a simple lookup?  You know it baby!
+				[appNamesByAppId setObject:e.productName forKey:e.productIdentifier];
+				[appIdByAppName setObject:e.productIdentifier forKey:e.productName];
+			}
+		}
 	}
-	NSArray *allAppsSorted = [[allApps allObjects] sortedArrayUsingSelector:@selector(compare:)];
+	NSArray *allAppsSorted = [[appNamesByAppId allValues] sortedArrayUsingSelector:@selector(compare:)];
 	for (UIView *v in self.trendViewsForApps) {
 		[v removeFromSuperview];
 	}
 	[trendViewsForApps removeAllObjects];
 	float x = 640.0;
-	for (NSString *app in allAppsSorted) {
+	for (NSString *appName in allAppsSorted) {
 		TrendGraphView *trendView = [[[TrendGraphView alloc] initWithFrame:CGRectMake(x, 0, 320, 200)] autorelease];
 		trendView.days = nil;
-		trendView.app = app;
+		trendView.appName = appName;
+		trendView.appID = [appIdByAppName objectForKey:appName];
 		[trendViewsForApps addObject:trendView];
 		[self.scrollView addSubview:trendView];
 		x += 320;
@@ -269,11 +281,17 @@
 			break;
 	}
 	
-	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
+	UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"" message:@"" delegate:self 
+										   cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:nil] autorelease];
+	[alert addButtonWithTitle:NSLocalizedString(@"All Time",nil)];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 7 Days",nil)];
 	[alert addButtonWithTitle:NSLocalizedString(@"Last 30 Days",nil)];
+	int i = 2; // alertView acts screwy if too many entries are present
 	for (NSString *monthButton in months) {
 		[alert addButtonWithTitle:monthButton];
+		if (--i == 0) {
+			break; // stop adding buttons, otherwise they'll run off the dialog
+		}
 	}
 	
 	[alert show];
@@ -290,18 +308,22 @@
 		return;
 	}
 	else if (buttonIndex == 1) {
+		toIndex = [self.days count] - 1;
+		fromIndex = 0;
+	}
+	else if (buttonIndex == 2) {
 		//Last 7 days
 		toIndex = [self.days count] - 1;
 		fromIndex = [self.days count] - 7;
 		if (fromIndex < 0) fromIndex = 0;
 	}
-	else if (buttonIndex == 2) {
+	else if (buttonIndex == 3) {
 		//Last 7 days
 		toIndex = [self.days count] - 1;
 		fromIndex = [self.days count] - 30;
 		if (fromIndex < 0) fromIndex = 0;
 	}
-	else if (buttonIndex == 3) {
+	else if (buttonIndex == 4) {
 		//NSLog(@"This month");
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;
@@ -325,7 +347,7 @@
 			lastMonth = month;
 		}
 	}
-	else if (buttonIndex == 4) {
+	else if (buttonIndex == 5) {
 		//NSLog(@"Last month");
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;
@@ -354,7 +376,7 @@
 			i--;
 		}
 	}
-	else if (buttonIndex == 5) {
+	else if (buttonIndex == 6) {
 		//NSLog(@"Two months ago");
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;
@@ -383,7 +405,7 @@
 			i--;
 		}
 	}
-	else if (buttonIndex == 6) {
+	else if (buttonIndex == 7) {
 		//NSLog(@"Three months ago");
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;

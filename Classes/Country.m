@@ -36,52 +36,61 @@
 
 @synthesize name;
 @synthesize day;
-@synthesize entries;
 
 - (id)initWithName:(NSString *)countryName day:(Day *)aDay
 {
-	[super init];
-	self.day = aDay;
-	self.name = countryName;
-	self.entries = [NSMutableArray array];
+	self = [super init];
+	if (self) {
+		day = [aDay retain];
+		name = [countryName retain];
+		entries = [NSMutableArray new];
+	}
 	return self;
+}
+
+- (NSArray*) entries {
+	return entries;
 }
 
 - (NSString *)description
 {
-	NSMutableDictionary *salesByProduct = [NSMutableDictionary dictionary];
+	NSMutableDictionary *idToName = [NSMutableDictionary dictionary];
+	NSMutableDictionary *salesByID = [NSMutableDictionary dictionary];
 	for (Entry *e in self.entries) {
 		if (e.purchase) {
-			NSNumber *unitsOfProduct = [salesByProduct objectForKey:[e productName]];
-			int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
-			u += [e units];
-			[salesByProduct setObject:[NSNumber numberWithInt:u] forKey:[e productName]];
+			NSNumber *unitsOfProduct = [salesByID objectForKey:e.productIdentifier];
+			int u = (unitsOfProduct != nil) ? unitsOfProduct.intValue : 0;
+			u += e.units;
+			[salesByID setObject:[NSNumber numberWithInt:u] forKey:e.productIdentifier];
 		}
+		[idToName setObject:e.productName forKey:e.productIdentifier];
 	}
-	NSMutableString *productSummary = [NSMutableString stringWithString:@"("];
-	NSEnumerator *reverseEnum = [[salesByProduct keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
-	NSString *productName;
-	while (productName = [reverseEnum nextObject]) {
-		NSNumber *productSales = [salesByProduct objectForKey:productName];
-		[productSummary appendFormat:@"%@ × %@, ", productSales, productName];
+	NSMutableString *productSummary = [NSMutableString string];
+	NSEnumerator *reverseEnum = [[salesByID keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
+	NSString *productIdentifier;
+	while ((productIdentifier = reverseEnum.nextObject) != nil) {
+		NSNumber *productSales = [salesByID objectForKey:productIdentifier];
+		[productSummary appendFormat:@"%@ × %@, ", productSales, [idToName objectForKey:productIdentifier]];
 	}
-	if ([productSummary length] >= 2)
-		[productSummary deleteCharactersInRange:NSMakeRange([productSummary length] - 2, 2)];
-	[productSummary appendString:@")"];
 	
-	if ([productSummary isEqual:@"()"])
-		return NSLocalizedString(@"No sales",nil);
+	const NSUInteger summaryLength = [productSummary length];
+	if (summaryLength == 0) {
+		return NSLocalizedString(@"no sales",nil);	
+	} else if (summaryLength >= 2) {
+		[productSummary deleteCharactersInRange:NSMakeRange(summaryLength - 2, 2)];
+	}
 	
 	return productSummary;
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	[super init];
-	self.day = [coder decodeObjectForKey:@"day"];
-	self.name = [coder decodeObjectForKey:@"name"];
-	self.entries = [coder decodeObjectForKey:@"entries"];
-	
+	self = [super init];
+	if (self) {
+		day = [[coder decodeObjectForKey:@"day"] retain];
+		name = [[coder decodeObjectForKey:@"name"] retain];
+		entries = [[coder decodeObjectForKey:@"entries"] retain];
+	}
 	return self;
 }
 
@@ -90,6 +99,10 @@
 	[coder encodeObject:self.day forKey:@"day"];
 	[coder encodeObject:self.name forKey:@"name"];
 	[coder encodeObject:self.entries forKey:@"entries"];
+}
+
+- (void) addEntry:(Entry*)entry {
+	[entries addObject:entry];
 }
 
 - (float)totalRevenueInBaseCurrency
@@ -133,11 +146,11 @@
 	return sum;
 }
 
-- (NSArray *)allProductNames
+- (NSArray *)allProductIDs
 {
 	NSMutableSet *names = [NSMutableSet set];
 	for (Entry *e in self.entries) {
-		[names addObject:e.productName];
+		[names addObject:e.productIdentifier];
 	}
 	return [names allObjects];
 }
@@ -164,9 +177,9 @@
 
 - (void)dealloc
 {
-	self.day = nil;
-	self.entries = nil;
-	self.name = nil;
+	[day release];
+	[entries release];
+	[name release];
 	
 	[super dealloc];
 }

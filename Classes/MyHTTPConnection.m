@@ -23,7 +23,7 @@
 	//TODO: Localize the import/export html
 	NSMutableString *page = [NSMutableString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ImportTemplate" ofType:@"html"] usedEncoding:NULL error:NULL];
 	NSMutableString *reportsList = [NSMutableString string];
-	NSArray *files = [[NSFileManager defaultManager] directoryContentsAtPath:path];
+	NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:nil];
     if ([files count] == 0) {
 		[reportsList appendString:NSLocalizedString(@"<i>No reports downloaded yet</i>",nil)];
 	} else {
@@ -142,7 +142,7 @@
 		
 		int l = [separatorData length];
 
-		for (int i = 0; i < [postDataChunk length] - l; i++) {
+		for (unsigned int i = 0; i < [postDataChunk length] - l; i++) {
 			NSRange searchRange = {i, l};
 
 			if ([[postDataChunk subdataWithRange:searchRange] isEqualToData:separatorData]) {
@@ -171,7 +171,7 @@
 					NSRange fileDataRange = {dataStartIndex, [postDataChunk length] - dataStartIndex};
 					
 					[[NSFileManager defaultManager] createFileAtPath:filename contents:[postDataChunk subdataWithRange:fileDataRange] attributes:nil];
-					NSFileHandle *file = [[NSFileHandle fileHandleForUpdatingAtPath:filename] retain];
+					NSFileHandle *file = [NSFileHandle fileHandleForUpdatingAtPath:filename];
 
 					if (file) {
 						[file seekToEndOfFile];
