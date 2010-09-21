@@ -14,14 +14,11 @@
 	UIScrollView *scrollView;
 	UILabel *statusLabel;
 	UIActivityIndicatorView *activityIndicator;
-	
-	UIPopoverController *reviewsPopover;
 }
 
 @property (nonatomic, retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UILabel *statusLabel;
 @property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
-@property (nonatomic, retain) UIPopoverController *reviewsPopover;
 
 - (void)reload;
 

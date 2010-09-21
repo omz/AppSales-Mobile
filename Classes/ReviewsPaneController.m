@@ -18,7 +18,7 @@
 
 @implementation ReviewsPaneController
 
-@synthesize scrollView, statusLabel, activityIndicator, reviewsPopover;
+@synthesize scrollView, statusLabel, activityIndicator;
 
 - (void) viewDidLoad {
 	[super viewDidLoad];
@@ -121,7 +121,7 @@
 	listController.hidesBottomBarWhenPushed = YES;
 	listController.title = app.appName;
 	UINavigationController *reviewListNavigationController = [[[UINavigationController alloc] initWithRootViewController:listController] autorelease];
-	self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:reviewListNavigationController] autorelease];
+	UIPopoverController *reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:reviewListNavigationController] autorelease];
 	
 	CGRect reviewSummaryFrame = [(UIView *)sender frame];
 	CGRect fromRect = CGRectMake(reviewSummaryFrame.origin.x, reviewSummaryFrame.origin.y + 20, reviewSummaryFrame.size.width, 10);
@@ -147,7 +147,7 @@
 {
 	ReviewsController *reviewsController = [[[ReviewsController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 	UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:reviewsController] autorelease];
-	self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
+	UIPopoverController *reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
 	
 	CGRect fromRect = [(UIView *)sender frame];
 	[reviewsPopover presentPopoverFromRect:fromRect inView:[sender superview] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
@@ -158,7 +158,6 @@
 {
 	[statusLabel release];
 	[activityIndicator release];
-	[reviewsPopover release];
 	[scrollView release];
     [super dealloc];
 }
