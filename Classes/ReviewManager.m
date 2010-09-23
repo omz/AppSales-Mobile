@@ -447,11 +447,10 @@ static NSDictionary* getStoreInfoDictionary(NSString *countryCode, NSString *sto
 	condition = [[NSCondition alloc] init];
 	numThreadsActive = NUMBER_OF_FETCHING_THREADS;
 	
+	[condition lock];
 	for (int i=0; i < NUMBER_OF_FETCHING_THREADS; i++) {
 		[self performSelectorInBackground:@selector(workerThreadFetch) withObject:nil];
 	}
-	
-	[condition lock];
 	[condition wait]; // wait for workers to finish (or cancel is requested)
 	[condition unlock];
 	
