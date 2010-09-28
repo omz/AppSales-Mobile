@@ -413,7 +413,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         BOOL error = false;
         Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, daySelectName, &viewState, &error);
         if (day) {
-            [self performSelectorOnMainThread:@selector(successfullyDownloadedDay:) withObject:day waitUntilDone:NO];            
+            [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:day waitUntilDone:NO];            
         } else if (error) {
             NSString *message = [@"could not download " stringByAppendingString:dayString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
@@ -445,7 +445,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         BOOL error = false;
         Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, weekSelectName, &viewState, &error);
         if (week) {
-            [self performSelectorOnMainThread:@selector(successfullyDownloadedWeek:) withObject:week waitUntilDone:NO];   
+            [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:week waitUntilDone:NO];   
         } else if (error) {
             NSString *message = [@"could not download " stringByAppendingString:weekString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
@@ -496,22 +496,20 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 }
 
 
-- (void) successfullyDownloadedDay:(Day*)day
-{
-    [days setObject:day forKey:day.date];
-	AppManager *manager = [AppManager sharedManager];
-    for (Country *c in [day.countries allValues]) {
-        for (Entry *e in c.entries) {
-            [manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
+- (void) successfullyDownloadedReport:(Day*)report {
+    if (report.isWeek) {
+        [weeks setObject:report forKey:report.date];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];        
+    } else {
+        [days setObject:report forKey:report.date];
+        AppManager *manager = [AppManager sharedManager];
+        for (Country *c in [report.countries allValues]) {
+            for (Entry *e in c.entries) {
+                [manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
+            }
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
     }
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
-}
-
-- (void) successfullyDownloadedWeek:(Day*)week
-{
-    [weeks setObject:week forKey:week.date];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 }
 
 
