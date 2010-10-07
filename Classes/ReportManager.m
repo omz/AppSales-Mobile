@@ -354,7 +354,6 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 	
 	scanner = [NSScanner scannerWithString:salesRedirectPage];
 	NSString *viewState = parseViewState(salesRedirectPage);
-	//[scanner scanUpToString:@"script id=\"defaultVendorPage:" intoString:nil];
 	[scanner scanUpToString:@"script id=\"defaultVendorPage:" intoString:nil];
 	if (! [scanner scanString:@"script id=\"defaultVendorPage:" intoString:nil]) {
 		[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not parse sales redirect page" waitUntilDone:NO];
@@ -371,7 +370,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 									defaultVendorPage, @"defaultVendorPage",
 									[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],
 									nil];
-    NSString *reportResponse = getPostRequestAsString(ITTS_VENDOR_DEFAULT_URL, reportPostData);
+    getPostRequestAsData(ITTS_VENDOR_DEFAULT_URL, reportPostData, nil);
 	
     // get the form field names needed to download the report
     NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL] usedEncoding:NULL error:NULL];
