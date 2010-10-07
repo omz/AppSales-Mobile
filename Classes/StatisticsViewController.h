@@ -12,7 +12,6 @@
 @class RegionsGraphView;
 
 @interface StatisticsViewController : UIViewController <UIPickerViewDelegate, UIPickerViewDataSource, UIAlertViewDelegate, UIScrollViewDelegate> {
-
 	UIScrollView *scrollView;
 	TrendGraphView *allAppsTrendView;
 	RegionsGraphView *regionsGraphView;
@@ -20,7 +19,6 @@
 	NSArray *selectedDays;
 	UIPickerView *datePicker;
 	NSArray *days;
-	NSDateFormatter *dateFormatter;
 }
 
 @property (retain) NSArray *days;
@@ -30,7 +28,6 @@
 @property (retain) NSMutableArray *trendViewsForApps;
 @property (retain) UIScrollView *scrollView;
 @property (retain) UIPickerView *datePicker;
-@property (retain) NSDateFormatter *dateFormatter;
 
 - (void)reload;
 

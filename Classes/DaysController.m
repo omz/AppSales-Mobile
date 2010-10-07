@@ -35,6 +35,7 @@
 #import "RootViewController.h"
 #import "CurrencyManager.h"
 #import "ReportManager.h"
+#import "NSDateFormatter+SharedInstances.h"
 
 @implementation DaysController
 
@@ -53,10 +54,12 @@
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 	int lastMonth = -1;
+    
+    NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 
 	for (Day *d in sortedDays) {
 		NSDate *date = d.date;
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSMonthCalendarUnit fromDate:date];
+		NSDateComponents *components = [calendar components:NSMonthCalendarUnit fromDate:date];
 		int month = [components month];
 		if (month != lastMonth) {
 			[daysByMonth addObject:[NSMutableArray array]];
@@ -134,9 +137,7 @@
 	CountriesController *countriesController = [[[CountriesController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 	countriesController.totalRevenue = total;
 	
-	NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-	[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+	NSDateFormatter *dateFormatter = [NSDateFormatter sharedMediumDateFormatter];
 	NSString *formattedDate = [dateFormatter stringFromDate:selectedDay.date];
 	countriesController.title = formattedDate;
 	

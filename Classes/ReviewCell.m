@@ -8,6 +8,8 @@
 
 #import "ReviewCell.h"
 #import "Review.h"
+#import "Day.h"
+#import "NSDateFormatter+SharedInstances.h"
 
 @implementation ReviewCell
 
@@ -56,9 +58,6 @@
 	self.backgroundColor = [UIColor whiteColor];
 	self.frame = CGRectMake(0,0,320,CELL_COUNTRY_HEIGHT);
 	cell = reviewCell;
-	dateFormatter = [[NSDateFormatter alloc] init];
-	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
 	
 	return self;
 }
@@ -90,7 +89,7 @@
 	[starsString drawInRect:CGRectMake(CELL_COUNTRY_WIDTH+5, 0, 100, 14) withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentLeft];
 	
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor darkGrayColor]) set];
-	NSString *userAndDate = [NSString stringWithFormat:@"%@  –  %@", review.user, [dateFormatter stringFromDate:review.reviewDate]];
+	NSString *userAndDate = [NSString stringWithFormat:@"%@  –  %@", review.user, [[NSDateFormatter sharedShortDateFormatter] stringFromDate:review.reviewDate]];
 	[userAndDate drawInRect:CGRectMake(125, 2, 188, 14) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeMiddleTruncation alignment:UITextAlignmentRight];
 		
 	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor blackColor]) set];
@@ -100,11 +99,5 @@
 	[review.presentationText drawInRect:CGRectMake(CELL_COUNTRY_WIDTH+5, 36, 265, 45) withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeTailTruncation alignment:UITextAlignmentLeft];
 	
 }	
-
-- (void)dealloc
-{
-	[dateFormatter release];
-	[super dealloc];
-}
 
 @end

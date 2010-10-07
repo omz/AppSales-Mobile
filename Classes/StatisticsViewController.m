@@ -13,12 +13,13 @@
 #import "ReportManager.h"
 #import "Entry.h"
 #import "Country.h"
+#import "NSDateFormatter+SharedInstances.h"
 
 #define GRAPH_MODE_ALERT_TAG	123
 
 @implementation StatisticsViewController
 
-@synthesize allAppsTrendView, regionsGraphView, trendViewsForApps, scrollView, datePicker, days, selectedDays, dateFormatter;
+@synthesize allAppsTrendView, regionsGraphView, trendViewsForApps, scrollView, datePicker, days, selectedDays;
 
 - (void)loadView 
 {
@@ -27,10 +28,6 @@
 	self.navigationItem.title = NSLocalizedString(@"Graphs",nil);
 	
 	self.trendViewsForApps = [NSMutableArray array];
-	
-	self.dateFormatter = [[NSDateFormatter new] autorelease];
-	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
 	
 	UIImageView *scrollBackground = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 200)] autorelease];
 	scrollBackground.image = [UIImage imageNamed:@"GraphScrollBackground.png"];
@@ -219,14 +216,12 @@
 	if ([self.days count] == 0)
 		return;
 	
-	NSEnumerator *backEnum = [self.days reverseObjectEnumerator];
-	Day *d = nil;
 	int lastMonth = -1;
 	NSMutableArray *months = [NSMutableArray array];
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-	NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSCalendar *gregorian = [NSCalendar currentCalendar];
+	NSDateFormatter *monthFormatter = [[NSDateFormatter new] autorelease];
 	[monthFormatter setDateFormat:@"MMMM yyyy"];
-	while (d = [backEnum nextObject]) {
+	for (Day *d in [self.days reverseObjectEnumerator]) {
 		NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 		int month = [comps month];
 		if (month != lastMonth) {
@@ -298,12 +293,10 @@
 		//NSLog(@"This month");
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;
-		NSEnumerator *backEnum = [self.days reverseObjectEnumerator];
-		Day *d = nil;
 		int lastMonth = -1;
 		int months = 0;
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
+        for (Day *d in [self.days reverseObjectEnumerator]) {
 			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 			int month = [comps month];
 			if (month != lastMonth) {
@@ -323,12 +316,10 @@
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;
 		int i = toIndex;
-		NSEnumerator *backEnum = [self.days reverseObjectEnumerator];
-		Day *d = nil;
 		int lastMonth = -1;
 		int months = 0;
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
+        for (Day *d in [self.days reverseObjectEnumerator]) {
 			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 			int month = [comps month];
 			if (month != lastMonth) {
@@ -352,12 +343,10 @@
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;
 		int i = toIndex;
-		NSEnumerator *backEnum = [self.days reverseObjectEnumerator];
-		Day *d = nil;
 		int lastMonth = -1;
 		int months = 0;
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
+        for (Day *d in [self.days reverseObjectEnumerator]) {
 			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 			int month = [comps month];
 			if (month != lastMonth) {
@@ -381,12 +370,10 @@
 		fromIndex = [self.days count] - 1;
 		toIndex = fromIndex;
 		int i = toIndex;
-		NSEnumerator *backEnum = [self.days reverseObjectEnumerator];
-		Day *d = nil;
 		int lastMonth = -1;
 		int months = 0;
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		while (d = [backEnum nextObject]) {
+        for (Day *d in [self.days reverseObjectEnumerator]) {
 			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 			int month = [comps month];
 			if (month != lastMonth) {
@@ -418,7 +405,7 @@
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
 {
-	return [dateFormatter stringFromDate:[[days objectAtIndex:row] date]];
+	return [[NSDateFormatter sharedShortDateFormatter] stringFromDate:[[days objectAtIndex:row] date]];
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
@@ -435,7 +422,6 @@
 {
 	self.days = nil;
 	self.datePicker = nil;
-	self.dateFormatter = nil;
 	self.trendViewsForApps = nil;
 	self.regionsGraphView = nil;
 	

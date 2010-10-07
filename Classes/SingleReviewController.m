@@ -8,6 +8,8 @@
 
 #import "SingleReviewController.h"
 #import "Review.h"
+#import "Day.h"
+#import "NSDateFormatter+SharedInstances.h"
 #import "NSString+UnescapeHtml.h"
 
 @implementation SingleReviewController
@@ -34,9 +36,7 @@
 	NSString *template = [[[NSString alloc] initWithContentsOfFile:templatePath usedEncoding:NULL error:NULL] autorelease];
 	
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:[review.presentationTitle encodeIntoBasicHtml]];
-	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+	NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
 	NSString *dateString = [dateFormatter stringFromDate:review.reviewDate];
 	NSMutableString *starsString = [NSMutableString string];
 	for (NSUInteger i=0; i<review.stars; i++) {
