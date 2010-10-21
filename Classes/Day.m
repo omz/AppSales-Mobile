@@ -37,6 +37,7 @@
 #import "ReportManager.h"
 #import "AppManager.h"
 #import "NSData+Compression.h"
+#import "NSDateFormatter+SharedInstances.h"
 
 static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
@@ -513,9 +514,7 @@ static NSDate* reportDateFromString(NSString *dateString) {
 	NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
 	[comp setHour:167];
 	NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:self.date options:0];
-	NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
+	NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
 	return [dateFormatter stringFromDate:dateWeekLater];
 }
 
