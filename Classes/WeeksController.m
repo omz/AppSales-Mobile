@@ -37,6 +37,7 @@
 #import "CurrencyManager.h"
 #import "ReportManager.h"
 #import "Country.h"
+#import "NSDateFormatter+SharedInstances.h"
 
 #define BACK_GROUND_COLOR [UIColor colorWithRed:0.92 green:1.0 blue:0.92 alpha:1.0]
 
@@ -208,9 +209,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 			NSString *weekEndDateString;
 			BOOL newMonth = NO;
             
-            NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-            [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-            [dateFormatter setDateStyle:NSDateFormatterShortStyle];
+            NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
 			
 			for(Day *d in sortedDays){
 				NSTimeInterval diff = [d.date timeIntervalSinceDate:firstDayLastWeek];
@@ -395,7 +394,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
     int section = [indexPath section];
 	int row = [indexPath row];
     
-    NSString *totalRevenueKey = @"@totalRevenueInBaseCurrency";
+    NSString *totalRevenueKey = @"totalRevenueInBaseCurrency";
     NSString *sumTotalRevenueKey = @"@sum.totalRevenueInBaseCurrency";
     
 	NSInteger count = [self.daysByMonth count];
@@ -470,9 +469,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	CountriesController *countriesController = [[[CountriesController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 	countriesController.totalRevenue = total;
 	
-	NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+	NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
 	NSString *formattedDate1 = [dateFormatter stringFromDate:selectedDay.date];
     
 	NSString *weekDesc;
