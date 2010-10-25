@@ -89,14 +89,12 @@
 		[sheet addButtonWithTitle:NSLocalizedString(@"All time",nil)];
 		[sheet showFromRect:[sender frame] inView:self.view animated:YES];
 	}else{
-		NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-		Day *d = nil;
 		int lastMonth = -1;
 		NSMutableArray *months = [NSMutableArray array];
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 		NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
 		[monthFormatter setDateFormat:@"MMMM yyyy"];
-		while (d = [backEnum nextObject]) {
+		for (Day *d in self.reports.reverseObjectEnumerator) {
 			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 			int month = [comps month];
 			if (month != lastMonth) {
@@ -153,11 +151,9 @@
 			//NSLog(@"Last year");
 			fromIndex = [self.reports count] - 1;
 			toIndex = fromIndex;
-			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-			Day *d = nil;
 			int lastYear = -1;
 			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			while (d = [backEnum nextObject]) {
+			for (Day *d in self.reports.reverseObjectEnumerator) {
 				NSDateComponents *comps = [gregorian components:NSYearCalendarUnit fromDate:d.date];
 				int y = [comps year];
 				if(lastYear == -1)
@@ -178,12 +174,10 @@
 			//NSLog(@"This month");
 			fromIndex = [self.reports count] - 1;
 			toIndex = fromIndex;
-			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-			Day *d = nil;
 			int lastMonth = -1;
 			int months = 0;
 			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			while (d = [backEnum nextObject]) {
+			for (Day *d in self.reports.reverseObjectEnumerator) {
 				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 				int month = [comps month];
 				if (month != lastMonth) {
@@ -203,12 +197,10 @@
 			fromIndex = [self.reports count] - 1;
 			toIndex = fromIndex;
 			int i = toIndex;
-			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-			Day *d = nil;
 			int lastMonth = -1;
 			int months = 0;
 			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			while (d = [backEnum nextObject]) {
+			for (Day *d in self.reports.reverseObjectEnumerator) {
 				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 				int month = [comps month];
 				if (month != lastMonth) {
@@ -232,12 +224,10 @@
 			fromIndex = [self.reports count] - 1;
 			toIndex = fromIndex;
 			int i = toIndex;
-			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-			Day *d = nil;
 			int lastMonth = -1;
 			int months = 0;
 			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			while (d = [backEnum nextObject]) {
+			for (Day *d in self.reports.reverseObjectEnumerator) {
 				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 				int month = [comps month];
 				if (month != lastMonth) {
@@ -261,12 +251,10 @@
 			fromIndex = [self.reports count] - 1;
 			toIndex = fromIndex;
 			int i = toIndex;
-			NSEnumerator *backEnum = [self.reports reverseObjectEnumerator];
-			Day *d = nil;
 			int lastMonth = -1;
 			int months = 0;
 			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			while (d = [backEnum nextObject]) {
+			for (Day *d in self.reports.reverseObjectEnumerator) {
 				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
 				int month = [comps month];
 				if (month != lastMonth) {
