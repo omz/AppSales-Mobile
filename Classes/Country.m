@@ -67,8 +67,7 @@
 	}
 	NSMutableString *productSummary = [NSMutableString string];
 	NSEnumerator *reverseEnum = [[salesByID keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
-	NSString *productIdentifier;
-	while ((productIdentifier = reverseEnum.nextObject) != nil) {
+    for (NSString *productIdentifier in reverseEnum) {
 		NSNumber *productSales = [salesByID objectForKey:productIdentifier];
 		[productSummary appendFormat:@"%@ × %@, ", productSales, [idToName objectForKey:productIdentifier]];
 	}
