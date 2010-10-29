@@ -70,10 +70,14 @@
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
 	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	if ([sortedDays count] < 1) {
+		return;
+	}
 	
 	//insert the weeks older than the oldest daily report
 	NSMutableArray *allDays = [[sortedDays mutableCopy] autorelease];
 	Day *oldestDayReport = [sortedDays objectAtIndex:0];
+	
 	// we don't want to calculate this each time in the following loop
 	NSTimeInterval oldestDayReportInterval = [oldestDayReport.date timeIntervalSince1970];	
 	NSSortDescriptor *weekSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
