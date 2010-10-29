@@ -1088,10 +1088,7 @@ static NSMutableArray *recentNonces;
 	{
 		NSDictionary *responseHeaders = [httpResponse httpHeaders];
 		
-		NSEnumerator *keyEnumerator = [responseHeaders keyEnumerator];
-		NSString *key;
-		
-		while(key = [keyEnumerator nextObject])
+		for (NSString *key in [responseHeaders keyEnumerator])
 		{
 			NSString *value = [responseHeaders objectForKey:key];
 			
@@ -1140,10 +1137,7 @@ static NSMutableArray *recentNonces;
 	{
 		NSDictionary *responseHeaders = [httpResponse httpHeaders];
 		
-		NSEnumerator *keyEnumerator = [responseHeaders keyEnumerator];
-		NSString *key;
-		
-		while(key = [keyEnumerator nextObject])
+		for (NSString *key in [responseHeaders keyEnumerator])
 		{
 			NSString *value = [responseHeaders objectForKey:key];
 			

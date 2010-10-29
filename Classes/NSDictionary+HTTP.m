@@ -17,10 +17,9 @@
 {
 	NSMutableString *s = [NSMutableString stringWithCapacity:256];
 	NSEnumerator *e = (nil == inOrdering) ? [self keyEnumerator] : [inOrdering objectEnumerator];
-	id key;
 	CFStringEncoding cfStrEnc = CFStringConvertNSStringEncodingToEncoding(inEncoding);
 	
-	while ((key = [e nextObject]))
+    for (id key in e)
 	{
         id keyObject = [self objectForKey: key];
 		// conform with rfc 1738 3.3, also escape URL-like characters that might be in the parameters
@@ -29,10 +28,7 @@
 															   NULL, (CFStringRef) key, NULL, (CFStringRef) @";:@&=/+", cfStrEnc);
         if ([keyObject respondsToSelector: @selector(objectEnumerator)])
         {
-            NSEnumerator	*multipleValueEnum = [keyObject objectEnumerator];
-            id				aValue;
-			
-            while ((aValue = [multipleValueEnum nextObject]))
+            for (id	aValue in [keyObject objectEnumerator])
             {
                 NSString *escapedObject
                 = (NSString *) CFURLCreateStringByAddingPercentEscapes(
