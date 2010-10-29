@@ -405,8 +405,7 @@ static NSDate* reportDateFromString(NSString *dateString) {
 	NSMutableString *productSummary = [NSMutableString stringWithString:@"("];
 	
 	NSEnumerator *reverseEnum = [[salesByProduct keysSortedByValueUsingSelector:@selector(compare:)] reverseObjectEnumerator];
-	NSString *productName;
-	while ((productName = reverseEnum.nextObject) != nil) {
+    for (NSString *productName in reverseEnum) {
 		NSNumber *productSales = [salesByProduct objectForKey:productName];
 		[productSummary appendFormat:@"%@ × %@, ", productSales, productName];
 	}
