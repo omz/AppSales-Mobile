@@ -333,17 +333,11 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
             return;
         }
     } // else, already logged in
-    
-    NSString *salesAction = [loginPage stringByMatching:@"/WebObjects/iTunesConnect.woa/wo/[0-9]\\.0\\.9\\.7\\.2\\.9\\.1\\.0\\.0\\.[0-9]"];
-    if (salesAction.length == 0) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could parse sales/trend action" waitUntilDone:NO];
-        [pool release];
-        return;
-    }
-    
+	
     // load sales/trends page.
     NSError *error = nil;
-    NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:salesAction]]
+	NSString *salesAction = @"https://reportingitc.apple.com";
+    NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:salesAction]
                                                        usedEncoding:NULL error:&error];
     if (error) {
         NSLog(@"unexpected error: %@", salesRedirectPage);
