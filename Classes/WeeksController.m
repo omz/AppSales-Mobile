@@ -206,7 +206,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 			NSMutableArray *lastWeekDays = [NSMutableArray array];
 			
 			NSString *dayString = nil;
-			NSString *weekEndDateString;
+			NSString *weekEndDateString = nil;
 			BOOL newMonth = NO;
             
             NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
