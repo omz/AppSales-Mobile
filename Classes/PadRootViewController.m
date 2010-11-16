@@ -65,7 +65,7 @@
 	[self.view addSubview:toolbar];
 	
 	dailyDashboardView = [DashboardViewController new];
-	dailyDashboardView.view.frame = CGRectMake(0, 47, 748, 320);
+	dailyDashboardView.view.frame = CGRectMake(0, 47, 768, 320);
 	dailyDashboardView.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	//[dailyDashboardView resetDatePicker];
 	
@@ -78,7 +78,7 @@
 	[self.view addSubview:dailyDashboardView.view];
 	
 	weeklyDashboardView = [DashboardViewController new];
-	weeklyDashboardView.view.frame = CGRectMake(0, 365, 748, 320);
+	weeklyDashboardView.view.frame = CGRectMake(0, 365, 768, 320);
 	weeklyDashboardView.view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	weeklyDashboardView.showsWeeklyReports = YES;
 	//[weeklyDashboardView resetDatePicker];
