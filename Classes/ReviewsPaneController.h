@@ -10,18 +10,15 @@
 
 
 @interface ReviewsPaneController : UIViewController {
-
 	UIScrollView *scrollView;
 	UILabel *statusLabel;
 	UIActivityIndicatorView *activityIndicator;
-	
-	UIPopoverController *reviewsPopover;
+    UIPopoverController *currentPopover; // required to keep popover from autoreleasing
 }
 
 @property (nonatomic, retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UILabel *statusLabel;
 @property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
-@property (nonatomic, retain) UIPopoverController *reviewsPopover;
 
 - (void)reload;
 

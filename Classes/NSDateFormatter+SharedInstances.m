@@ -8,14 +8,14 @@
 
 #import "NSDateFormatter+SharedInstances.h"
 
-
 @implementation NSDateFormatter (SharedInstances)
 
 + (NSDateFormatter *)sharedFullDateFormatter
 {
+    NSAssert([NSThread isMainThread], nil);
 	static NSDateFormatter *sharedDateFormatter = nil;
 	if (!sharedDateFormatter) {
-		sharedDateFormatter = [[NSDateFormatter alloc] init];
+		sharedDateFormatter = [NSDateFormatter new];
 		[sharedDateFormatter setTimeStyle:NSDateFormatterNoStyle];
 		[sharedDateFormatter setDateStyle:NSDateFormatterFullStyle];
 	}
@@ -24,20 +24,35 @@
 
 + (NSDateFormatter *)sharedLongDateFormatter
 {
+    NSAssert([NSThread isMainThread], nil);
 	static NSDateFormatter *sharedDateFormatter = nil;
 	if (!sharedDateFormatter) {
-		sharedDateFormatter = [[NSDateFormatter alloc] init];
+		sharedDateFormatter = [NSDateFormatter new];
 		[sharedDateFormatter setTimeStyle:NSDateFormatterNoStyle];
 		[sharedDateFormatter setDateStyle:NSDateFormatterLongStyle];
 	}
 	return sharedDateFormatter;
 }
 
-+ (NSDateFormatter *)sharedShortDateFormatter
++ (NSDateFormatter *)sharedMediumDateFormatter
 {
+    NSAssert([NSThread isMainThread], nil);
 	static NSDateFormatter *sharedDateFormatter = nil;
 	if (!sharedDateFormatter) {
-		sharedDateFormatter = [[NSDateFormatter alloc] init];
+		sharedDateFormatter = [NSDateFormatter new];
+        [sharedDateFormatter setTimeStyle:NSDateFormatterNoStyle];
+        [sharedDateFormatter setDateStyle:NSDateFormatterMediumStyle];
+	}
+	return sharedDateFormatter;
+}
+
+
++ (NSDateFormatter *)sharedShortDateFormatter
+{
+    NSAssert([NSThread isMainThread], nil);
+	static NSDateFormatter *sharedDateFormatter = nil;
+	if (!sharedDateFormatter) {
+		sharedDateFormatter = [NSDateFormatter new];
 		[sharedDateFormatter setTimeStyle:NSDateFormatterNoStyle];
 		[sharedDateFormatter setDateStyle:NSDateFormatterShortStyle];
 	}

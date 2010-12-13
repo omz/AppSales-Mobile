@@ -13,6 +13,7 @@
 
 + (NSDateFormatter *)sharedFullDateFormatter;
 + (NSDateFormatter *)sharedLongDateFormatter;
++ (NSDateFormatter *)sharedMediumDateFormatter;
 + (NSDateFormatter *)sharedShortDateFormatter;
 
 @end

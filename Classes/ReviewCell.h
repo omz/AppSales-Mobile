@@ -11,7 +11,6 @@
 @class Review, ReviewCellView;
 
 @interface ReviewCell : UITableViewCell {
-
 	ReviewCellView *cellView;
 	Review *review;
 }
@@ -23,9 +22,7 @@
 
 
 @interface ReviewCellView : UIView {
-
 	ReviewCell *cell;
-	NSDateFormatter *dateFormatter;
 }
 
 - (id)initWithCell:(ReviewCell *)reviewCell;

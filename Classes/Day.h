@@ -42,6 +42,7 @@
 	NSMutableDictionary *countries;
 	BOOL isWeek;
 	
+	BOOL wasLoadedFromDisk;
 	BOOL isFault;
 	NSDictionary *summary;
 }

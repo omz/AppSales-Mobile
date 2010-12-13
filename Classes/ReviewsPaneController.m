@@ -18,7 +18,7 @@
 
 @implementation ReviewsPaneController
 
-@synthesize scrollView, statusLabel, activityIndicator, reviewsPopover;
+@synthesize scrollView, statusLabel, activityIndicator;
 
 - (void) viewDidLoad {
 	[super viewDidLoad];
@@ -121,11 +121,15 @@
 	listController.hidesBottomBarWhenPushed = YES;
 	listController.title = app.appName;
 	UINavigationController *reviewListNavigationController = [[[UINavigationController alloc] initWithRootViewController:listController] autorelease];
-	self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:reviewListNavigationController] autorelease];
+    // popover will be retained until next call to show reviews (even after dismissed)
+    // could add a delegate to release it upon being dismissed
+    [currentPopover release];
+	currentPopover = [[UIPopoverController alloc] initWithContentViewController:reviewListNavigationController];
 	
 	CGRect reviewSummaryFrame = [(UIView *)sender frame];
 	CGRect fromRect = CGRectMake(reviewSummaryFrame.origin.x, reviewSummaryFrame.origin.y + 20, reviewSummaryFrame.size.width, 10);
-	[reviewsPopover presentPopoverFromRect:fromRect inView:[sender superview] permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
+    
+	[currentPopover presentPopoverFromRect:fromRect inView:[sender superview] permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
 }
 
 
@@ -147,10 +151,11 @@
 {
 	ReviewsController *reviewsController = [[[ReviewsController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 	UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:reviewsController] autorelease];
-	self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
+    [currentPopover release];
+	currentPopover = [[UIPopoverController alloc] initWithContentViewController:nav];
 	
 	CGRect fromRect = [(UIView *)sender frame];
-	[reviewsPopover presentPopoverFromRect:fromRect inView:[sender superview] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	[currentPopover presentPopoverFromRect:fromRect inView:[sender superview] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
 
@@ -158,8 +163,8 @@
 {
 	[statusLabel release];
 	[activityIndicator release];
-	[reviewsPopover release];
 	[scrollView release];
+    [currentPopover release];
     [super dealloc];
 }
 

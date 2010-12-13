@@ -12,7 +12,6 @@
 @class RegionsGraphView;
 
 @interface StatisticsViewController : UIViewController <UIPickerViewDelegate, UIPickerViewDataSource, UIAlertViewDelegate, UIScrollViewDelegate> {
-
 	UIScrollView *scrollView;
 	UIPageControl *pageControl;
 	TrendGraphView *allAppsTrendView;
@@ -36,7 +35,6 @@
 @property (retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UIPageControl *pageControl;
 @property (retain) UIPickerView *datePicker;
-@property (retain) NSDateFormatter *dateFormatter;
 
 - (void)reload;
 - (void)updateGraphModeButton;

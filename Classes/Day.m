@@ -37,6 +37,7 @@
 #import "ReportManager.h"
 #import "AppManager.h"
 #import "NSData+Compression.h"
+#import "NSDateFormatter+SharedInstances.h"
 
 static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
@@ -181,17 +182,17 @@ static NSDate* reportDateFromString(NSString *dateString) {
         NSString *royaltyCurrency;
 
 		if (numColumns > 19) {
-            // old format
+            // old format	
             productName = [columns objectAtIndex:6];
             transactionType = [columns objectAtIndex:8];
             units = [columns objectAtIndex:9];
             royalties = [columns objectAtIndex:10];
-            dateColumn = [columns objectAtIndex:11];
-            toDateColumn = [columns objectAtIndex:12];
+            dateColumn = [[columns objectAtIndex:11] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            toDateColumn = [[columns objectAtIndex:12] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             countryString = [columns objectAtIndex:14];
             royaltyCurrency = [columns objectAtIndex:15];
-            appId = [columns objectAtIndex:19];
-            parentID = (([columns count] >= 26) ? [columns objectAtIndex:26] : nil);
+            appId = [columns objectAtIndex:18];
+            parentID = (([columns count] >= 27) ? [columns objectAtIndex:26] : nil);
         } else if (numColumns == 18) {
             // Sept 2010 format
             productName = [columns objectAtIndex:4];
@@ -513,9 +514,7 @@ static NSDate* reportDateFromString(NSString *dateString) {
 	NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
 	[comp setHour:167];
 	NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:self.date options:0];
-	NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
+	NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
 	return [dateFormatter stringFromDate:dateWeekLater];
 }
 

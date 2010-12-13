@@ -121,8 +121,9 @@
 	} else {
 		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %@",nil), [revenues count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
 	}
-	[subtitle drawInRect:CGRectMake(10, maxY + 5, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
-
+	CGRect subtitleRect = CGRectMake(10, maxY + 5, 300, 20);
+	[[UIColor darkGrayColor] set];
+	[subtitle drawInRect:subtitleRect withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 	
 	//draw weekend background:
 	if ([revenues count] <= 62) {

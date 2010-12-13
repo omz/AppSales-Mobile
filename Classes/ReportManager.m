@@ -333,17 +333,11 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
             return;
         }
     } // else, already logged in
-    
-    NSString *salesAction = [loginPage stringByMatching:@"/WebObjects/iTunesConnect.woa/wo/[0-9]\\.0\\.9\\.7\\.2\\.9\\.1\\.0\\.0\\.[0-9]"];
-    if (salesAction.length == 0) {
-        [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could parse sales/trend action" waitUntilDone:NO];
-        [pool release];
-        return;
-    }
-    
+	
     // load sales/trends page.
     NSError *error = nil;
-    NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:salesAction]]
+	NSString *salesAction = @"https://reportingitc.apple.com";
+    NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:salesAction]
                                                        usedEncoding:NULL error:&error];
     if (error) {
         NSLog(@"unexpected error: %@", salesRedirectPage);
@@ -354,7 +348,6 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 	
 	scanner = [NSScanner scannerWithString:salesRedirectPage];
 	NSString *viewState = parseViewState(salesRedirectPage);
-	//[scanner scanUpToString:@"script id=\"defaultVendorPage:" intoString:nil];
 	[scanner scanUpToString:@"script id=\"defaultVendorPage:" intoString:nil];
 	if (! [scanner scanString:@"script id=\"defaultVendorPage:" intoString:nil]) {
 		[self performSelectorOnMainThread:@selector(downloadFailed:) withObject:@"could not parse sales redirect page" waitUntilDone:NO];
@@ -371,7 +364,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 									defaultVendorPage, @"defaultVendorPage",
 									[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],
 									nil];
-    NSString *reportResponse = getPostRequestAsString(ITTS_VENDOR_DEFAULT_URL, reportPostData);
+    getPostRequestAsData(ITTS_VENDOR_DEFAULT_URL, reportPostData, nil);
 	
     // get the form field names needed to download the report
     NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:ITTS_SALES_PAGE_URL] usedEncoding:NULL error:NULL];
@@ -436,7 +429,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         BOOL error = false;
         Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, daySelectName, &viewState, &error);
         if (day) {
-            [self performSelectorOnMainThread:@selector(successfullyDownloadedDay:) withObject:day waitUntilDone:NO];            
+            [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:day waitUntilDone:NO];            
         } else if (error) {
             NSString *message = [@"could not download " stringByAppendingString:dayString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
@@ -468,7 +461,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         BOOL error = false;
         Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, weekSelectName, &viewState, &error);
         if (week) {
-            [self performSelectorOnMainThread:@selector(successfullyDownloadedWeek:) withObject:week waitUntilDone:NO];   
+            [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:week waitUntilDone:NO];   
         } else if (error) {
             NSString *message = [@"could not download " stringByAppendingString:weekString];
             [self performSelectorOnMainThread:@selector(downloadFailed:) withObject:message waitUntilDone:NO];
@@ -519,22 +512,20 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 }
 
 
-- (void) successfullyDownloadedDay:(Day*)day
-{
-    [days setObject:day forKey:day.date];
-	AppManager *manager = [AppManager sharedManager];
-    for (Country *c in [day.countries allValues]) {
-        for (Entry *e in c.entries) {
-            [manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
+- (void) successfullyDownloadedReport:(Day*)report {
+    if (report.isWeek) {
+        [weeks setObject:report forKey:report.date];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];        
+    } else {
+        [days setObject:report forKey:report.date];
+        AppManager *manager = [AppManager sharedManager];
+        for (Country *c in [report.countries allValues]) {
+            for (Entry *e in c.entries) {
+                [manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
+            }
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
     }
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedDailyReportsNotification object:self];
-}
-
-- (void) successfullyDownloadedWeek:(Day*)week
-{
-    [weeks setObject:week forKey:week.date];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];
 }
 
 

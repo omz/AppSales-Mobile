@@ -35,8 +35,6 @@
 - (BOOL)isDownloadingReports;
 - (void)downloadReports;
 
-- (void)deleteDay:(Day *)dayToDelete;
-
 - (void)saveData;
 - (NSString *)originalReportsPath;
 - (NSString *)reportCachePath;

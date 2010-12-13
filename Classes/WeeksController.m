@@ -28,6 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #import "WeeksController.h"
 #import "Day.h"
 #import "WeekCell.h"
@@ -36,6 +37,7 @@
 #import "CurrencyManager.h"
 #import "ReportManager.h"
 #import "Country.h"
+#import "NSDateFormatter+SharedInstances.h"
 
 #define BACK_GROUND_COLOR [UIColor colorWithRed:0.92 green:1.0 blue:0.92 alpha:1.0]
 
@@ -43,26 +45,27 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 {
 	Country *country = [countries objectForKey:countryName];
 	if (!country) {
-		country = [[[Country alloc] initWithName:countryName day:nil] autorelease];
+		country = [[Country alloc] initWithName:countryName day:nil];
 		[countries setObject:country forKey:countryName];
+        [country release];
 	}
 	return country;
 }
 
+
 @implementation PrevisionReport
 @synthesize dayString, weekEndDateString, revenue, newMonth;
-
 - (void) dealloc
 {
 	self.dayString = nil;
 	self.weekEndDateString = nil;
 	[super dealloc];
 }
-
 @end
 
 
 @interface PrevisionWeekCell : UITableViewCell {
+@private
 	UILabel *dayLabel;
 	UILabel *weekdayLabel;
 	UILabel *revenueLabel;
@@ -71,8 +74,8 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 }
 @property (assign) float maxRevenue;
 - (void)setPrevisonReport:(PrevisionReport *)report;
-
 @end
+
 
 @implementation PrevisionWeekCell
 
@@ -83,30 +86,26 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 		UIColor *calendarBackgroundColor = [UIColor colorWithRed:0.84 green:1.0 blue:0.84 alpha:1.0];
 		UIView *calendarBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(0,0,45,44)] autorelease];
 		calendarBackgroundView.backgroundColor = calendarBackgroundColor;
-		calendarBackgroundView.opaque = YES;
 		
 		dayLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 45, 30)] autorelease];
 		dayLabel.textAlignment = UITextAlignmentCenter;
 		dayLabel.font = [UIFont boldSystemFontOfSize:22.0];
 		dayLabel.backgroundColor = calendarBackgroundColor;
-		dayLabel.opaque = YES;
 		
 		weekdayLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 27, 45, 14)] autorelease];
 		weekdayLabel.textAlignment = UITextAlignmentCenter;
 		weekdayLabel.font = [UIFont systemFontOfSize:10.0];
 		weekdayLabel.backgroundColor = calendarBackgroundColor;
-		weekdayLabel.opaque = YES;
 		
+        UIColor *backgroundColor = BACK_GROUND_COLOR;
 		revenueLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 8/*0*/, 100, 30)] autorelease];
 		revenueLabel.font = [UIFont boldSystemFontOfSize:20.0];
 		revenueLabel.textAlignment = UITextAlignmentRight;
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
-		revenueLabel.opaque = YES;
-		revenueLabel.backgroundColor = BACK_GROUND_COLOR;
+		revenueLabel.backgroundColor = backgroundColor;
 		
 		graphView = [[[UIView alloc] initWithFrame:CGRectMake(160, 10, 130, 25)] autorelease];
 		graphView.backgroundColor = [UIColor colorWithRed:0.22 green:1.0 blue:0.49 alpha:1.0];
-		graphView.opaque = YES;
 		
 		[self.contentView addSubview:calendarBackgroundView];
 		[self.contentView addSubview:dayLabel];
@@ -116,7 +115,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 		
 		self.maxRevenue = 0;
 		
-		self.contentView.backgroundColor = BACK_GROUND_COLOR;
+		self.contentView.backgroundColor = backgroundColor;
     }
     return self;
 }
@@ -130,23 +129,24 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 
 @end
 
+
 @implementation WeeksController
 
 @synthesize previsionReport;
 
 - (id)init
 {
-	[super init];
-	
-	self.title = NSLocalizedString(@"Weekly Reports",nil);
-	
-	UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Only sum", nil) 
-															   style:UIBarButtonItemStyleBordered 
-															  target:self 
-															  action:@selector(onlySum:)];
-	self.navigationItem.rightBarButtonItem = button;
-	[button release];
-	
+	self = [super init];
+    if (self) {
+        self.title = NSLocalizedString(@"Weekly Reports",nil);
+        
+        UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Only sum", nil) 
+                                                                   style:UIBarButtonItemStyleBordered 
+                                                                  target:self 
+                                                                  action:@selector(onlySum:)];
+        self.navigationItem.rightBarButtonItem = button;
+        [button release];
+    }	
 	return self;
 }
 
@@ -154,6 +154,16 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	onlySum = !onlySum;
 	[self.navigationItem.rightBarButtonItem setStyle:onlySum ? UIBarButtonItemStyleDone : UIBarButtonItemStyleBordered];
 	[self.tableView reloadData];
+}
+
+- (NSIndexPath*) adjustPathForCurrentView:(NSIndexPath*)path {
+    if(!onlySum && previsionReport){
+        if(previsionReport.newMonth)
+            return [NSIndexPath indexPathForRow:path.row inSection:path.section-1];
+        if(path.section == 0)
+            return [NSIndexPath indexPathForRow:path.row-1 inSection:path.section];
+    }
+    return path;
 }
 
 - (void)reload
@@ -166,12 +176,13 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	int firstMonth = -1;
 	int numeberOfMonths = 0;
 	float max = 0;
+    NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 	for (Day *d in sortedWeeks) {
 		float revenue = [d totalRevenueInBaseCurrency];
 		if (revenue > max)
 			max = revenue;
 		NSDate *date = d.date;
-		NSDateComponents *components = [[NSCalendar currentCalendar] components:NSMonthCalendarUnit fromDate:date];
+		NSDateComponents *components = [calendar components:NSMonthCalendarUnit fromDate:date];
 		int month = [components month];
 		if (month != lastMonth) {
 			if (lastMonth == -1)
@@ -197,25 +208,24 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 			NSString *dayString = nil;
 			NSString *weekEndDateString;
 			BOOL newMonth = NO;
+            
+            NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
 			
 			for(Day *d in sortedDays){
 				NSTimeInterval diff = [d.date timeIntervalSinceDate:firstDayLastWeek];
 				if(diff >= 604800){//7 days: 1 week
 					[newWeekDays insertObject:d atIndex:0];
 					if(diff == 604800){
-						NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit | NSMonthCalendarUnit fromDate:d.date];
+						NSDateComponents *components = [calendar components:NSDayCalendarUnit | NSMonthCalendarUnit fromDate:d.date];
 						dayString = [NSString stringWithFormat:@"%i", [components day]];
-												
+                        
 						int month = [components month];
 						if (month != firstMonth) // FIXME
 							newMonth = YES;
 						
 						NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
 						[comp setHour:167];
-						NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:d.date options:0];
-						NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-						[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-						[dateFormatter setDateStyle:NSDateFormatterShortStyle];
+						NSDate *dateWeekLater = [calendar dateByAddingComponents:comp toDate:d.date options:0];
 						weekEndDateString = [dateFormatter stringFromDate:dateWeekLater];
 					}
 				}else if(diff >= 0){
@@ -265,10 +275,10 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath 
 { 
 	if (editingStyle == UITableViewCellEditingStyleDelete) {
-		int section = [indexPath section];
-		int row = [indexPath row];
-		NSArray *selectedMonth = [self.daysByMonth objectAtIndex:section];
-		Day *selectedDay = [selectedMonth objectAtIndex:row];
+        indexPath = [self adjustPathForCurrentView:indexPath];
+        
+		NSArray *selectedMonth = [self.daysByMonth objectAtIndex:indexPath.section];
+		Day *selectedDay = [selectedMonth objectAtIndex:indexPath.row];
 		[[ReportManager sharedManager] deleteDay:selectedDay];
 		[self reload];
 	}
@@ -282,12 +292,14 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
     [super dealloc];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
+- (BOOL) isPrevisionReportIndex:(NSIndexPath*)indexPath
 {
-	int section = [indexPath section];
-	int row = [indexPath row];
-	
-	if(!onlySum && previsionReport && section == 0 && row == 0){
+	return !onlySum && previsionReport && indexPath.section == 0 && indexPath.row == 0;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
+{	
+	if([self isPrevisionReportIndex:indexPath]){
 		static NSString *CellIdentifier = @"CellPrevisione";
 		
 		PrevisionWeekCell *cell = (PrevisionWeekCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -301,12 +313,9 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 		
 		return cell;
 	}
-	if(!onlySum && previsionReport){
-		if(previsionReport.newMonth)
-			section--;
-		else if(section == 0)
-			row--;
-	}
+    indexPath = [self adjustPathForCurrentView:indexPath];
+    int section = [indexPath section];
+	int row = [indexPath row];
 	
 	NSInteger count = [self.daysByMonth count];
 	if(count > 1 && section == count){
@@ -361,14 +370,14 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	}
 	
 	Day *selectedDay = [selectedMonth objectAtIndex:row];
-
+    
     static NSString *CellIdentifier = @"Cell";
     
     WeekCell *cell = (WeekCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[[WeekCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
     }
-
+    
 	cell.maxRevenue = self.maxRevenue;
     cell.day = selectedDay;
 	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -377,19 +386,17 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
-{
-	int section = [indexPath section];
-	int row = [indexPath row];
-	
-	if(!onlySum && previsionReport && section == 0 && row == 0)
+{	
+    if ([self isPrevisionReportIndex:indexPath])
 		return;
-	if(!onlySum && previsionReport){
-		if(previsionReport.newMonth)
-			section--;
-		else if(section == 0)
-			row--;
-	}
-	
+    
+    indexPath = [self adjustPathForCurrentView:indexPath];
+    int section = [indexPath section];
+	int row = [indexPath row];
+    
+    NSString *totalRevenueKey = @"totalRevenueInBaseCurrency";
+    NSString *sumTotalRevenueKey = @"@sum.totalRevenueInBaseCurrency";
+    
 	NSInteger count = [self.daysByMonth count];
 	if(count > 1 && section == count){
 		NSMutableDictionary *countries = [NSMutableDictionary dictionary];
@@ -403,12 +410,12 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 					}
 				}
 			}
-		}	
+		}
 		
-		NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"totalRevenueInBaseCurrency" ascending:NO] autorelease];
+		NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:totalRevenueKey ascending:NO] autorelease];
 		NSArray *children = [[countries allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 		
-		float total = [[children valueForKeyPath:@"@sum.totalRevenueInBaseCurrency"] floatValue];
+		float total = [[children valueForKeyPath:sumTotalRevenueKey] floatValue];
 		
 		CountriesController *countriesController = [[[CountriesController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 		countriesController.totalRevenue = total;
@@ -423,7 +430,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	}
 	
 	NSArray *selectedMonth = [self.daysByMonth objectAtIndex:section];
-
+    
 	if(onlySum || row == [selectedMonth count]){
 		NSMutableDictionary *countries = [NSMutableDictionary dictionary];
 		
@@ -436,10 +443,10 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 			}
 		}
 		
-		NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"totalRevenueInBaseCurrency" ascending:NO] autorelease];
+		NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:totalRevenueKey ascending:NO] autorelease];
 		NSArray *children = [[countries allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 		
-		float total = [[children valueForKeyPath:@"@sum.totalRevenueInBaseCurrency"] floatValue];
+		float total = [[children valueForKeyPath:sumTotalRevenueKey] floatValue];
 		
 		CountriesController *countriesController = [[[CountriesController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 		countriesController.totalRevenue = total;
@@ -456,17 +463,15 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	
 	Day *selectedDay = [selectedMonth objectAtIndex:row];
 	NSArray *children = [selectedDay children];
-
-	float total = [[children valueForKeyPath:@"@sum.totalRevenueInBaseCurrency"] floatValue];
+    
+	float total = [[children valueForKeyPath:sumTotalRevenueKey] floatValue];
 	
 	CountriesController *countriesController = [[[CountriesController alloc] initWithStyle:UITableViewStylePlain] autorelease];
 	countriesController.totalRevenue = total;
 	
-	NSDateFormatter *dateFormatter = [[NSDateFormatter new] autorelease];
-	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
-	[dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+	NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
 	NSString *formattedDate1 = [dateFormatter stringFromDate:selectedDay.date];
-		
+    
 	NSString *weekDesc;
 	if ([self.title isEqualToString:NSLocalizedString(@"Total",nil)]) {
 		weekDesc = NSLocalizedString(@"Total",nil);
@@ -474,11 +479,12 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	else {
 		NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
 		[comp setHour:167];
-		NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:selectedDay.date options:0];
+        NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+		NSDate *dateWeekLater = [calendar dateByAddingComponents:comp toDate:selectedDay.date options:0];
 		NSString *formattedDate2 = [dateFormatter stringFromDate:dateWeekLater];
 		weekDesc = [NSString stringWithFormat:@"%@ - %@", formattedDate1, formattedDate2];
 	}
-		
+    
 	countriesController.title = weekDesc;
 	countriesController.countries = children;
 	[countriesController.tableView reloadData];
@@ -524,7 +530,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
+{    
 	if(!onlySum && previsionReport && previsionReport.newMonth){
 		if(section == 0)
 			return @"";
@@ -551,20 +557,24 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath 
 {
 	if(onlySum)
-		return NO;	
-	
-	int section = [indexPath section];
-	int row = [indexPath row];
-	
-	if(!onlySum && previsionReport && section == 0 && row == 0)
 		return NO;
-	
-	if(!onlySum && previsionReport){
-		if(section)
-			section--;
-		else
-			row--;
-	}
+    
+    if ([self isPrevisionReportIndex:indexPath])
+		return NO;
+    
+    indexPath = [self adjustPathForCurrentView:indexPath];
+    int section = [indexPath section];
+	int row = [indexPath row];
+    
+    // this was originally here before refactoring to use adjustPathForCurrentView,
+    // but the code here commented out is slightly different than the refactored version
+    // might have been a mistake, might have been intentional....
+    //	if(!onlySum && previsionReport){
+    //		if(section)
+    //			section--;
+    //		else
+    //			row--;
+    //	}
 	
 	NSInteger count = self.daysByMonth.count;
 	if(count > 1 && section == count){
