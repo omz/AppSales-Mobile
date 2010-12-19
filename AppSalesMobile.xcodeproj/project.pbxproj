@@ -664,6 +664,7 @@
 		FAED39BD11E7E86E003061C4 /* ReviewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FAED39BB11E7E86E003061C4 /* ReviewManager.m */; };
 		FAED3B2011E7F5B9003061C4 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FAED3B1F11E7F5B9003061C4 /* libz.dylib */; };
 		FAED3B9E11E7FC96003061C4 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FAED3B9D11E7FC96003061C4 /* SettingsViewController.xib */; };
+		FAFB6F8412BDA3E400F807BA /* ProductMask@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FAFB6F8312BDA3E400F807BA /* ProductMask@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1409,6 +1410,7 @@
 		FAED3B9911E7FBCB003061C4 /* Korean */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Korean; path = Korean.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FAED3B9A11E7FBD8003061C4 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FAED3B9D11E7FC96003061C4 /* SettingsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsViewController.xib; sourceTree = SOURCE_ROOT; };
+		FAFB6F8312BDA3E400F807BA /* ProductMask@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ProductMask@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1533,14 +1535,14 @@
 		7F4C217510230EF200F17F7D /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				F22984E611DD3A950067EFD2 /* Settings2_Highlighted@2x.png */,
-				F22984E711DD3A950067EFD2 /* Settings2@2x.png */,
 				7FE310F811521254004DEA7C /* Settings2.png */,
+				F22984E711DD3A950067EFD2 /* Settings2@2x.png */,
 				7FE3155E1152E117004DEA7C /* Settings2_Highlighted.png */,
+				F22984E611DD3A950067EFD2 /* Settings2_Highlighted@2x.png */,
 				7FEA5AA8105B61CD000A12E6 /* 5stars.png */,
+				F22984C811DD343C0067EFD2 /* 5stars@2x.png */,
 				7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */,
 				F22984C711DD343C0067EFD2 /* 5stars_gray@2x.png */,
-				F22984C811DD343C0067EFD2 /* 5stars@2x.png */,
 				7F4A54DF116ACAEE00FA2019 /* Background.png */,
 				7FE3134C115282EE004DEA7C /* Blue.png */,
 				7FE3135C115284A5004DEA7C /* Blueish.png */,
@@ -1580,9 +1582,9 @@
 				7F82E747116C044D00D5F228 /* Icon72.png */,
 				7FAF141C11E64131009FD31B /* Icon114.png */,
 				7FE310FC11521272004DEA7C /* ImportExport.png */,
-				F229853F11E1A9EE0067EFD2 /* ImportExport_Highlighted@2x.png */,
 				F229854011E1A9EE0067EFD2 /* ImportExport@2x.png */,
 				7FE3155F1152E117004DEA7C /* ImportExport_Highlighted.png */,
+				F229853F11E1A9EE0067EFD2 /* ImportExport_Highlighted@2x.png */,
 				7FE3135A115284A5004DEA7C /* LightGray.png */,
 				7F4A5168116A869E00FA2019 /* PaneBackground.png */,
 				7F4A5207116A97A900FA2019 /* PaneButtonHighlighted.png */,
@@ -1590,13 +1592,14 @@
 				7F4A51A7116A8BAA00FA2019 /* PickerOverlay.png */,
 				7F4C217F10230EF200F17F7D /* Product.png */,
 				7F4C218010230EF200F17F7D /* ProductMask.png */,
+				FAFB6F8312BDA3E400F807BA /* ProductMask@2x.png */,
 				7FE311B311523E3D004DEA7C /* Purchase.png */,
 				7FE311B711523E90004DEA7C /* Return.png */,
 				7F4A54B8116AC88B00FA2019 /* ReviewBackground.png */,
 				7FE3111E115213AC004DEA7C /* Star.png */,
+				F280E0EC11DD2DCA0058FB57 /* Star@2x.png */,
 				7FE3155C1152E117004DEA7C /* Star_Highlighted.png */,
 				F280E0EB11DD2DCA0058FB57 /* Star_Highlighted@2x.png */,
-				F280E0EC11DD2DCA0058FB57 /* Star@2x.png */,
 				7F06B8EA11714FBF00AFB66D /* TB_About.png */,
 				7F4695691196403700E82747 /* TB_Calculator.png */,
 				7F82E764116C0C3900D5F228 /* TB_Filter.png */,
@@ -3018,6 +3021,7 @@
 				FA0B31C211EA312E00BB8B01 /* zm@2x.png in Resources */,
 				FA0B31C311EA312E00BB8B01 /* zw.png in Resources */,
 				FA0B31C411EA312E00BB8B01 /* zw@2x.png in Resources */,
+				FAFB6F8412BDA3E400F807BA /* ProductMask@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3162,13 +3166,18 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_FAST_MATH = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = "APPSALES_DEBUG=1";
-				GCC_THUMB_SUPPORT = YES;
+				GCC_STRICT_ALIASING = YES;
+				GCC_THUMB_SUPPORT = NO;
+				"GCC_THUMB_SUPPORT[arch=armv6]" = NO;
+				"GCC_THUMB_SUPPORT[arch=armv7]" = YES;
+				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_PEDANTIC = NO;
@@ -3181,7 +3190,7 @@
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
-				SDKROOT = iphoneos4.1;
+				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};
@@ -3192,11 +3201,16 @@
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				GCC_FAST_MATH = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AppSalesMobile_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = "NS_BLOCK_ASSERTIONS=1";
-				GCC_THUMB_SUPPORT = YES;
+				GCC_STRICT_ALIASING = YES;
+				GCC_THUMB_SUPPORT = NO;
+				"GCC_THUMB_SUPPORT[arch=armv6]" = NO;
+				"GCC_THUMB_SUPPORT[arch=armv7]" = YES;
+				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_PEDANTIC = NO;
@@ -3208,7 +3222,7 @@
 				PRODUCT_NAME = AppSalesMobile;
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
-				SDKROOT = iphoneos4.1;
+				SDKROOT = iphoneos;
 			};
 			name = Release;
 		};
@@ -3216,46 +3230,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				PREBINDING = YES;
-				PRODUCT_NAME = AppSales;
-				PROVISIONING_PROFILE = "";
-				SDKROOT = iphoneos4.2;
-			};
-			name = Distribution;
-		};
-		C01FCF4F08A954540054247B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
-				PREBINDING = YES;
-				PRODUCT_NAME = AppSales;
-				PROVISIONING_PROFILE = "";
-				SDKROOT = iphoneos4.1;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		C01FCF5008A954540054247B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_ENTITLEMENTS = Entitlements.plist;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = YES;
@@ -3268,7 +3242,50 @@
 				PREBINDING = YES;
 				PRODUCT_NAME = AppSales;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = iphoneos4.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Distribution;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
+				PREBINDING = YES;
+				PRODUCT_NAME = AppSales;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
+				PREBINDING = YES;
+				PRODUCT_NAME = AppSales;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
