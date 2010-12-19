@@ -11,9 +11,8 @@
 @class App, AppCellView;
 
 @interface AppCell : UITableViewCell {
-
 	App *app;
-	AppCellView *cellView;
+	AppCellView *cellView; // weak reference
 }
 
 @property (nonatomic, retain) App *app;
@@ -22,9 +21,10 @@
 
 
 
-@interface AppCellView : UIView {
 
-	AppCell *cell;
+
+@interface AppCellView : UIView {
+	AppCell *cell; // weak reference
 }
 
 - (id)initWithCell:(AppCell *)appCell;
