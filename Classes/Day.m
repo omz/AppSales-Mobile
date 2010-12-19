@@ -102,12 +102,6 @@ static NSDate* reportDateFromString(NSString *dateString) {
 
 @synthesize date, countries, isWeek, wasLoadedFromDisk, summary, isFault;
 
-//+ (NSString*) fileNameForString:(NSString*)name extension:(NSString*)fileExtension isWeek:(BOOL)isWeek {
-//	return [NSString stringWithFormat:@"%@_%@.%@",  (isWeek ? @"week" : @"day"), 
-//			[name stringByReplacingOccurrencesOfString:@"/" withString:@"_"], 
-//			fileExtension];
-//}
-
 + (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed {
 	NSString *text = nil;
 	if (compressed) {
@@ -164,6 +158,8 @@ static NSDate* reportDateFromString(NSString *dateString) {
     
     const NSUInteger numColumns = [[lines objectAtIndex:0] componentsSeparatedByString:@"\t"].count;
     [lines removeObjectAtIndex:0]; // remove column header
+	
+	NSCharacterSet *whitespaceCharacterSet = [NSCharacterSet whitespaceCharacterSet];
     
 	for (NSString *line in lines) {
 		NSArray *columns = [line componentsSeparatedByString:@"\t"];
@@ -199,8 +195,8 @@ static NSDate* reportDateFromString(NSString *dateString) {
             transactionType = [columns objectAtIndex:6];
             units = [columns objectAtIndex:7];
             royalties = [columns objectAtIndex:8];
-            dateColumn = [[columns objectAtIndex:9] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            toDateColumn = [[columns objectAtIndex:10] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            dateColumn = [[columns objectAtIndex:9] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+            toDateColumn = [[columns objectAtIndex:10] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
             countryString = [columns objectAtIndex:12];
             royaltyCurrency = [columns objectAtIndex:13];
             appId = [columns objectAtIndex:14];
