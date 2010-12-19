@@ -222,7 +222,11 @@
 					[scanner scanUpToString:@"</SetFontStyle>" intoString:&reviewDateAndVersion];
 					reviewDateAndVersion = [reviewDateAndVersion stringByReplacingOccurrencesOfString:@"\n" withString:@""];
 					NSArray *dateVersionSplitted = [reviewDateAndVersion componentsSeparatedByString:@"- "];
-					if (dateVersionSplitted.count == 3) {
+					if (dateVersionSplitted.count == 2) {
+						NSString *date = [dateVersionSplitted objectAtIndex:1];
+						date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+						reviewDate = [dateFormatter dateFromString:date];						
+					} else if (dateVersionSplitted.count == 3) {
 						NSString *version = [dateVersionSplitted objectAtIndex:1];
 						reviewVersion = [version stringByTrimmingCharactersInSet:whitespaceCharacterSet];
 						NSString *date = [dateVersionSplitted objectAtIndex:2];
