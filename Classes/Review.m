@@ -75,16 +75,16 @@ static NSString *presentationLanguage, *defaultCountryCode;
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-	[coder encodeObject:self.user forKey:@"user"];
-	[coder encodeObject:self.title forKey:@"title"];
-	[coder encodeObject:self.translatedTitle forKey:@"translatedTitle"];
-	[coder encodeObject:self.reviewDate forKey:@"reviewDate"];
-	[coder encodeObject:self.downloadDate forKey:@"downloadDate"];
-	[coder encodeObject:self.text forKey:@"text"];
-	[coder encodeObject:self.translatedText forKey:@"translatedText"];
-	[coder encodeObject:self.version forKey:@"version"];
-	[coder encodeObject:self.countryCode forKey:@"countryCode"];
-	[coder encodeInt:self.stars forKey:@"stars"];
+	[coder encodeObject:user forKey:@"user"];
+	[coder encodeObject:title forKey:@"title"];
+	[coder encodeObject:translatedTitle forKey:@"translatedTitle"];
+	[coder encodeObject:reviewDate forKey:@"reviewDate"];
+	[coder encodeObject:downloadDate forKey:@"downloadDate"];
+	[coder encodeObject:text forKey:@"text"];
+	[coder encodeObject:translatedText forKey:@"translatedText"];
+	[coder encodeObject:version forKey:@"version"];
+	[coder encodeObject:countryCode forKey:@"countryCode"];
+	[coder encodeInt:stars forKey:@"stars"];
 }
 
 
