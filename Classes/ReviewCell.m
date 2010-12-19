@@ -80,8 +80,8 @@
 	[[review.countryCode uppercaseString] drawInRect:CGRectMake(0, 54, CELL_COUNTRY_WIDTH, 9) withFont:[UIFont systemFontOfSize:9.0]
 									   lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentCenter];
 	
-	NSMutableString *starsString = [NSMutableString string];
-	for (NSUInteger i = 0; i < review.stars; i++) {
+	NSMutableString *starsString = [NSMutableString stringWithCapacity:5];
+	for (NSUInteger i = review.stars; i > 0 ; i--) {
 		[starsString appendString:@"★"];
 	}
 	

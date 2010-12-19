@@ -22,7 +22,7 @@
 
 
 @interface ReviewCellView : UIView {
-	ReviewCell *cell;
+	ReviewCell *cell; // weak reference
 }
 
 - (id)initWithCell:(ReviewCell *)reviewCell;
