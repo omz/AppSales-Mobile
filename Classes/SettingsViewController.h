@@ -30,14 +30,14 @@ AppSalesMobile
 
 #import <UIKit/UIKit.h>
 
-
 @interface SettingsViewController : UIViewController <UITextFieldDelegate> {
 	IBOutlet UILabel *explanationsLabel;
-	IBOutlet UILabel *copyrightLabel;
 	IBOutlet UITextField *usernameTextField;
 	IBOutlet UITextField *passwordTextField;
 	IBOutlet UILabel *translationLabel;
 	IBOutlet UISwitch *translationSwitch;
+	IBOutlet UILabel *fetchInactiveReviewsLessOftenLabel;
+	IBOutlet UISwitch *fetchReviewsLessOftenSwitch;
 	IBOutlet UISegmentedControl *currencySelectionControl;
 	IBOutlet UILabel *loginSectionLabel;
 	IBOutlet UILabel *usernameLabel;
