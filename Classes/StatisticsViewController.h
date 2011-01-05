@@ -20,7 +20,6 @@
 	NSArray *selectedDays;
 	UIPickerView *datePicker;
 	NSArray *days;
-	NSDateFormatter *dateFormatter;
 	UIBarButtonItem *graphModeButton;
 	
 	// To be used when scrolls originate from the UIPageControl

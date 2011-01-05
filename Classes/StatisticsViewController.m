@@ -19,7 +19,7 @@
 
 @implementation StatisticsViewController
 
-@synthesize allAppsTrendView, regionsGraphView, trendViewsForApps, scrollView, pageControl, datePicker, days, selectedDays, dateFormatter;
+@synthesize allAppsTrendView, regionsGraphView, trendViewsForApps, scrollView, pageControl, datePicker, days, selectedDays;
 
 - (void)loadView 
 {
