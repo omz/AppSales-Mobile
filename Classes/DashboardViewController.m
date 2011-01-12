@@ -26,7 +26,7 @@
 	backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	[self.view addSubview:backgroundImageView];
 	
-	self.dateRangePicker = [[[UIPickerView alloc] initWithFrame:CGRectMake(21, 17, 215, 215)] autorelease];
+	self.dateRangePicker = [[[UIPickerView alloc] initWithFrame:CGRectMake(21, 17, 215, 180)] autorelease];
 	dateRangePicker.showsSelectionIndicator = YES;
 	dateRangePicker.delegate = self;
 	dateRangePicker.dataSource = self;

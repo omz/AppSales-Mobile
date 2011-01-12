@@ -37,9 +37,11 @@
 	NSMutableArray *revenues = [NSMutableArray array];
 	float maxRevenue = 0.0;
 	float totalRevenue = 0.0;
+	Day* lastDay = nil;
 	for (Day *d in self.days) {
 		float revenue = (showUnits) ? (float)[d totalUnitsForAppWithID:appID] : [d totalRevenueInBaseCurrencyForAppWithID:appID];
 		totalRevenue += revenue;
+		/*
 		if(d.isWeek){
 			revenue /= 7.0;
 			for(int i = 0; i < 7; i++)
@@ -47,7 +49,16 @@
 		}else{
 			[revenues addObject:[NSNumber numberWithFloat:revenue]];
 		}
+		*/
+		if (lastDay) {			
+			//NSLog(@"%d",(int)[d.date timeIntervalSinceDate:lastDay.date]);
+			for (int j=1; [d.date timeIntervalSinceDate:lastDay.date] > 3600*24*j ; j++) {
+				[revenues addObject:[NSNumber numberWithFloat:0.0f]]; //add zero revenue for days with no reports
+			}
+		}		
+		[revenues addObject:[NSNumber numberWithFloat:revenue]];
 		if (revenue > maxRevenue) maxRevenue = revenue;
+		lastDay = d;
 	}
 	
 	UIColor *graphColor = (self.appName) ? [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0] : [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0];
@@ -72,7 +83,7 @@
 	float averageRevenue = totalRevenue / [revenues count];
 	float averageY = maxY - ((averageRevenue / maxRevenue) * (maxY - minY));
 	if ((averageY < (maxY + 10)) && (averageY > (minY + 10))) {
-		NSString *averageString = [NSString stringWithFormat:@"%i", (int)averageRevenue];
+		NSString *averageString = (averageRevenue < 100 )? [NSString stringWithFormat:@"%.1f", averageRevenue] : [NSString stringWithFormat:@"%i", (int)averageRevenue];
 		[graphColor set];
 		[averageString drawInRect:CGRectMake(0, averageY - 6, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	}
@@ -110,13 +121,14 @@
 	} else {
 		subtitle = [NSString stringWithFormat:NSLocalizedString(@"%i days, ∑ = %@",nil), [revenues count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
 	}
-	[subtitle drawInRect:CGRectMake(10, maxY + 5, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
-
+	CGRect subtitleRect = CGRectMake(10, maxY + 5, 300, 20);
+	[[UIColor darkGrayColor] set];
+	[subtitle drawInRect:subtitleRect withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 	
 	//draw weekend background:
-	if ([days count] <= 31) {
+	if ([revenues count] <= 62) {
 		CGContextSetAllowsAntialiasing(c, NO);
-		float weekendWidth = (maxX - minX) / ([days count] - 1);
+		float weekendWidth = (maxX - minX) / ([revenues count] - 1);
 		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 		UIColor *shade;
 		if (self.appID == nil)
@@ -124,18 +136,16 @@
 		else
 			shade = [UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:0.1];
 		[shade set];
-		int i = 0;
-		for (Day *d in self.days) {
-			//NSLog(@"%@", d.date);
-			NSDateComponents *comps = [gregorian components:NSWeekdayCalendarUnit fromDate:d.date];
-			if ([comps weekday] == 7) {
-				float x = minX + ((maxX - minX) / ([days count] - 1)) * i;
+		
+		int startWeekDay = [[gregorian components:NSWeekdayCalendarUnit fromDate:[[days objectAtIndex:0] date] ] weekday];
+		for (int i=0; i < [revenues count]; i++) {
+			if ( (startWeekDay + i)%7 == 0 ) { // every Sunday
+				float x = minX + ((maxX - minX) / ([revenues count] - 1)) * i;
 				float x2 = x + weekendWidth;
 				if (x2 > maxX) x2 = maxX;
 				CGRect weekendRect = CGRectMake(x, minY - 2, (x2 - x), (maxY - minY) + 3);
 				CGContextFillRect(c, weekendRect);
 			}
-			i++;
 		}
 		CGContextSetAllowsAntialiasing(c, YES);
 	}

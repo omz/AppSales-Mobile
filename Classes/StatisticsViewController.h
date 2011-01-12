@@ -13,12 +13,17 @@
 
 @interface StatisticsViewController : UIViewController <UIPickerViewDelegate, UIPickerViewDataSource, UIAlertViewDelegate, UIScrollViewDelegate> {
 	UIScrollView *scrollView;
+	UIPageControl *pageControl;
 	TrendGraphView *allAppsTrendView;
 	RegionsGraphView *regionsGraphView;
 	NSMutableArray *trendViewsForApps;
 	NSArray *selectedDays;
 	UIPickerView *datePicker;
 	NSArray *days;
+	UIBarButtonItem *graphModeButton;
+	
+	// To be used when scrolls originate from the UIPageControl
+	BOOL pageControlUsed;
 }
 
 @property (retain) NSArray *days;
@@ -27,8 +32,10 @@
 @property (retain) RegionsGraphView *regionsGraphView;
 @property (retain) NSMutableArray *trendViewsForApps;
 @property (retain) UIScrollView *scrollView;
+@property (nonatomic, retain) UIPageControl *pageControl;
 @property (retain) UIPickerView *datePicker;
 
 - (void)reload;
+- (void)updateGraphModeButton;
 
 @end
