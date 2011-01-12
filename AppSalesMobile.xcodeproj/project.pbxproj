@@ -3243,7 +3243,6 @@
 				PRODUCT_NAME = AppSales;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Distribution;
 		};
