@@ -10,7 +10,7 @@
 		1D3623260D0F684500981E51 /* AppSalesMobileAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AppSalesMobileAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
-		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
 		345D1A480F3174DC002AB336 /* AbstractDayOrWeekController.m in Sources */ = {isa = PBXBuildFile; fileRef = 345D1A470F3174DC002AB336 /* AbstractDayOrWeekController.m */; };
@@ -27,14 +27,6 @@
 		7F4695941196439900E82747 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F4695931196439900E82747 /* QuartzCore.framework */; };
 		7F4695AA119643CE00E82747 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F4695A9119643CE00E82747 /* AudioToolbox.framework */; };
 		7F4695B41196448900E82747 /* CalculatorClick.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695B31196448900E82747 /* CalculatorClick.caf */; };
-		7F4695C1119644B500E82747 /* CalculatorButtonNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695B8119644B500E82747 /* CalculatorButtonNormal.png */; };
-		7F4695C2119644B500E82747 /* CalculatorButton2Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695B9119644B500E82747 /* CalculatorButton2Highlighted.png */; };
-		7F4695C3119644B500E82747 /* CalculatorButton2Normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BA119644B500E82747 /* CalculatorButton2Normal.png */; };
-		7F4695C4119644B500E82747 /* CalculatorButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BB119644B500E82747 /* CalculatorButtonHighlighted.png */; };
-		7F4695C5119644B500E82747 /* CalculatorButton3Normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BC119644B500E82747 /* CalculatorButton3Normal.png */; };
-		7F4695C6119644B500E82747 /* CalculatorButton3Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BD119644B500E82747 /* CalculatorButton3Highlighted.png */; };
-		7F4695C7119644B500E82747 /* CalculatorButton4Normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BE119644B500E82747 /* CalculatorButton4Normal.png */; };
-		7F4695C8119644B500E82747 /* CalculatorButton4Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4695BF119644B500E82747 /* CalculatorButton4Highlighted.png */; };
 		7F46961A1196458A00E82747 /* CalculatorBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4696191196458A00E82747 /* CalculatorBackground.png */; };
 		7F4A4FE9116A648000FA2019 /* PadRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A4FE8116A648000FA2019 /* PadRootViewController.m */; };
 		7F4A50DC116A781D00FA2019 /* DashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F4A50DB116A781D00FA2019 /* DashboardViewController.m */; };
@@ -653,6 +645,15 @@
 		FA0B31C311EA312E00BB8B01 /* zw.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2FD611EA312E00BB8B01 /* zw.png */; };
 		FA0B31C411EA312E00BB8B01 /* zw@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FA0B2FD711EA312E00BB8B01 /* zw@2x.png */; };
 		FA0E305A124167A90076A3EF /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FA0E3059124167A90076A3EF /* libicucore.dylib */; };
+		FAA9E8FC12E2242500ADD3C9 /* CalculatorButton2Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8F412E2242500ADD3C9 /* CalculatorButton2Highlighted.png */; };
+		FAA9E8FD12E2242500ADD3C9 /* CalculatorButton2Normal.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8F512E2242500ADD3C9 /* CalculatorButton2Normal.png */; };
+		FAA9E8FE12E2242500ADD3C9 /* CalculatorButton3Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8F612E2242500ADD3C9 /* CalculatorButton3Highlighted.png */; };
+		FAA9E8FF12E2242500ADD3C9 /* CalculatorButton3Normal.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8F712E2242500ADD3C9 /* CalculatorButton3Normal.png */; };
+		FAA9E90012E2242500ADD3C9 /* CalculatorButton4Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8F812E2242500ADD3C9 /* CalculatorButton4Highlighted.png */; };
+		FAA9E90112E2242500ADD3C9 /* CalculatorButton4Normal.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8F912E2242500ADD3C9 /* CalculatorButton4Normal.png */; };
+		FAA9E90212E2242500ADD3C9 /* CalculatorButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8FA12E2242500ADD3C9 /* CalculatorButtonHighlighted.png */; };
+		FAA9E90312E2242500ADD3C9 /* CalculatorButtonNormal.png in Resources */ = {isa = PBXBuildFile; fileRef = FAA9E8FB12E2242500ADD3C9 /* CalculatorButtonNormal.png */; };
+		FAA9E92712E22BB200ADD3C9 /* AppSalesUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = FAA9E92612E22BB200ADD3C9 /* AppSalesUtils.m */; };
 		FAED39A511E7E810003061C4 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FAED399A11E7E810003061C4 /* NSObject+SBJSON.m */; };
 		FAED39A611E7E810003061C4 /* NSString+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FAED399C11E7E810003061C4 /* NSString+SBJSON.m */; };
 		FAED39A711E7E810003061C4 /* SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = FAED399E11E7E810003061C4 /* SBJSON.m */; };
@@ -700,14 +701,6 @@
 		7F4695931196439900E82747 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		7F4695A9119643CE00E82747 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		7F4695B31196448900E82747 /* CalculatorClick.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = CalculatorClick.caf; sourceTree = "<group>"; };
-		7F4695B8119644B500E82747 /* CalculatorButtonNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButtonNormal.png; path = ../CalculatorButtonNormal.png; sourceTree = "<group>"; };
-		7F4695B9119644B500E82747 /* CalculatorButton2Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButton2Highlighted.png; path = ../CalculatorButton2Highlighted.png; sourceTree = "<group>"; };
-		7F4695BA119644B500E82747 /* CalculatorButton2Normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButton2Normal.png; path = ../CalculatorButton2Normal.png; sourceTree = "<group>"; };
-		7F4695BB119644B500E82747 /* CalculatorButtonHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButtonHighlighted.png; path = ../CalculatorButtonHighlighted.png; sourceTree = "<group>"; };
-		7F4695BC119644B500E82747 /* CalculatorButton3Normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButton3Normal.png; path = ../CalculatorButton3Normal.png; sourceTree = "<group>"; };
-		7F4695BD119644B500E82747 /* CalculatorButton3Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButton3Highlighted.png; path = ../CalculatorButton3Highlighted.png; sourceTree = "<group>"; };
-		7F4695BE119644B500E82747 /* CalculatorButton4Normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButton4Normal.png; path = ../CalculatorButton4Normal.png; sourceTree = "<group>"; };
-		7F4695BF119644B500E82747 /* CalculatorButton4Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CalculatorButton4Highlighted.png; path = ../CalculatorButton4Highlighted.png; sourceTree = "<group>"; };
 		7F4696191196458A00E82747 /* CalculatorBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorBackground.png; sourceTree = "<group>"; };
 		7F47897710661CBD002415A2 /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
 		7F4A4FE7116A648000FA2019 /* PadRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PadRootViewController.h; sourceTree = "<group>"; };
@@ -1385,6 +1378,16 @@
 		FA0B2FD611EA312E00BB8B01 /* zw.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = zw.png; sourceTree = "<group>"; };
 		FA0B2FD711EA312E00BB8B01 /* zw@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "zw@2x.png"; sourceTree = "<group>"; };
 		FA0E3059124167A90076A3EF /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		FAA9E8F412E2242500ADD3C9 /* CalculatorButton2Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButton2Highlighted.png; sourceTree = "<group>"; };
+		FAA9E8F512E2242500ADD3C9 /* CalculatorButton2Normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButton2Normal.png; sourceTree = "<group>"; };
+		FAA9E8F612E2242500ADD3C9 /* CalculatorButton3Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButton3Highlighted.png; sourceTree = "<group>"; };
+		FAA9E8F712E2242500ADD3C9 /* CalculatorButton3Normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButton3Normal.png; sourceTree = "<group>"; };
+		FAA9E8F812E2242500ADD3C9 /* CalculatorButton4Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButton4Highlighted.png; sourceTree = "<group>"; };
+		FAA9E8F912E2242500ADD3C9 /* CalculatorButton4Normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButton4Normal.png; sourceTree = "<group>"; };
+		FAA9E8FA12E2242500ADD3C9 /* CalculatorButtonHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButtonHighlighted.png; sourceTree = "<group>"; };
+		FAA9E8FB12E2242500ADD3C9 /* CalculatorButtonNormal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CalculatorButtonNormal.png; sourceTree = "<group>"; };
+		FAA9E92512E22BB200ADD3C9 /* AppSalesUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppSalesUtils.h; sourceTree = "<group>"; };
+		FAA9E92612E22BB200ADD3C9 /* AppSalesUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppSalesUtils.m; sourceTree = "<group>"; };
 		FAED399811E7E810003061C4 /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON.h; path = "Classes/Google Translate ObjC/JSON.h"; sourceTree = "<group>"; };
 		FAED399911E7E810003061C4 /* NSObject+SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+SBJSON.h"; path = "Classes/Google Translate ObjC/NSObject+SBJSON.h"; sourceTree = "<group>"; };
 		FAED399A11E7E810003061C4 /* NSObject+SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+SBJSON.m"; path = "Classes/Google Translate ObjC/NSObject+SBJSON.m"; sourceTree = "<group>"; };
@@ -1547,16 +1550,16 @@
 				7FE3134C115282EE004DEA7C /* Blue.png */,
 				7FE3135C115284A5004DEA7C /* Blueish.png */,
 				7F4696191196458A00E82747 /* CalculatorBackground.png */,
-				7F4695B9119644B500E82747 /* CalculatorButton2Highlighted.png */,
-				7F4695BA119644B500E82747 /* CalculatorButton2Normal.png */,
-				7F4695BD119644B500E82747 /* CalculatorButton3Highlighted.png */,
-				7F4695BC119644B500E82747 /* CalculatorButton3Normal.png */,
-				7F4695BF119644B500E82747 /* CalculatorButton4Highlighted.png */,
-				7F4695BE119644B500E82747 /* CalculatorButton4Normal.png */,
-				7F4695BB119644B500E82747 /* CalculatorButtonHighlighted.png */,
-				7F4695B8119644B500E82747 /* CalculatorButtonNormal.png */,
-				7F82E849116C1F5800D5F228 /* CalendarButtonHighlighted.png */,
+				FAA9E8FB12E2242500ADD3C9 /* CalculatorButtonNormal.png */,
+				FAA9E8FA12E2242500ADD3C9 /* CalculatorButtonHighlighted.png */,
+				FAA9E8F412E2242500ADD3C9 /* CalculatorButton2Highlighted.png */,
+				FAA9E8F512E2242500ADD3C9 /* CalculatorButton2Normal.png */,
+				FAA9E8F612E2242500ADD3C9 /* CalculatorButton3Highlighted.png */,
+				FAA9E8F712E2242500ADD3C9 /* CalculatorButton3Normal.png */,
+				FAA9E8F812E2242500ADD3C9 /* CalculatorButton4Highlighted.png */,
+				FAA9E8F912E2242500ADD3C9 /* CalculatorButton4Normal.png */,
 				7F82E848116C1F5800D5F228 /* CalendarButtonNormal.png */,
+				7F82E849116C1F5800D5F228 /* CalendarButtonHighlighted.png */,
 				7F4C217810230EF200F17F7D /* DateButtonHighlight.png */,
 				7F4C217910230EF200F17F7D /* DateButtonNormal.png */,
 				7FE311171152133D004DEA7C /* Day.png */,
@@ -2154,24 +2157,26 @@
 		7FB0C5830EBA3431005E2C45 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				FA027E6C12407BF500067812 /* RegexKitLite.h */,
-				FA027E6D12407BF500067812 /* RegexKitLite.m */,
-				7F4A5259116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.h */,
-				7F4A525A116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m */,
-				7FB0C4400EB97BC1005E2C45 /* NSDictionary+HTTP.h */,
-				7FB0C4410EB97BC1005E2C45 /* NSDictionary+HTTP.m */,
+				FAA9E92512E22BB200ADD3C9 /* AppSalesUtils.h */,
+				FAA9E92612E22BB200ADD3C9 /* AppSalesUtils.m */,
 				7FB0C4A90EB99D01005E2C45 /* CurrencyManager.h */,
 				7FB0C4AA0EB99D01005E2C45 /* CurrencyManager.m */,
 				34DCF08E0F0461A2009F9929 /* SFHFKeychainUtils.h */,
 				34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */,
 				7FE3138E1152891A004DEA7C /* ProgressHUD.h */,
 				7FE3138F1152891A004DEA7C /* ProgressHUD.m */,
+				FA027E6C12407BF500067812 /* RegexKitLite.h */,
+				FA027E6D12407BF500067812 /* RegexKitLite.m */,
+				7F4A5259116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.h */,
+				7F4A525A116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m */,
+				7FB0C4400EB97BC1005E2C45 /* NSDictionary+HTTP.h */,
+				7FB0C4410EB97BC1005E2C45 /* NSDictionary+HTTP.m */,
 				7FE313A0115294C9004DEA7C /* NSData+Compression.h */,
 				7FE313A1115294C9004DEA7C /* NSData+Compression.m */,
-				34DDA8BB116A199D00F5BA8C /* UIDevice+iPad.h */,
-				34DDA8BC116A199D00F5BA8C /* UIDevice+iPad.m */,
 				FAED39B811E7E86E003061C4 /* NSString+UnescapeHtml.h */,
 				FAED39B911E7E86E003061C4 /* NSString+UnescapeHtml.m */,
+				34DDA8BB116A199D00F5BA8C /* UIDevice+iPad.h */,
+				34DDA8BC116A199D00F5BA8C /* UIDevice+iPad.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -2185,8 +2190,6 @@
 				7FB0C3F70EB9791C005E2C45 /* Country.m */,
 				7FB0C3F90EB97923005E2C45 /* Entry.h */,
 				7FB0C3FA0EB97923005E2C45 /* Entry.m */,
-				7FBC1E590FFEA5CC0067F3DA /* AppIconManager.h */,
-				7FBC1E5A0FFEA5CC0067F3DA /* AppIconManager.m */,
 				7FEA576A105AFF91000A12E6 /* Reviews */,
 			);
 			name = Models;
@@ -2288,6 +2291,8 @@
 			children = (
 				1D3623240D0F684500981E51 /* AppSalesMobileAppDelegate.h */,
 				1D3623250D0F684500981E51 /* AppSalesMobileAppDelegate.m */,
+				7FBC1E590FFEA5CC0067F3DA /* AppIconManager.h */,
+				7FBC1E5A0FFEA5CC0067F3DA /* AppIconManager.m */,
 				FA009F1011E93E8200242DFF /* AppManager.h */,
 				FA009F1111E93E8200242DFF /* AppManager.m */,
 				7FD9B3F210591EFF00FE74C3 /* ReportManager.h */,
@@ -2505,14 +2510,6 @@
 				7F06B8EB11714FBF00AFB66D /* TB_About.png in Resources */,
 				7F46956A1196403700E82747 /* TB_Calculator.png in Resources */,
 				7F4695B41196448900E82747 /* CalculatorClick.caf in Resources */,
-				7F4695C1119644B500E82747 /* CalculatorButtonNormal.png in Resources */,
-				7F4695C2119644B500E82747 /* CalculatorButton2Highlighted.png in Resources */,
-				7F4695C3119644B500E82747 /* CalculatorButton2Normal.png in Resources */,
-				7F4695C4119644B500E82747 /* CalculatorButtonHighlighted.png in Resources */,
-				7F4695C5119644B500E82747 /* CalculatorButton3Normal.png in Resources */,
-				7F4695C6119644B500E82747 /* CalculatorButton3Highlighted.png in Resources */,
-				7F4695C7119644B500E82747 /* CalculatorButton4Normal.png in Resources */,
-				7F4695C8119644B500E82747 /* CalculatorButton4Highlighted.png in Resources */,
 				7F46961A1196458A00E82747 /* CalculatorBackground.png in Resources */,
 				F280E0ED11DD2DCA0058FB57 /* Star_Highlighted@2x.png in Resources */,
 				F280E0EE11DD2DCA0058FB57 /* Star@2x.png in Resources */,
@@ -3022,6 +3019,14 @@
 				FA0B31C311EA312E00BB8B01 /* zw.png in Resources */,
 				FA0B31C411EA312E00BB8B01 /* zw@2x.png in Resources */,
 				FAFB6F8412BDA3E400F807BA /* ProductMask@2x.png in Resources */,
+				FAA9E8FC12E2242500ADD3C9 /* CalculatorButton2Highlighted.png in Resources */,
+				FAA9E8FD12E2242500ADD3C9 /* CalculatorButton2Normal.png in Resources */,
+				FAA9E8FE12E2242500ADD3C9 /* CalculatorButton3Highlighted.png in Resources */,
+				FAA9E8FF12E2242500ADD3C9 /* CalculatorButton3Normal.png in Resources */,
+				FAA9E90012E2242500ADD3C9 /* CalculatorButton4Highlighted.png in Resources */,
+				FAA9E90112E2242500ADD3C9 /* CalculatorButton4Normal.png in Resources */,
+				FAA9E90212E2242500ADD3C9 /* CalculatorButtonHighlighted.png in Resources */,
+				FAA9E90312E2242500ADD3C9 /* CalculatorButtonNormal.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3122,6 +3127,7 @@
 				FAED39BD11E7E86E003061C4 /* ReviewManager.m in Sources */,
 				FA009F1211E93E8200242DFF /* AppManager.m in Sources */,
 				FA027E6E12407BF500067812 /* RegexKitLite.m in Sources */,
+				FAA9E92712E22BB200ADD3C9 /* AppSalesUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3254,7 +3260,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -3276,7 +3282,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;

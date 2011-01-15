@@ -8,6 +8,7 @@
 #import "LKGoogleTranslator.h"
 #import "JSON.h"
 #import "NSString+UnescapeHtml.h"
+#import "AppSalesUtils.h" 
 
 #define MAX_INPUT_TEXT_LENGTH 1900 // size after url encoding, and arbitrarily set by Google 
 #define URL_STRING @"http://ajax.googleapis.com/ajax/services/language/translate?v=1.0&langpair="
@@ -26,14 +27,10 @@
 - (NSString*)translateText:(NSString*)sourceText fromLanguage:(NSString*)sourceLanguage toLanguage:(NSString*)targetLanguage {
 	NSString *urlEncodedSource = [sourceText correctlyEncodeToURL];
 	if (urlEncodedSource.length > MAX_INPUT_TEXT_LENGTH) {
-		#if APPSALES_DEBUG
-			NSLog(@"string too long, skipping translation: %@", sourceText);
-		#endif
+		APPSALESLOG(@"string too long, skipping translation: %@", sourceText);
 		return sourceText;
 	}
-	#if APPSALES_DEBUG
-		NSLog(@"translating into %@: %@", targetLanguage, sourceText);
-	#endif
+	APPSALESLOG(@"translating into %@: %@", targetLanguage, sourceText);
 	
 	
 	NSMutableString* urlString = [NSMutableString stringWithCapacity:URL_STRING.length + APPSALES_GOOGLE_API_KEY.length 
@@ -57,9 +54,7 @@
 	NSString* contents = [[[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding] autorelease];
 	id responseData = [[contents JSONValue] objectForKey:@"responseData"];
 	if (responseData == [NSNull null]) {
-		#if APPSALES_DEBUG
-			NSLog(@"translation error:%@", contents);
-		#endif
+		APPSALESLOG(@"translation error:%@", contents);
 		return sourceText;
 	}
 	NSString *translatedText = [responseData objectForKey: @"translatedText"];

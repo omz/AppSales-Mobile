@@ -38,6 +38,7 @@
 #import "AppManager.h"
 #import "NSData+Compression.h"
 #import "NSDateFormatter+SharedInstances.h"
+#import "AppSalesUtils.h"
 
 static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];

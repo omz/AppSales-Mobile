@@ -1,6 +1,7 @@
 
 #import "AppManager.h"
 #import "App.h"
+#import "AppSalesUtils.h"
 
 #define APP_ENCODED_FILE_NAME @"encodedApps"
 

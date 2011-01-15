@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-NSString* getDocPath(); // utility methods that belong in some other file
-
 @class Review;
 
 @interface App : NSObject <NSCoding> {

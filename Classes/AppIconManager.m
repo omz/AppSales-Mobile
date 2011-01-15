@@ -7,7 +7,7 @@
 //
 
 #import "AppIconManager.h"
-#import "App.h" // for getDocPath()
+#import "AppSalesUtils.h"
 
 
 @implementation AppIconManager
@@ -16,7 +16,7 @@
 {
 	self = [super init];
 	if (self) {
-		iconsByAppID = [[NSMutableDictionary alloc] init];
+		iconsByAppID = [NSMutableDictionary new];
 	}
 	return self;
 }
@@ -25,7 +25,7 @@
 {
 	static AppIconManager *sharedManager = nil;
 	if (sharedManager == nil) {
-		sharedManager = [[self alloc] init];
+		sharedManager = [self new];
 	}
 	return sharedManager;
 }
