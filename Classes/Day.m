@@ -51,23 +51,6 @@ static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	return YES;
 }
 
-static BOOL parseDateString(NSString *dateString, int *year, int *month, int *day) {
-	if ([dateString rangeOfString:@"/"].location == NSNotFound) {
-		if (dateString.length == 8) { // old date format
-			*year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
-			*month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
-			*day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
-			return YES; // parsed ok
-		}
-	} else if (dateString.length == 10) { // new date format
-		*year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
-		*month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
-		*day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
-		return YES;
-	}
-	return NO; // unrecognized string
-}
-
 static NSDate* reportDateFromString(NSString *dateString) {
     const NSUInteger stringLength = dateString.length;
     const NSRange slashRange = [dateString rangeOfString:@"/"];
