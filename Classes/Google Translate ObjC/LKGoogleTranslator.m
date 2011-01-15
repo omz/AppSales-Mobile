@@ -36,7 +36,8 @@
 	#endif
 	
 	
-	NSMutableString* urlString = [NSMutableString string];
+	NSMutableString* urlString = [NSMutableString stringWithCapacity:URL_STRING.length + APPSALES_GOOGLE_API_KEY.length 
+																	 + urlEncodedSource.length + 30];
 	[urlString appendString: URL_STRING];
 	[urlString appendString: sourceLanguage];
 	[urlString appendString: @"%7C"];
