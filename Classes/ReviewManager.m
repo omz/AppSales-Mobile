@@ -18,7 +18,7 @@
 // 
 // to fetch inactive region/apps less often, set both thresholds to larger values
 #define TIME_THRESHOLD_TO_MAYBE_FETCH_REGION 5 * 60 // 5 minutes
-#define TIME_THRESHOLD_TO_ALWAYS_FETCH_REGION 4 * 24 * 60 * 60 // 4 days
+#define TIME_THRESHOLD_TO_ALWAYS_FETCH_REGION 5 * 24 * 60 * 60 // 5 days
 
 // percent of the app regions _that have previously downloaded reviews_ that must be checked for new reviews
 // decrease value to check less active regions less often
@@ -387,7 +387,7 @@ static inline float random_0_1() {
 
 	downloadDate = [NSDate new];
 	
-	condition = [[NSCondition alloc] init];
+	condition = [NSCondition new];
 	numThreadsActive = NUMBER_OF_FETCHING_THREADS;
 	
 	[condition lock];
@@ -426,7 +426,7 @@ static inline float random_0_1() {
 
 - (void) incrementDownloadProgress:(NSNumber*)numAppRegionsFetched {
 	percentComplete += numAppRegionsFetched.integerValue * progressIncrement;
-	NSString *status = [[NSString alloc] initWithFormat:@"%2.0f%% complete", percentComplete];
+	NSString *status = [[NSString alloc] initWithFormat:@"%2.0f%% complete", ceil(percentComplete)];
 	[self updateReviewDownloadProgress:status];
 	[status release];
 }
@@ -587,17 +587,6 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 				  [StoreInfo storeInfoCountryCode:@"vn" storeID:@"143471" formatter:nil],
 				  [StoreInfo storeInfoCountryCode:@"za" storeID:@"143472" formatter:nil],
 				  nil];
-    
-	// sort regions by its number of existing reviews, so the less active regions are downloaded last
-	NSMutableDictionary *numExistingReviews = [NSMutableDictionary dictionaryWithCapacity:storeInfos.count];
-	for (App *app in allApps) {
-		for (Review *review in app.reviewsByUser.objectEnumerator) {
-			NSNumber *object = [numExistingReviews objectForKey:review.countryCode];
-			const NSUInteger count = (object ? object.intValue + 1 : 1);
-			[numExistingReviews setObject:[NSNumber numberWithInt:count] forKey:review.countryCode];
-		}
-	}
-	[storeInfos sortUsingFunction:&numStoreReviewsComparator context:numExistingReviews];
 	
 	// figure out which regions of each app to fetch
 	BOOL skipLessActiveRegions;
@@ -625,26 +614,41 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
         [appIDtoStoreRegion setValue:storeRegiontoBool forKey:app.appID];
     }
 	
-	if (skipLessActiveRegions) {
-		// add a chunk of the app regions that have existing reviews
-		NSMutableDictionary *appToRegionScores = [NSMutableDictionary dictionaryWithCapacity:allApps.count];
-		NSMutableArray *numExistingReviews = [NSMutableArray array];
-		for (App *app in allApps) {
-			NSMutableDictionary *numExistingRegionReviews = [NSMutableDictionary dictionary];
-			for (Review *review in app.reviewsByUser.objectEnumerator) {
-				NSNumber *countObj = [numExistingRegionReviews objectForKey:review.countryCode];
-				const NSInteger count = (countObj ? countObj.integerValue + 1 : 1);
-				countObj = [[NSNumber alloc] initWithInteger:count];
-				[numExistingRegionReviews setObject:countObj forKey:review.countryCode];
-				[countObj release];
-			}
-			[appToRegionScores setValue:numExistingRegionReviews forKey:app.appID];
-			[numExistingReviews addObjectsFromArray:numExistingRegionReviews.allValues];
-		}
-		[numExistingReviews sortUsingSelector:@selector(compare:)];
+    
+	// build intermediate data structures to figure out which app regions to download
+	NSMutableArray *numAllAppRegionReviews = [NSMutableArray arrayWithCapacity:allApps.count * storeInfos.count]; // raw review count for all app regions
+	NSMutableDictionary *numRegionReviews = [NSMutableDictionary dictionaryWithCapacity:storeInfos.count]; // number reviews for all apps (countryCode -> NSNumber) 
+	NSMutableDictionary *appRegionReviews = [NSMutableDictionary dictionaryWithCapacity:allApps.count]; // number of reviews for app region (appID -> (countryCode -> NSNumber))
 
+	for (App *app in allApps) {
+		NSMutableDictionary *numAppRegionReviews = [NSMutableDictionary dictionaryWithCapacity:storeInfos.count];
+		[appRegionReviews setValue:numAppRegionReviews forKey:app.appID];
+		for (Review *review in app.reviewsByUser.objectEnumerator) {
+			// add up total number of reviews for each _region_
+			NSNumber *regionCountObj = [numRegionReviews objectForKey:review.countryCode];
+			const NSUInteger regionCount = (regionCountObj ? regionCountObj.intValue + 1 : 1);
+			regionCountObj = [[NSNumber alloc] initWithInteger:regionCount];
+			[numRegionReviews setObject:regionCountObj forKey:review.countryCode];
+			[regionCountObj release];
+			
+			// add up total number of reviews for each _app region_
+			NSNumber *appRegionCountObj = [numAppRegionReviews objectForKey:review.countryCode];
+			const NSInteger appRegionCount = (appRegionCountObj ? appRegionCountObj.integerValue + 1 : 1);
+			appRegionCountObj = [[NSNumber alloc] initWithInteger:appRegionCount];
+			[numAppRegionReviews setObject:appRegionCountObj forKey:review.countryCode];
+			[appRegionCountObj release];
+		}
+		[numAllAppRegionReviews addObjectsFromArray:numAppRegionReviews.allValues];
+	}
+	[numAllAppRegionReviews sortUsingSelector:@selector(compare:)];
+	
+	
+	// sort regions by its number of existing reviews, so the more active regions are downloaded first
+	[storeInfos sortUsingFunction:&numStoreReviewsComparator context:numRegionReviews];
+	
+	if (skipLessActiveRegions) {
 		NSAssert(PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD >= 0 && PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD <= 1, nil);
-		if (numExistingReviews.count == 0) {
+		if (numAllAppRegionReviews.count == 0) {
 			// no reviews for any app have been downloaded yet,
             // and thus we have no idea where new reviews are more likely to show up
 			APPSALESLOG(@"no existing reviews found, downloading all app regions");
@@ -654,15 +658,15 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 				}
 			}
 		} else {
-            // else, grab a chunk of the larger app/regions
+            // else, grab a chunk of the larger app regions
 			// index of upper percent we want to use
-			const NSUInteger scoreThresholdIndex = (1.0f - PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD) * (numExistingReviews.count - 1);
-			const NSInteger scoreThreshold = [[numExistingReviews objectAtIndex:scoreThresholdIndex] integerValue];
+			const NSUInteger scoreThresholdIndex = (1.0f - PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD) * (numAllAppRegionReviews.count - 1);
+			const NSInteger scoreThreshold = [[numAllAppRegionReviews objectAtIndex:scoreThresholdIndex] integerValue];
 			
-			for (NSString *appID in appToRegionScores.allKeys) {
-				NSMutableDictionary *numExistingRegionReviews = [appToRegionScores valueForKey:appID];
-				for (NSString *regionCode in numExistingRegionReviews.allKeys) {
-					NSInteger regionScore = [[numExistingRegionReviews valueForKey:regionCode] integerValue];
+			for (NSString *appID in appRegionReviews.allKeys) {
+				NSMutableDictionary *existingAppRegionReviews = [appRegionReviews valueForKey:appID];
+				for (NSString *regionCode in existingAppRegionReviews.allKeys) {
+					NSInteger regionScore = [[existingAppRegionReviews valueForKey:regionCode] integerValue];
 					if (regionScore >= scoreThreshold) {
 						APPSALESLOG(@"adding %@ %@", regionCode, [[AppManager sharedManager] appWithID:appID].appName);
 						NSMutableDictionary *regionToBool = [appIDtoStoreRegion valueForKey:appID];
@@ -691,11 +695,11 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 						}
 					}
 				}
-			}		
-		}		
+			}
+		}
 	}
     
-    // set the last fetched time, and count up how many app/regions are fetched
+    // count up how many app/regions will be fetched, and update last fetched time
     NSUInteger numAppRegionsToFetch = 0;
 	AppManager *manager = [AppManager sharedManager];
 	for (NSString *appID in appIDtoStoreRegion.allKeys) {
