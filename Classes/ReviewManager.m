@@ -199,7 +199,8 @@
         } else if (! [oldReview.text isEqual:fetchedReview.text]) {
 			 // fetched review is different than what's stored
             const NSTimeInterval ageOfStaleReviewsToIgnore = 24 * 60 * 60; // 1 day
-            if ([fetchedReview.reviewDate isEqualToDate:oldReview.reviewDate] 
+			NSComparisonResult compare = [fetchedReview.reviewDate compare:oldReview.reviewDate];
+            if ((compare == NSOrderedSame || compare == NSOrderedDescending)
                     && ageOfStaleReviewsToIgnore < -1*[fetchedReview.reviewDate timeIntervalSinceNow]) {
                 // if a user writes a review then immediately submits a different review, 
                 // occasionally Apples web servers won't propagate the updated review to all it's webservers,
