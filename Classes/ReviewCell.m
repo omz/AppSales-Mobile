@@ -17,8 +17,9 @@
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
-        cellView = [[[ReviewCellView alloc] initWithCell:self] autorelease];
+        cellView = [[ReviewCellView alloc] initWithCell:self];
 		[self.contentView addSubview:cellView];
+        [cellView release];
     }
     return self;
 }

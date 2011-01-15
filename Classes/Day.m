@@ -166,8 +166,8 @@ static NSDate* reportDateFromString(NSString *dateString) {
             transactionType = [columns objectAtIndex:8];
             units = [columns objectAtIndex:9];
             royalties = [columns objectAtIndex:10];
-            dateColumn = [[columns objectAtIndex:11] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            toDateColumn = [[columns objectAtIndex:12] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            dateColumn = [[columns objectAtIndex:11] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+            toDateColumn = [[columns objectAtIndex:12] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
             countryString = [columns objectAtIndex:14];
             royaltyCurrency = [columns objectAtIndex:15];
             appId = [columns objectAtIndex:18];
