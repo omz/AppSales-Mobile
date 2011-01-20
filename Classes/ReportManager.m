@@ -245,7 +245,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     // iTC shows a (fixed?) number of date ranges in the form, even if all of them are not available 
     // if trying to download a report that doesn't exist, it'll return an error page instead of the report
     if ([responseString rangeOfString:@"theForm:errorPanel"].location != NSNotFound) {
-		APPSALESLOG(@"report not available for @% @%", dayString, weekString);
+		APPSALESLOG(@"report not available for %@ %@", dayString, weekString);
         return nil;
     }
     
