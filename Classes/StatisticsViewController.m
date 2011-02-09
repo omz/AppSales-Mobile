@@ -72,10 +72,8 @@
 	[self updateGraphModeButton];
 	self.navigationItem.rightBarButtonItem = graphModeButton;
 	
-	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
-	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-	
-	/*
+	[self reloadDays];
+    /*
 	//insert the weeks older than the oldest daily report
 	NSMutableArray *allDays = [[sortedDays mutableCopy] autorelease];
 	Day *oldestDayReport = [sortedDays objectAtIndex:0];
@@ -100,7 +98,9 @@
 	}
 	*/
 	
-	self.days = sortedDays;
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadDays)
+												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	
 }
 
 - (void)viewDidLoad
@@ -148,6 +148,15 @@
 	}
 }
 
+- (void)reloadDays
+{
+    NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
+	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+    self.days = sortedDays;
+    [datePicker reloadAllComponents];
+    [self reload];
+}
+
 - (void)reload
 {
 	if (!self.days || [self.days count] == 0)
@@ -164,6 +173,7 @@
 		toIndex = fromIndex;
 		fromIndex = temp;
 	}
+    
 	NSRange selectedRange = NSMakeRange(fromIndex, toIndex - fromIndex + 1);
 	self.selectedDays = [self.days subarrayWithRange:selectedRange];
 	
