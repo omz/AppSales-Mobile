@@ -161,7 +161,19 @@ static NSDate* reportDateFromString(NSString *dateString) {
         NSString *countryString;
         NSString *royaltyCurrency;
 
-		if (numColumns > 19) {
+		if ((numColumns == 18) || (numColumns == 20)) {
+            // Sept 2010 format (18), Feb 2011 format (20)
+            productName = [columns objectAtIndex:4];
+            transactionType = [columns objectAtIndex:6];
+            units = [columns objectAtIndex:7];
+            royalties = [columns objectAtIndex:8];
+            dateColumn = [[columns objectAtIndex:9] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+            toDateColumn = [[columns objectAtIndex:10] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+            countryString = [columns objectAtIndex:12];
+            royaltyCurrency = [columns objectAtIndex:13];
+            appId = [columns objectAtIndex:14];
+            parentID = [columns objectAtIndex:17];
+        } else if (numColumns > 19) {
             // old format	
             productName = [columns objectAtIndex:6];
             transactionType = [columns objectAtIndex:8];
@@ -173,18 +185,6 @@ static NSDate* reportDateFromString(NSString *dateString) {
             royaltyCurrency = [columns objectAtIndex:15];
             appId = [columns objectAtIndex:18];
             parentID = (([columns count] >= 27) ? [columns objectAtIndex:26] : nil);
-        } else if (numColumns == 18) {
-            // Sept 2010 format
-            productName = [columns objectAtIndex:4];
-            transactionType = [columns objectAtIndex:6];
-            units = [columns objectAtIndex:7];
-            royalties = [columns objectAtIndex:8];
-            dateColumn = [[columns objectAtIndex:9] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
-            toDateColumn = [[columns objectAtIndex:10] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
-            countryString = [columns objectAtIndex:12];
-            royaltyCurrency = [columns objectAtIndex:13];
-            appId = [columns objectAtIndex:14];
-            parentID = [columns objectAtIndex:17];
         } else {
             NSLog(@"unknown CSV format: columns %d - %@", numColumns, line);
             [self release];
