@@ -72,10 +72,8 @@
 	[self updateGraphModeButton];
 	self.navigationItem.rightBarButtonItem = graphModeButton;
 	
-	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
-	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-	
-	/*
+	[self reloadDays];
+    /*
 	//insert the weeks older than the oldest daily report
 	NSMutableArray *allDays = [[sortedDays mutableCopy] autorelease];
 	Day *oldestDayReport = [sortedDays objectAtIndex:0];
@@ -100,7 +98,9 @@
 	}
 	*/
 	
-	self.days = sortedDays;
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadDays)
+												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
+	
 }
 
 - (void)viewDidLoad
@@ -148,6 +148,15 @@
 	}
 }
 
+- (void)reloadDays
+{
+    NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
+	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+    self.days = sortedDays;
+    [datePicker reloadAllComponents];
+    [self reload];
+}
+
 - (void)reload
 {
 	if (!self.days || [self.days count] == 0)
@@ -164,38 +173,39 @@
 		toIndex = fromIndex;
 		fromIndex = temp;
 	}
+    
 	NSRange selectedRange = NSMakeRange(fromIndex, toIndex - fromIndex + 1);
 	self.selectedDays = [self.days subarrayWithRange:selectedRange];
 	
 	// this is gross!  There should be a way to lookup an app name by it's id, and the converse
 	NSMutableDictionary *appNamesByAppId = [NSMutableDictionary dictionary];
-	NSMutableDictionary *appIdByAppName = [NSMutableDictionary dictionary];
 	for (Day *d in selectedDays) {
 		for (Country *c in d.countries.allValues) {
 			for (Entry *e in c.entries) { // O(N^3) for a simple lookup?  You know it baby!
 				[appNamesByAppId setObject:e.productName forKey:e.productIdentifier];
-				[appIdByAppName setObject:e.productIdentifier forKey:e.productName];
 			}
 		}
 	}
-	NSArray *allAppsSorted = [[appNamesByAppId allValues] sortedArrayUsingSelector:@selector(compare:)];
+    //sort apps by app id, so that the app with the highest id (latest release date) is shown first:
+    NSArray *allAppIDs = [[appNamesByAppId allKeys] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:nil ascending:NO selector:@selector(compare:)] autorelease]]];
+    
 	for (UIView *v in self.trendViewsForApps) {
 		[v removeFromSuperview];
 	}
 	[trendViewsForApps removeAllObjects];
 	float x = 640.0;
-	for (NSString *appName in allAppsSorted) {
+	for (NSString *appID in allAppIDs) {
 		TrendGraphView *trendView = [[[TrendGraphView alloc] initWithFrame:CGRectMake(x, 0, 320, 200)] autorelease];
 		trendView.days = nil;
-		trendView.appName = appName;
-		trendView.appID = [appIdByAppName objectForKey:appName];
+		trendView.appName = [appNamesByAppId objectForKey:appID];
+		trendView.appID = appID;// [appIdByAppName objectForKey:appName];
 		[trendViewsForApps addObject:trendView];
 		[self.scrollView addSubview:trendView];
 		x += 320;
 	}
 	self.scrollView.contentSize = CGSizeMake(640.0 + [trendViewsForApps count] * 320.0, 200);
 	
-	self.pageControl.numberOfPages = [allAppsSorted count] + 2;
+	self.pageControl.numberOfPages = [allAppIDs count] + 2;
 	
 	[self scrollViewDidEndDecelerating:scrollView];
 }

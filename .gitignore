@@ -8,3 +8,5 @@ build
 .perspective
 *.perspectivev3
 *.mode1v3
+*.xcworkspacedata
+*.xcuserstate
