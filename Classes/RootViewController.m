@@ -128,7 +128,7 @@
 - (UIImage *)sparklineForReports:(NSArray *)days
 {
 	if (&UIGraphicsBeginImageContextWithOptions) {
-		UIGraphicsBeginImageContextWithOptions(CGSizeMake(120, 30),NO,UIScreen.mainScreen.scale);
+		UIGraphicsBeginImageContextWithOptions(CGSizeMake(120, 30), NO, [[UIScreen mainScreen] scale]);
 	} else { // ipad
 		UIGraphicsBeginImageContext(CGSizeMake(120, 30));
 	}
