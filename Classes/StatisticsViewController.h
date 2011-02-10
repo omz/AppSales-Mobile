@@ -35,6 +35,7 @@
 @property (nonatomic, retain) UIPageControl *pageControl;
 @property (retain) UIPickerView *datePicker;
 
+- (void)reloadDays;
 - (void)reload;
 - (void)updateGraphModeButton;
 
