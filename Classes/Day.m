@@ -192,7 +192,6 @@ static NSDate* reportDateFromString(NSString *dateString) {
             return self;
         }
 			
-        [[AppIconManager sharedManager] downloadIconForAppID:appId];
         NSDate *fromDate = reportDateFromString(dateColumn);
         NSDate *toDate = reportDateFromString(toDateColumn);
         if (!fromDate) {
@@ -213,6 +212,8 @@ static NSDate* reportDateFromString(NSString *dateString) {
 			self = nil;
             return self; //sanity check, country code has to have two characters
         }
+		
+		[[AppIconManager sharedManager] downloadIconForAppID:appId];
         
         //Treat in-app purchases as regular purchases for our purposes.
         //IA1: In-App Purchase
