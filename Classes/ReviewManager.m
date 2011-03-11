@@ -7,8 +7,8 @@
 #import "AppManager.h"
 
 // based on the amount of time since the last fetch
-// 'maybe' threshold is the minimum time before an app/region _may_ be downloaded,
-// 'always' threshold is the limit before an app/region _must_ be downloaded
+//  'maybe' threshold is the minimum time before an app/region _may_ be downloaded,
+// 'always' threshold is the minimum time before an app/region _must_ be downloaded
 // 
 // to fetch inactive region/apps less often, set both thresholds to larger values
 #define TIME_THRESHOLD_TO_MAYBE_FETCH_REGION 5 * 60 // 5 minutes
@@ -411,7 +411,7 @@
 
 - (void) incrementDownloadProgress:(NSNumber*)numAppRegionsFetched {
 	percentComplete += numAppRegionsFetched.integerValue * progressIncrement;
-	NSString *status = [[NSString alloc] initWithFormat:@"%2.0f%% complete", ceil(percentComplete)];
+	NSString *status = [[NSString alloc] initWithFormat:@"%2.0f%% complete", percentComplete];
 	[self updateReviewDownloadProgress:status];
 	[status release];
 }
