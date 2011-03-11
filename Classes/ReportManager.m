@@ -520,6 +520,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         AppManager *manager = [AppManager sharedManager];
         for (Country *c in [report.countries allValues]) {
             for (Entry *e in c.entries) {
+				if (e.transactionType==2) { continue; } //skips IAPs in app manager, so IAPs don't duplicate reviews
                 [manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
             }
         }

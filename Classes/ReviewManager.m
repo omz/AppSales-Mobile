@@ -370,6 +370,148 @@
 	NSDate *start = [NSDate date];
 #endif
 
+<<<<<<< HEAD
+=======
+	// setup store fronts, this should probably go into a plist...:
+	NSDateFormatter *frDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSLocale *frLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"fr"] autorelease];
+	[frDateFormatter setLocale:frLocale];
+	[frDateFormatter setDateFormat:@"dd MMM yyyy"];
+	
+	NSDateFormatter *deDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSLocale *deLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"de"] autorelease];
+	[deDateFormatter setLocale:deLocale];
+	[deDateFormatter setDateFormat:@"dd.MM.yyyy"];
+	
+	NSDateFormatter *itDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSLocale *itLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"it"] autorelease];
+	[itDateFormatter setLocale:itLocale];
+	[itDateFormatter setDateFormat:@"dd-MMM-yyyy"];
+		
+	NSDateFormatter *usDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
+	[usDateFormatter setLocale:usLocale];
+	[usDateFormatter setDateFormat:@"MMM dd, yyyy"];
+	
+	defaultDateFormatter = [[NSDateFormatter alloc] init];
+	[defaultDateFormatter setDateFormat:@"dd-MMM-yyyy"];
+    [defaultDateFormatter setLocale:usLocale];
+	
+	storeInfos = [[NSMutableArray alloc] initWithObjects:
+				  getStoreInfoDictionary(@"ae", @"143481", nil),
+				  getStoreInfoDictionary(@"am", @"143524", nil),
+				  getStoreInfoDictionary(@"ar", @"143505", nil),
+				  getStoreInfoDictionary(@"at", @"143445", nil),
+				  getStoreInfoDictionary(@"au", @"143460", nil),
+				  getStoreInfoDictionary(@"bd", @"143446", nil),
+				  getStoreInfoDictionary(@"be", @"143446", nil),
+				  getStoreInfoDictionary(@"bg", @"143526", nil),
+				  getStoreInfoDictionary(@"br", @"143503", nil),
+				  getStoreInfoDictionary(@"bw", @"143525", nil),
+				  getStoreInfoDictionary(@"ca", @"143455", nil),
+				  getStoreInfoDictionary(@"ch", @"143459", nil),
+				  getStoreInfoDictionary(@"ci", @"143527", nil),
+				  getStoreInfoDictionary(@"cl", @"143483", nil),
+				  getStoreInfoDictionary(@"cn", @"143465", nil),
+				  getStoreInfoDictionary(@"co", @"143501", nil),
+				  getStoreInfoDictionary(@"cr", @"143495", nil),
+				  getStoreInfoDictionary(@"cz", @"143489", nil),
+				  getStoreInfoDictionary(@"de", @"143443", deDateFormatter),
+				  getStoreInfoDictionary(@"dk", @"143458", nil),
+				  getStoreInfoDictionary(@"do", @"143508", nil),
+				  getStoreInfoDictionary(@"ec", @"143509", nil),
+				  getStoreInfoDictionary(@"ee", @"143518", nil),
+				  getStoreInfoDictionary(@"eg", @"143516", nil),
+				  getStoreInfoDictionary(@"es", @"143454", nil),
+				  getStoreInfoDictionary(@"fi", @"143447", nil),
+				  getStoreInfoDictionary(@"fr", @"143442", frDateFormatter),
+				  getStoreInfoDictionary(@"gb", @"143444", nil),
+				  getStoreInfoDictionary(@"gr", @"143448", nil),
+				  getStoreInfoDictionary(@"gt", @"143504", nil),
+				  getStoreInfoDictionary(@"hk", @"143463", nil),
+				  getStoreInfoDictionary(@"hn", @"143510", nil),
+				  getStoreInfoDictionary(@"hr", @"143494", nil),
+				  getStoreInfoDictionary(@"hu", @"143482", nil),
+				  getStoreInfoDictionary(@"id", @"143476", nil),
+				  getStoreInfoDictionary(@"ie", @"143449", nil),
+				  getStoreInfoDictionary(@"il", @"143491", nil),
+				  getStoreInfoDictionary(@"in", @"143467", nil),
+				  getStoreInfoDictionary(@"it", @"143450", itDateFormatter),
+				  getStoreInfoDictionary(@"jm", @"143511", nil),
+				  getStoreInfoDictionary(@"jo", @"143528", nil),
+				  getStoreInfoDictionary(@"jp", @"143462", nil),
+				  getStoreInfoDictionary(@"ke", @"143529", nil),
+				  getStoreInfoDictionary(@"kr", @"143466", nil),
+				  getStoreInfoDictionary(@"kw", @"143493", nil),
+				  getStoreInfoDictionary(@"kz", @"143517", nil),
+				  getStoreInfoDictionary(@"lb", @"143497", nil),
+				  getStoreInfoDictionary(@"li", @"143522", nil),
+				  getStoreInfoDictionary(@"lk", @"143486", nil),
+				  getStoreInfoDictionary(@"lt", @"143520", nil),
+				  getStoreInfoDictionary(@"lu", @"143451", nil),
+				  getStoreInfoDictionary(@"lv", @"143519", nil),
+				  getStoreInfoDictionary(@"md", @"143523", nil),
+				  getStoreInfoDictionary(@"mg", @"143531", nil),
+				  getStoreInfoDictionary(@"mk", @"143530", nil),
+				  getStoreInfoDictionary(@"ml", @"143532", nil),
+				  getStoreInfoDictionary(@"mo", @"143515", nil),
+				  getStoreInfoDictionary(@"mt", @"143521", nil),
+				  getStoreInfoDictionary(@"mu", @"143533", nil),
+				  getStoreInfoDictionary(@"mv", @"143488", nil),
+				  getStoreInfoDictionary(@"mx", @"143468", nil),
+				  getStoreInfoDictionary(@"my", @"143473", nil),
+				  getStoreInfoDictionary(@"ne", @"143534", nil),
+				  getStoreInfoDictionary(@"ni", @"143512", nil),
+				  getStoreInfoDictionary(@"nl", @"143452", nil),
+				  getStoreInfoDictionary(@"no", @"143457", nil),
+				  getStoreInfoDictionary(@"np", @"143484", nil),
+				  getStoreInfoDictionary(@"nz", @"143461", nil),
+				  getStoreInfoDictionary(@"pa", @"143485", nil),
+				  getStoreInfoDictionary(@"pe", @"143507", nil),
+				  getStoreInfoDictionary(@"ph", @"143474", nil),
+				  getStoreInfoDictionary(@"pk", @"143477", nil),
+				  getStoreInfoDictionary(@"pl", @"143478", nil),
+				  getStoreInfoDictionary(@"pt", @"143453", nil),
+				  getStoreInfoDictionary(@"py", @"143513", nil),
+				  getStoreInfoDictionary(@"qa", @"143498", nil),
+				  getStoreInfoDictionary(@"ro", @"143487", nil),
+				  getStoreInfoDictionary(@"rs", @"143500", nil),
+				  getStoreInfoDictionary(@"ru", @"143469", nil),
+				  getStoreInfoDictionary(@"sa", @"143479", nil),
+				  getStoreInfoDictionary(@"se", @"143456", nil),
+				  getStoreInfoDictionary(@"sg", @"143464", nil),
+				  getStoreInfoDictionary(@"si", @"143499", nil),
+				  getStoreInfoDictionary(@"sk", @"143496", nil),
+				  getStoreInfoDictionary(@"sn", @"143535", nil),
+				  getStoreInfoDictionary(@"sv", @"143506", nil),
+				  getStoreInfoDictionary(@"th", @"143475", nil),
+				  getStoreInfoDictionary(@"tn", @"143536", nil),
+				  getStoreInfoDictionary(@"tr", @"143480", nil),
+				  getStoreInfoDictionary(@"tw", @"143470", nil),
+				  getStoreInfoDictionary(@"ua", @"143492", nil),
+				  getStoreInfoDictionary(@"ug", @"143537", nil),
+				  getStoreInfoDictionary(@"us", @"143441", usDateFormatter),
+				  getStoreInfoDictionary(@"uy", @"143514", nil),
+				  getStoreInfoDictionary(@"ve", @"143502", nil),
+				  getStoreInfoDictionary(@"vn", @"143471", nil),
+				  getStoreInfoDictionary(@"za", @"143472", nil),
+				  nil];
+	
+	// sort regions by its number of existing reviews, so the less active regions are downloaded last
+	NSMutableDictionary *numExistingReviews = [NSMutableDictionary dictionary];
+	for (App *app in [AppManager sharedManager].allApps) {
+		for (Review *review in [app.reviewsByUser objectEnumerator]) {
+			NSNumber *object = [numExistingReviews objectForKey:review.countryCode];
+			const NSUInteger count = (object ? object.intValue + 1 : 1);
+			[numExistingReviews setObject:[NSNumber numberWithInt:count] forKey:review.countryCode];
+		}
+	}
+	[storeInfos sortUsingFunction:&numStoreReviewsComparator context:numExistingReviews];
+	
+	// increment field can only be accessed on main thread
+	NSNumber *increment = [NSNumber numberWithFloat:100.0f / storeInfos.count];
+	[self performSelectorOnMainThread:@selector(resetProgressIncrement:) withObject:increment waitUntilDone:NO];
+>>>>>>> 60a240bec0eec7cfbeb54d3f6e804409f68d509d
 	downloadDate = [NSDate new];
 	
 	condition = [NSCondition new];
