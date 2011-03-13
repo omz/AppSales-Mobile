@@ -379,8 +379,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSString *dailyName = [salesPage stringByMatching:@"theForm:j_id_jsp_[0-9]*_6"];
     NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_22"];
     NSString *ajaxName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_2"];
-    NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_32"];
-    NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_37"];
+    NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_43"];
+    NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_48"];
     
     // parse days available
     NSMutableArray *availableDays = extractFormOptions(salesPage, @"theForm:datePickerSourceSelectElement");
