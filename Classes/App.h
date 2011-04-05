@@ -19,14 +19,20 @@ NSString* getPrefetchedPath();
 	NSString *appName;
 	NSMutableDictionary *reviewsByUser;
 	float averageStars;
+	float recentStars;
+	NSString *recentVersion;
 }
 
 @property (readonly) NSString *appID;
 @property (readonly) NSString *appName;
 @property (readonly) NSDictionary *reviewsByUser;
 @property (readonly) NSUInteger newReviewsCount;
+@property (readonly) NSUInteger recentReviewsCount;
+@property (readonly) NSUInteger newRecentReviewsCount;
 @property (readonly) NSArray *allAppNames;
 @property (readonly) float averageStars;
+@property (readonly) float recentStars;
+@property (readonly) NSString *recentVersion;
 
 - (id) initWithID:(NSString*)identifier name:(NSString*)name;
 - (void) addOrReplaceReview:(Review*)review;

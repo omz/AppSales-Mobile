@@ -37,7 +37,7 @@
 	[super viewDidLoad];
 	self.sortedApps = [AppManager sharedManager].allAppsSorted;
 	
-	self.tableView.rowHeight = 45;
+	self.tableView.rowHeight = 60;
 	self.title = NSLocalizedString(@"Reviews",nil);
 	UIBarButtonItem *downloadButton = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Download",nil) 
 																		style:UIBarButtonItemStyleBordered 
