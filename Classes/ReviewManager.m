@@ -226,12 +226,26 @@
 						NSString *date = [dateVersionSplitted objectAtIndex:1];
 						date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
 						reviewDate = [dateFormatter dateFromString:date];						
+                        if (reviewDate == nil) {
+                            NSDateFormatter *usDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                            NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
+                            [usDateFormatter setLocale:usLocale];
+                            [usDateFormatter setDateFormat:@"MMM dd, yyyy"];
+                            reviewDate = [usDateFormatter dateFromString:date];
+                        }
 					} else if (dateVersionSplitted.count == 3) {
 						NSString *version = [dateVersionSplitted objectAtIndex:1];
 						reviewVersion = [version stringByTrimmingCharactersInSet:whitespaceCharacterSet];
 						NSString *date = [dateVersionSplitted objectAtIndex:2];
 						date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
 						reviewDate = [dateFormatter dateFromString:date];
+                        if (reviewDate == nil) {
+                            NSDateFormatter *usDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                            NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
+                            [usDateFormatter setLocale:usLocale];
+                            [usDateFormatter setDateFormat:@"MMM dd, yyyy"];
+                            reviewDate = [usDateFormatter dateFromString:date];
+                        }
 					}
 					
 					[scanner scanUpToString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
