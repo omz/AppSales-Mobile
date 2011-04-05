@@ -521,7 +521,11 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         AppManager *manager = [AppManager sharedManager];
         for (Country *c in [report.countries allValues]) {
             for (Entry *e in c.entries) {
-				if (e.transactionType==2) { continue; } //skips IAPs in app manager, so IAPs don't duplicate reviews
+				if (e.transactionType == 2 || e.transactionType == 9) {
+                    //skips IAPs in app manager, so IAPs don't duplicate reviews
+                    [manager removeAppWithID:e.productIdentifier];
+                    continue;
+                } 
                 [manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
             }
         }
@@ -535,6 +539,11 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 	AppManager *manager = [AppManager sharedManager];
 	for (Country *c in [report.countries allValues]) {
 		for (Entry *e in c.entries) {
+            if (e.transactionType == 2 || e.transactionType == 9) {
+                //skips IAPs in app manager, so IAPs don't duplicate reviews
+                [manager removeAppWithID:e.productIdentifier];
+                continue;
+            } 
 			[manager createOrUpdateAppIfNeededWithID:e.productIdentifier name:e.productName];
 		}
 	}
