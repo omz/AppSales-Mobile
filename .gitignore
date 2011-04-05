@@ -10,3 +10,4 @@ build
 *.mode1v3
 *.xcworkspacedata
 *.xcuserstate
+*xcuserdata*
