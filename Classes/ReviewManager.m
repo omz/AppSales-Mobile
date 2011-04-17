@@ -169,7 +169,7 @@
             
 			NSString *storeFrontID = [storeInfo objectForKey:@"storeFrontID"];
 			NSString *storeFront = [storeFrontID stringByAppendingFormat:@"-1"];
-			[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
+			[headers setObject:@"iTunes/10.2.1 (Macintosh; Intel Mac OS X 10.6.7) AppleWebKit/533.20.25" forKey:@"User-Agent"];
 			[headers setObject:storeFront forKey:@"X-Apple-Store-Front"];
 			[request setAllHTTPHeaderFields:headers];
 			[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
