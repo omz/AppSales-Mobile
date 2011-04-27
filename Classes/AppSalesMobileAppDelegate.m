@@ -41,13 +41,30 @@
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application 
 {
-	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+	self.window = [[[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
 	
 	if ([[UIDevice currentDevice] isPad]) {
 		self.rootViewController = [[[PadRootViewController alloc] initWithNibName:nil bundle:nil] autorelease];
 	} else {
 		self.rootViewController = [[[UINavigationController alloc] initWithRootViewController:[[[RootViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease]] autorelease];
 		[(UINavigationController *)rootViewController setToolbarHidden:NO];
+        
+        // quickly fade from splash screen to the active app
+        UIImageView *splashView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 20, 320, 460)];
+        UIImage *image = [UIImage imageNamed:@"Default"];
+        NSAssert(image, nil);
+        splashView.image = image;
+        [rootViewController.view addSubview:splashView]; // retains
+        
+        [UIView beginAnimations:nil context:NULL];
+		[UIView setAnimationDuration:0.2f];
+        
+        splashView.alpha = 0;
+        
+		[UIView setAnimationDelegate:splashView];
+		[UIView setAnimationDidStopSelector:@selector(removeFromSuperview)]; // releases
+		[UIView commitAnimations];
+        [splashView release];
 	}
 	
 	[window addSubview:rootViewController.view];
