@@ -7,6 +7,7 @@
 //
 
 #import "AppleFiscalCalendar.h"
+#import "AppSalesUtils.h"
 
 @implementation AppleFiscalCalendar
 
@@ -14,7 +15,7 @@
 {
     self = [super init];
     if (self) {
-        sortedDateStrings = [[NSArray arrayWithObjects:
+        sortedDateStrings = [[NSArray alloc] initWithObjects:
                                         @"20080928", // Oct 2008
                                         @"20081102", // Nov 2008
                                         @"20081130", // Dec 2008
@@ -51,12 +52,13 @@
                                         @"20110626", // Jul 2011
                                         @"20110731", // Aug 2011
                                         @"20110828", // Sep 2011
-                                       nil] retain];
+                                       nil];
 
-        NSMutableArray *names = [NSMutableArray arrayWithCapacity:[sortedDateStrings count]];
-        NSMutableArray *dates = [NSMutableArray arrayWithCapacity:[sortedDateStrings count]];
+        const NSUInteger numSortedDates = [sortedDateStrings count];
+        NSMutableArray *names = [NSMutableArray arrayWithCapacity:numSortedDates];
+        NSMutableArray *dates = [NSMutableArray arrayWithCapacity:numSortedDates];
 
-        NSDateFormatter *dayStringParser = [[NSDateFormatter alloc] init];
+        NSDateFormatter *dayStringParser = [NSDateFormatter new];
         [dayStringParser setDateFormat:@"YYYYMMdd"];
 		NSDateFormatter *sectionTitleFormatter = [NSDateFormatter new];
 		[sectionTitleFormatter setDateFormat:@"MMMM yyyy"];
@@ -66,7 +68,7 @@
             [dates addObject:date];
 
             // Name of the fiscal month can be reliably found by the calendar month of a day 2 weeks after the fiscal month begins
-            NSDateComponents *components = [[NSDateComponents alloc] init];
+            NSDateComponents *components = [NSDateComponents new];
             [components setDay:14];
             NSDate *result = [gregorian dateByAddingComponents:components toDate:date options:0];
             [components release];
@@ -104,6 +106,7 @@
 
 + (AppleFiscalCalendar *)sharedFiscalCalendar
 {
+    ASSERT_IS_MAIN_THREAD();
 	static AppleFiscalCalendar *sharedFiscalCalendar = nil;
 	if (sharedFiscalCalendar == nil)
 		sharedFiscalCalendar = [AppleFiscalCalendar new];
@@ -113,9 +116,9 @@
 
 - (void)dealloc
 {
-    [sortedDates release], sortedDates = nil;
-    [sortedDateStrings release], sortedDateStrings = nil;
-    [sortedFiscalMonthNames release], sortedFiscalMonthNames = nil;
+    RELEASE_SAFELY(sortedDates);
+    RELEASE_SAFELY(sortedDateStrings);
+    RELEASE_SAFELY(sortedFiscalMonthNames);
     [super dealloc];
 }
 

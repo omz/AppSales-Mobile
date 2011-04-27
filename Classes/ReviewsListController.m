@@ -68,12 +68,9 @@
 
 -(void) readall
 {
-	NSUInteger lCurIdx, lNbReviews = [reviews count];
-	for (lCurIdx = 0; lCurIdx < lNbReviews; lCurIdx++)
-	{
-		Review * lCurReview = [reviews objectAtIndex:lCurIdx];
-		lCurReview.newOrUpdatedReview = NO;
-	}
+    for (Review *rev in reviews) {
+        rev.newOrUpdatedReview = NO;
+    }
 	[self.tableView reloadData];
 }
 

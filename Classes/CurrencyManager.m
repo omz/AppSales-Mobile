@@ -121,7 +121,7 @@
 		[self refreshIfNeeded];
 	}
 
-	self.conversionDict = [[NSMutableDictionary alloc] init];
+	self.conversionDict = [NSMutableDictionary new];
 		
 	return self;
 }

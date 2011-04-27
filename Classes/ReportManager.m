@@ -481,8 +481,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 }
 
 - (void) finishFetchingReports {
-	NSAssert([NSThread isMainThread], nil);
-	
+    ASSERT_IS_MAIN_THREAD();
 	isRefreshing = NO;
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerUpdatedDownloadProgressNotification object:self];
@@ -492,7 +491,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 
 - (void)downloadFailed:(NSString*)error
 {
-    NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	NSString *message = NSLocalizedString(
 										  @"Sorry, an error occured when trying to download the report files. Please check your username, password and internet connection.",nil);
@@ -596,7 +595,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 
 - (void)saveData
 {
-    NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	[[AppManager sharedManager] saveToDisk];
 	
 	//save all days/weeks in separate files:

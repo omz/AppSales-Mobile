@@ -7,12 +7,13 @@
 //
 
 #import "NSDateFormatter+SharedInstances.h"
+#import "AppSalesUtils.h"
 
 @implementation NSDateFormatter (SharedInstances)
 
 + (NSDateFormatter *)sharedFullDateFormatter
 {
-    NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	static NSDateFormatter *sharedDateFormatter = nil;
 	if (!sharedDateFormatter) {
 		sharedDateFormatter = [NSDateFormatter new];
@@ -24,7 +25,7 @@
 
 + (NSDateFormatter *)sharedLongDateFormatter
 {
-    NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	static NSDateFormatter *sharedDateFormatter = nil;
 	if (!sharedDateFormatter) {
 		sharedDateFormatter = [NSDateFormatter new];
@@ -36,7 +37,7 @@
 
 + (NSDateFormatter *)sharedMediumDateFormatter
 {
-    NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	static NSDateFormatter *sharedDateFormatter = nil;
 	if (!sharedDateFormatter) {
 		sharedDateFormatter = [NSDateFormatter new];
@@ -49,7 +50,7 @@
 
 + (NSDateFormatter *)sharedShortDateFormatter
 {
-    NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	static NSDateFormatter *sharedDateFormatter = nil;
 	if (!sharedDateFormatter) {
 		sharedDateFormatter = [NSDateFormatter new];

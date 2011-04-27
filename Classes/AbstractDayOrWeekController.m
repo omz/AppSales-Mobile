@@ -25,7 +25,7 @@
 		daysByMonth = [NSMutableArray new];
 		sectionTitleFormatter = [NSDateFormatter new];
 		[sectionTitleFormatter setDateFormat:@"MMMM yyyy"];
-		self.maxRevenue = 0;
+		maxRevenue = 0;
 	}	
 	return self;
 }
@@ -47,7 +47,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-	if (self.daysByMonth.count == 0)
+	if (daysByMonth.count == 0)
 		return @"";
 	
 	NSArray *sectionArray = [daysByMonth objectAtIndex:section];
@@ -55,19 +55,19 @@
 		return @"";
 		
 	Day *firstDayInSection = [sectionArray objectAtIndex:0];
-	return [self.sectionTitleFormatter stringFromDate:firstDayInSection.date];
+	return [sectionTitleFormatter stringFromDate:firstDayInSection.date];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
 {
-	NSInteger count = self.daysByMonth.count;
+	NSInteger count = daysByMonth.count;
 	return (count > 1 ? count : 1);
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
-	if (self.daysByMonth.count > 0) {
-		return [[self.daysByMonth objectAtIndex:section] count];
+	if (daysByMonth.count > 0) {
+		return [[daysByMonth objectAtIndex:section] count];
 	}
     return 0;
 }
@@ -79,8 +79,8 @@
 
 - (void)dealloc 
 {
-	self.sectionTitleFormatter = nil;
-	self.daysByMonth = nil;
+	[sectionTitleFormatter release];
+    [daysByMonth release];
     [super dealloc];
 }
 

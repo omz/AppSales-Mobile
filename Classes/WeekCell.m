@@ -58,13 +58,4 @@
 }
 
 
-- (void)dealloc 
-{
-	self.day = nil;
-	self.graphColor = nil;
-	
-    [super dealloc];
-}
-
-
 @end

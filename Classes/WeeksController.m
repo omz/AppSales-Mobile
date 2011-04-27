@@ -337,7 +337,6 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 
 - (void)dealloc 
 {
-	self.daysByMonth = nil;
 	self.previsionReport = nil;
     [super dealloc];
 }
