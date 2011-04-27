@@ -26,6 +26,8 @@
 + (BOOL) showTranslatedReviews;
 + (void) setShowTranslatedReviews:(BOOL)showTranslatedReviews;
 
++ (void) updateTranslations:(NSArray*)reviews; // identical to the individual instance method, but much faster when translating multiple reviews
+
 @property (retain, readonly) NSString *user;
 @property (retain, readonly) NSDate *reviewDate;
 @property (retain, readonly) NSDate *downloadDate;
