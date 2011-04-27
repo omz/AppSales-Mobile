@@ -8,6 +8,9 @@
 #endif
 
 
+#define ASSERT_IS_MAIN_THREAD() NSAssert([NSThread isMainThread], @"must call from main thread");
+#define ASSERT_NOT_MAIN_THREAD() NSAssert([NSThread isMainThread] == false, @"do not call from main thread");
+
 __attribute__((constructor)) // run this function run when the app loads
 static void InitRandom() {
 	srandom(time(NULL));

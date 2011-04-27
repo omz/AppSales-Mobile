@@ -46,7 +46,7 @@
 @end
 
 
-@interface WeeksController : AbstractDayOrWeekController {
+@interface WeeksController : AbstractDayOrWeekController<UIActionSheetDelegate> {
 	BOOL onlySum;
 	PrevisionReport *previsionReport;
 }

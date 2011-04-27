@@ -48,6 +48,7 @@
 #import "ReviewManager.h"
 #import "ImportExportViewController.h"
 #import "UIDevice+iPad.h"
+#import "AppleFiscalCalendar.h"
 
 @implementation RootViewController
 
@@ -111,6 +112,12 @@
 												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshWeeklyTrend) 
 												 name:ReportManagerDownloadedWeeklyReportsNotification object:nil];	
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    // Pre-initialize Apple calendar here for UI responsiveness; slight, slight gain, but noticeable
+    [AppleFiscalCalendar sharedFiscalCalendar];
 }
 
 - (void) viewWillDisappear:(BOOL)animated {

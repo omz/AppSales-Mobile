@@ -19,6 +19,7 @@
 - (App*) appWithID:(NSString*)appID;
 - (void) addApp:(App*)app;
 - (BOOL) createOrUpdateAppIfNeededWithID:(NSString*)appID name:(NSString*)appName;
+- (void) removeAppWithID:(NSString*)appID;
 - (void) saveToDisk;
 
 @end

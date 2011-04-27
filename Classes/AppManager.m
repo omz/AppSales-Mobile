@@ -54,6 +54,10 @@
 	[appsByID setObject:app forKey:app.appID];
 }
 
+- (void) removeAppWithID:(NSString*)appID {
+    [appsByID removeObjectForKey:appID];
+}
+
 - (BOOL) createOrUpdateAppIfNeededWithID:(NSString*)appID name:(NSString*)appName {
 	App *app = [self appWithID:appID];
 	if (app == nil) {

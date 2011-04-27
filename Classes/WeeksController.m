@@ -38,6 +38,7 @@
 #import "ReportManager.h"
 #import "Country.h"
 #import "NSDateFormatter+SharedInstances.h"
+#import "AppleFiscalCalendar.h"
 
 #define BACK_GROUND_COLOR [UIColor colorWithRed:0.92 green:1.0 blue:0.92 alpha:1.0]
 
@@ -82,7 +83,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 @synthesize maxRevenue;
 
 - (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier {
-	if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
+	if ((self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier])) {
 		UIColor *calendarBackgroundColor = [UIColor colorWithRed:0.84 green:1.0 blue:0.84 alpha:1.0];
 		UIView *calendarBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(0,0,45,44)] autorelease];
 		calendarBackgroundView.backgroundColor = calendarBackgroundColor;
@@ -130,9 +131,13 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 @end
 
 
+@interface WeeksController ()
+@property (nonatomic, assign) DayCalendarType calendarType;
+@end
+
 @implementation WeeksController
 
-@synthesize previsionReport;
+@synthesize previsionReport, calendarType;
 
 - (id)init
 {
@@ -140,10 +145,13 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
     if (self) {
         self.title = NSLocalizedString(@"Weekly Reports",nil);
         
-        UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Only sum", nil) 
-                                                                   style:UIBarButtonItemStyleBordered 
-                                                                  target:self 
-                                                                  action:@selector(onlySum:)];
+//        UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Only sum", nil) 
+//                                                                   style:UIBarButtonItemStyleBordered 
+//                                                                  target:self 
+//                                                                  action:@selector(onlySum:)];
+//        self.navigationItem.rightBarButtonItem = button;
+//        [button release];
+        UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(showActions:)];
         self.navigationItem.rightBarButtonItem = button;
         [button release];
     }	
@@ -154,6 +162,34 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	onlySum = !onlySum;
 	[self.navigationItem.rightBarButtonItem setStyle:onlySum ? UIBarButtonItemStyleDone : UIBarButtonItemStyleBordered];
 	[self.tableView reloadData];
+}
+
+- (void)showActions:(id)sender {
+    NSString *otherCalendar = self.calendarType == DayCalendarTypeCalendar ? @"Use Fiscal Calendar" : @"Use Monthly Calendar";
+    UIActionSheet *actions = [[UIActionSheet alloc] initWithTitle:@""
+                                                         delegate:self
+                                                cancelButtonTitle:@"Cancel"
+                                           destructiveButtonTitle:nil
+                                                otherButtonTitles:@"Show Only Sums", otherCalendar, nil];
+    [actions showInView:self.view];
+    [actions release];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == actionSheet.cancelButtonIndex) {
+        return;
+    }
+    if (buttonIndex == actionSheet.firstOtherButtonIndex) {
+        [self onlySum:actionSheet];
+        return;
+    }
+    if (self.calendarType == DayCalendarTypeCalendar) {
+        [[NSUserDefaults standardUserDefaults] setInteger:DayCalendarTypeAppleFiscal forKey:@"DayCalendarType"];
+    } else {
+        [[NSUserDefaults standardUserDefaults] setInteger:DayCalendarTypeCalendar forKey:@"DayCalendarType"];
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self reload];
 }
 
 - (NSIndexPath*) adjustPathForCurrentView:(NSIndexPath*)path {
@@ -169,6 +205,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 - (void)reload
 {
 	self.daysByMonth = [NSMutableArray array];
+    self.calendarType = [[NSUserDefaults standardUserDefaults] integerForKey:@"DayCalendarType"];
 	
 	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 	NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
@@ -177,27 +214,40 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	int numeberOfMonths = 0;
 	float max = 0;
     NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+    AppleFiscalCalendar *appleCalendar = [AppleFiscalCalendar sharedFiscalCalendar];
+    NSString *lastMonthString = nil;
+
 	for (Day *d in sortedWeeks) {
 		float revenue = [d totalRevenueInBaseCurrency];
 		if (revenue > max)
 			max = revenue;
+        
 		NSDate *date = d.date;
-		NSDateComponents *components = [calendar components:NSMonthCalendarUnit fromDate:date];
-		int month = [components month];
-		if (month != lastMonth) {
-			if (lastMonth == -1)
-				firstMonth = month;
-			[daysByMonth addObject:[NSMutableArray array]];
-			lastMonth = month;
-		}
-		[[daysByMonth lastObject] addObject:d];
+        if (self.calendarType == DayCalendarTypeCalendar) {
+            NSDateComponents *components = [calendar components:NSMonthCalendarUnit fromDate:date];
+            int month = [components month];
+            if (month != lastMonth) {
+                if (lastMonth == -1)
+                    firstMonth = month;
+                [self.daysByMonth addObject:[NSMutableArray array]];
+                lastMonth = month;
+            }
+        } else {
+            NSString *monthString = [appleCalendar fiscalMonthForDate:date];
+            if (monthString && [monthString compare:lastMonthString] != NSOrderedSame) {
+                [self.daysByMonth addObject:[NSMutableArray array]];
+                lastMonthString = monthString;
+            }
+        }
+        [[self.daysByMonth lastObject] addObject:d];
+
 		numeberOfMonths++;
 	}
-	
+    	
 	//Prevision
 	self.previsionReport = nil; 
 	if(numeberOfMonths > 0){
-		NSDate *firstDayLastWeek = ((Day *)[[daysByMonth objectAtIndex:0] objectAtIndex:0]).date;
+		NSDate *firstDayLastWeek = ((Day *)[[self.daysByMonth objectAtIndex:0] objectAtIndex:0]).date;
 		NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
 		if(sortedDays.count > 0 && [((Day *)[sortedDays objectAtIndex:0]).date timeIntervalSinceDate:firstDayLastWeek] >= 691200){ //8 days
 			//days of the current week
@@ -242,7 +292,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 					revenueNewWeek += [[newWeekDays objectAtIndex:i] totalRevenueInBaseCurrency];
 					revenueLastWeek += [[lastWeekDays objectAtIndex:i] totalRevenueInBaseCurrency];					
 				}
-				float revenue = [[[daysByMonth objectAtIndex:0] objectAtIndex:0] totalRevenueInBaseCurrency] * revenueNewWeek / revenueLastWeek;
+				float revenue = [[[self.daysByMonth objectAtIndex:0] objectAtIndex:0] totalRevenueInBaseCurrency] * revenueNewWeek / revenueLastWeek;
 				if(revenue > max)
 					max = revenue;
 				self.previsionReport = [[PrevisionReport new] autorelease];
@@ -357,8 +407,13 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 		}
 		
 		if(!onlySum){
-			Day *firstDayInSection = [[self.daysByMonth objectAtIndex:section] objectAtIndex:0];
-			cell.textLabel.text = [NSString stringWithFormat:@"%@:", [self.sectionTitleFormatter stringFromDate:firstDayInSection.date]];
+			Day *firstDayInSection = [[self.daysByMonth objectAtIndex:indexPath.section] objectAtIndex:0];
+            if (self.calendarType == DayCalendarTypeCalendar) {
+                cell.textLabel.text = [NSString stringWithFormat:@"%@:", [self.sectionTitleFormatter stringFromDate:firstDayInSection.date]];
+            } else {
+                AppleFiscalCalendar *calendar = [AppleFiscalCalendar sharedFiscalCalendar];
+                cell.textLabel.text = [calendar fiscalMonthForDate:firstDayInSection.date];
+            }
 		}else
 			cell.textLabel.text = NSLocalizedString(@"Subtotal:", nil);
 		
@@ -452,7 +507,13 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 		countriesController.totalRevenue = total;
 		
 		Day *firstDayInSection = [[self.daysByMonth objectAtIndex:section] objectAtIndex:0];
-		countriesController.title = [self.sectionTitleFormatter stringFromDate:firstDayInSection.date];
+        if (self.calendarType == DayCalendarTypeCalendar) {
+            countriesController.title = [self.sectionTitleFormatter stringFromDate:firstDayInSection.date];
+        } else {
+            AppleFiscalCalendar *calendar = [AppleFiscalCalendar sharedFiscalCalendar];
+            countriesController.title = [calendar fiscalMonthForDate:firstDayInSection.date];
+        }
+
 		countriesController.countries = children;
 		[countriesController.tableView reloadData];
 		
@@ -546,12 +607,17 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	if (self.daysByMonth.count == 0)
 		return @"";
 	
-	NSArray *sectionArray = [daysByMonth objectAtIndex:section];
+	NSArray *sectionArray = [self.daysByMonth objectAtIndex:section];
 	if (sectionArray.count == 0)
 		return @"";
 	
 	Day *firstDayInSection = [sectionArray objectAtIndex:0];
-	return [self.sectionTitleFormatter stringFromDate:firstDayInSection.date];
+    if (self.calendarType == DayCalendarTypeCalendar) {
+        return [self.sectionTitleFormatter stringFromDate:firstDayInSection.date];
+    } else {
+        AppleFiscalCalendar *calendar = [AppleFiscalCalendar sharedFiscalCalendar];
+        return [calendar fiscalMonthForDate:firstDayInSection.date];
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath 

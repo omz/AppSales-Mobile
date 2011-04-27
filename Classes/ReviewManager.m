@@ -178,7 +178,7 @@
 }
 
 - (void) checkIfReviewsUpToDate:(ReviewUpdateBundle*)bundle {
-	NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	App *app = [[AppManager sharedManager] appWithID:bundle.appID];
 	
 	NSDictionary *existingReviews = app.reviewsByUser;
@@ -208,7 +208,7 @@
 
 // called after translating new or updated reviews
 - (void) addReviews:(ReviewUpdateBundle*)bundle {
-	NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	App *app = [[AppManager sharedManager] appWithID:bundle.appID];
     for (Review *fetchedReivew in bundle.needsUpdating) {
         [app addOrReplaceReview:fetchedReivew];        
@@ -217,7 +217,7 @@
 }
 
 - (void) workerThreadFetch { // called by worker threads
-    NSAssert(! [NSThread isMainThread], nil);
+    ASSERT_NOT_MAIN_THREAD();
 	NSAutoreleasePool *outerPool = [NSAutoreleasePool new];
 	@try {
 		NSMutableURLRequest *request = [[NSMutableURLRequest new] autorelease];
@@ -241,7 +241,7 @@
             
 			NSString *storeFrontID = storeInfo.storeFrontID;
 			NSString *storeFront = [storeFrontID stringByAppendingString:@"-1"];
-			[headers setObject:@"iTunes/4.2 (Macintosh; U; PPC Mac OS X 10.2)" forKey:@"User-Agent"];
+			[headers setObject:@"iTunes/9.2.1 (Macintosh; Intel Mac OS X 10.5.8) AppleWebKit/533.16" forKey:@"User-Agent"];
 			[headers setObject:storeFront forKey:@"X-Apple-Store-Front"];
 			[request setAllHTTPHeaderFields:headers];
 			[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
@@ -305,12 +305,26 @@
 						NSString *date = [dateVersionSplitted objectAtIndex:1];
 						date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
 						reviewDate = [dateFormatter dateFromString:date];						
+                        if (reviewDate == nil) {
+                            NSDateFormatter *usDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                            NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
+                            [usDateFormatter setLocale:usLocale];
+                            [usDateFormatter setDateFormat:@"MMM dd, yyyy"];
+                            reviewDate = [usDateFormatter dateFromString:date];
+                        }
 					} else if (dateVersionSplitted.count == 3) {
 						NSString *version = [dateVersionSplitted objectAtIndex:1];
 						reviewVersion = [version stringByTrimmingCharactersInSet:whitespaceCharacterSet];
 						NSString *date = [dateVersionSplitted objectAtIndex:2];
 						date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
 						reviewDate = [dateFormatter dateFromString:date];
+                        if (reviewDate == nil) {
+                            NSDateFormatter *usDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                            NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
+                            [usDateFormatter setLocale:usLocale];
+                            [usDateFormatter setDateFormat:@"MMM dd, yyyy"];
+                            reviewDate = [usDateFormatter dateFromString:date];
+                        }
 					}
 					
 					[scanner scanUpToString:@"<SetFontStyle normalStyle=\"textColor\">" intoString:NULL];
@@ -338,9 +352,7 @@
                     ReviewUpdateBundle *bundle = [[[ReviewUpdateBundle alloc] initWithAppID:appID reviews:input] autorelease];
                     [self performSelectorOnMainThread:@selector(checkIfReviewsUpToDate:) withObject:bundle waitUntilDone:YES];
                     if (bundle.needsUpdating.count) {
-                        for (Review *fetchedReview in bundle.needsUpdating) {
-                            [fetchedReview updateTranslations];
-                        }
+                        [Review updateTranslations:bundle.needsUpdating];
                         [self performSelectorOnMainThread:@selector(addReviews:) withObject:bundle waitUntilDone:YES];		
                     }
                 }
@@ -361,7 +373,7 @@
 
 - (void) updateReviews {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
-	NSAssert(! [NSThread isMainThread], nil);
+    ASSERT_NOT_MAIN_THREAD();
 #if APPSALES_DEBUG
 	NSDate *start = [NSDate date];
 #endif
@@ -398,7 +410,7 @@
 }
 
 - (void) updateReviewDownloadProgress:(NSString*)status {
-    //	NSAssert([NSThread isMainThread], nil);
+    //	    ASSERT_IS_MAIN_THREAD();
 	[status retain]; // must retain first
 	[reviewDownloadStatus release];
 	reviewDownloadStatus = status;
@@ -425,7 +437,7 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 }
 
 - (void) downloadReviews {
-	NSAssert([NSThread isMainThread], nil);
+    ASSERT_IS_MAIN_THREAD();
 	if (isDownloadingReviews) {
 		return;
 	}
@@ -702,7 +714,7 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 }
 
 - (void) finishDownloadingReviews {
-	NSAssert([NSThread isMainThread], nil);	
+    ASSERT_IS_MAIN_THREAD();
 	isDownloadingReviews = NO;
 	
 	[[AppManager sharedManager] saveToDisk];

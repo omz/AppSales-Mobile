@@ -17,15 +17,21 @@
 	NSMutableDictionary *reviewsByUser;
     NSMutableDictionary *lastTimeRegionDownloaded; // mapping of app store to NSDate of last time reviews fetched
 	float averageStars;
+	float recentStars;
+	NSString *recentVersion;
 }
 
 @property (readonly) NSString *appID;
 @property (readonly) NSString *appName;
+@property (readonly) NSString *recentVersion; // the current app version
 @property (readonly) NSDictionary *reviewsByUser;
-@property (readonly) NSUInteger totalReviewsCount;
+@property (readonly) NSUInteger totalReviewsCount; // all reviews downloaded, for any version (current or old) 
 @property (readonly) NSUInteger newReviewsCount;
+@property (readonly) NSUInteger recentReviewsCount; // reviews for the current app version  
+@property (readonly) NSUInteger newRecentReviewsCount; // freshly downloaded reviews for the current app version
 @property (readonly) NSArray *allAppNames;
 @property (readonly) float averageStars;
+@property (readonly) float recentStars; // average stars for the current app version
 
 - (id) initWithID:(NSString*)identifier name:(NSString*)name;
 - (void) addOrReplaceReview:(Review*)review;

@@ -138,6 +138,7 @@
 		7FEA5B40105B6CD2000A12E6 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5B3F105B6CD2000A12E6 /* ReviewTemplate.html */; };
 		7FEA5B43105B6D38000A12E6 /* SingleReviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */; };
 		7FEA5C2C105C1A57000A12E6 /* 5stars_gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */; };
+		B03E6A4D134BC34C00532893 /* AppleFiscalCalendar.m in Sources */ = {isa = PBXBuildFile; fileRef = B03E6A4C134BC34C00532893 /* AppleFiscalCalendar.m */; };
 		F22984BC11DD32700067EFD2 /* Graphs_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F22984BA11DD32700067EFD2 /* Graphs_Highlighted@2x.png */; };
 		F22984BD11DD32700067EFD2 /* Graphs@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F22984BB11DD32700067EFD2 /* Graphs@2x.png */; };
 		F22984C911DD343C0067EFD2 /* 5stars_gray@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F22984C711DD343C0067EFD2 /* 5stars_gray@2x.png */; };
@@ -869,6 +870,8 @@
 		7FEA5B42105B6D38000A12E6 /* SingleReviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleReviewController.m; sourceTree = "<group>"; };
 		7FEA5C2B105C1A57000A12E6 /* 5stars_gray.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5stars_gray.png; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B03E6A4B134BC34C00532893 /* AppleFiscalCalendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleFiscalCalendar.h; sourceTree = "<group>"; };
+		B03E6A4C134BC34C00532893 /* AppleFiscalCalendar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleFiscalCalendar.m; sourceTree = "<group>"; };
 		F22984BA11DD32700067EFD2 /* Graphs_Highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphs_Highlighted@2x.png"; sourceTree = "<group>"; };
 		F22984BB11DD32700067EFD2 /* Graphs@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphs@2x.png"; sourceTree = "<group>"; };
 		F22984C711DD343C0067EFD2 /* 5stars_gray@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "5stars_gray@2x.png"; sourceTree = "<group>"; };
@@ -2171,6 +2174,14 @@
 				7F4A525A116A9F4E00FA2019 /* NSDateFormatter+SharedInstances.m */,
 				7FB0C4400EB97BC1005E2C45 /* NSDictionary+HTTP.h */,
 				7FB0C4410EB97BC1005E2C45 /* NSDictionary+HTTP.m */,
+				7FB0C4A90EB99D01005E2C45 /* CurrencyManager.h */,
+				7FB0C4AA0EB99D01005E2C45 /* CurrencyManager.m */,
+				B03E6A4B134BC34C00532893 /* AppleFiscalCalendar.h */,
+				B03E6A4C134BC34C00532893 /* AppleFiscalCalendar.m */,
+				34DCF08E0F0461A2009F9929 /* SFHFKeychainUtils.h */,
+				34DCF08D0F0461A2009F9929 /* SFHFKeychainUtils.m */,
+				7FE3138E1152891A004DEA7C /* ProgressHUD.h */,
+				7FE3138F1152891A004DEA7C /* ProgressHUD.m */,
 				7FE313A0115294C9004DEA7C /* NSData+Compression.h */,
 				7FE313A1115294C9004DEA7C /* NSData+Compression.m */,
 				FAED39B811E7E86E003061C4 /* NSString+UnescapeHtml.h */,
@@ -3128,6 +3139,7 @@
 				FA009F1211E93E8200242DFF /* AppManager.m in Sources */,
 				FA027E6E12407BF500067812 /* RegexKitLite.m in Sources */,
 				FAA9E92712E22BB200ADD3C9 /* AppSalesUtils.m in Sources */,
+				B03E6A4D134BC34C00532893 /* AppleFiscalCalendar.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3239,16 +3251,20 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_FAST_MATH = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = "NS_BLOCK_ASSERTIONS=1";
+				GCC_STRICT_ALIASING = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
-				PREBINDING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = AppSales;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Distribution;
 		};
@@ -3259,13 +3275,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_FAST_MATH = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "APPSALES_DEBUG=1";
+				GCC_STRICT_ALIASING = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
-				PREBINDING = YES;
 				PRODUCT_NAME = AppSales;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
@@ -3281,13 +3300,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_FAST_MATH = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = "NS_BLOCK_ASSERTIONS=1";
+				GCC_STRICT_ALIASING = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
-				PREBINDING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				PRODUCT_NAME = AppSales;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
