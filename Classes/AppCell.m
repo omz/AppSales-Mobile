@@ -16,7 +16,7 @@
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier 
 {
-	if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+	if ((self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])) {
 		cellView = [[[AppCellView alloc] initWithCell:self] autorelease];
 		[self.contentView addSubview:cellView];
     }
@@ -120,7 +120,7 @@
 	[@"Overall" drawInRect:CGRectMake(50, 40, 140, 15) withFont:[UIFont italicSystemFontOfSize:12.0]];
 	NSString *overallSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %i reviews",nil), app.averageStars, [app.reviewsByUser count]];
 	if (app.newRecentReviewsCount) {
-		overallSummary = [overallSummary stringByAppendingFormat:NSLocalizedString(@" (%i new)",nil), app.newRecentReviewsCount];
+		overallSummary = [overallSummary stringByAppendingFormat:NSLocalizedString(@" (%i new)",nil), app.newReviewsCount];
 	}
     CGSize overallSummarySize = [overallSummary sizeWithFont:[UIFont systemFontOfSize:12.0]];
 	[overallSummary drawInRect:CGRectMake(290-overallSummarySize.width, 55-overallSummarySize.height, overallSummarySize.width, overallSummarySize.height) withFont:[UIFont italicSystemFontOfSize:12.0]];
