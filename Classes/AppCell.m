@@ -102,7 +102,7 @@
 	else
 		[[UIColor darkGrayColor] set];
     
-	[app.recentVersion drawInRect:CGRectMake(50, 25, 140, 15) withFont:[UIFont systemFontOfSize:12.0]];
+	[app.currentVersion drawInRect:CGRectMake(50, 25, 140, 15) withFont:[UIFont systemFontOfSize:12.0]];
 	NSString *recentSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %i reviews",nil), app.recentStars, app.recentReviewsCount];
 	if (app.newRecentReviewsCount) {
 		recentSummary = [recentSummary stringByAppendingFormat:NSLocalizedString(@" (%i new)",nil), app.newRecentReviewsCount];

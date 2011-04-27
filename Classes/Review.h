@@ -31,7 +31,7 @@
 @property (retain, readonly) NSString *user;
 @property (retain, readonly) NSDate *reviewDate;
 @property (retain, readonly) NSDate *downloadDate;
-@property (retain, readonly) NSString *version;
+@property (retain, readonly) NSString *version; // may be empty string, as some iTunes review don't include the app version
 @property (retain, readonly) NSString *countryCode;
 @property (retain, readonly) NSString *title;
 @property (retain, readonly) NSString *text;

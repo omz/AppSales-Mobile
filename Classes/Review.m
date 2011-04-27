@@ -6,6 +6,7 @@
 //  Copyright 2009 omz:software. All rights reserved.
 //
 
+#import "AppManager.h"
 #import "Review.h"
 #import "LKGoogleTranslator.h"
 #import "AppSalesUtils.h"
@@ -43,13 +44,13 @@ static NSString *presentationLanguage, *defaultCountryCode;
 			   text:(NSString*)reviewText stars:(NSUInteger)numStars {
 	self = [super init];
 	if (self) {
-		user = [userName retain];
-		reviewDate = [rDate retain];
-		downloadDate = [dDate retain];
-		version = [reviewVersion retain];
-		countryCode = [reviewCountryCode retain];
-		title = [reviewTitle retain];
-		text = [reviewText retain];
+		user = [ASSERT_NOT_NULL(userName) retain];
+		reviewDate = [ASSERT_NOT_NULL(rDate) retain];
+		downloadDate = [ASSERT_NOT_NULL(dDate) retain];
+		version = [ASSERT_NOT_NULL(reviewVersion) retain];
+		countryCode = [ASSERT_NOT_NULL(reviewCountryCode) retain];
+		title = [ASSERT_NOT_NULL(reviewTitle) retain];
+		text = [ASSERT_NOT_NULL(reviewText) retain];
 		stars = numStars;
 		newOrUpdatedReview = true;
 	}

@@ -13,6 +13,11 @@
 
 #define RELEASE_SAFELY(__PTR) { [__PTR release]; __PTR = nil; }
 
+static inline id ASSERT_NOT_NULL(id __PTR) {
+    NSCAssert(__PTR, nil);
+    return __PTR;
+}
+
 
 __attribute__((constructor)) // run this function run when the app loads
 static void InitRandom() {

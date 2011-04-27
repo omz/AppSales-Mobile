@@ -11,7 +11,7 @@
 
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, averageStars, recentStars, recentVersion;
+@synthesize appID, appName, reviewsByUser, averageStars, recentStars, currentVersion;
 
 - (void) updateAverages {
     double overallSum = 0;
@@ -19,13 +19,13 @@
     int mostRecentVersionCount = 0;
 	for (Review *r in reviewsByUser.allValues) {
 		overallSum += r.stars;
-        if (recentVersion == nil || [recentVersion compare:r.version] == NSOrderedAscending) {
-            [recentVersion release];
-            recentVersion = [r.version retain];
+        if (currentVersion == nil || [currentVersion compare:r.version] == NSOrderedAscending) {
+            [currentVersion release];
+            currentVersion = [r.version retain];
             mostRecentVersionCount = 0;
             mostRecentVersionSum = 0;
         }
-        if ([r.version isEqualToString:recentVersion]) {
+        if ([r.version isEqualToString:currentVersion]) {
             mostRecentVersionCount++;
             mostRecentVersionSum += r.stars;
         }
@@ -47,7 +47,7 @@
             lastTimeRegionDownloaded = [NSMutableDictionary new];
         }
         if ([coder containsValueForKey:@"recentVersion"] && [coder containsValueForKey:@"recentStars"]) {
-            recentVersion = [[coder decodeObjectForKey:@"recentVersion"] retain];
+            currentVersion = [[coder decodeObjectForKey:@"recentVersion"] retain];
             recentStars = [coder decodeFloatForKey:@"recentStars"];
         } else {
             [self updateAverages]; // older serialized object
@@ -109,7 +109,7 @@
     [coder encodeObject:lastTimeRegionDownloaded forKey:@"lastTimeRegionDownloaded"];
 	[coder encodeFloat:averageStars forKey:@"averageStars"];
 	[coder encodeObject:reviewsByUser forKey:@"reviewsByUser"];
-	[coder encodeObject:recentVersion forKey:@"recentVersion"];
+	[coder encodeObject:currentVersion forKey:@"recentVersion"];
 	[coder encodeFloat:recentStars forKey:@"recentStars"];
 }
 
@@ -129,7 +129,7 @@
 - (NSUInteger) recentReviewsCount {
 	NSUInteger recentReviewsCount = 0;
 	for (Review *r in reviewsByUser.allValues) {
-		if ([r.version isEqualToString:recentVersion]) {
+		if ([r.version isEqualToString:currentVersion]) {
 			recentReviewsCount++;
 		}
 	}
@@ -139,7 +139,7 @@
 - (NSUInteger) newRecentReviewsCount {
 	NSUInteger newReviewsCount = 0;
 	for (Review *r in reviewsByUser.allValues) {
-		if (r.newOrUpdatedReview && [r.version isEqualToString:recentVersion]) {
+		if (r.newOrUpdatedReview && [r.version isEqualToString:currentVersion]) {
 			newReviewsCount++;
 		}
 	}
@@ -163,7 +163,7 @@
 	[reviewsByUser release];
 	[allAppNames release];
     [lastTimeRegionDownloaded release];
-    [recentVersion release];
+    [currentVersion release];
 	[super dealloc];
 }
 
