@@ -18,6 +18,10 @@
 // decrease value to check less active regions less often
 #define PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD 0.7f
 
+// upper limit of new reviews to fetch, for any one app in any region
+// if you have tons of reviews and only interested in reading the latest reviews, reduce this number to keep the UI more responsive
+#define MAX_NUM_REVIEWS_PER_REGION_TO_FETCH 500
+
 
 // used to pass stuff between background worker threads and main thread
 @interface ReviewUpdateBundle : NSObject {
@@ -263,11 +267,16 @@
 				APPSALESLOG(@"fetching %@ %@", countryCode, appID);
 				NSAutoreleasePool *singleAppPool = [NSAutoreleasePool new];
                 regionsFetched++;
-                
+
+                // number of new reviews that must be downloaded from a page before checking the the next page
+                const NSInteger thresholdForParsingNextPage = 20;
                 NSInteger pageNumber = 0;
-                BOOL foundNewReviewsForCurrentVersion;
+                NSInteger totalNumberOfNewReviews = 0; // number of new reviews parsed for all pages
+                NSInteger numFetchedNewReviews; // number of new reviews parsed on the page
+                BOOL foundNewReviewsForCurrentAppVersion;
                 do {
-                    foundNewReviewsForCurrentVersion = false;
+                    numFetchedNewReviews = 0;
+                    foundNewReviewsForCurrentAppVersion = false;
                     NSString *reviewsURLString = [NSString stringWithFormat:@"http://ax.phobos.apple.com.edgesuite.net/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=%@&pageNumber=%d&sortOrdering=4&type=Purple+Software", appID, pageNumber];
                     pageNumber++;
                     [request setURL:[NSURL URLWithString:reviewsURLString]];
@@ -315,13 +324,13 @@
                         NSArray *dateVersionSplitted = [reviewDateAndVersion componentsSeparatedByString:@"- "];
                         if (dateVersionSplitted.count == 2) {
                             NSString *version = [dateVersionSplitted objectAtIndex:0];
-                            reviewVersion = [version stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+                            reviewVersion = [[version stringByTrimmingCharactersInSet:whitespaceCharacterSet] lowercaseString];
                             NSString *date = [dateVersionSplitted objectAtIndex:1];
                             date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
                             reviewDate = [dateFormatter dateFromString:date];
                         } else if (dateVersionSplitted.count == 3) {
                             NSString *version = [dateVersionSplitted objectAtIndex:1];
-                            reviewVersion = [version stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+                            reviewVersion = [[version stringByTrimmingCharactersInSet:whitespaceCharacterSet] lowercaseString];
                             NSString *date = [dateVersionSplitted objectAtIndex:2];
                             date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
                             reviewDate = [dateFormatter dateFromString:date];
@@ -352,15 +361,17 @@
                         // but it can overload google translate so we'll translate reviews on each page separately
                         ReviewUpdateBundle *bundle = [[[ReviewUpdateBundle alloc] initWithAppID:appID reviews:input] autorelease];
                         [bundle performSelectorOnMainThread:@selector(checkIfReviewsUpToDate) withObject:nil waitUntilDone:YES];
+                        numFetchedNewReviews = bundle.needsUpdating.count;
+                        totalNumberOfNewReviews += numFetchedNewReviews;
+                        foundNewReviewsForCurrentAppVersion = bundle.foundReviewsOfCurrentVersion;
                         if (bundle.needsUpdating.count) {
-                            if (bundle.foundReviewsOfCurrentVersion) {
-                                foundNewReviewsForCurrentVersion = true;
-                            } // else, only reviews for older versions found
                             [Review updateTranslations:bundle.needsUpdating];
                             [self performSelectorOnMainThread:@selector(addReviews:) withObject:bundle waitUntilDone:YES];		
                         }
                     }
-                } while (foundNewReviewsForCurrentVersion);
+                } while (foundNewReviewsForCurrentAppVersion
+                         && numFetchedNewReviews >= thresholdForParsingNextPage
+                         && totalNumberOfNewReviews < MAX_NUM_REVIEWS_PER_REGION_TO_FETCH);
                                 
 				[singleAppPool release];
 			}
@@ -419,7 +430,7 @@
 
 - (void) incrementDownloadProgress:(NSNumber*)numAppRegionsFetched {
 	percentComplete += numAppRegionsFetched.integerValue * progressIncrement;
-	NSString *status = [[NSString alloc] initWithFormat:@"%2.0f%% complete", percentComplete];
+	NSString *status = [[NSString alloc] initWithFormat:NSLocalizedString(@"%2.0f%% complete", nil), percentComplete];
 	[self updateReviewDownloadProgress:status];
 	[status release];
 }
