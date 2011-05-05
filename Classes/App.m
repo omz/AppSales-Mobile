@@ -11,7 +11,7 @@
 
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, averageStars, recentStars, currentVersion;
+@synthesize appID, appName, reviewsByUser, averageStars, currentStars, currentVersion;
 
 - (void) updateAverages {
     double overallSum = 0;
@@ -31,7 +31,7 @@
         }
 	}
 	averageStars = overallSum / reviewsByUser.count;
-	recentStars = mostRecentVersionSum / mostRecentVersionCount;
+	currentStars = mostRecentVersionSum / mostRecentVersionCount;
 }
 
 - (id)initWithCoder:(NSCoder *)coder {
@@ -48,7 +48,7 @@
         }
         if ([coder containsValueForKey:@"recentVersion"] && [coder containsValueForKey:@"recentStars"]) {
             currentVersion = [[coder decodeObjectForKey:@"recentVersion"] retain];
-            recentStars = [coder decodeFloatForKey:@"recentStars"];
+            currentStars = [coder decodeFloatForKey:@"recentStars"];
         } else {
             [self updateAverages]; // older serialized object
         }
@@ -110,7 +110,7 @@
 	[coder encodeFloat:averageStars forKey:@"averageStars"];
 	[coder encodeObject:reviewsByUser forKey:@"reviewsByUser"];
 	[coder encodeObject:currentVersion forKey:@"recentVersion"];
-	[coder encodeFloat:recentStars forKey:@"recentStars"];
+	[coder encodeFloat:currentStars forKey:@"recentStars"];
 }
 
 - (NSString *) description {
@@ -126,7 +126,7 @@
 	return reviewsByUser.count;
 }
 
-- (NSUInteger) recentReviewsCount {
+- (NSUInteger) currentReviewsCount {
 	NSUInteger recentReviewsCount = 0;
 	for (Review *r in reviewsByUser.allValues) {
 		if ([r.version isEqualToString:currentVersion]) {
@@ -136,7 +136,7 @@
 	return recentReviewsCount;
 }
 
-- (NSUInteger) newRecentReviewsCount {
+- (NSUInteger) newCurrentReviewsCount {
 	NSUInteger newReviewsCount = 0;
 	for (Review *r in reviewsByUser.allValues) {
 		if (r.newOrUpdatedReview && [r.version isEqualToString:currentVersion]) {
