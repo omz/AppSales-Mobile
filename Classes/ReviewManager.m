@@ -18,9 +18,9 @@
 // decrease value to check less active regions less often
 #define PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD 0.7f
 
-// upper limit of new reviews to fetch, for any one app in any region
+// upper limit of new reviews to fetch, for any one app in any region.
 // if you have tons of reviews and only interested in reading the latest reviews, reduce this number to keep the UI more responsive
-#define MAX_NUM_REVIEWS_PER_REGION_TO_FETCH 500
+#define MAX_NUM_REVIEWS_PER_REGION_TO_FETCH 300
 
 
 // used to pass stuff between background worker threads and main thread
