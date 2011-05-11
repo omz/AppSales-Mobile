@@ -18,9 +18,6 @@
 
 @implementation ReviewsController
 
-@synthesize sortedApps, statusLabel, activityIndicator;
-
-
 - (void)updateStatus
 {
 	ReviewManager *manager = [ReviewManager sharedManager];
@@ -35,7 +32,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	self.sortedApps = [AppManager sharedManager].allAppsSorted;
+	sortedApps = [[AppManager sharedManager].allAppsSorted retain];
 	
 	self.tableView.rowHeight = 60;
 	self.title = NSLocalizedString(@"Reviews",nil);
@@ -43,7 +40,7 @@
 																		style:UIBarButtonItemStyleBordered 
 																	   target:self 
 																	   action:@selector(downloadReviews)] autorelease];
-	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 25)] autorelease];
+	statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 25)];
 	statusLabel.textColor = [UIColor whiteColor];
 	statusLabel.shadowColor = [UIColor darkGrayColor];
 	statusLabel.shadowOffset = CGSizeMake(0, 1);
@@ -52,19 +49,17 @@
 	statusLabel.backgroundColor = [UIColor clearColor];
 	statusLabel.textAlignment = UITextAlignmentLeft;
 	statusLabel.text = @"";
-	UIBarButtonItem *statusItem = [[[UIBarButtonItem alloc] initWithCustomView:statusLabel] autorelease];
 	
-	self.activityIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
-	//[activityIndicator startAnimating];
+	activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    
+    UIBarButtonItem *statusItem = [[[UIBarButtonItem alloc] initWithCustomView:statusLabel] autorelease];
 	UIBarButtonItem *activityItem = [[[UIBarButtonItem alloc] initWithCustomView:activityIndicator] autorelease];
-	
 	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
 	
 	self.toolbarItems = [NSArray arrayWithObjects:downloadButton, flexSpace, statusItem, flexSpace, activityItem, nil];
 	
-	UIBarButtonItem *b = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark all as read", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)];
+	UIBarButtonItem *b = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark all as read", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)] autorelease];
 	self.navigationItem.rightBarButtonItem = b;
-	[b release];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
@@ -149,6 +144,9 @@
 - (void)dealloc 
 {
 	[sortedApps release];
+    [statusLabel release];
+	[activityIndicator release];
+
     [super dealloc];
 }
 

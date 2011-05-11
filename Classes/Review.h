@@ -46,6 +46,6 @@
 - (id) initWithUser:(NSString*)userName reviewDate:(NSDate*)rDate downloadDate:(NSDate*)dDate version:(NSString*)reviewVersion 
 		countryCode:(NSString*)reviewCountryCode title:(NSString*)reviewTitle text:(NSString*)reviewText stars:(NSUInteger)numStars;
 
-- (void) updateTranslations;
+- (void) updateTranslations; // must be called off main thread
 
 @end
