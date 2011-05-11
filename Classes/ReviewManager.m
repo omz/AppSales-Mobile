@@ -324,13 +324,13 @@
                         NSArray *dateVersionSplitted = [reviewDateAndVersion componentsSeparatedByString:@"- "];
                         if (dateVersionSplitted.count == 2) {
                             NSString *version = [dateVersionSplitted objectAtIndex:0];
-                            reviewVersion = [[version stringByTrimmingCharactersInSet:whitespaceCharacterSet] lowercaseString];
+                            reviewVersion = [version stringByTrimmingCharactersInSet:whitespaceCharacterSet];
                             NSString *date = [dateVersionSplitted objectAtIndex:1];
                             date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
                             reviewDate = [dateFormatter dateFromString:date];
                         } else if (dateVersionSplitted.count == 3) {
                             NSString *version = [dateVersionSplitted objectAtIndex:1];
-                            reviewVersion = [[version stringByTrimmingCharactersInSet:whitespaceCharacterSet] lowercaseString];
+                            reviewVersion = [version stringByTrimmingCharactersInSet:whitespaceCharacterSet];
                             NSString *date = [dateVersionSplitted objectAtIndex:2];
                             date = [date stringByTrimmingCharactersInSet:whitespaceCharacterSet];
                             reviewDate = [dateFormatter dateFromString:date];
