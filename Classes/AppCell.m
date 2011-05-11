@@ -130,9 +130,9 @@
     
     UIFont *italicSystemFontOfSize12 = systemFontOfSize12; //[UIFont italicSystemFontOfSize:12.0];
     
-	[NSLocalizedString(@"overall", nil) drawInRect:CGRectMake(50, 40, 140, 15) withFont:italicSystemFontOfSize12];
+	[NSLocalizedString(@"Overall", nil) drawInRect:CGRectMake(50, 40, 140, 15) withFont:italicSystemFontOfSize12];
 	NSString *overallSummary;
-	if (app.newCurrentReviewsCount) {
+	if (app.newReviewsCount) {
         overallSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %4i new",nil), app.averageStars, app.newReviewsCount];
 	} else {
         overallSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %4i reviews",nil), app.averageStars, app.totalReviewsCount];
