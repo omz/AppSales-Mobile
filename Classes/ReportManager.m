@@ -262,6 +262,12 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSHTTPURLResponse *downloadResponse = nil;
     NSData *requestResponseData = getPostRequestAsData(ITTS_SALES_PAGE_URL, postDict, &downloadResponse);
     NSString *originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"Filename"];
+    
+    if( !originalFilename )
+    {
+        originalFilename    = [[downloadResponse allHeaderFields] objectForKey:@"filename"];    // iOS 5 beta 1 fix
+    }
+    
     if (originalFilename) {
         [requestResponseData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
         return[Day dayWithData:requestResponseData compressed:YES];
