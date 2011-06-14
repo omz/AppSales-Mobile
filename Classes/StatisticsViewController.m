@@ -97,10 +97,6 @@
 		}
 	}
 	*/
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadDays)
-												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
-	
 }
 
 - (void)viewDidLoad
@@ -118,6 +114,13 @@
 - (void) viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	[self reload];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadDays)
+												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)toggleGraphMode

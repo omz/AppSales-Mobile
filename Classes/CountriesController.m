@@ -94,7 +94,7 @@
 	NSMutableDictionary *productInfos = [NSMutableDictionary dictionary];
 	for (Country *c in countries) {
 		for (Entry *e in c.entries) {
-			if (e.purchase) {
+			if (e.isPurchase) {
 				NSMutableDictionary *productInfo = [productInfos objectForKey:e.productIdentifier];
 				if (!productInfo) {
 					productInfo = [NSMutableDictionary dictionary];

@@ -33,17 +33,18 @@ static inline void replace(NSMutableString *string, NSString *search, NSString *
 }
 
 - (NSString*) removeHtmlEscaping {
-	NSMutableString *translatedText = [NSMutableString string];
+	const NSUInteger length = self.length;
+	NSMutableString *translatedText = [NSMutableString stringWithCapacity:length];
 	NSRange range = [self rangeOfString: @"&#"];
 	int processedSoFar = 0;
 	while (range.location != NSNotFound) {
 		const int pos = range.location;
 		[translatedText appendString:[self substringWithRange:NSMakeRange(processedSoFar, pos - processedSoFar)]];
-		range = [self rangeOfString: @";" options:0 range: NSMakeRange(pos + 2, self.length - pos - 2)];
+		range = [self rangeOfString: @";" options:0 range: NSMakeRange(pos + 2, length - pos - 2)];
 		const int code = [self substringWithRange:NSMakeRange(pos + 2, range.location - pos - 2)].intValue;
 		[translatedText appendFormat: @"%C", (unichar)code];
 		processedSoFar = range.location + 1;
-		range = [self rangeOfString: @"&#" options:0 range:NSMakeRange(processedSoFar, self.length - processedSoFar)];
+		range = [self rangeOfString: @"&#" options:0 range:NSMakeRange(processedSoFar, length - processedSoFar)];
 	}
 	[translatedText appendString:[self substringFromIndex:processedSoFar]];
 	

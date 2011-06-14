@@ -9,22 +9,30 @@
 #import "App.h"
 #import "Review.h"
 
-NSString* getDocPath() {
-	static NSString *documentsDirectory = nil;
-	if (!documentsDirectory) {
-		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-		documentsDirectory = [[paths objectAtIndex:0] retain];
-	}
-	return documentsDirectory;
-}
-
-@interface App ()
-- (void) updateAverages;
-@end
-
 @implementation App
 
-@synthesize appID, appName, reviewsByUser, averageStars, recentStars, recentVersion;
+@synthesize appID, appName, reviewsByUser, averageStars, currentStars, currentVersion;
+
+- (void) updateAverages {
+    double overallSum = 0;
+    double mostRecentVersionSum = 0;
+    int mostRecentVersionCount = 0;
+	for (Review *r in reviewsByUser.allValues) {
+		overallSum += r.stars;
+        if (currentVersion == nil || [currentVersion compare:r.version] == NSOrderedAscending) {
+            [currentVersion release];
+            currentVersion = [r.version retain];
+            mostRecentVersionCount = 0;
+            mostRecentVersionSum = 0;
+        }
+        if ([r.version isEqualToString:currentVersion]) {
+            mostRecentVersionCount++;
+            mostRecentVersionSum += r.stars;
+        }
+	}
+	averageStars = overallSum / reviewsByUser.count;
+	currentStars = mostRecentVersionSum / mostRecentVersionCount;
+}
 
 - (id)initWithCoder:(NSCoder *)coder {
 	self = [super init];
@@ -33,14 +41,27 @@ NSString* getDocPath() {
 		appName = [[coder decodeObjectForKey:@"appName"] retain];
 		reviewsByUser = [[coder decodeObjectForKey:@"reviewsByUser"] retain];
 		allAppNames = [[coder decodeObjectForKey:@"allAppNames"] retain];
+        lastTimeRegionDownloaded = [[coder decodeObjectForKey:@"lastTimeRegionDownloaded"] retain];
 		averageStars = [coder decodeFloatForKey:@"averageStars"];
-		recentVersion = [[coder decodeObjectForKey:@"recentVersion"] retain];
-        recentStars = [coder decodeFloatForKey:@"recentStars"];
-        if (![coder containsValueForKey:@"recentStars"] || ![coder containsValueForKey:@"recentVersion"]) {
-            [self updateAverages];
+        if (lastTimeRegionDownloaded == nil) { // backwards compatibility with older serialized objects
+            lastTimeRegionDownloaded = [NSMutableDictionary new];
+        }
+        if ([coder containsValueForKey:@"recentVersion"] && [coder containsValueForKey:@"recentStars"]) {
+            currentVersion = [[coder decodeObjectForKey:@"recentVersion"] retain];
+            currentStars = [coder decodeFloatForKey:@"recentStars"];
+        } else {
+            [self updateAverages]; // older serialized object
         }
 	}
 	return self;
+}
+
+- (NSDate*) lastTimeReviewsForStoreWasDownloaded:(NSString*)storeCountryCode {
+    return [lastTimeRegionDownloaded objectForKey:storeCountryCode];
+}
+
+- (void) setLastTimeReviewsDownloaded:(NSString*)storeCountryCode time:(NSDate*)timeLastDownloaded {
+    [lastTimeRegionDownloaded setValue:timeLastDownloaded forKey:storeCountryCode];
 }
 
 - (void) resetNewReviewCount {
@@ -73,7 +94,8 @@ NSString* getDocPath() {
 	if (self) {
 		appID = [identifier retain];
 		appName = [name retain];
-		reviewsByUser = [[NSMutableDictionary alloc] init];
+		reviewsByUser = [NSMutableDictionary new];
+        lastTimeRegionDownloaded = [NSMutableDictionary new];
 	}
 	return self;
 }
@@ -81,17 +103,18 @@ NSString* getDocPath() {
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-	[coder encodeObject:self.appID forKey:@"appID"];
-	[coder encodeObject:self.appName forKey:@"appName"];
-	[coder encodeObject:self.reviewsByUser forKey:@"reviewsByUser"];
-	[coder encodeFloat:self.averageStars forKey:@"averageStars"];
-	[coder encodeFloat:self.recentStars forKey:@"recentStars"];
-	[coder encodeObject:self.recentVersion forKey:@"recentVersion"];
-	[coder encodeObject:self.allAppNames forKey:@"allAppNames"];
+	[coder encodeObject:appID forKey:@"appID"];
+	[coder encodeObject:appName forKey:@"appName"];
+	[coder encodeObject:allAppNames forKey:@"allAppNames"];
+    [coder encodeObject:lastTimeRegionDownloaded forKey:@"lastTimeRegionDownloaded"];
+	[coder encodeFloat:averageStars forKey:@"averageStars"];
+	[coder encodeObject:reviewsByUser forKey:@"reviewsByUser"];
+	[coder encodeObject:currentVersion forKey:@"recentVersion"];
+	[coder encodeFloat:currentStars forKey:@"recentStars"];
 }
 
 - (NSString *) description {
-	return [NSString stringWithFormat:@"App %@ (%@)", self.appName, self.appID];
+	return [NSString stringWithFormat:NSLocalizedString(@"App %@ (%@)", nil), self.appName, self.appID];
 }
 
 - (void) addOrReplaceReview:(Review*)review {
@@ -99,40 +122,24 @@ NSString* getDocPath() {
     [self updateAverages];
 }
 
-- (void) updateAverages {
-    double overallSum = 0;
-    double mostRecentVersionSum = 0;
-    int mostRecentVersionCount = 0;
-	for (Review *r in reviewsByUser.allValues) {
-		overallSum += r.stars;
-        if (recentVersion == nil || [recentVersion compare:r.version] == NSOrderedAscending) {
-            recentVersion = r.version;
-            mostRecentVersionCount = 0;
-            mostRecentVersionSum = 0;
-        }
-        if ([r.version isEqualToString:recentVersion]) {
-            mostRecentVersionCount++;
-            mostRecentVersionSum += r.stars;
-        }
-	}
-	averageStars = overallSum / reviewsByUser.count;
-	recentStars = mostRecentVersionSum / mostRecentVersionCount;
+- (NSUInteger) totalReviewsCount {
+	return reviewsByUser.count;
 }
 
-- (NSUInteger) recentReviewsCount {
+- (NSUInteger) currentReviewsCount {
 	NSUInteger recentReviewsCount = 0;
 	for (Review *r in reviewsByUser.allValues) {
-		if ([r.version isEqualToString:recentVersion]) {
+		if ([r.version isEqualToString:currentVersion]) {
 			recentReviewsCount++;
 		}
 	}
 	return recentReviewsCount;
 }
 
-- (NSUInteger) newRecentReviewsCount {
+- (NSUInteger) newCurrentReviewsCount {
 	NSUInteger newReviewsCount = 0;
 	for (Review *r in reviewsByUser.allValues) {
-		if (r.newOrUpdatedReview && [r.version isEqualToString:recentVersion]) {
+		if (r.newOrUpdatedReview && [r.version isEqualToString:currentVersion]) {
 			newReviewsCount++;
 		}
 	}
@@ -155,6 +162,8 @@ NSString* getDocPath() {
 	[appName release];
 	[reviewsByUser release];
 	[allAppNames release];
+    [lastTimeRegionDownloaded release];
+    [currentVersion release];
 	[super dealloc];
 }
 

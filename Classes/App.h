@@ -8,9 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-NSString* getDocPath(); // utility methods that belong in some other file
-NSString* getPrefetchedPath(); 
-
 @class Review;
 
 @interface App : NSObject <NSCoding> {
@@ -18,24 +15,29 @@ NSString* getPrefetchedPath();
 	NSString *appID;
 	NSString *appName;
 	NSMutableDictionary *reviewsByUser;
+    NSMutableDictionary *lastTimeRegionDownloaded; // mapping of app store to NSDate of last time reviews fetched
 	float averageStars;
-	float recentStars;
-	NSString *recentVersion;
+	float currentStars;
+	NSString *currentVersion;
 }
 
 @property (readonly) NSString *appID;
 @property (readonly) NSString *appName;
+@property (readonly) NSString *currentVersion; // the current app version
 @property (readonly) NSDictionary *reviewsByUser;
+@property (readonly) NSUInteger totalReviewsCount; // all reviews downloaded, for any version (current or old) 
 @property (readonly) NSUInteger newReviewsCount;
-@property (readonly) NSUInteger recentReviewsCount;
-@property (readonly) NSUInteger newRecentReviewsCount;
-@property (readonly) NSArray *allAppNames;
+@property (readonly) NSUInteger currentReviewsCount; // reviews for the current app version  
+@property (readonly) NSUInteger newCurrentReviewsCount; // freshly downloaded reviews for the current app version
+@property (readonly) NSArray *allAppNames; // current app name, and any previous app names (if different from current)
 @property (readonly) float averageStars;
-@property (readonly) float recentStars;
-@property (readonly) NSString *recentVersion;
+@property (readonly) float currentStars; // average stars for the current app version
 
 - (id) initWithID:(NSString*)identifier name:(NSString*)name;
 - (void) addOrReplaceReview:(Review*)review;
+
+- (NSDate*) lastTimeReviewsForStoreWasDownloaded:(NSString*)storeCountryCode;
+- (void) setLastTimeReviewsDownloaded:(NSString*)storeCountryCode time:(NSDate*)timeLastDownloaded;
 
 - (void) resetNewReviewCount;
 

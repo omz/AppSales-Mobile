@@ -51,7 +51,7 @@
 @property (readonly) int transactionType;
 @property (readonly) float royalties;
 @property (readonly) int units;
-@property (readonly) BOOL purchase;
+@property (readonly) BOOL isPurchase; // as opposed to a free download
 @property (readonly, getter=isInAppPurchase) BOOL inAppPurchase;
 
 - (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u 

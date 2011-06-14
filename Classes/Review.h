@@ -26,10 +26,12 @@
 + (BOOL) showTranslatedReviews;
 + (void) setShowTranslatedReviews:(BOOL)showTranslatedReviews;
 
++ (void) updateTranslations:(NSArray*)reviews; // identical to the individual instance method, but much faster when translating multiple reviews
+
 @property (retain, readonly) NSString *user;
 @property (retain, readonly) NSDate *reviewDate;
 @property (retain, readonly) NSDate *downloadDate;
-@property (retain, readonly) NSString *version;
+@property (retain, readonly) NSString *version; // may be empty string, as some iTunes review don't include the app version
 @property (retain, readonly) NSString *countryCode;
 @property (retain, readonly) NSString *title;
 @property (retain, readonly) NSString *text;
@@ -44,6 +46,6 @@
 - (id) initWithUser:(NSString*)userName reviewDate:(NSDate*)rDate downloadDate:(NSDate*)dDate version:(NSString*)reviewVersion 
 		countryCode:(NSString*)reviewCountryCode title:(NSString*)reviewTitle text:(NSString*)reviewText stars:(NSUInteger)numStars;
 
-- (void) updateTranslations;
+- (void) updateTranslations; // must be called off main thread
 
 @end

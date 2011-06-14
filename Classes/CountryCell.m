@@ -41,6 +41,8 @@
 		UIColor *calendarBackgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
 		UIView *calendarBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(0,0,45,44)] autorelease];
 		calendarBackgroundView.backgroundColor = calendarBackgroundColor;
+        
+        UIColor *whiteColor = [UIColor whiteColor];
 		
 		flagView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 4, 24, 24)];
 		
@@ -49,25 +51,25 @@
 		countryLabel.textAlignment = UITextAlignmentCenter;
 		countryLabel.text = @"N/A";
 		countryLabel.backgroundColor = calendarBackgroundColor;
-		countryLabel.highlightedTextColor = [UIColor whiteColor];
+		countryLabel.highlightedTextColor = whiteColor;
 		
 		detailsLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 15)];
 		detailsLabel.textColor = [UIColor grayColor];
 		detailsLabel.font = [UIFont systemFontOfSize:12.0]; 
 		detailsLabel.textAlignment = UITextAlignmentCenter;
-		detailsLabel.highlightedTextColor = [UIColor whiteColor];
+		detailsLabel.highlightedTextColor = whiteColor;
 		
 		revenueLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 100, 30)];
 		revenueLabel.font = [UIFont boldSystemFontOfSize:20.0];
 		revenueLabel.textAlignment = UITextAlignmentRight;
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
-		revenueLabel.highlightedTextColor = [UIColor whiteColor];
+		revenueLabel.highlightedTextColor = whiteColor;
 		
 		graphLabel = [[UILabel alloc] initWithFrame:CGRectMake(160, 4, 130, 21)];
 		graphLabel.textAlignment = UITextAlignmentRight;
 		graphLabel.font = [UIFont boldSystemFontOfSize:12.0];
 		graphLabel.backgroundColor = [UIColor clearColor];
-		graphLabel.textColor = [UIColor whiteColor];
+		graphLabel.textColor = whiteColor;
 		graphLabel.text = @"## %";
 		
 		UIImageView *graphBackground = [[[UIImageView alloc] initWithFrame:CGRectMake(160, 4, 130, 21)] autorelease];
