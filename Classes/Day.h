@@ -40,10 +40,11 @@
 @interface Day : NSObject<NSCoding> {
 	NSDate *date;
 	NSMutableDictionary *countries;
-	BOOL isWeek;
 	
-	BOOL wasLoadedFromDisk;
-	BOOL isFault;
+    BOOL isWeek:1;
+	BOOL wasLoadedFromDisk:1;
+	BOOL isFault:1;
+    
 	NSDictionary *summary;
 }
 

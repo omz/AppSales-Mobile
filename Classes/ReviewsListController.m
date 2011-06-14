@@ -68,12 +68,9 @@
 
 -(void) readall
 {
-	NSUInteger lCurIdx, lNbReviews = [reviews count];
-	for (lCurIdx = 0; lCurIdx < lNbReviews; lCurIdx++)
-	{
-		Review * lCurReview = [reviews objectAtIndex:lCurIdx];
-		lCurReview.newOrUpdatedReview = NO;
-	}
+    for (Review *rev in reviews) {
+        rev.newOrUpdatedReview = NO;
+    }
 	[self.tableView reloadData];
 }
 
@@ -106,7 +103,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	
-	SingleReviewController *reviewController = [[[SingleReviewController alloc] init] autorelease];
+	SingleReviewController *reviewController = [[SingleReviewController new] autorelease];
 	Review *review = [reviews objectAtIndex:indexPath.row];
 	reviewController.review = review;
 	review.newOrUpdatedReview = NO;

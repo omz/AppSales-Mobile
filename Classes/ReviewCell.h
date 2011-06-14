@@ -11,7 +11,7 @@
 @class Review, ReviewCellView;
 
 @interface ReviewCell : UITableViewCell {
-	ReviewCellView *cellView;
+	ReviewCellView *cellView; // weak reference
 	Review *review;
 }
 

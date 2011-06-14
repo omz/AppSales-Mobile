@@ -32,9 +32,7 @@
 
 
 @interface HelpBrowser : UIViewController <UIWebViewDelegate> {
-	UIWebView *webView;
+	UIWebView *webView; // weak reference
 }
-
-@property (retain) UIWebView *webView;
 
 @end

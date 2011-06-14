@@ -33,12 +33,10 @@
 
 @implementation CurrencySelectionDialog
 
-@synthesize sortedCurrencies;
-
 
 - (void)dealloc 
 {
-	self.sortedCurrencies = nil;
+	[sortedCurrencies release];
 	
     [super dealloc];
 }
@@ -49,14 +47,14 @@
 	
 	self.title = NSLocalizedString(@"Currencies",nil);
 	//Create sorted list of currencies:
-	self.sortedCurrencies = [NSMutableArray array];
+	sortedCurrencies = [NSMutableArray new];
 	NSArray *availableCurrencies = [[CurrencyManager sharedManager] availableCurrencies];
 	for (NSString *currencyCode in availableCurrencies) {
 		NSDictionary *currencyInfo = [NSDictionary dictionaryWithObjectsAndKeys:currencyCode, @"currencyCode", NSLocalizedString(currencyCode,nil), @"localizedName", nil];
-		[self.sortedCurrencies addObject:currencyInfo];
+		[sortedCurrencies addObject:currencyInfo];
 	}
 	NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"localizedName" ascending:YES] autorelease];
-	[self.sortedCurrencies sortUsingDescriptors:[NSArray arrayWithObject:sorter]];
+	[sortedCurrencies sortUsingDescriptors:[NSArray arrayWithObject:sorter]];
 	
 	UIBarButtonItem *doneButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismiss)] autorelease];
 	[self.navigationItem setRightBarButtonItem:doneButtonItem];
@@ -69,7 +67,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
 {
-	return [self.sortedCurrencies count];
+	return [sortedCurrencies count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
@@ -81,7 +79,7 @@
         cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
     }
 	
-	cell.textLabel.text = [[self.sortedCurrencies objectAtIndex:[indexPath row]] objectForKey:@"localizedName"];
+	cell.textLabel.text = [[sortedCurrencies objectAtIndex:[indexPath row]] objectForKey:@"localizedName"];
 	
     return cell;
 }

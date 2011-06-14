@@ -13,7 +13,7 @@
 
 - (id)initWithFrame:(CGRect)frame 
 {
-    if (self = [super initWithFrame:frame]) {
+    if ((self = [super initWithFrame:frame]) != nil) {
 		self.days = [NSArray array];
 		self.opaque = NO;
 		self.backgroundColor = [UIColor clearColor];

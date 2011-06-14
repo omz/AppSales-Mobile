@@ -400,11 +400,5 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 	[[self navigationController] pushViewController:countriesController animated:YES];
 }
 
-- (void)dealloc 
-{
-	self.daysByMonth = nil;
-    [super dealloc];
-}
-
 @end
 

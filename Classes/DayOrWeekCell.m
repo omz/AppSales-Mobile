@@ -17,43 +17,40 @@
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
-	if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
+	if ((self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier])) {
 		UIColor *calendarBackgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
 		UIView *calendarBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(0,0,45,44)] autorelease];
 		calendarBackgroundView.backgroundColor = calendarBackgroundColor;
+        
+        UIColor *whiteColor = [UIColor whiteColor];
 		
-		dayLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 45, 30)] autorelease];
+		dayLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 45, 30)];
 		dayLabel.textAlignment = UITextAlignmentCenter;
 		dayLabel.font = [UIFont boldSystemFontOfSize:22.0];
 		dayLabel.backgroundColor = calendarBackgroundColor;
-		dayLabel.highlightedTextColor = [UIColor whiteColor];
-		dayLabel.opaque = YES;
+		dayLabel.highlightedTextColor = whiteColor;
 		
-		weekdayLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 27, 45, 14)] autorelease];
+		weekdayLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 27, 45, 14)];
 		weekdayLabel.textAlignment = UITextAlignmentCenter;
 		weekdayLabel.font = [UIFont systemFontOfSize:10.0];
-		weekdayLabel.highlightedTextColor = [UIColor whiteColor];
+		weekdayLabel.highlightedTextColor = whiteColor;
 		weekdayLabel.backgroundColor = calendarBackgroundColor;
-		weekdayLabel.opaque = YES;
 		
-		revenueLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 0, 100, 30)] autorelease];
+		revenueLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 100, 30)];
 		revenueLabel.font = [UIFont boldSystemFontOfSize:20.0];
 		revenueLabel.textAlignment = UITextAlignmentRight;
-		revenueLabel.backgroundColor = [UIColor whiteColor];
-		revenueLabel.highlightedTextColor = [UIColor whiteColor];
+		revenueLabel.backgroundColor = whiteColor;
+		revenueLabel.highlightedTextColor = whiteColor;
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
-		revenueLabel.opaque = YES;
 		
-		detailsLabel = [[[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 14)] autorelease];
+		detailsLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 27, 250, 14)];
 		detailsLabel.textColor = [UIColor grayColor];
-		detailsLabel.backgroundColor = [UIColor whiteColor];
-		detailsLabel.opaque = YES;
+		detailsLabel.backgroundColor = whiteColor;
 		detailsLabel.font = [UIFont systemFontOfSize:12.0];
 		detailsLabel.highlightedTextColor = [UIColor whiteColor];
 		detailsLabel.textAlignment = UITextAlignmentCenter;
 				
-		graphView = [[[UIImageView alloc] initWithFrame:CGRectMake(160, 0, 130, 20)] autorelease];
-		graphView.opaque = YES;
+		graphView = [[UIImageView alloc] initWithFrame:CGRectMake(160, 0, 130, 20)];
 		
 		[self.contentView addSubview:calendarBackgroundView];
 		[self.contentView addSubview:dayLabel];
@@ -125,8 +122,14 @@
 
 - (void)dealloc 
 {
-	self.day = nil;
-	self.graphColor = nil;
+	[day release];
+	[graphColor release];
+    [dayLabel release];
+	[weekdayLabel release];
+    [revenueLabel release];
+	[detailsLabel release];
+    [graphView release];
+
     [super dealloc];
 }
 

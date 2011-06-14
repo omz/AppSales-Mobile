@@ -9,15 +9,18 @@
 
 @interface ReviewManager : NSObject {
 	@private
-	float percentComplete, progressIncrement; // for presentation.  can only be accessed on main thread
+	double percentComplete, progressIncrement; // for presentation.  can only be accessed on main thread
+	NSTimeInterval timeLastFetched; // used to detect downloading twice in a row, which forces downloading all apps/regions
 	
 	BOOL isDownloadingReviews;
 	volatile BOOL cancelRequested; // used by multile threads without synchronization, hence volatile
-	volatile BOOL saveToDiskNeeded; 
 	NSString *reviewDownloadStatus;
+
 	
 	// used by worker threads
 	NSCondition *condition;
+	NSArray *allAppIds;
+    NSMutableDictionary *appIDtoStoreRegion; // mapping of appID -> Dictionary(storeCountryCode -> boolShouldDownload) 
 	NSUInteger numThreadsActive;
 	NSMutableArray *storeInfos;
 	NSDateFormatter *defaultDateFormatter;
@@ -28,6 +31,7 @@
 
 @property (readonly) NSString *reviewDownloadStatus;
 @property (readonly) BOOL isDownloadingReviews;
+@property (readwrite) BOOL skipLessActiveRegions;
 
 - (void) downloadReviews;
 - (void) markAllReviewsAsRead;

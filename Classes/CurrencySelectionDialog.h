@@ -37,8 +37,6 @@
 	
 }
 
-@property (retain) NSMutableArray *sortedCurrencies;
-
 - (void)dismiss;
 
 @end

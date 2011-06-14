@@ -38,6 +38,7 @@
 #import "AppManager.h"
 #import "NSData+Compression.h"
 #import "NSDateFormatter+SharedInstances.h"
+#import "AppSalesUtils.h"
 
 static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
@@ -49,23 +50,6 @@ static BOOL containsOnlyWhiteSpace(NSArray* array) {
 		}
 	}
 	return YES;
-}
-
-static BOOL parseDateString(NSString *dateString, int *year, int *month, int *day) {
-	if ([dateString rangeOfString:@"/"].location == NSNotFound) {
-		if (dateString.length == 8) { // old date format
-			*year = [[dateString substringWithRange:NSMakeRange(0,4)] intValue];
-			*month = [[dateString substringWithRange:NSMakeRange(4,2)] intValue];
-			*day = [[dateString substringWithRange:NSMakeRange(6,2)] intValue];
-			return YES; // parsed ok
-		}
-	} else if (dateString.length == 10) { // new date format
-		*year = [[dateString substringWithRange:NSMakeRange(6,4)] intValue];
-		*month = [[dateString substringWithRange:NSMakeRange(0,2)] intValue];
-		*day = [[dateString substringWithRange:NSMakeRange(3,2)] intValue];
-		return YES;
-	}
-	return NO; // unrecognized string
 }
 
 static NSDate* reportDateFromString(NSString *dateString) {
@@ -116,7 +100,9 @@ static NSDate* reportDateFromString(NSString *dateString) {
 }
 
 
-
+//
+// currently broken
+//
 + (NSDate*) adjustDateToLocalTimeZone:(NSDate *)inDate
 {
     /* All dates should be set to midnight. If set otherwise, they were created in a different time zone.
@@ -195,8 +181,8 @@ static NSDate* reportDateFromString(NSString *dateString) {
             transactionType = [columns objectAtIndex:8];
             units = [columns objectAtIndex:9];
             royalties = [columns objectAtIndex:10];
-            dateColumn = [[columns objectAtIndex:11] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            toDateColumn = [[columns objectAtIndex:12] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            dateColumn = [[columns objectAtIndex:11] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
+            toDateColumn = [[columns objectAtIndex:12] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
             countryString = [columns objectAtIndex:14];
             royaltyCurrency = [columns objectAtIndex:15];
             appId = [columns objectAtIndex:18];
@@ -208,7 +194,6 @@ static NSDate* reportDateFromString(NSString *dateString) {
             return self;
         }
 			
-        [[AppIconManager sharedManager] downloadIconForAppID:appId];
         NSDate *fromDate = reportDateFromString(dateColumn);
         NSDate *toDate = reportDateFromString(toDateColumn);
         if (!fromDate) {
@@ -229,6 +214,8 @@ static NSDate* reportDateFromString(NSString *dateString) {
 			self = nil;
             return self; //sanity check, country code has to have two characters
         }
+		
+		[[AppIconManager sharedManager] downloadIconForAppID:appId];
         
         //Treat in-app purchases as regular purchases for our purposes.
         //IA1: In-App Purchase
@@ -258,7 +245,7 @@ static NSDate* reportDateFromString(NSString *dateString) {
                                         royalties:[royalties floatValue]
                                          currency:royaltyCurrency
                                           country:country
-                                    inAppPurchase:inAppPurchase] autorelease]; //gets added to the countries entry list automatically
+                                    inAppPurchase:inAppPurchase] release]; //gets added to the countries entry list automatically
 	}
 
 	[self generateSummary];
@@ -271,7 +258,7 @@ static NSDate* reportDateFromString(NSString *dateString) {
 	NSMutableDictionary *salesByApp = [NSMutableDictionary dictionary];
 	for (Country *country in [self.countries allValues]) {
 		for (Entry *entry in country.entries) {
-			if (entry.purchase ) {
+			if (entry.isPurchase ) {
 				NSNumber *newCount = [NSNumber numberWithInt:[[salesByApp objectForKey:entry.productName] intValue] + entry.units];
 				[salesByApp setObject:newCount forKey:entry.productName];
 				NSNumber *oldRevenue = [revenueByCurrency objectForKey:entry.currency];
@@ -362,9 +349,9 @@ static NSDate* reportDateFromString(NSString *dateString) {
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-	[coder encodeObject:self.countries forKey:@"countries"];
-	[coder encodeObject:self.date forKey:@"date"];
-	[coder encodeBool:self.isWeek forKey:@"isWeek"];
+    [coder encodeObject:date forKey:@"date"];
+	[coder encodeObject:countries forKey:@"countries"];
+	[coder encodeBool:isWeek forKey:@"isWeek"];
 }
 
 - (Country *)countryNamed:(NSString *)countryName
@@ -385,7 +372,7 @@ static NSDate* reportDateFromString(NSString *dateString) {
 		NSMutableDictionary *temp = [NSMutableDictionary dictionary];
 		for (Country *c in [self.countries allValues]) {
 			for (Entry *e in [c entries]) {
-				if (e.purchase) {
+				if (e.isPurchase) {
 					NSNumber *unitsOfProduct = [temp objectForKey:[e productName]];
 					int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
 					u += [e units];
@@ -472,15 +459,6 @@ static NSDate* reportDateFromString(NSString *dateString) {
 	return names.allObjects;
 }
 
-//- (NSArray *)allProductNames
-//{
-//	NSMutableSet *names = [NSMutableSet set];
-//	for (Country *c in [self.countries allValues]) {
-//		[names addObjectsFromArray:[c allProductNames]];
-//	}
-//	return [names allObjects];
-//}
-
 - (NSString *)totalRevenueString
 {
 	return [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:
@@ -547,13 +525,12 @@ static NSDate* reportDateFromString(NSString *dateString) {
 }
 
 - (NSString *)appIDForApp:(NSString *)appName {
-	NSString *appID = nil;
 	for(Country *c in [self.countries allValues]){
-		appID = [c appIDForApp:appName];
+        NSString *appID = [c appIDForApp:appName];
 		if(appID)
-			break;
+			return appID;
 	}
-	return appID;
+	return nil;
 }
 
 - (void)dealloc

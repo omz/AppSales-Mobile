@@ -6,8 +6,10 @@
 //  Copyright 2009 omz:software. All rights reserved.
 //
 
+#import "AppManager.h"
 #import "Review.h"
 #import "LKGoogleTranslator.h"
+#import "AppSalesUtils.h"
 
 
 @implementation Review
@@ -24,8 +26,7 @@ static BOOL showTranslations;
 
 static NSString *presentationLanguage, *defaultCountryCode;
 
-+ (void) initialize 
-{
++ (void) initialize  {
 	if (self == [Review class]) {
 		NSLocale *defaultLocale = [NSLocale currentLocale];
 		presentationLanguage = [defaultLocale objectForKey:NSLocaleLanguageCode];
@@ -43,21 +44,20 @@ static NSString *presentationLanguage, *defaultCountryCode;
 			   text:(NSString*)reviewText stars:(NSUInteger)numStars {
 	self = [super init];
 	if (self) {
-		user = [userName retain];
-		reviewDate = [rDate retain];
-		downloadDate = [dDate retain];
-		version = [reviewVersion retain];
-		countryCode = [reviewCountryCode retain];
-		title = [reviewTitle retain];
-		text = [reviewText retain];
+		user = [ASSERT_NOT_NULL(userName) retain];
+		reviewDate = [ASSERT_NOT_NULL(rDate) retain];
+		downloadDate = [ASSERT_NOT_NULL(dDate) retain];
+		version = [ASSERT_NOT_NULL(reviewVersion) retain];
+		countryCode = [ASSERT_NOT_NULL(reviewCountryCode) retain];
+		title = [ASSERT_NOT_NULL(reviewTitle) retain];
+		text = [ASSERT_NOT_NULL(reviewText) retain];
 		stars = numStars;
 		newOrUpdatedReview = true;
 	}
 	return self;
 }
 
-- (id)initWithCoder:(NSCoder *)coder
-{
+- (id)initWithCoder:(NSCoder *)coder {
 	[super init];
 	user = [[coder decodeObjectForKey:@"user"] retain];
 	title = [[coder decodeObjectForKey:@"title"] retain];
@@ -73,8 +73,7 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	return self;
 }
 
-- (void)encodeWithCoder:(NSCoder *)coder
-{
+- (void)encodeWithCoder:(NSCoder *)coder {
 	[coder encodeObject:user forKey:@"user"];
 	[coder encodeObject:title forKey:@"title"];
 	[coder encodeObject:translatedTitle forKey:@"translatedTitle"];
@@ -87,17 +86,12 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	[coder encodeInt:stars forKey:@"stars"];
 }
 
-
-- (NSString *)description
-{
+- (NSString *)description {
 	return [NSString stringWithFormat:@"%@ (%@ %@): %@ (%i stars)", self.user, self.countryCode, self.reviewDate, self.title, self.stars];
 }
 
 - (NSString*) translateToCurrentCountry:(NSString*)string {
-	NSAssert(! [NSThread isMainThread], nil);
-	if ([countryCode caseInsensitiveCompare:defaultCountryCode] == NSOrderedSame) {
-		return string; // already in native country language
-	}
+    ASSERT_NOT_MAIN_THREAD();
 	LKGoogleTranslator *translator = [[LKGoogleTranslator alloc] init];
 	NSString *translated = [translator translateText:string toLanguage:presentationLanguage];
 	[translator release];
@@ -125,7 +119,35 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	return showTranslations ? translatedText : text;
 }
 
+- (void) privateSetTranslatedTitle:(NSString*)t1 text:(NSString*)t2 {
+    [translatedTitle release];
+    translatedTitle = [t1 retain];
+    [translatedText release];
+    translatedText = [t2 retain];
+}
+
++ (void) updateTranslations:(NSArray*)reviews {
+    ASSERT_NOT_MAIN_THREAD();
+    
+    NSMutableArray *unTranslated = [NSMutableArray arrayWithCapacity:2*reviews.count];
+    for (Review *review in reviews) {
+        [unTranslated addObject:review.title];
+        [unTranslated addObject:review.text];
+    }
+    
+    LKGoogleTranslator *translator = [[LKGoogleTranslator new] autorelease];
+	NSArray *translated = [translator translateMultipleText:unTranslated toLanguage:presentationLanguage];
+    
+    for (NSUInteger i=0; i < reviews.count; i++) {
+        Review *review = [reviews objectAtIndex:i];
+        NSString *translatedTitle = [translated objectAtIndex:2*i];
+        NSString *translatedText = [translated objectAtIndex:2*i+1];
+        [review privateSetTranslatedTitle:translatedTitle text:translatedText];
+    }
+}
+         
 - (void) updateTranslations {
+    ASSERT_NOT_MAIN_THREAD();
 	if (translatedText == nil && text != nil) {
 		translatedText = [[self translateToCurrentCountry:text] retain];
 	}
@@ -134,8 +156,7 @@ static NSString *presentationLanguage, *defaultCountryCode;
 	}
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[user release];
 	[title release];
 	[translatedTitle release];

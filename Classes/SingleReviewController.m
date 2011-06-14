@@ -14,15 +14,16 @@
 
 @implementation SingleReviewController
 
-@synthesize webView, review;
+@synthesize review;
 
 - (void)loadView
 {
-	self.view = [[[UIWebView alloc] initWithFrame:CGRectMake(0,0,320,480)] autorelease];
-	self.webView = (UIWebView *)self.view;
-	self.webView.dataDetectorTypes = UIDataDetectorTypeNone;
-	self.webView.scalesPageToFit = NO;
-	self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+	webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,320,480)];
+	webView.dataDetectorTypes = UIDataDetectorTypeNone;
+	webView.scalesPageToFit = NO;
+    webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    
+	self.view = webView;
 }
 
 - (CGSize)contentSizeForViewInPopover
@@ -46,7 +47,7 @@
 	template = [template stringByReplacingOccurrencesOfString:@"[[[DATE]]]" withString:variousInfo];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:[review.presentationText encodeIntoBasicHtml]];
 	
-	[self.webView loadHTMLString:template baseURL:nil];
+	[webView loadHTMLString:template baseURL:nil];
 }
 
 - (void)dealloc 

@@ -33,28 +33,26 @@
 
 @implementation HelpBrowser
 
-@synthesize webView;
-
 
 - (void)dealloc 
 {
-	self.webView = nil;	
+	[webView release];
 	[super dealloc];
 }
 
 - (void)loadView
 {
 	self.view = [[[UIWebView alloc] initWithFrame:CGRectMake(0,0,320,480)] autorelease];
-	self.webView = (UIWebView *)self.view;
 	self.view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-	self.webView.scalesPageToFit = NO;
+	webView = (UIWebView *)self.view;
+	webView.scalesPageToFit = NO;
 	webView.delegate = self;
 	
 	self.title = NSLocalizedString(@"About AppSales", nil);
 	
 	NSString *helpPath = [[NSBundle mainBundle] pathForResource:@"index" ofType:@"html" inDirectory:@"help"];
 	NSURL *helpURL = [NSURL fileURLWithPath:helpPath];
-	[self.webView loadRequest:[NSURLRequest requestWithURL:helpURL]];
+	[webView loadRequest:[NSURLRequest requestWithURL:helpURL]];
 	
 	UIBarButtonItem *doneButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismiss)] autorelease];
 	self.navigationItem.rightBarButtonItem = doneButton;

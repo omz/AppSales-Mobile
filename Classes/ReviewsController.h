@@ -10,15 +10,10 @@
 
 
 @interface ReviewsController : UITableViewController {
-
 	NSArray *sortedApps;
 	UILabel *statusLabel;
 	UIActivityIndicatorView *activityIndicator;
 }
-
-@property (nonatomic, retain) NSArray *sortedApps;
-@property (nonatomic, retain) UILabel *statusLabel;
-@property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
 
 - (void)reload;
 - (void)markAllAsRead:(id)sender;

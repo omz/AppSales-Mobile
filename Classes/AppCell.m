@@ -16,7 +16,7 @@
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier 
 {
-	if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+	if ((self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])) {
 		cellView = [[[AppCellView alloc] initWithCell:self] autorelease];
 		[self.contentView addSubview:cellView];
     }
@@ -70,8 +70,13 @@
 	UIImage *appIcon = [[AppIconManager sharedManager] iconForAppID:app.appID];
 	[appIcon drawInRect:CGRectMake(6, 7, 28, 28)];
 	[[UIImage imageNamed:@"ProductMask.png"] drawInRect:CGRectMake(4, 6, 32, 32)];
-	
-	[((cell.highlighted) ? [UIColor whiteColor] : [UIColor blackColor]) set];
+    
+    UIColor *whiteColor = [UIColor whiteColor];
+    if (cell.highlighted) {
+        [whiteColor set];
+    } else {
+        [[UIColor blackColor] set];
+    }
 	[app.appName drawInRect:CGRectMake(50, 3, 140, 30) withFont:[UIFont boldSystemFontOfSize:17.0]];
 	
 	[[UIImage imageNamed:@"5stars_gray.png"] drawInRect:CGRectMake(200, 8, 90, 15)];
@@ -79,13 +84,13 @@
 	CGSize size = CGSizeMake(90,15);
 	if (&UIGraphicsBeginImageContextWithOptions) {
 		UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
-	} else { // ipad
+	} else { // iOS 3.x
 		UIGraphicsBeginImageContext(size);
 	}
 	CGContextRef ctx = UIGraphicsGetCurrentContext();
-	[starsImage drawInRect:CGRectMake(0,0,90,15)];
-	float averageStars = [app recentStars];
-	float widthOfStars = 90.0 - (averageStars / 5.0) * 90.0;
+	[starsImage drawAtPoint:CGPointZero];
+	float averageStars = [app currentStars];
+	float widthOfStars = 90 - (averageStars / 5.0) * 90.0;
 	[[UIColor clearColor] set];
 	CGContextSetBlendMode(ctx, kCGBlendModeCopy);
 	CGContextFillRect(ctx, CGRectMake(90 - widthOfStars, 0, widthOfStars, 15));
@@ -95,35 +100,45 @@
 	[averageStarsImage drawInRect:CGRectMake(200, 8, 90, 15)];
 	//[[UIImage imageNamed:@"5stars.png"] drawInRect:CGRectMake(200, 15, 88, 15)];
 	
-	if(cell.highlighted)
-		[[UIColor whiteColor] set];
-	else if(app.newRecentReviewsCount)
+	if (cell.highlighted) {
+		[whiteColor set];
+	} else if(app.newCurrentReviewsCount) {
 		[[UIColor redColor] set];
-	else
+	} else {
 		[[UIColor darkGrayColor] set];
+    }
     
-	[app.recentVersion drawInRect:CGRectMake(50, 25, 140, 15) withFont:[UIFont systemFontOfSize:12.0]];
-	NSString *recentSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %i reviews",nil), app.recentStars, app.recentReviewsCount];
-	if (app.newRecentReviewsCount) {
-		recentSummary = [recentSummary stringByAppendingFormat:NSLocalizedString(@" (%i new)",nil), app.newRecentReviewsCount];
-	}
-    CGSize recentSummarySize = [recentSummary sizeWithFont:[UIFont systemFontOfSize:12.0]];
-	[recentSummary drawInRect:CGRectMake(290-recentSummarySize.width, 40-recentSummarySize.height, recentSummarySize.width, recentSummarySize.height) withFont:[UIFont systemFontOfSize:12.0]];
+    UIFont *systemFontOfSize12 = [UIFont systemFontOfSize:12.0];
+    
+	[app.currentVersion drawInRect:CGRectMake(50, 25, 140, 15) withFont:systemFontOfSize12];
+	NSString *recentSummary;
+	if (app.newCurrentReviewsCount) {
+        recentSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %4i new",nil), app.currentStars, app.newCurrentReviewsCount];
+	} else {
+        recentSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %4i reviews",nil), app.currentStars, app.currentReviewsCount];
+    }
+    CGSize recentSummarySize = [recentSummary sizeWithFont:systemFontOfSize12];
+	[recentSummary drawInRect:CGRectMake(290-recentSummarySize.width, 40-recentSummarySize.height, recentSummarySize.width, recentSummarySize.height) withFont:systemFontOfSize12];
 	
-	if(cell.highlighted)
-		[[UIColor whiteColor] set];
-	else if(app.newReviewsCount)
-		[[UIColor redColor] set];
-	else
+	if (cell.highlighted) {
+		[whiteColor set];
+    } else if(app.newReviewsCount) {
+        [[UIColor colorWithRed:255/255.0f green:90/255.0f blue:90/255.0f alpha:1] set];
+    } else {
 		[[UIColor lightGrayColor] set];
+    }
     
-	[@"Overall" drawInRect:CGRectMake(50, 40, 140, 15) withFont:[UIFont italicSystemFontOfSize:12.0]];
-	NSString *overallSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %i reviews",nil), app.averageStars, [app.reviewsByUser count]];
-	if (app.newRecentReviewsCount) {
-		overallSummary = [overallSummary stringByAppendingFormat:NSLocalizedString(@" (%i new)",nil), app.newRecentReviewsCount];
-	}
-    CGSize overallSummarySize = [overallSummary sizeWithFont:[UIFont systemFontOfSize:12.0]];
-	[overallSummary drawInRect:CGRectMake(290-overallSummarySize.width, 55-overallSummarySize.height, overallSummarySize.width, overallSummarySize.height) withFont:[UIFont italicSystemFontOfSize:12.0]];
+    UIFont *italicSystemFontOfSize12 = systemFontOfSize12; //[UIFont italicSystemFontOfSize:12.0];
+    
+	[NSLocalizedString(@"Overall", nil) drawInRect:CGRectMake(50, 40, 140, 15) withFont:italicSystemFontOfSize12];
+	NSString *overallSummary;
+	if (app.newReviewsCount) {
+        overallSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %4i new",nil), app.averageStars, app.newReviewsCount];
+	} else {
+        overallSummary = [NSString stringWithFormat:NSLocalizedString(@"%1.2f avg, %4i reviews",nil), app.averageStars, app.totalReviewsCount];
+    }
+    CGSize overallSummarySize = [overallSummary sizeWithFont:systemFontOfSize12];
+	[overallSummary drawInRect:CGRectMake(290-overallSummarySize.width, 55-overallSummarySize.height, overallSummarySize.width, overallSummarySize.height) withFont:italicSystemFontOfSize12];
 }
 
 @end
