@@ -62,30 +62,12 @@
 	{
 		return nil;
 	}
-	
-	if( [coder containsValueForKey:kS_RowDictionaryCodingKey] )
+	if( ![coder containsValueForKey:kS_RowDictionaryCodingKey] )
 	{
-		rowDictionary	= [[coder decodeObjectForKey:kS_RowDictionaryCodingKey] retain];
+		return nil;		// this will generate the report from the original file.
 	}
-	else
-	{
-		rowDictionary = [[NSMutableDictionary alloc] init];
-	
-		[rowDictionary setObject:[coder decodeObjectForKey:@"productIdentifier"]						forKey:kS_AppleReport_AppleIdentifier];
-		[rowDictionary setObject:[coder decodeObjectForKey:@"productName"]								forKey:kS_AppleReport_Title];
-		[rowDictionary setObject:[coder decodeObjectForKey:@"country"]									forKey:kS_AppleReport_CountryCode];
-		[rowDictionary setObject:[coder decodeObjectForKey:@"currency"]									forKey:kS_AppleReport_CurrencyofProceeds];
-		[rowDictionary setObject:[NSNumber numberWithInt:[coder decodeIntForKey:@"units"]]				forKey:kS_AppleReport_Units];
-		[rowDictionary setObject:[NSNumber numberWithFloat:[coder decodeFloatForKey:@"royalties"]]		forKey:kS_AppleReport_DeveloperProceeds];
-		
-		switch( [coder decodeIntForKey:@"transactionType"] )
-		{
-			case 1:		[rowDictionary setObject:kS_AppleReport_ProductType_UniveralAppPurchase forKey:kS_AppleReport_ProductTypeIdentifier];break;
-			case 2:		[rowDictionary setObject:kS_AppleReport_ProductType_InAppPurchase		forKey:kS_AppleReport_ProductTypeIdentifier];break;
-			case 7:		[rowDictionary setObject:kS_AppleReport_ProductType_UniveralAppUpdate	forKey:kS_AppleReport_ProductTypeIdentifier];break;
-			case 9:		[rowDictionary setObject:kS_AppleReport_ProductType_InAppSubscription	forKey:kS_AppleReport_ProductTypeIdentifier];break;
-		}
-	}
+
+	rowDictionary	= [[coder decodeObjectForKey:kS_RowDictionaryCodingKey] retain];
 	country			= [[coder decodeObjectForKey:kS_countryCodingKey] retain];
 	[country addEntry:self]; // self escaping
 	return self;

@@ -40,7 +40,7 @@
 	if (self) {
 		days = [NSMutableDictionary new];
 		weeks = [NSMutableDictionary new];
-		
+	
 		BOOL cacheLoaded = [self loadReportCache];
 		if (!cacheLoaded) {
 			[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Updating Cache...",nil)];
@@ -63,7 +63,9 @@
 		return NO;
 	}
 	NSDictionary *reportCache = [NSKeyedUnarchiver unarchiveObjectWithFile:reportCacheFile];
+	
 	if (!reportCache) {
+		JLog(@"reportCache could not be loaded");
 		return NO;
 	}
 	
@@ -90,11 +92,18 @@
 	NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
 	NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
 	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
-	for (NSString *filename in filenames) {
-		if (![[filename pathExtension] isEqual:@"dat"]) continue;
-		NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
-		Day *report = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
-		if (report != nil) {
+	for (NSString *filename in filenames) 
+	{
+		if( ![[filename pathExtension] isEqual:@"dat"] ) 
+		{
+			continue;
+		}
+		
+		NSString	*fullPath	= [docPath stringByAppendingPathComponent:filename];
+		Day			*report		= [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+		
+		if( report )
+		{
 			[report generateSummary];
 			if (report.date) {
 				if (report.isWeek) {

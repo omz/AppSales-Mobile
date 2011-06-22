@@ -270,13 +270,15 @@ static NSDate* reportDateFromString(NSString *dateString)
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	self = [self init];
-	if (self) {
-		date = [[coder decodeObjectForKey:@"date"] retain];
-		countries = [[coder decodeObjectForKey:@"countries"] retain];
-		isWeek = [coder decodeBoolForKey:@"isWeek"];
-		wasLoadedFromDisk = YES;
+	if( !(self = [self init]) )
+	{
+		return nil;
 	}
+	date				= [[coder decodeObjectForKey:@"date"] retain];
+	countries			= [[coder decodeObjectForKey:@"countries"] retain];
+	isWeek				= [coder decodeBoolForKey:@"isWeek"];
+	wasLoadedFromDisk	= YES;
+	
 	return self;
 }
 
@@ -287,6 +289,75 @@ static NSDate* reportDateFromString(NSString *dateString)
 		NSString *filename = [self proposedFilename];
 		NSString *fullPath = [getDocPath() stringByAppendingPathComponent:filename];
 		Day *fulfilledFault = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+		
+		if( !fulfilledFault )
+		{
+			JLog(@"Entry seems to be not compatible - reloading from csv");
+			
+			{
+				NSError *error;
+				
+				if( ! [[NSFileManager defaultManager] removeItemAtPath:fullPath error:&error] )
+				{
+					JLog(@"Could not remove file at %@ due to %@",fullPath,error);
+				}
+			}
+		
+			NSMutableDictionary		*originalFilenameDictionary = nil;
+			NSString				*originalFilenameDirectory = [getDocPath() stringByAppendingPathComponent:@"OriginalReports"];
+
+			if( !originalFilenameDictionary )
+			{
+				originalFilenameDictionary = [NSMutableDictionary dictionary];
+				
+				for( NSString	*originalFilename in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:originalFilenameDirectory error:NULL] )
+				{
+					NSArray *originalFilenameParts = [originalFilename componentsSeparatedByString:@"_"];
+					
+					if(		[originalFilenameParts count] == 5 )
+					{
+						NSString	*reportType = [originalFilenameParts objectAtIndex:1];
+						NSString	*reportDate	= [originalFilenameParts objectAtIndex:3];
+						
+						if( [reportType isEqual:@"D"] || [reportType isEqual:@"W"])
+						{
+							[originalFilenameDictionary setObject:originalFilename	forKey:[NSString stringWithFormat:@"%@_%@",[reportType isEqual:@"D"]?@"day":@"week",reportDate]];
+						}
+					}
+				}
+			}
+
+			NSArray	*filenameParts		= [[filename stringByDeletingPathExtension] componentsSeparatedByString:@"_"];
+			
+			if( [filenameParts count] == 4 )
+			{
+				NSString	*originalReportFilename = [originalFilenameDictionary objectForKey:[NSString stringWithFormat:@"%@_%@%@%@"	,[filenameParts objectAtIndex:0]
+																																		,[filenameParts objectAtIndex:3]
+																																		,[filenameParts objectAtIndex:1]
+																																		,[filenameParts objectAtIndex:2]]];
+				if( originalReportFilename )
+				{
+					JLog(@"Generating report from original filename:%@",originalReportFilename);
+					
+					NSData *filecontentData = [NSData dataWithContentsOfFile:[originalFilenameDirectory stringByAppendingPathComponent:originalReportFilename]];
+					
+					if( ! filecontentData )
+					{
+						JLog(@"Could not read file: %@",[originalFilenameDirectory stringByAppendingPathComponent:originalReportFilename]);
+					}
+					else
+					{				
+						fulfilledFault	= [Day dayWithData:filecontentData compressed:[filename hasSuffix:@".gz"]?YES:NO];
+						[fulfilledFault archiveToDocumentPathIfNeeded:getDocPath()];
+					}
+				}
+			}
+			else
+			{
+				JLog(@"Cache filename looks weird.%@",filename);
+			}	
+		}
+		
 		countries = [fulfilledFault.countries retain];
 		isFault = NO;
 	}
@@ -300,19 +371,24 @@ static NSDate* reportDateFromString(NSString *dateString)
 	return [loadedDay autorelease];
 }
 
-- (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath {
-	NSFileManager *manager = [NSFileManager defaultManager];
-	NSString *fullPath = [docPath stringByAppendingPathComponent:self.proposedFilename];
-	BOOL isDirectory = false;
-	if ([manager fileExistsAtPath:fullPath isDirectory:&isDirectory]) {
-		if (isDirectory) {
+- (BOOL)archiveToDocumentPathIfNeeded:(NSString*)docPath
+{
+	NSFileManager	*manager	= [NSFileManager defaultManager];
+	NSString		*fullPath	= [docPath stringByAppendingPathComponent:self.proposedFilename];
+	BOOL			isDirectory = false;
+	if([manager fileExistsAtPath:fullPath isDirectory:&isDirectory])
+	{
+		JLog(@"could not archive out fileExistsAtPath :%@ , %@",docPath,fullPath);
+		if (isDirectory) 
+		{
 			[NSException raise:NSGenericException format:@"found unexpected directory at Day path: %@", fullPath];
 		}
 		return FALSE;
 	}
 	// hasn't been arhived yet, write it out now
-	if (! [NSKeyedArchiver archiveRootObject:self toFile:fullPath]) {
-		NSLog(@"could not archive out %@", self);
+	if(! [NSKeyedArchiver archiveRootObject:self toFile:fullPath] ) 
+	{
+		JLog(@"could not archive out to:%@ self:%@",fullPath,self);
 		return FALSE;
 	}
 	return TRUE;
@@ -320,9 +396,9 @@ static NSDate* reportDateFromString(NSString *dateString)
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:date forKey:@"date"];
-	[coder encodeObject:countries forKey:@"countries"];
-	[coder encodeBool:isWeek forKey:@"isWeek"];
+    [coder encodeObject:date		forKey:@"date"];
+	[coder encodeObject:countries	forKey:@"countries"];
+	[coder encodeBool:isWeek		forKey:@"isWeek"];
 }
 
 - (Country *)countryNamed:(NSString *)countryName
