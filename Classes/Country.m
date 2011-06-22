@@ -135,6 +135,7 @@
 	return sum;
 }
 
+
 - (int)totalUnits
 {
 	int sum = 0;
@@ -144,6 +145,21 @@
 	}
 	return sum;
 }
+
+- (float)customerPriceForAppWithID:(NSString *)appID {
+	if (appID == nil)
+		return -1.0;
+
+	for(Entry *e in self.entries) 
+	{
+		if( [e.productIdentifier isEqualToString:appID] &&  e.isPurchase )
+		{
+			return e.customerprice;
+		}
+	}
+	return -1.0;
+}
+
 
 - (NSArray *)allProductIDs
 {

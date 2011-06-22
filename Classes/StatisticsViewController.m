@@ -199,9 +199,11 @@
 	float x = 640.0;
 	for (NSString *appID in allAppIDs) {
 		TrendGraphView *trendView = [[[TrendGraphView alloc] initWithFrame:CGRectMake(x, 0, 320, 200)] autorelease];
-		trendView.days = nil;
-		trendView.appName = [appNamesByAppId objectForKey:appID];
-		trendView.appID = appID;// [appIdByAppName objectForKey:appName];
+		
+		trendView.days		= nil;
+		trendView.appName	= [appNamesByAppId objectForKey:appID];
+		trendView.appID		= appID;// [appIdByAppName objectForKey:appName];
+		
 		[trendViewsForApps addObject:trendView];
 		[self.scrollView addSubview:trendView];
 		x += 320;

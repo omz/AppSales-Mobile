@@ -35,6 +35,58 @@
 #define kSummaryRevenue	@"revenue"
 #define kSummaryIsWeek	@"isWeek"
 
+
+/*
+on 2011-06-20 a header line looks like this:
+
+Provider	Provider Country	SKU	Developer	Title	Version	Product Type Identifier	Units	Developer Proceeds	Begin Date	End Date	Customer Currency	Country Code	Currency of Proceeds	Apple Identifier	Customer Price	Promo Code	Parent Identifier	Subscription	Period
+
+to create the following defines use the script in the commandline:
+*/
+// pbpaste |perl -ne '@fields=split(/\t/,$_);for( @fields) {$original=$_;s/\s*//g;print "#define\t kS_AppleReport_$_\t\t@\"".lc $original."\"\n";};'
+
+
+#define	 kS_AppleReport_Provider				@"provider"
+#define	 kS_AppleReport_ProviderCountry			@"provider country"
+#define	 kS_AppleReport_SKU						@"sku"
+#define	 kS_AppleReport_Developer				@"developer"
+#define	 kS_AppleReport_Title					@"title"
+#define	 kS_AppleReport_Version					@"version"
+#define	 kS_AppleReport_ProductTypeIdentifier	@"product type identifier"
+#define	 kS_AppleReport_Units					@"units"
+#define	 kS_AppleReport_DeveloperProceeds		@"developer proceeds"
+#define	 kS_AppleReport_BeginDate				@"begin date"
+#define	 kS_AppleReport_EndDate					@"end date"
+#define	 kS_AppleReport_CustomerCurrency		@"customer currency"
+#define	 kS_AppleReport_CountryCode				@"country code"
+#define	 kS_AppleReport_CurrencyofProceeds		@"currency of proceeds"
+#define	 kS_AppleReport_AppleIdentifier			@"apple identifier"
+#define	 kS_AppleReport_CustomerPrice			@"customer price"
+#define	 kS_AppleReport_PromoCode				@"promo code"
+#define	 kS_AppleReport_ParentIdentifier		@"parent identifier"
+#define	 kS_AppleReport_Subscription			@"subscription"
+#define	 kS_AppleReport_Period					@"period"
+
+
+
+// defines taken from http://www.apple.com/itunesnews/docs/AppStoreReportingInstructions.pdf
+
+#define	kS_AppleReport_ProductType_iPhoneAppPurchase	@"1"
+#define	kS_AppleReport_ProductType_iPhoneAppUpdate		@"7"
+#define	kS_AppleReport_ProductType_InAppPurchase		@"IA1"
+#define	kS_AppleReport_ProductType_InAppSubscription	@"IA9"
+#define	kS_AppleReport_ProductType_UniveralAppPurchase	@"1F"
+#define	kS_AppleReport_ProductType_UniveralAppUpdate	@"7F"
+#define	kS_AppleReport_ProductType_iPadAppPurchase		@"1T"
+#define	kS_AppleReport_ProductType_iPadAppUpdate		@"7T"
+
+// following encounterd in the wild and not (yet) described in the appstore reporting instrucitons
+#define	kS_AppleReport_ProductType_MacAppPurchase		@"F1"
+#define	kS_AppleReport_ProductType_MacAppUpdate			@"F7"
+
+
+
+
 @class Country;
 
 @interface Day : NSObject<NSCoding> {
@@ -73,6 +125,8 @@
 - (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
 - (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
+
+- (float)customerUSPriceForAppWithID:(NSString *)appID ;
 
 - (NSArray *)allProductIDs;
 

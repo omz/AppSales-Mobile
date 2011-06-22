@@ -25,39 +25,54 @@
 - (void)drawRect:(CGRect)rect 
 {
 	[super drawRect:rect];
-		
+
 	BOOL showUnits = [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowUnitsInGraphs"];
-		
+
 	//draw background:
 	float maxX = 305.0;
 	float minX = 40.0;
 	float minY = 30.0;
 	float maxY = 170;
 	
-	NSMutableArray *revenues = [NSMutableArray array];
+	NSMutableArray *revenues		= [NSMutableArray array];
+	NSMutableArray *productprices	= [NSMutableArray array];
 	float maxRevenue = 0.0;
 	float totalRevenue = 0.0;
 	Day* lastDay = nil;
-	for (Day *d in self.days) {
-		float revenue = (showUnits) ? (float)[d totalUnitsForAppWithID:appID] : [d totalRevenueInBaseCurrencyForAppWithID:appID];
-		totalRevenue += revenue;
-		/*
-		if(d.isWeek){
-			revenue /= 7.0;
-			for(int i = 0; i < 7; i++)
-				[revenues addObject:[NSNumber numberWithFloat:revenue]];
-		}else{
-			[revenues addObject:[NSNumber numberWithFloat:revenue]];
+    
+    float maxproductprice	= 0.0;
+	float lastproductprice	= 0.0;
+	for( Day *d in self.days ) 
+	{
+        float productprice		= (float)[d customerUSPriceForAppWithID:appID];        
+		float unitsorrevenue	= (showUnits) ? (float)[d totalUnitsForAppWithID:appID] : (float)[d totalRevenueInBaseCurrencyForAppWithID:appID];
+		
+		if( productprice < 0.0 )
+		{
+			productprice = lastproductprice;
 		}
-		*/
-		if (lastDay) {			
-			//NSLog(@"%d",(int)[d.date timeIntervalSinceDate:lastDay.date]);
-			for (int j=1; [d.date timeIntervalSinceDate:lastDay.date] > 3600*24*j ; j++) {
-				[revenues addObject:[NSNumber numberWithFloat:0.0f]]; //add zero revenue for days with no reports
+		else 
+		{
+			lastproductprice = productprice;
+		}
+
+		totalRevenue += unitsorrevenue;
+
+		if( lastDay )
+		{			
+			for (int j=1; [d.date timeIntervalSinceDate:lastDay.date] > 3600*24*j ; j++) 
+			{
+				[revenues		addObject:[NSNumber numberWithFloat:0.0f]]; //add zero revenue for days with no reports
+				[productprices	addObject:[NSNumber numberWithFloat:0.0f]];
 			}
-		}		
-		[revenues addObject:[NSNumber numberWithFloat:revenue]];
-		if (revenue > maxRevenue) maxRevenue = revenue;
+		}
+		
+		[revenues		addObject:[NSNumber numberWithFloat:unitsorrevenue]];
+		[productprices	addObject:[NSNumber numberWithFloat:productprice]];
+		
+		if (unitsorrevenue > maxRevenue) maxRevenue = unitsorrevenue;
+		if (productprice > maxproductprice) maxproductprice = productprice;
+		
 		lastDay = d;
 	}
 	
@@ -79,7 +94,7 @@
 	CGContextSetAllowsAntialiasing(c, YES);
 	[@"0" drawInRect:CGRectMake(0, maxY - 4, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	NSString *maxString = [NSString stringWithFormat:@"%i", (int)maxRevenue];
-	[maxString drawInRect:CGRectMake(0, minY - 8, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
+	[maxString drawInRect:CGRectMake(0, minY - 12, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	float averageRevenue = totalRevenue / [revenues count];
 	float averageY = maxY - ((averageRevenue / maxRevenue) * (maxY - minY));
 	if ((averageY < (maxY + 10)) && (averageY > (minY + 10))) {
@@ -87,6 +102,9 @@
 		[graphColor set];
 		[averageString drawInRect:CGRectMake(0, averageY - 6, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	}
+	
+	
+	
 	[[UIColor darkGrayColor] set];
 	
 	NSString *caption;
@@ -150,29 +168,58 @@
 		CGContextSetAllowsAntialiasing(c, YES);
 	}
 	
+    //draw customerprice line
+    {
+        [[UIColor colorWithRed:0.0 green:0.4 blue:0.2 alpha:0.8] set];
+		[[NSString stringWithFormat:@"%.2f", (float)maxproductprice] drawInRect:CGRectMake(0, minY - 4, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
+	
+       int i = 0;
+        float prevX = 0.0;
+        CGContextBeginPath(c);
+        CGContextSetLineWidth(c, 2.0);
+        CGContextSetLineJoin(c, kCGLineJoinRound);
+        for (NSNumber *productprice in productprices) {
+            float r = [productprice floatValue];
+            float y = maxY - ((r / maxproductprice) * (maxY - minY));
+            float x = minX + ((maxX - minX) / ([revenues count] - 1)) * i;
+            if (prevX == 0.0) {
+                CGContextMoveToPoint(c, x, y);
+            }
+            else {
+                CGContextAddLineToPoint(c, x, y);
+            }
+            prevX = x;
+            //	prevY = y;
+            i++;
+        }
+        CGContextDrawPath(c, kCGPathStroke);
+    }
 	//draw trend line:
-	[graphColor set];
-	int i = 0;
-	float prevX = 0.0;
-	//float prevY = 0.0;
-	CGContextBeginPath(c);
-	CGContextSetLineWidth(c, 2.0);
-	CGContextSetLineJoin(c, kCGLineJoinRound);
-	for (NSNumber *revenue in revenues) {
-		float r = [revenue floatValue];
-		float y = maxY - ((r / maxRevenue) * (maxY - minY));
-		float x = minX + ((maxX - minX) / ([revenues count] - 1)) * i;
-		if (prevX == 0.0) {
-			CGContextMoveToPoint(c, x, y);
-		}
-		else {
-			CGContextAddLineToPoint(c, x, y);
-		}
-		prevX = x;
-	//	prevY = y;
-		i++;
-	}
-	CGContextDrawPath(c, kCGPathStroke);
+	{
+        [graphColor set];
+        int i = 0;
+        float prevX = 0.0;
+        //float prevY = 0.0;
+        CGContextBeginPath(c);
+        CGContextSetLineWidth(c, 2.0);
+        CGContextSetLineJoin(c, kCGLineJoinRound);
+        for (NSNumber *revenue in revenues) {
+            float r = [revenue floatValue];
+            float y = maxY - ((r / maxRevenue) * (maxY - minY));
+            float x = minX + ((maxX - minX) / ([revenues count] - 1)) * i;
+            if (prevX == 0.0) {
+                CGContextMoveToPoint(c, x, y);
+            }
+            else {
+                CGContextAddLineToPoint(c, x, y);
+            }
+            prevX = x;
+        //	prevY = y;
+            i++;
+        }
+        CGContextDrawPath(c, kCGPathStroke);
+    }
+    
 	
 	//draw average line:
 	[graphColor set];

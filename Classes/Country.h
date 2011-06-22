@@ -47,6 +47,7 @@
 - (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
 - (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
+- (float)customerPriceForAppWithID:(NSString *)appID;
 - (NSArray *)allProductIDs;
 - (NSString *)totalRevenueString;
 - (NSArray *)children;

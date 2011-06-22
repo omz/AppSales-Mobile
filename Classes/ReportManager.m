@@ -241,7 +241,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
                               nil];
     NSString *responseString = getPostRequestAsString(ITTS_SALES_PAGE_URL, postDict);
     *viewState = parseViewState(responseString);
-    
+		NSLog(@"original website:\n%@\n%@ %@",responseString, dayString, weekString);
     // iTC shows a (fixed?) number of date ranges in the form, even if all of them are not available 
     // if trying to download a report that doesn't exist, it'll return an error page instead of the report
     if ([responseString rangeOfString:@"theForm:errorPanel"].location != NSNotFound) {
@@ -272,8 +272,9 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         [requestResponseData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
         return[Day dayWithData:requestResponseData compressed:YES];
     } else {
-        responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-        NSLog(@"unexpected response: %@", responseString);
+        NSLog(@"unexpected response: headers:\n%@",[downloadResponse allHeaderFields]);
+		responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+        NSLog(@"unexpected response: content:\n%@", responseString);
         *error = YES;
         return nil;
     }   

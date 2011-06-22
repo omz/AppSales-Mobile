@@ -34,28 +34,22 @@
 
 @interface Entry : NSObject {
     @private
-	Country *country;
-	NSString *productName;
-	NSString *productIdentifier;
-	NSString *currency;
-	int transactionType;
-	int units;
-	float royalties;
-	BOOL inAppPurchase;
+	NSMutableDictionary	*rowDictionary;
+	Country				*country;
 }
 
-@property (readonly, retain) Country *country;
-@property (readonly, retain) NSString *productName;
-@property (readonly, retain) NSString *productIdentifier;
-@property (readonly, retain) NSString *currency;
-@property (readonly) int transactionType;
-@property (readonly) float royalties;
-@property (readonly) int units;
-@property (readonly) BOOL isPurchase; // as opposed to a free download
+@property (readonly)  Country	*country;
+@property (readonly) NSString	*productName;
+@property (readonly) NSString	*productIdentifier;
+@property (readonly) NSString	*currency;
+@property (readonly) NSString	*transactionType;
+@property (readonly)		float		royalties;
+@property (readonly)		float		customerprice;
+@property (readonly)		int			units;
+@property (readonly)		BOOL		isPurchase; // as opposed to a free download
 @property (readonly, getter=isInAppPurchase) BOOL inAppPurchase;
 
-- (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u 
-					  royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry inAppPurchase:(BOOL)inApp;
+- (id)initWithRowDictionary:(NSDictionary *)aRowDictionary country:(Country *)country;
 - (float)totalRevenueInBaseCurrency;
 
 @end

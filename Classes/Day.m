@@ -40,7 +40,7 @@
 #import "NSDateFormatter+SharedInstances.h"
 #import "AppSalesUtils.h"
 
-static BOOL containsOnlyWhiteSpace(NSArray* array) {
+static BOOL arrayContainsOnlyWhiteSpaceStrings(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
 	for (NSString *string in array) {
 		for (int i = string.length - 1; i >= 0; i--) {
@@ -52,7 +52,8 @@ static BOOL containsOnlyWhiteSpace(NSArray* array) {
 	return YES;
 }
 
-static NSDate* reportDateFromString(NSString *dateString) {
+static NSDate* reportDateFromString(NSString *dateString) 
+{
     const NSUInteger stringLength = dateString.length;
     const NSRange slashRange = [dateString rangeOfString:@"/"];
     int year, month, day;
@@ -131,121 +132,91 @@ static NSDate* reportDateFromString(NSString *dateString) {
 
 - (id)initWithCSV:(NSString *)csv
 {
-	[super init];
+	if( !(self=[super init]) )
+	{
+		return nil;
+	}
 	
-	wasLoadedFromDisk = NO;	
-	countries = [[NSMutableDictionary alloc] init];
-    
-    NSMutableArray *lines = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
-	if ([lines count] == 0) {
+    NSMutableArray *rowStringArray = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
+	
+	if( [rowStringArray count] == 0 ) 
+	{
+		JLog(@"No lines in csv:%@",csv);
 		[self release];
 		return nil; // sanity check
 	}
-    
-    const NSUInteger numColumns = [[lines objectAtIndex:0] componentsSeparatedByString:@"\t"].count;
-    [lines removeObjectAtIndex:0]; // remove column header
 	
-	NSCharacterSet *whitespaceCharacterSet = [NSCharacterSet whitespaceCharacterSet];
-    
-	for (NSString *line in lines) {
-		NSArray *columns = [line componentsSeparatedByString:@"\t"];
-		if (containsOnlyWhiteSpace(columns)) {
+	wasLoadedFromDisk	= NO;	
+	countries			= [[NSMutableDictionary alloc] init];
+		
+	NSString	*headerLineString	= [[rowStringArray objectAtIndex:0] lowercaseString];
+	NSArray		*columnHeadersArray	= [headerLineString componentsSeparatedByString:@"\t"];
+	
+	[rowStringArray removeObjectAtIndex:0];		// remove headerline
+	
+	{
+		NSMutableSet *requiredHeadersSet	= [NSMutableSet setWithObjects:	kS_AppleReport_Title,
+																			kS_AppleReport_ProductTypeIdentifier,
+																			kS_AppleReport_Units,
+																			kS_AppleReport_DeveloperProceeds,
+																			kS_AppleReport_BeginDate,
+																			kS_AppleReport_EndDate,
+																			kS_AppleReport_CountryCode,
+																			kS_AppleReport_CurrencyofProceeds,
+																			kS_AppleReport_AppleIdentifier,
+																			kS_AppleReport_ParentIdentifier,
+																			kS_AppleReport_CustomerPrice,
+																			nil];
+																			
+		if( ![requiredHeadersSet isSubsetOfSet:[NSSet setWithArray:columnHeadersArray]] )
+		{
+			JLog(@"Apples csv does not contain the required header fields:\n%@\n%@\n",columnHeadersArray,requiredHeadersSet);
+			[self release];
+			return nil;
+		}
+	}	
+	
+	for( NSString *rowString in rowStringArray ) 
+	{
+		NSArray *rowFieldsArray = [rowString componentsSeparatedByString:@"\t"];
+		
+		if( arrayContainsOnlyWhiteSpaceStrings(rowFieldsArray) ) 
+		{
+			DJLog(@"row contains only whitespace - ignored:%@",rowString);
 			continue;
 		}
-        NSString *productName;
-        NSString *transactionType;
-        NSString *units;
-        NSString *royalties;
-        NSString *dateColumn;
-        NSString *toDateColumn;
-        NSString *appId;
-        NSString *parentID;
-        NSString *countryString;
-        NSString *royaltyCurrency;
-
-		if ((numColumns == 18) || (numColumns == 20)) {
-            // Sept 2010 format (18), Feb 2011 format (20)
-            productName = [columns objectAtIndex:4];
-            transactionType = [columns objectAtIndex:6];
-            units = [columns objectAtIndex:7];
-            royalties = [columns objectAtIndex:8];
-            dateColumn = [[columns objectAtIndex:9] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
-            toDateColumn = [[columns objectAtIndex:10] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
-            countryString = [columns objectAtIndex:12];
-            royaltyCurrency = [columns objectAtIndex:13];
-            appId = [columns objectAtIndex:14];
-            parentID = [columns objectAtIndex:17];
-        } else if (numColumns > 19) {
-            // old format	
-            productName = [columns objectAtIndex:6];
-            transactionType = [columns objectAtIndex:8];
-            units = [columns objectAtIndex:9];
-            royalties = [columns objectAtIndex:10];
-            dateColumn = [[columns objectAtIndex:11] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
-            toDateColumn = [[columns objectAtIndex:12] stringByTrimmingCharactersInSet:whitespaceCharacterSet];
-            countryString = [columns objectAtIndex:14];
-            royaltyCurrency = [columns objectAtIndex:15];
-            appId = [columns objectAtIndex:18];
-            parentID = (([columns count] >= 27) ? [columns objectAtIndex:26] : nil);
-        } else {
-            NSLog(@"unknown CSV format: columns %d - %@", numColumns, line);
-            [self release];
-			self = nil;
-            return self;
-        }
-			
-        NSDate *fromDate = reportDateFromString(dateColumn);
-        NSDate *toDate = reportDateFromString(toDateColumn);
-        if (!fromDate) {
-            NSLog(@"Date is invalid: %@", dateColumn);
-            [self release];
-			self = nil;
-            return self;
-        } else {
-//            date = [[Day adjustDateToLocalTimeZone:fromDate] retain];
-            date = [fromDate retain];
-            if (![fromDate isEqualToDate:toDate]) {
-                isWeek = YES;
-            }
-        }
-        if ([countryString length] != 2) {
-            NSLog(@"Country code is invalid: %@", countryString);
-            [self release];
-			self = nil;
-            return self; //sanity check, country code has to have two characters
-        }
-		
-		[[AppIconManager sharedManager] downloadIconForAppID:appId];
         
-        //Treat in-app purchases as regular purchases for our purposes.
-        //IA1: In-App Purchase
-        //IA7: In-App Free Upgrade / Repurchase (?)
-        //IA9: In-App Subscription
-		//F1: Mac Purchase
-		//F7: Mac Update ??? //TODO: Verify this, the iTC guide doesn't say anything about it yet.
-		
-        if ([transactionType isEqualToString:@"IA1"]) {
-			transactionType = @"2";
-		} else if([transactionType isEqualToString:@"IA9"]) {
-			transactionType = @"9";
-		} else if ([transactionType isEqualToString:@"IA7"]) {
-			transactionType = @"7";
-		} else if ([transactionType isEqualToString:@"F1"]) {
-			transactionType = @"1";
-		} else if ([transactionType isEqualToString:@"F7"]) {
-			transactionType = @"7";
+		if( rowFieldsArray.count != columnHeadersArray.count )
+		{
+			JLog(@"row contains different count of fields than header line:\n%@\n%@",headerLineString,rowString);
+			continue;
 		}
+				
+		NSMutableDictionary *rowDictionary = [NSMutableDictionary dictionaryWithObjects:rowFieldsArray forKeys:columnHeadersArray];
+		
+		for( NSString *columnName in columnHeadersArray )
+		{
+			if( [columnName hasSuffix:@"date"] )
+			{
+				NSString	*fieldContents	= [rowDictionary objectForKey:columnName];
+				NSDate		*fieldDate		= reportDateFromString([fieldContents stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]);
+				
+				if( !fieldDate )
+				{
+					JLog(@"Could not parse %@ date field:%@",columnName,fieldContents);
+					continue;
+				}
+				[rowDictionary setObject:fieldDate forKey:columnName];
+			}
+		}
+		DJLog(@"Rows:%@",rowDictionary);
+		
+		isWeek		= ![[rowDictionary objectForKey:kS_AppleReport_BeginDate] isEqual:[rowDictionary objectForKey:kS_AppleReport_EndDate]];
+		date		= [[rowDictionary objectForKey:kS_AppleReport_BeginDate] retain];
+		
+		[[AppIconManager sharedManager] downloadIconForAppID:[rowDictionary objectForKey:kS_AppleReport_AppleIdentifier]];
         
-        const BOOL inAppPurchase = ![parentID isEqualToString:@" "];
-        Country *country = [self countryNamed:countryString]; //will be created on-the-fly if needed.
-        [[[Entry alloc] initWithProductIdentifier:appId
-                                             name:productName
-                                  transactionType:[transactionType intValue]
-                                            units:[units intValue]
-                                        royalties:[royalties floatValue]
-                                         currency:royaltyCurrency
-                                          country:country
-                                    inAppPurchase:inAppPurchase] release]; //gets added to the countries entry list automatically
+        [[[Entry alloc] initWithRowDictionary:rowDictionary country:[self countryNamed:[rowDictionary objectForKey:kS_AppleReport_CountryCode]]] release];		//gets added to the countries entry list automatically
 	}
 
 	[self generateSummary];
@@ -440,7 +411,6 @@ static NSDate* reportDateFromString(NSString *dateString) {
 	return sum;
 }
 
-
 - (int)totalUnits
 {
 	int sum = 0;
@@ -448,6 +418,14 @@ static NSDate* reportDateFromString(NSString *dateString) {
 		sum += c.totalUnits;
 	}
 	return sum;
+}
+- (float)customerUSPriceForAppWithID:(NSString *)appID 
+{
+	if(appID == nil)
+	{
+		return -1.0;
+	}	
+	return [[[self countries] objectForKey:@"US"] customerPriceForAppWithID:appID];
 }
 
 - (NSArray *)allProductIDs

@@ -1,0 +1,99 @@
+// Creator: Patrick Stein aka Jolly
+// Taken from JNXFree ( github.com/jollyjinx/JNXFree )
+
+
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
+#define FIXRANGE(A,MIN,MAX)		\
+{								\
+	if( A < MIN )				\
+	{							\
+		A = MIN;				\
+	}							\
+	else if( A >MAX )			\
+	{							\
+		A = MAX;				\
+	}							\
+}
+
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+
+#if MAC_OS_X_VERSION_10_5 && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5)
+#else	
+	#define NSInteger int
+#endif	
+
+
+
+
+	#ifndef JLog
+		#define JLine(firstarg, ...)			([NSString stringWithFormat:@"\t(%08x.%04d)%s %@",self,__LINE__,__FUNCTION__,[NSString stringWithFormat:firstarg, ##__VA_ARGS__ ]])
+		#define JLineC(firstarg, ...)			([NSString stringWithFormat:@"\t(%08x.%04d) %s %s(): %@",NULL,__LINE__,__FILE__,__FUNCTION__,[NSString stringWithFormat:firstarg , ##__VA_ARGS__ ]])
+
+		#define JLog(firstarg, ...)				NSLog(@"%@",JLine(firstarg , ##__VA_ARGS__ ))
+		#define JLogC(firstarg, ...)			NSLog(@"%@",JLineC(firstarg ,  ##__VA_ARGS__ ))
+
+		#define DJLog		if(DEBUG)JLog
+		#define DJLogC		if(DEBUG)JLogC
+		
+		#define D2JLog		if(DEBUG>1)JLog
+		#define D2JLogC		if(DEBUG>1)JLogC
+		
+		#define D3JLog		if(DEBUG>2)JLog
+		#define D3JLogC		if(DEBUG>2)JLogC
+
+		#define DJLOG		if(DEBUG)DJLog(@"");
+		#define D2JLOG		if(DEBUG>1)DJLog(@"");
+		#define D3JLOG		if(DEBUG>1)DJLog(@"");
+	#endif
+
+
+	#ifndef DNSLog
+		#define DNSLog		if(DEBUG)JLogC
+		#define D2NSLog		if(DEBUG>1)JLogC
+	#endif
+
+
+
+	#ifdef DEBUGRETAIN
+	#define DEBUGRETAINCYCLE	\
+	- retain\
+	{\
+		[super retain];\
+		JLog(@"%d",[self retainCount]);\
+		return self;\
+	}\
+	\
+	- (void)release\
+	{\
+		JLog(@"%d",[self retainCount]-1);\
+		[super release];\
+	}\
+	- autorelease\
+	{\
+		[super autorelease];\
+		JLog(@"%d",[self retainCount]);\
+		return self;\
+	}\
+
+	#else
+	#define DEBUGRETAINCYCLE
+	#endif
+
+
+	#if NDEBUG
+	#define TIMELOG(nsstring)
+	#else 
+	#define TIMELOG(nsstring)	\
+	{																														\
+		static CFAbsoluteTime	timeloglasttime	= 0;																		\
+		CFAbsoluteTime			timelogtimenow		= CFAbsoluteTimeGetCurrent();											\
+		NSLog(@"%@ %3.2fHz %8.4fms",nsstring,1.0/(timelogtimenow-timeloglasttime),(timelogtimenow-timeloglasttime)*1000.0);	\
+		timeloglasttime = timelogtimenow;																									\
+	}
+	#endif
+#endif

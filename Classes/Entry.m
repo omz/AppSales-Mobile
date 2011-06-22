@@ -28,6 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "Day.h"
 #import "Entry.h"
 #import "Country.h"
 #import "CurrencyManager.h"
@@ -35,69 +36,120 @@
 #import "AppManager.h"
 
 @implementation Entry
-
 @synthesize country;
-@synthesize productName;
-@synthesize productIdentifier;
-@synthesize currency;
-@synthesize transactionType;
-@synthesize royalties;
-@synthesize units;
-@synthesize inAppPurchase;
 
-- (id)initWithProductIdentifier:(NSString*)identifier name:(NSString *)name transactionType:(int)type units:(int)u royalties:(float)r currency:(NSString *)currencyCode country:(Country *)aCountry inAppPurchase:(BOOL)inApp {
-	self = [super init];
-	if (self) {
-		productIdentifier = [identifier retain];
-		productName = [name retain];
-		country = [aCountry retain];
-		currency = [currencyCode retain];
-		
-		transactionType = type;
-		units = u;
-		royalties = r;
-		[country addEntry:self]; // beware, self reference is escaping constructor
+
+#define	kS_RowDictionaryCodingKey	@"rowDictionaryCodingKey"
+#define	kS_countryCodingKey			@"country"
+
+
+- (id)initWithRowDictionary:(NSDictionary *)aRowDictionary country:(Country *)aCountry
+{
+	if( !(self=[super init]) )
+	{
+		return nil;
 	}
+	
+	rowDictionary	= [aRowDictionary retain];
+	country			= [aCountry retain];
+	[country addEntry:self]; // self escaping
 	return self;
 }
 
-- (id)initWithCoder:(NSCoder *)coder {
-	self = [super init];
-	if (self) {
-        productIdentifier = [[coder decodeObjectForKey:@"productIdentifier"] retain];
-		productName = [[coder decodeObjectForKey:@"productName"] retain];
-		country = [[coder decodeObjectForKey:@"country"] retain];
-		currency = [[coder decodeObjectForKey:@"currency"] retain];
-        
-		transactionType = [coder decodeIntForKey:@"transactionType"];
-		units = [coder decodeIntForKey:@"units"];
-		royalties = [coder decodeFloatForKey:@"royalties"];
-		inAppPurchase = [coder decodeBoolForKey:@"inAppPurchase"];
-		
-		if (! productIdentifier) {
-			productIdentifier = [[AppManager sharedManager] appIDForAppName:productName];
-        }
-        [country addEntry:self]; // self escaping
+- (id)initWithCoder:(NSCoder *)coder 
+{
+	if( !(self=[super init]) )
+	{
+		return nil;
 	}
-
+	
+	if( [coder containsValueForKey:kS_RowDictionaryCodingKey] )
+	{
+		rowDictionary	= [[coder decodeObjectForKey:kS_RowDictionaryCodingKey] retain];
+	}
+	else
+	{
+		rowDictionary = [[NSMutableDictionary alloc] init];
+	
+		[rowDictionary setObject:[coder decodeObjectForKey:@"productIdentifier"]						forKey:kS_AppleReport_AppleIdentifier];
+		[rowDictionary setObject:[coder decodeObjectForKey:@"productName"]								forKey:kS_AppleReport_Title];
+		[rowDictionary setObject:[coder decodeObjectForKey:@"country"]									forKey:kS_AppleReport_CountryCode];
+		[rowDictionary setObject:[coder decodeObjectForKey:@"currency"]									forKey:kS_AppleReport_CurrencyofProceeds];
+		[rowDictionary setObject:[NSNumber numberWithInt:[coder decodeIntForKey:@"units"]]				forKey:kS_AppleReport_Units];
+		[rowDictionary setObject:[NSNumber numberWithFloat:[coder decodeFloatForKey:@"royalties"]]		forKey:kS_AppleReport_DeveloperProceeds];
+		
+		switch( [coder decodeIntForKey:@"transactionType"] )
+		{
+			case 1:		[rowDictionary setObject:kS_AppleReport_ProductType_UniveralAppPurchase forKey:kS_AppleReport_ProductTypeIdentifier];break;
+			case 2:		[rowDictionary setObject:kS_AppleReport_ProductType_iPhoneAppPurchase forKey:kS_AppleReport_ProductTypeIdentifier];break;
+			case 7:		[rowDictionary setObject:kS_AppleReport_ProductType_UniveralAppUpdate forKey:kS_AppleReport_ProductTypeIdentifier];break;
+			case 9:		[rowDictionary setObject:kS_AppleReport_ProductType_InAppSubscription forKey:kS_AppleReport_ProductTypeIdentifier];break;
+		}
+	}
+	country			= [[coder decodeObjectForKey:kS_countryCodingKey] retain];
+	[country addEntry:self]; // self escaping
 	return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-	[coder encodeObject:productIdentifier forKey:@"productIdentifier"];
-	[coder encodeObject:productName forKey:@"productName"];
-	[coder encodeObject:country forKey:@"country"];
-	[coder encodeObject:currency forKey:@"currency"];
-	
-	[coder encodeInt:transactionType forKey:@"transactionType"];
-	[coder encodeInt:units forKey:@"units"];
-	[coder encodeFloat:royalties forKey:@"royalties"];
-	[coder encodeBool:inAppPurchase forKey:@"inAppPurchase"];
+	[coder encodeObject:rowDictionary forKey:kS_RowDictionaryCodingKey];
 }
 
-- (BOOL) isPurchase {
-	return transactionType == 1 || transactionType == 2 || transactionType == 9;
++ (NSSet *)purchaseProductTypesSet;
+{
+	static NSSet *purchaseSet = nil;
+	
+	if( !purchaseSet )
+	{
+		purchaseSet = [[NSSet setWithObjects:	kS_AppleReport_ProductType_iPhoneAppPurchase,
+												kS_AppleReport_ProductType_iPadAppPurchase,
+												kS_AppleReport_ProductType_UniveralAppPurchase,
+												kS_AppleReport_ProductType_MacAppPurchase,
+												kS_AppleReport_ProductType_InAppSubscription,
+												nil] retain];		
+	}
+	return purchaseSet;
 }
+
+- (BOOL)isPurchase 
+{
+	return [[[self class] purchaseProductTypesSet] containsObject:[rowDictionary objectForKey:kS_AppleReport_ProductTypeIdentifier]];
+}
+- (BOOL)isInAppPurchase
+{
+	return [[rowDictionary objectForKey:kS_AppleReport_ProductTypeIdentifier] isEqualToString:kS_AppleReport_ProductType_InAppSubscription];
+}
+
+
+- (NSString *)productName
+{
+	return [rowDictionary objectForKey:kS_AppleReport_Title]; 
+}
+- (NSString *)productIdentifier
+{
+	return [rowDictionary objectForKey:kS_AppleReport_AppleIdentifier]; 
+}
+- (NSString *)currency
+{
+	return [rowDictionary objectForKey:kS_AppleReport_CurrencyofProceeds]; 
+}
+- (NSString *)transactionType
+{
+	return [rowDictionary objectForKey:kS_AppleReport_ProductTypeIdentifier]; 
+}
+- (float)royalties
+{
+	return [[rowDictionary objectForKey:kS_AppleReport_DeveloperProceeds] floatValue]; 
+}
+- (int)units
+{
+	return [[rowDictionary objectForKey:kS_AppleReport_Units] intValue]; 
+}
+- (float)customerprice
+{
+	return [[rowDictionary objectForKey:kS_AppleReport_CustomerPrice] floatValue]; 
+}
+
 
 - (float)totalRevenueInBaseCurrency {
 	if (self.isPurchase) {
@@ -124,11 +176,10 @@
 	return [NSString stringWithFormat:NSLocalizedString(@"%@ : %i free downloads",nil), self.productName, self.units];
 }
 
-- (void)dealloc {
+- (void)dealloc 
+{
+	[rowDictionary release];
 	[country release];
-	[productName release];
-	[currency release];
-	[productIdentifier release];
 	
 	[super dealloc];
 }
