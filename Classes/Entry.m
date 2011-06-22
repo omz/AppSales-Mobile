@@ -81,9 +81,9 @@
 		switch( [coder decodeIntForKey:@"transactionType"] )
 		{
 			case 1:		[rowDictionary setObject:kS_AppleReport_ProductType_UniveralAppPurchase forKey:kS_AppleReport_ProductTypeIdentifier];break;
-			case 2:		[rowDictionary setObject:kS_AppleReport_ProductType_iPhoneAppPurchase forKey:kS_AppleReport_ProductTypeIdentifier];break;
-			case 7:		[rowDictionary setObject:kS_AppleReport_ProductType_UniveralAppUpdate forKey:kS_AppleReport_ProductTypeIdentifier];break;
-			case 9:		[rowDictionary setObject:kS_AppleReport_ProductType_InAppSubscription forKey:kS_AppleReport_ProductTypeIdentifier];break;
+			case 2:		[rowDictionary setObject:kS_AppleReport_ProductType_InAppPurchase		forKey:kS_AppleReport_ProductTypeIdentifier];break;
+			case 7:		[rowDictionary setObject:kS_AppleReport_ProductType_UniveralAppUpdate	forKey:kS_AppleReport_ProductTypeIdentifier];break;
+			case 9:		[rowDictionary setObject:kS_AppleReport_ProductType_InAppSubscription	forKey:kS_AppleReport_ProductTypeIdentifier];break;
 		}
 	}
 	country			= [[coder decodeObjectForKey:kS_countryCodingKey] retain];

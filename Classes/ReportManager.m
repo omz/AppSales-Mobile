@@ -537,10 +537,16 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         [[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];        
     } else {
         [days setObject:report forKey:report.date];
-        AppManager *manager = [AppManager sharedManager];
+        AppManager	*manager	= [AppManager sharedManager];
+		NSSet		*ignoreSet	= [NSSet setWithObjects:	kS_AppleReport_ProductType_InAppSubscription,
+															kS_AppleReport_ProductType_InAppPurchase,
+															nil];
+		
         for (Country *c in [report.countries allValues]) {
-            for (Entry *e in c.entries) {
-				if (e.transactionType == 2 || e.transactionType == 9) {
+            for (Entry *e in c.entries) 
+			{
+				if( [ignoreSet containsObject:e.transactionType] ) 
+				{
                     //skips IAPs in app manager, so IAPs don't duplicate reviews
                     [manager removeAppWithID:e.productIdentifier];
                     continue;
@@ -555,10 +561,14 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 
 - (void)importReport:(Day *)report
 {
-	AppManager *manager = [AppManager sharedManager];
+	AppManager	*manager	= [AppManager sharedManager];
+	NSSet		*ignoreSet	= [NSSet setWithObjects:	kS_AppleReport_ProductType_InAppSubscription,
+														kS_AppleReport_ProductType_InAppPurchase,
+														nil];
+
 	for (Country *c in [report.countries allValues]) {
 		for (Entry *e in c.entries) {
-            if (e.transactionType == 2 || e.transactionType == 9) {
+			if( [ignoreSet containsObject:e.transactionType] ) {
                 //skips IAPs in app manager, so IAPs don't duplicate reviews
                 [manager removeAppWithID:e.productIdentifier];
                 continue;
