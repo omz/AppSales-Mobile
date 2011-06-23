@@ -113,7 +113,7 @@
 	} else {
 		caption = [NSString stringWithFormat:NSLocalizedString(@"Revenue (in %@)",nil), [[CurrencyManager sharedManager] baseCurrencyDescription]];
 	}
-	[caption drawInRect:CGRectMake(10, 10, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
+	[caption drawInRect:CGRectMake(10, 10, 140, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 
 	
 	NSString *appNameToShow = (self.appName != nil) ? (self.appName) : NSLocalizedString(@"All Apps",nil);
@@ -171,7 +171,8 @@
     //draw customerprice line
 	if( maxcustomerprice > 0.0 )
     {
-        [[UIColor colorWithRed:0.0 green:0.4 blue:0.2 alpha:0.8] set];
+		[[UIColor colorWithRed:0.0 green:0.4 blue:0.2 alpha:0.8] set];
+		[NSLocalizedString(@"/ Customer price (in US$)",nil) drawInRect:CGRectMake(155, 10, 200, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentLeft];
 		[[NSString stringWithFormat:@"%.2f", (float)maxcustomerprice] drawInRect:CGRectMake(0, minY - 4, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	
 		int i = 0;
