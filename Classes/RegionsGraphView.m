@@ -147,15 +147,14 @@
 	CGContextSetAllowsAntialiasing(c, YES);
 	
 	//draw pie chart:
-	NSArray *colors = [NSArray arrayWithObjects:
-					   [UIColor colorWithRed:0.58 green:0.31 blue:0.04 alpha:1.0],
-					   [UIColor colorWithRed:0.20 green:0.76 blue:0.78 alpha:1.0],
-					   [UIColor colorWithRed:0.96 green:0.11 blue:0.51 alpha:1.0],
-					   [UIColor colorWithRed:0.91 green:0.49 blue:0.06 alpha:1.0],
-					   [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0],
-					   [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0],
-					   [UIColor colorWithRed:0.34 green:0.65 blue:0.02 alpha:1.0], nil];
-	
+	NSDictionary	*colorCountryDictionary	= [NSDictionary dictionaryWithObjectsAndKeys:	[UIColor colorWithRed:0.58 green:0.31 blue:0.04 alpha:1.0],	@"WW",
+																							[UIColor colorWithRed:0.20 green:0.76 blue:0.78 alpha:1.0],	@"AU",
+																							[UIColor colorWithRed:0.96 green:0.11 blue:0.51 alpha:1.0],	@"JP",
+																							[UIColor colorWithRed:0.91 green:0.49 blue:0.06 alpha:1.0],	@"CA", 
+																							[UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0],	@"EU",
+																							[UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0],	@"GB",
+																							[UIColor colorWithRed:0.34 green:0.65 blue:0.02 alpha:1.0],	@"US", nil];
+
 	float lastAngle = -M_PI_2;
 
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter new] autorelease];
@@ -164,7 +163,7 @@
 		
 	for (int i = 0; i< [sortedRegions count] ; i++ ) {
 		NSString	*region			= [sortedRegions objectAtIndex:i];
-		UIColor		*regionColor	= [colors objectAtIndex:i%[colors count]];
+		UIColor		*regionColor	= [colorCountryDictionary objectForKey:region];
 		float		units			= [[unitsByRegion objectForKey:region] floatValue];
 		float		percentage		= units / totalUnits;
 
