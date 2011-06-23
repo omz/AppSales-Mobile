@@ -70,31 +70,7 @@
 		//JP:
 		[regionsByCountryCode setObject:@"JP" forKey:@"JP"];
 		
-		//WW:
-		[regionsByCountryCode setObject:@"WW" forKey:@"HR"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"CN"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"HK"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"IN"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"ID"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"IL"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"KR"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"KW"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"LK"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"LB"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"MY"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"PH"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"PK"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"QA"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"RU"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"SG"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"SA"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"ZA"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"SY"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"TH"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"TR"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"AE"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"VN"];
-		
+		//WW: the rest will be worldwide
     }
     return self;
 }
@@ -128,38 +104,43 @@
 	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"WW"];
 	NSMutableDictionary *unitsByRegion = [[revenueByRegion mutableCopyWithZone: NULL] autorelease];
 	
-	int totalUnits = 0;
-	for (Day *d in self.days) {
-		for (Country *c in [d.countries allValues]) {
-			NSString *region = [regionsByCountryCode objectForKey:c.name];
+	int		totalUnits		= 0;
+	float	totalRevenue	= 0.0;
+	
+	for (Day *day in self.days) {
+		for (Country *country in [day.countries allValues]) {
+			NSString *region = [regionsByCountryCode objectForKey:country.name];
 			if (!region)
-				region = @"WW"; //just to be safe...
-			float revenueOfCurrentRegion = [[revenueByRegion objectForKey:region] floatValue];
-			revenueOfCurrentRegion += [c totalRevenueInBaseCurrency];
-			[revenueByRegion setObject:[NSNumber numberWithFloat:revenueOfCurrentRegion] forKey:region];
-			int unitsOfCurrentRegion = [[unitsByRegion objectForKey:region] intValue];
-			int units = [c totalUnits];
-			unitsOfCurrentRegion += units;
-			totalUnits += units;
-			[unitsByRegion setObject:[NSNumber numberWithInt:unitsOfCurrentRegion] forKey:region];
+				region = @"WW"; // if not known it's WW
+				
+			float	revenueofregion		=	[[revenueByRegion objectForKey:region] floatValue];
+			float	revenueofcountry	=	[country totalRevenueInBaseCurrency];
+					totalRevenue		+=	revenueofcountry;
+		
+			[revenueByRegion setObject:[NSNumber numberWithFloat:(revenueofregion+revenueofcountry)] forKey:region];
+			
+			int		unitsofregion		=	[[unitsByRegion objectForKey:region] intValue];
+			int		unitsofcountry		=	[country totalUnits];
+					totalUnits			+=	unitsofcountry;
+
+			[unitsByRegion setObject:[NSNumber numberWithInt:(unitsofregion+unitsofcountry)] forKey:region];
 		}
 	}
 	
-	NSArray *sortedRegions = [revenueByRegion keysSortedByValueUsingSelector:@selector(compare:)];
-	float totalRevenue = 0.0;
-	for (NSString *region in sortedRegions) {
-		totalRevenue += [[revenueByRegion objectForKey:region] floatValue];
+	NSString	*caption;
+	NSArray		*sortedRegions;
+	if (showUnits)
+	{
+		sortedRegions	= [revenueByRegion keysSortedByValueUsingSelector:@selector(compare:)];
+		caption			= [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %i sales)",nil), [self.days count], totalUnits];
 	}
-	if (showUnits)
-		sortedRegions = [unitsByRegion keysSortedByValueUsingSelector:@selector(compare:)];
-	
-	//draw title:
-	[[UIColor darkGrayColor] set];
-	NSString *caption;
-	if (showUnits)
-		caption = [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %i sales)",nil), [self.days count], totalUnits];
 	else
-		caption = [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %@)",nil), [self.days count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+	{
+		sortedRegions	= [unitsByRegion keysSortedByValueUsingSelector:@selector(compare:)];
+		caption			= [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %@)",nil), [self.days count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+	}
+
+	[[UIColor darkGrayColor] set];
 	[caption drawInRect:CGRectMake(10, 10, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 	float maxX = 305.0;
 	float minX = 15.0;
