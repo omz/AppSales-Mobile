@@ -383,12 +383,13 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     }
 	
     
-    viewState = parseViewState(salesPage);    
+	viewState = parseViewState(salesPage);    
     NSString *dailyName = [salesPage stringByMatching:@"theForm:j_id_jsp_[0-9]*_6"];
-    NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_22"];
-    NSString *ajaxName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_2"];
-    NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_43"];
-    NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_48"];
+	NSRange lastTwoChars = NSMakeRange([dailyName length] - 2, 2);
+    NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_22" options:0 range:lastTwoChars];
+    NSString *ajaxName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_2" options:0 range:lastTwoChars];
+    NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_43" options:0 range:lastTwoChars];
+    NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_48" options:0 range:lastTwoChars];
     
     // parse days available
     NSMutableArray *availableDays = extractFormOptions(salesPage, @"theForm:datePickerSourceSelectElement");
