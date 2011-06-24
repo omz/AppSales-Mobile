@@ -53,7 +53,11 @@
 {
     CGRect bounds = appCell.bounds;
     bounds.size.height = 60;
-	[super initWithFrame:bounds];
+
+	if( !(self=	[super initWithFrame:bounds]) )
+    {
+        return nil;
+    }
 	self.backgroundColor = [UIColor whiteColor];
 	cell = appCell;
 	return self;
