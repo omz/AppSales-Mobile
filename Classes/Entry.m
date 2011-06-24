@@ -62,9 +62,11 @@
 	{
 		return nil;
 	}
-	if( ![coder containsValueForKey:kS_RowDictionaryCodingKey] )
+	if(     ![coder containsValueForKey:kS_RowDictionaryCodingKey]
+        ||  ![coder containsValueForKey:kS_countryCodingKey] )
 	{
-		return nil;		// this will generate the report from the original file.
+        JLog(@"Coded values on disk seems to be a old version , will generate new Entry from original file.");
+		return nil;
 	}
 
 	rowDictionary	= [[coder decodeObjectForKey:kS_RowDictionaryCodingKey] retain];
@@ -74,7 +76,8 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-	[coder encodeObject:rowDictionary forKey:kS_RowDictionaryCodingKey];
+	[coder encodeObject:rowDictionary   forKey:kS_RowDictionaryCodingKey];
+	[coder encodeObject:country         forKey:kS_countryCodingKey];
 }
 
 + (NSSet *)purchaseProductTypesSet;
