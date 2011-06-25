@@ -34,29 +34,32 @@
 
 @implementation Country
 
-@synthesize name;
+@synthesize countryName;
 @synthesize day;
 
-- (id)initWithName:(NSString *)countryName day:(Day *)aDay
+- (id)initWithName:(NSString *)aCountryName day:(Day *)aDay
 {
-	self = [super init];
-	if (self) {
-		day = [aDay retain];
-		name = [countryName retain];
-		entries = [NSMutableArray new];
-	}
+	if( !(self = [super init]) )
+    {
+        return nil;
+    }
+
+	day             = [aDay retain];
+	countryName     = [aCountryName retain];
+	entriesArray    = [NSMutableArray new];
+
 	return self;
 }
 
-- (NSArray*) entries {
-	return entries;
+- (NSArray*) entriesArray {
+	return entriesArray;
 }
 
 - (NSString *)description
 {
 	NSMutableDictionary *idToName = [NSMutableDictionary dictionary];
 	NSMutableDictionary *salesByID = [NSMutableDictionary dictionary];
-	for (Entry *e in self.entries) {
+	for (Entry *e in self.entriesArray) {
 		if (e.isPurchase) {
 			NSNumber *unitsOfProduct = [salesByID objectForKey:e.productIdentifier];
 			int u = (unitsOfProduct != nil) ? unitsOfProduct.intValue : 0;
@@ -84,30 +87,38 @@
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	self = [super init];
-	if (self) {
-		day = [[coder decodeObjectForKey:@"day"] retain];
-		name = [[coder decodeObjectForKey:@"name"] retain];
-		entries = [[coder decodeObjectForKey:@"entries"] retain];
+	if( !(self = [super init]))
+    {
+        return nil;
+    }
+    
+	day          = [[coder decodeObjectForKey:@"day"] retain];
+	countryName  = [[coder decodeObjectForKey:@"name"] retain];
+	entriesArray = [[coder decodeObjectForKey:@"entries"] retain];
+        
+    if( !day || !countryName || !entriesArray || (entriesArray.count < 1) )
+    {
+        [self release];
+        return nil;
 	}
 	return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-	[coder encodeObject:day forKey:@"day"];
-	[coder encodeObject:name forKey:@"name"];
-	[coder encodeObject:entries forKey:@"entries"];
+	[coder encodeObject:day             forKey:@"day"];
+	[coder encodeObject:countryName            forKey:@"name"];
+	[coder encodeObject:entriesArray    forKey:@"entries"];
 }
 
 - (void) addEntry:(Entry*)entry {
-	[entries addObject:entry];
+	[entriesArray addObject:entry];
 }
 
 - (float)totalRevenueInBaseCurrency
 {
 	float sum = 0.0;
-	for (Entry *e in self.entries) {
+	for (Entry *e in self.entriesArray) {
 		sum += [e totalRevenueInBaseCurrency];
 	}
 	return sum;
@@ -117,7 +128,7 @@
 	if (appID == nil)
 		return [self totalRevenueInBaseCurrency];
 	float sum = 0.0;
-	for (Entry *e in self.entries) {
+	for (Entry *e in self.entriesArray) {
 		if ([e.productIdentifier isEqual:appID])
 			sum += [e totalRevenueInBaseCurrency];
 	}
@@ -128,7 +139,7 @@
 	if (appID == nil)
 		return [self totalUnits];
 	int sum = 0;
-	for (Entry *e in self.entries) {
+	for (Entry *e in self.entriesArray) {
 		if ((e.isPurchase) && ([e.productIdentifier isEqual:appID]))
 			sum += [e units];
 	}
@@ -139,7 +150,7 @@
 - (int)totalUnits
 {
 	int sum = 0;
-	for (Entry *e in self.entries) {
+	for (Entry *e in self.entriesArray) {
 		if (e.isPurchase)
 			sum += [e units];
 	}
@@ -150,7 +161,7 @@
 	if (appID == nil)
 		return -1.0;
 
-	for(Entry *e in self.entries) 
+	for(Entry *e in self.entriesArray) 
 	{
 		if( [e.productIdentifier isEqualToString:appID] &&  e.isPurchase )
 		{
@@ -164,7 +175,7 @@
 - (NSArray *)allProductIDs
 {
 	NSMutableSet *names = [NSMutableSet set];
-	for (Entry *e in self.entries) {
+	for (Entry *e in self.entriesArray) {
 		[names addObject:e.productIdentifier];
 	}
 	return [names allObjects];
@@ -178,12 +189,12 @@
 - (NSArray *)children
 {
 	NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"totalRevenueInBaseCurrency" ascending:NO] autorelease];
-	NSArray *sortedChildren = [self.entries sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
+	NSArray *sortedChildren = [self.entriesArray sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 	return sortedChildren;
 }
 
 - (NSString *)appIDForApp:(NSString *)appName {
-	for (Entry *e in self.entries) {
+	for (Entry *e in self.entriesArray) {
 		if([e.productName isEqualToString:appName])
 			return e.productIdentifier;
 	}
@@ -193,8 +204,8 @@
 - (void)dealloc
 {
 	[day release];
-	[entries release];
-	[name release];
+	[entriesArray release];
+	[countryName release];
 	
 	[super dealloc];
 }

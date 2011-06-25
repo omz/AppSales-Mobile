@@ -183,8 +183,8 @@
 	// this is gross!  There should be a way to lookup an app name by it's id, and the converse
 	NSMutableDictionary *appNamesByAppId = [NSMutableDictionary dictionary];
 	for (Day *d in selectedDays) {
-		for (Country *c in d.countries.allValues) {
-			for (Entry *e in c.entries) { // O(N^3) for a simple lookup?  You know it baby!
+		for (Country *c in d.countriesDictionary.allValues) {
+			for (Entry *e in c.entriesArray) { // O(N^3) for a simple lookup?  You know it baby!
 				[appNamesByAppId setObject:e.productName forKey:e.productIdentifier];
 			}
 		}

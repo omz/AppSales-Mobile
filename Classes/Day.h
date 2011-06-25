@@ -91,7 +91,7 @@ to create the following defines use the script in the commandline:
 
 @interface Day : NSObject<NSCoding> {
 	NSDate *date;
-	NSMutableDictionary *countries;
+	NSMutableDictionary *countriesDictionary;
 	
     BOOL isWeek:1;
 	BOOL wasLoadedFromDisk:1;
@@ -101,47 +101,49 @@ to create the following defines use the script in the commandline:
 }
 
 @property (readonly) NSDate *date;
-@property (readonly) NSMutableDictionary *countries;
+@property (readonly) NSMutableDictionary *countriesDictionary;
 @property (readonly) BOOL isWeek;
 @property (readonly) BOOL wasLoadedFromDisk;
 @property (readonly) BOOL isFault;
 @property (readonly) NSDictionary *summary;
 
-+ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
++ (NSDate*) adjustDateToLocalTimeZone:(NSDate *)inDate;
+#
+#pragma mark initalization Methods
+#
 + (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
-
 - (id)initWithCSV:(NSString *)csv;
-
-// returns true if instances was serialized out to docPath
-- (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath;
-
-
-- (void)generateSummary;
++ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
+- (id) initWithSummary:(NSDictionary*)summaryToUse date:(NSDate*)dateToUse isWeek:(BOOL)week isFault:(BOOL)fault;
 + (Day *)dayWithSummary:(NSDictionary *)reportSummary;
-
+- (void)dealloc;
+#
+#pragma mark Archiving / Unarchiving
+#
+- (id)initWithCoder:(NSCoder *)coder;
+- (void)encodeWithCoder:(NSCoder *)coder;
+- (BOOL)archiveToDocumentPathIfNeeded:(NSString*)docPath;
+#
+#pragma mark
+#
+- (void)generateSummary;
+- (NSMutableDictionary *)countriesDictionary;
 - (Country *)countryNamed:(NSString *)countryName;
-
+- (NSString *)description;
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
 - (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
-
-- (float)customerUSPriceForAppWithID:(NSString *)appID ;
-
+- (float)customerUSPriceForAppWithID:(NSString *)appID;
 - (NSArray *)allProductIDs;
-
-- (NSString *)dayString;
-- (NSString *)weekdayString;
-- (NSString *)weekEndDateString;
-- (UIColor *)weekdayColor;
-
 - (NSString *)totalRevenueString;
 - (NSString *)totalRevenueStringForApp:(NSString *)appName;
-
-- (NSString *)proposedFilename;
-
+- (NSString *)dayString;
+- (NSString *)weekdayString;
+- (UIColor *)weekdayColor;
+- (NSString *)weekEndDateString;
 - (NSArray *)children;
-
-- (NSString *)appIDForApp:(NSString *)appName; // TODO: rename
+- (NSString *)proposedFilename;
+- (NSString *)appIDForApp:(NSString *)appName;
 
 @end

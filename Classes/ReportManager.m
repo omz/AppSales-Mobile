@@ -551,8 +551,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 															kS_AppleReport_ProductType_InAppPurchase,
 															nil];
 		
-        for (Country *c in [report.countries allValues]) {
-            for (Entry *e in c.entries) 
+        for (Country *c in [report.countriesDictionary allValues]) {
+            for (Entry *e in c.entriesArray) 
 			{
 				if( [ignoreSet containsObject:e.transactionType] ) 
 				{
@@ -575,8 +575,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 														kS_AppleReport_ProductType_InAppPurchase,
 														nil];
 
-	for (Country *c in [report.countries allValues]) {
-		for (Entry *e in c.entries) {
+	for (Country *c in [report.countriesDictionary allValues]) {
+		for (Entry *e in c.entriesArray) {
 			if( [ignoreSet containsObject:e.transactionType] ) {
                 //skips IAPs in app manager, so IAPs don't duplicate reviews
                 [manager removeAppWithID:e.productIdentifier];

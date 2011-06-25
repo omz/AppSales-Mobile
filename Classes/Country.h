@@ -33,14 +33,14 @@
 @class Day, Entry;
 
 @interface Country : NSObject {
-	Day *day;
-	NSMutableArray *entries;
-	NSString *name;
+	Day             *day;
+	NSMutableArray  *entriesArray;
+	NSString        *countryName;
 }
 
-@property (readonly) NSString *name;
-@property (readonly) Day *day;
-@property (readonly) NSArray *entries;
+@property (readonly) NSString   *countryName;
+@property (readonly) Day        *day;
+@property (readonly) NSArray    *entriesArray;
 
 - (id)initWithName:(NSString *)countryName day:(Day *)aDay;
 - (float)totalRevenueInBaseCurrency;

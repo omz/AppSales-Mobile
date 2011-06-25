@@ -85,21 +85,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 
 @implementation Day
 
-@synthesize date, countries, isWeek, wasLoadedFromDisk, summary, isFault;
-
-+ (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed {
-	NSString *text = nil;
-	if (compressed) {
-		NSData *uncompressedData = [dayData gzipInflate];
-		text = [[NSString alloc] initWithData:uncompressedData encoding:NSUTF8StringEncoding];
-	} else {
-		text = [[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding];
-	}
-	Day *day = [[[Day alloc] initWithCSV:text] autorelease];
-	[text release];
-	return day;
-}
-
+@synthesize date, countriesDictionary, isWeek, wasLoadedFromDisk, summary, isFault;
 
 //
 // currently broken
@@ -129,6 +115,28 @@ static NSDate* reportDateFromString(NSString *dateString)
     }
 }
 
+#
+#pragma mark initalization Methods
+#
+
++ (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed 
+{
+	NSString *text = nil;
+    
+	if( !compressed)
+    {
+		text = [[[NSString alloc] initWithData:[dayData gzipInflate] encoding:NSUTF8StringEncoding] autorelease];
+	}
+    
+    if( compressed || !text )
+    {
+        text = [[[NSString alloc] initWithData:[dayData gzipInflate] encoding:NSUTF8StringEncoding] autorelease];
+	}
+    
+	return [[[Day alloc] initWithCSV:text] autorelease];
+}
+
+
 
 - (id)initWithCSV:(NSString *)csv
 {
@@ -147,7 +155,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 	}
 	
 	wasLoadedFromDisk	= NO;	
-	countries			= [[NSMutableDictionary alloc] init];
+	countriesDictionary			= [[NSMutableDictionary alloc] init];
 		
 	NSString	*headerLineString	= [[rowStringArray objectAtIndex:0] lowercaseString];
 	NSArray		*columnHeadersArray	= [headerLineString componentsSeparatedByString:@"\t"];
@@ -223,12 +231,119 @@ static NSDate* reportDateFromString(NSString *dateString)
 	return self;
 }
 
+
+
++ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
+{
+	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
+	Day *loadedDay = [[Day alloc] initWithCSV:[NSString stringWithContentsOfFile:fullPath encoding:NSUTF8StringEncoding error:nil]];	
+	return [loadedDay autorelease];
+}
+
+
+
+- (id) initWithSummary:(NSDictionary*)summaryToUse date:(NSDate*)dateToUse isWeek:(BOOL)week isFault:(BOOL)fault
+{
+	if( !(self = [super init]) )
+    {
+        return self;
+    }
+    
+    summary             = [summaryToUse retain];
+    date                = [dateToUse retain];
+    isWeek              = week;
+    isFault             = fault;
+    wasLoadedFromDisk   = YES;
+
+	return self;
+}
+
+
+
++ (Day *)dayWithSummary:(NSDictionary *)reportSummary
+{
+	return [[[Day alloc] initWithSummary:reportSummary date:[reportSummary objectForKey:kSummaryDate]
+								  isWeek:[[reportSummary objectForKey:kSummaryIsWeek] boolValue] isFault:YES] autorelease];
+}
+
+
+
+- (void)dealloc
+{
+	[countriesDictionary release];
+	[date release];
+	[summary release];
+	
+	[super dealloc];
+}
+
+#pragma mark Archiving / Unarchiving
+
+- (id)initWithCoder:(NSCoder *)coder
+{
+	if( !(self = [self init]) )
+	{
+		return nil;
+	} 
+	date                        = [[coder decodeObjectForKey:@"date"] retain];
+    NSArray *countriesKeys      = [coder decodeObjectForKey:@"countriesKeys"];
+    NSArray *countriesObjects   = [coder decodeObjectForKey:@"countriesObjects"];
+	isWeek                      = [coder decodeBoolForKey:@"isWeek"];
+	wasLoadedFromDisk           = YES;
+	
+    if( !date || !countriesKeys || !countriesObjects || (countriesKeys.count <1) || (countriesKeys.count!=countriesObjects.count) )
+    {
+        [self release];
+        return nil;
+    }
+    countriesDictionary = [[NSMutableDictionary alloc] initWithObjects:countriesObjects forKeys:countriesKeys];
+	return self;
+}
+
+
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:date                            forKey:@"date"];
+	[coder encodeObject:[countriesDictionary allKeys]   forKey:@"countriesKeys"];               // we encode keys and objects sperarate as a a new version in the encoding might 
+	[coder encodeObject:[countriesDictionary allValues] forKey:@"countriesObjects"];            // not be compatible and that way we don't get NSDictionary to complain about nonexisting objects
+	[coder encodeBool:isWeek                            forKey:@"isWeek"];                     
+}
+
+
+
+- (BOOL)archiveToDocumentPathIfNeeded:(NSString*)docPath
+{
+	NSFileManager	*manager	= [NSFileManager defaultManager];
+	NSString		*fullPath	= [docPath stringByAppendingPathComponent:self.proposedFilename];
+	BOOL			isDirectory = false;
+	if([manager fileExistsAtPath:fullPath isDirectory:&isDirectory])
+	{
+		JLog(@"could not archive out fileExistsAtPath :%@ , %@",docPath,fullPath);
+		if (isDirectory) 
+		{
+			[NSException raise:NSGenericException format:@"found unexpected directory at Day path: %@", fullPath];
+		}
+		return FALSE;
+	}
+	// hasn't been arhived yet, write it out now
+	if(! [NSKeyedArchiver archiveRootObject:self toFile:fullPath] ) 
+	{
+		JLog(@"could not archive out to:%@ self:%@",fullPath,self);
+		return FALSE;
+	}
+	return TRUE;
+}
+
+
+#pragma mark
+
 - (void)generateSummary
 {
 	NSMutableDictionary *revenueByCurrency = [NSMutableDictionary dictionary];
 	NSMutableDictionary *salesByApp = [NSMutableDictionary dictionary];
-	for (Country *country in [self.countries allValues]) {
-		for (Entry *entry in country.entries) {
+	for (Country *country in [self.countriesDictionary allValues]) {
+		for (Entry *entry in country.entriesArray) {
 			if (entry.isPurchase ) {
 				NSNumber *newCount = [NSNumber numberWithInt:[[salesByApp objectForKey:entry.productName] intValue] + entry.units];
 				[salesByApp setObject:newCount forKey:entry.productName];
@@ -240,50 +355,16 @@ static NSDate* reportDateFromString(NSString *dateString)
 	}
 	[summary release];
 	summary = [[NSDictionary alloc] initWithObjectsAndKeys: 
-									self.date, kSummaryDate,
-									revenueByCurrency, kSummaryRevenue,
-									salesByApp, kSummarySales,
-									[NSNumber numberWithBool:self.isWeek], kSummaryIsWeek,
-									nil];
+               self.date, kSummaryDate,
+               revenueByCurrency, kSummaryRevenue,
+               salesByApp, kSummarySales,
+               [NSNumber numberWithBool:self.isWeek], kSummaryIsWeek,
+               nil];
 }
 
 
-- (id) initWithSummary:(NSDictionary*)summaryToUse date:(NSDate*)dateToUse isWeek:(BOOL)week isFault:(BOOL)fault
-{
-	self = [super init];
-	if (self) {
-		summary = [summaryToUse retain];
-		date = [dateToUse retain];
-		isWeek = week;
-		isFault = fault;
-		wasLoadedFromDisk = YES;
-	}
-	return self;
-}
 
-+ (Day *)dayWithSummary:(NSDictionary *)reportSummary
-{
-	return [[[Day alloc] initWithSummary:reportSummary date:[reportSummary objectForKey:kSummaryDate]
-								  isWeek:[[reportSummary objectForKey:kSummaryIsWeek] boolValue] isFault:YES] autorelease];
-}
-
-
-- (id)initWithCoder:(NSCoder *)coder
-{
-	if( !(self = [self init]) )
-	{
-		return nil;
-	}
-	date				= [[coder decodeObjectForKey:@"date"] retain];
-	countries			= [[coder decodeObjectForKey:@"countries"] retain];
-	isWeek				= [coder decodeBoolForKey:@"isWeek"];
-	wasLoadedFromDisk	= YES;
-	
-	return self;
-}
-
-
-- (NSMutableDictionary *)countries
+- (NSMutableDictionary *)countriesDictionary
 {	
 	if (isFault) {
 		NSString *filename = [self proposedFilename];
@@ -297,20 +378,20 @@ static NSDate* reportDateFromString(NSString *dateString)
 			{
 				NSError *error;
 				
-				if( ! [[NSFileManager defaultManager] removeItemAtPath:fullPath error:&error] )
+				if( [[NSFileManager defaultManager] fileExistsAtPath:fullPath] && ![[NSFileManager defaultManager] removeItemAtPath:fullPath error:&error] )
 				{
 					JLog(@"Could not remove file at %@ due to %@",fullPath,error);
 				}
 			}
 		
-			NSMutableDictionary		*originalFilenameDictionary = nil;
-			NSString				*originalFilenameDirectory = [getDocPath() stringByAppendingPathComponent:@"OriginalReports"];
+			NSMutableDictionary		*originalFilenameDictionary     = nil;
+			NSString				*originalFilenameDirectoryPath  = [getDocPath() stringByAppendingPathComponent:@"OriginalReports"];
 
 			if( !originalFilenameDictionary )
 			{
 				originalFilenameDictionary = [NSMutableDictionary dictionary];
 				
-				for( NSString	*originalFilename in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:originalFilenameDirectory error:NULL] )
+				for( NSString	*originalFilename in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:originalFilenameDirectoryPath error:NULL] )
 				{
 					NSArray *originalFilenameParts = [originalFilename componentsSeparatedByString:@"_"];
 					
@@ -339,16 +420,23 @@ static NSDate* reportDateFromString(NSString *dateString)
 				{
 					JLog(@"Generating report from original filename:%@",originalReportFilename);
 					
-					NSData *filecontentData = [NSData dataWithContentsOfFile:[originalFilenameDirectory stringByAppendingPathComponent:originalReportFilename]];
+                    NSString    *originalReportFullFilename = [originalFilenameDirectoryPath stringByAppendingPathComponent:originalReportFilename];
+					NSData      *filecontentData            = [NSData dataWithContentsOfFile:originalReportFullFilename];
 					
-					if( ! filecontentData )
+					if( !filecontentData || filecontentData.length < 1)
 					{
-						JLog(@"Could not read file: %@",[originalFilenameDirectory stringByAppendingPathComponent:originalReportFilename]);
+						JLog(@"Could not read file:%@",originalReportFullFilename);
 					}
 					else
-					{				
-						fulfilledFault	= [Day dayWithData:filecontentData compressed:[filename hasSuffix:@".gz"]?YES:NO];
-						[fulfilledFault archiveToDocumentPathIfNeeded:getDocPath()];
+					{
+                        if( (fulfilledFault	= [Day dayWithData:filecontentData compressed:[filename hasSuffix:@".gz"]?YES:NO]) )
+                        {
+                            [fulfilledFault archiveToDocumentPathIfNeeded:getDocPath()];
+                        }
+                        else
+                        {
+                            JLog(@"Could not create Day from report file:%@\n%@",originalReportFilename,filecontentData);
+                        }
 					}
 				}
 			}
@@ -358,55 +446,21 @@ static NSDate* reportDateFromString(NSString *dateString)
 			}	
 		}
 		
-		countries = [fulfilledFault.countries retain];
+		countriesDictionary = [fulfilledFault.countriesDictionary retain];
 		isFault = NO;
 	}
-	return countries;
+	return countriesDictionary;
 }
 
-+ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
-{
-	NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
-	Day *loadedDay = [[Day alloc] initWithCSV:[NSString stringWithContentsOfFile:fullPath encoding:NSUTF8StringEncoding error:nil]];	
-	return [loadedDay autorelease];
-}
 
-- (BOOL)archiveToDocumentPathIfNeeded:(NSString*)docPath
-{
-	NSFileManager	*manager	= [NSFileManager defaultManager];
-	NSString		*fullPath	= [docPath stringByAppendingPathComponent:self.proposedFilename];
-	BOOL			isDirectory = false;
-	if([manager fileExistsAtPath:fullPath isDirectory:&isDirectory])
-	{
-		JLog(@"could not archive out fileExistsAtPath :%@ , %@",docPath,fullPath);
-		if (isDirectory) 
-		{
-			[NSException raise:NSGenericException format:@"found unexpected directory at Day path: %@", fullPath];
-		}
-		return FALSE;
-	}
-	// hasn't been arhived yet, write it out now
-	if(! [NSKeyedArchiver archiveRootObject:self toFile:fullPath] ) 
-	{
-		JLog(@"could not archive out to:%@ self:%@",fullPath,self);
-		return FALSE;
-	}
-	return TRUE;
-}
 
-- (void)encodeWithCoder:(NSCoder *)coder
-{
-    [coder encodeObject:date		forKey:@"date"];
-	[coder encodeObject:countries	forKey:@"countries"];
-	[coder encodeBool:isWeek		forKey:@"isWeek"];
-}
 
 - (Country *)countryNamed:(NSString *)countryName
 {
-	Country *country = [self.countries objectForKey:countryName];
+	Country *country = [self.countriesDictionary objectForKey:countryName];
 	if (!country) {
 		country = [[Country alloc] initWithName:countryName day:self];
-		[self.countries setObject:country forKey:countryName];
+		[self.countriesDictionary setObject:country forKey:countryName];
 		[country release];
 	}
 	return country;
@@ -417,8 +471,8 @@ static NSDate* reportDateFromString(NSString *dateString)
 	NSDictionary *salesByProduct = nil;
 	if (!self.summary) {
 		NSMutableDictionary *temp = [NSMutableDictionary dictionary];
-		for (Country *c in [self.countries allValues]) {
-			for (Entry *e in [c entries]) {
+		for (Country *c in [self.countriesDictionary allValues]) {
+			for (Entry *e in [c entriesArray]) {
 				if (e.isPurchase) {
 					NSNumber *unitsOfProduct = [temp objectForKey:[e productName]];
 					int u = (unitsOfProduct != nil) ? ([unitsOfProduct intValue]) : 0;
@@ -460,7 +514,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 		return sum;
 	} else {
 		float sum = 0.0;
-		for (Country *c in [self.countries allValues]) {
+		for (Country *c in [self.countriesDictionary allValues]) {
 			sum += [c totalRevenueInBaseCurrency];
 		}
 		return sum;
@@ -471,7 +525,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 	if (appID == nil)
 		return [self totalRevenueInBaseCurrency];
 	float sum = 0.0;
-	for (Country *c in [self.countries allValues]) {
+	for (Country *c in [self.countriesDictionary allValues]) {
 		sum += [c totalRevenueInBaseCurrencyForAppWithID:appID];
 	}
 	return sum;
@@ -481,7 +535,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 	if (appID == nil)
 		return [self totalUnits];
 	int sum = 0;
-	for (Country *c in [self.countries allValues]) {
+	for (Country *c in [self.countriesDictionary allValues]) {
 		sum += [c totalUnitsForAppWithID:appID];
 	}
 	return sum;
@@ -490,7 +544,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 - (int)totalUnits
 {
 	int sum = 0;
-	for (Country *c in self.countries.allValues) {
+	for (Country *c in self.countriesDictionary.allValues) {
 		sum += c.totalUnits;
 	}
 	return sum;
@@ -501,13 +555,13 @@ static NSDate* reportDateFromString(NSString *dateString)
 	{
 		return -1.0;
 	}	
-	return [[[self countries] objectForKey:@"US"] customerPriceForAppWithID:appID];
+	return [[[self countriesDictionary] objectForKey:@"US"] customerPriceForAppWithID:appID];
 }
 
 - (NSArray *)allProductIDs
 {
 	NSMutableSet *names = [NSMutableSet set];
-	for (Country *c in self.countries.allValues) {
+	for (Country *c in self.countriesDictionary.allValues) {
 		[names addObjectsFromArray:c.allProductIDs];
 	}
 	return names.allObjects;
@@ -561,7 +615,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 - (NSArray *)children
 {
 	NSSortDescriptor *sorter = [[[NSSortDescriptor alloc] initWithKey:@"totalUnits" ascending:NO] autorelease];
-	NSArray *sortedChildren = [self.countries.allValues sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
+	NSArray *sortedChildren = [self.countriesDictionary.allValues sortedArrayUsingDescriptors:[NSArray arrayWithObject:sorter]];
 	return sortedChildren;
 }
 
@@ -579,7 +633,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 }
 
 - (NSString *)appIDForApp:(NSString *)appName {
-	for(Country *c in [self.countries allValues]){
+	for(Country *c in [self.countriesDictionary allValues]){
         NSString *appID = [c appIDForApp:appName];
 		if(appID)
 			return appID;
@@ -587,13 +641,5 @@ static NSDate* reportDateFromString(NSString *dateString)
 	return nil;
 }
 
-- (void)dealloc
-{
-	[countries release];
-	[date release];
-	[summary release];
-	
-	[super dealloc];
-}
 
 @end

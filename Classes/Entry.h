@@ -34,11 +34,11 @@
 
 @interface Entry : NSObject {
     @private
-	NSMutableDictionary	*rowDictionary;
-	Country				*country;
+	NSDictionary	*rowDictionary;
+	Country			*theCountry;
 }
 
-@property (readonly)  Country	*country;
+@property (readonly)  Country	*theCountry;
 @property (readonly) NSString	*productName;
 @property (readonly) NSString	*productIdentifier;
 @property (readonly) NSString	*currency;

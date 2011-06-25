@@ -93,7 +93,7 @@
 	//compile product stats:
 	NSMutableDictionary *productInfos = [NSMutableDictionary dictionary];
 	for (Country *c in countries) {
-		for (Entry *e in c.entries) {
+		for (Entry *e in c.entriesArray) {
 			if (e.isPurchase) {
 				NSMutableDictionary *productInfo = [productInfos objectForKey:e.productIdentifier];
 				if (!productInfo) {
@@ -174,7 +174,7 @@
 	if (self.displayMode == 0) {
 		Country *selectedCountry = [self.countries objectAtIndex:[indexPath row]];
 		EntriesController *entriesController = [[[EntriesController alloc] init] autorelease];
-		entriesController.title = selectedCountry.name;
+		entriesController.title = selectedCountry.countryName;
 		entriesController.entries = [selectedCountry children];
 		[entriesController.tableView reloadData];
 		[self.navigationController pushViewController:entriesController animated:YES];

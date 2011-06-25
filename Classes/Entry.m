@@ -36,7 +36,7 @@
 #import "AppManager.h"
 
 @implementation Entry
-@synthesize country;
+@synthesize theCountry;
 
 
 #define	kS_RowDictionaryCodingKey	@"rowDictionaryCodingKey"
@@ -51,8 +51,8 @@
 	}
 	
 	rowDictionary	= [aRowDictionary retain];
-	country			= [aCountry retain];
-	[country addEntry:self]; // self escaping
+	theCountry		= [aCountry retain];
+	[theCountry addEntry:self]; // self escaping
 	return self;
 }
 
@@ -65,19 +65,19 @@
 	if(     ![coder containsValueForKey:kS_RowDictionaryCodingKey]
         ||  ![coder containsValueForKey:kS_countryCodingKey] )
 	{
-        JLog(@"Coded values on disk seems to be a old version , will generate new Entry from original file.");
+        JLog(@"Coded values on disk seems to be a old version - should be regenerated");
 		return nil;
 	}
 
 	rowDictionary	= [[coder decodeObjectForKey:kS_RowDictionaryCodingKey] retain];
-	country			= [[coder decodeObjectForKey:kS_countryCodingKey] retain];
-	[country addEntry:self]; // self escaping
+	theCountry		= [[coder decodeObjectForKey:kS_countryCodingKey] retain];
+	[theCountry addEntry:self]; // self escaping
 	return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
 	[coder encodeObject:rowDictionary   forKey:kS_RowDictionaryCodingKey];
-	[coder encodeObject:country         forKey:kS_countryCodingKey];
+	[coder encodeObject:theCountry         forKey:kS_countryCodingKey];
 }
 
 + (NSSet *)purchaseProductTypesSet;
@@ -164,7 +164,7 @@
 - (void)dealloc 
 {
 	[rowDictionary release];
-	[country release];
+	[theCountry release];
 	
 	[super dealloc];
 }

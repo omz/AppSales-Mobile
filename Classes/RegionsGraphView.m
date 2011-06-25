@@ -107,8 +107,8 @@
 	float	totalUnits		= 0;
 	
 	for (Day *day in self.days) {
-		for (Country *country in [day.countries allValues]) {
-			NSString *region = [regionsByCountryCode objectForKey:country.name];
+		for (Country *country in [day.countriesDictionary allValues]) {
+			NSString *region = [regionsByCountryCode objectForKey:country.countryName];
 			if (!region)
 				region = @"WW"; // if not known it's WW
 			

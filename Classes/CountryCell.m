@@ -112,11 +112,11 @@
 	if (country == nil)
 		return;
 	
-	UIImage *flagImage = [UIImage imageNamed:[[NSString stringWithFormat:@"%@.png", country.name] lowercaseString]];
+	UIImage *flagImage = [UIImage imageNamed:[[NSString stringWithFormat:@"%@.png", country.countryName] lowercaseString]];
 	if (!flagImage)
 		flagImage = [UIImage imageNamed:@"world.png"];
 	[flagView setImage:flagImage];
-	countryLabel.text = country.name;
+	countryLabel.text = country.countryName;
 	detailsLabel.text = [country description];
 	
 	revenueLabel.text = [country totalRevenueString];

@@ -110,7 +110,7 @@
 - (id) initWithCountryCode:(NSString*)code storeID:(NSString*)storeID formatter:(NSDateFormatter*)format {
 	self = [super init];
 	if (self) {
-		NSAssert(code && storeID, nil);
+		NSAssert(code && storeID, @"code:%p or storeID:%p nil",code,storeID);
 		countryCode = [code retain];
 		storeFrontID = [storeID retain];
 		countryName = [[[NSLocale currentLocale] displayNameForKey:NSLocaleCountryCode value:countryCode] retain];
@@ -211,7 +211,7 @@
 
 - (void) workerDone {
 	[condition lock];
-	NSAssert(numThreadsActive > 0, nil);
+	NSAssert(numThreadsActive > 0, @"worker done even though numThreadsActive>0" );
 	if (--numThreadsActive == 0) {
 		[condition broadcast];
 	}
@@ -651,7 +651,7 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	[storeInfos sortUsingFunction:&numStoreReviewsComparator context:numRegionReviews];
 	
 	if (skipLessActiveRegions) {
-		NSAssert(PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD >= 0 && PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD <= 1, nil);
+		NSAssert(PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD >= 0 && PERCENT_OF_MOST_ACTIVE_REGIONS_TO_ALWAYS_DOWNLOAD <= 1, @"");
 		if (numAllAppRegionReviews.count == 0) {
 			// no reviews for any app have been downloaded yet,
             // and thus we have no idea where new reviews are more likely to show up
@@ -680,7 +680,7 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 			}
 			
 			// add app regions that have never been downloaded, or last fetch was longer than threshold
-			NSAssert(TIME_THRESHOLD_TO_MAYBE_FETCH_REGION < TIME_THRESHOLD_TO_ALWAYS_FETCH_REGION, nil);
+			NSAssert(TIME_THRESHOLD_TO_MAYBE_FETCH_REGION < TIME_THRESHOLD_TO_ALWAYS_FETCH_REGION, @"");
 			for (App *app in allApps) {
 				for (StoreInfo *store in storeInfos) {
 					NSString *countryCode = store.countryCode;

@@ -52,7 +52,7 @@
         // quickly fade from splash screen to the active app
         UIImageView *splashView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 20, 320, 460)];
         UIImage *image = [UIImage imageNamed:@"Default"];
-        NSAssert(image, nil);
+        NSAssert(image!=nil,@"Default image not found");
         splashView.image = image;
         [rootViewController.view addSubview:splashView]; // retains
         
