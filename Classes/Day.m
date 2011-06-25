@@ -125,7 +125,7 @@ static NSDate* reportDateFromString(NSString *dateString)
     
 	if( !compressed)
     {
-		text = [[[NSString alloc] initWithData:[dayData gzipInflate] encoding:NSUTF8StringEncoding] autorelease];
+		text = [[[NSString alloc] initWithData:dayData encoding:NSUTF8StringEncoding] autorelease];
 	}
     
     if( compressed || !text )
@@ -147,9 +147,9 @@ static NSDate* reportDateFromString(NSString *dateString)
 	
     NSMutableArray *rowStringArray = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
 	
-	if( [rowStringArray count] == 0 ) 
+	if( [rowStringArray count] < 3 ) 
 	{
-		JLog(@"No lines in csv:%@",csv);
+		JLog(@"Not enough lines in csv:%@",csv);
 		[self release];
 		return nil; // sanity check
 	}
@@ -178,7 +178,8 @@ static NSDate* reportDateFromString(NSString *dateString)
 																			
 		if( ![requiredHeadersSet isSubsetOfSet:[NSSet setWithArray:columnHeadersArray]] )
 		{
-			JLog(@"Apples csv does not contain the required header fields:\n%@\n%@\n",columnHeadersArray,requiredHeadersSet);
+			JLog(@"Apples csv does not contain the required header fields:\n%@\n%@\n%@\n",columnHeadersArray,requiredHeadersSet,csv);
+            
 			[self release];
 			return nil;
 		}
@@ -429,7 +430,7 @@ static NSDate* reportDateFromString(NSString *dateString)
 					}
 					else
 					{
-                        if( (fulfilledFault	= [Day dayWithData:filecontentData compressed:[filename hasSuffix:@".gz"]?YES:NO]) )
+                        if( (fulfilledFault	= [Day dayWithData:filecontentData compressed:[originalReportFullFilename hasSuffix:@".gz"]?YES:NO]) )
                         {
                             [fulfilledFault archiveToDocumentPathIfNeeded:getDocPath()];
                         }
