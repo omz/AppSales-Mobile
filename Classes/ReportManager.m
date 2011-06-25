@@ -249,7 +249,7 @@ static NSString* parseViewState(NSString *htmlPage) {
                               nil];
     NSString *responseString = getPostRequestAsString(ITTS_SALES_PAGE_URL, postDict);
     *viewState = parseViewState(responseString);
-		NSLog(@"original website:\n%@\n%@ %@",responseString, dayString, weekString);
+	DJLog(@"original website:\n%@\n%@ %@",responseString, dayString, weekString);
     // iTC shows a (fixed?) number of date ranges in the form, even if all of them are not available 
     // if trying to download a report that doesn't exist, it'll return an error page instead of the report
     if ([responseString rangeOfString:@"theForm:errorPanel"].location != NSNotFound) {
