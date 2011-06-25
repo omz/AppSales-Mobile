@@ -113,7 +113,7 @@
 
 - (void) viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
-	[self reload];
+	[self reloadDays];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadDays)
 												 name:ReportManagerDownloadedDailyReportsNotification object:nil];
 }
