@@ -153,8 +153,7 @@
 	return isRefreshing;
 }
 
-- (void)downloadReports
-{
+- (void)downloadReports {
 	if (isRefreshing) {
 		return;
 	}
@@ -235,8 +234,8 @@ static NSString* parseViewState(NSString *htmlPage) {
 }
 
 // code path shared for both day and week downloads
-static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NSString *dayString, 
-                           NSString *weekString, NSString *selectName, NSString **viewState, BOOL *error)  {
+- (Day*) downloadReportFromiTC:(NSString*)originalReportsPath ajaxName:(NSString*)ajaxName dayString:(NSString*)dayString
+             weekString:(NSString*)weekString selectName:(NSString*)selectName viewState:(NSString**)viewState uiStatus:(NSString*)uiStatus error:(BOOL*)error  {
     // set the date within the web page
     NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
                               ajaxName, @"AJAXREQUEST",
@@ -258,6 +257,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         return nil;
     }
     
+    [self performSelectorOnMainThread:@selector(setProgress:) withObject:uiStatus waitUntilDone:NO];
+    
     // and finally...we're ready to download the report
     postDict = [NSDictionary dictionaryWithObjectsAndKeys:
                 @"theForm", @"theForm",
@@ -272,9 +273,8 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSData *requestResponseData = getPostRequestAsData(ITTS_SALES_PAGE_URL, postDict, &downloadResponse);
     NSString *originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"Filename"];
     
-    if( !originalFilename )
-    {
-        originalFilename    = [[downloadResponse allHeaderFields] objectForKey:@"filename"];    // iOS 5 beta 1 fix
+    if (! originalFilename ) { // iOS 5 beta 1 fix
+        originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"filename"];
     }
     
     if (originalFilename) {
@@ -289,8 +289,7 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     }   
 }
 
-- (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
-{
+- (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	NSScanner *scanner;
     [self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download",nil) waitUntilDone:NO];
@@ -445,11 +444,11 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     int count = 1;
     for (NSString *dayString in availableDays) {
         BOOL error = false;
-        Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, daySelectName, &viewState, &error);
+        NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %d of %d",nil), count, numReportsActuallyAvailable];
+        Day *day = [self downloadReportFromiTC:originalReportsPath ajaxName:ajaxName dayString:dayString weekString:arbitraryWeek
+                                    selectName:daySelectName viewState:&viewState uiStatus:progressMessage error:&error];
         if (day) {
-            NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloaded day %d of %d",nil), count, numReportsActuallyAvailable];
             count++;
-            [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
             [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:day waitUntilDone:NO];
             numberOfReportsDownloaded++;
         } else if (error) {
@@ -482,9 +481,10 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     count = 1;
     for (NSString *weekString in availableWeeks) {
         BOOL error = false;
-        Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, weekSelectName, &viewState, &error);
+        NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading week %d of %d",nil), count, numReportsActuallyAvailable];
+        Day *week = [self downloadReportFromiTC:originalReportsPath ajaxName:ajaxName dayString:arbitraryDay weekString:weekString
+                                     selectName:weekSelectName viewState:&viewState uiStatus:progressMessage error:&error];
         if (week) {
-            NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloaded week %d of %d",nil), count, numReportsActuallyAvailable];
             count++;
             [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
             [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:week waitUntilDone:NO];
