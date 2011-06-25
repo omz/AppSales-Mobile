@@ -171,7 +171,7 @@
     //draw customerprice line
 	if( maxcustomerprice > 0.0 )
     {
-		[[UIColor colorWithRed:0.0 green:0.4 blue:0.2 alpha:0.8] set];
+		[[UIColor colorWithRed:0.0 green:0.4 blue:0.2 alpha:1.0] set];
 		[NSLocalizedString(@"/ Customer price (in US$)",nil) drawInRect:CGRectMake(155, 10, 200, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentLeft];
 		[[NSString stringWithFormat:@"%.2f", (float)maxcustomerprice] drawInRect:CGRectMake(0, minY - 4, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	
@@ -200,14 +200,15 @@
         }
         CGContextDrawPath(c, kCGPathStroke);
     }
-	//draw trend line:
+    
+    // draw report line
 	{
         [graphColor set];
         int i = 0;
         float prevX = 0.0;
         //float prevY = 0.0;
         CGContextBeginPath(c);
-        CGContextSetLineWidth(c, 2.0);
+        CGContextSetLineWidth(c, 1.0);
         CGContextSetLineJoin(c, kCGLineJoinRound);
         for (NSNumber *revenue in revenues) {
             float r = [revenue floatValue];
@@ -220,13 +221,52 @@
                 CGContextAddLineToPoint(c, x, y);
             }
             prevX = x;
-        //	prevY = y;
+            //	prevY = y;
+            i++;
+        }
+        CGContextDrawPath(c, kCGPathStroke);
+    }
+	
+	//draw 7 day average line:
+	{
+		[[UIColor colorWithRed:0.8 green:0.2 blue:0.2 alpha:1.0] set];
+        
+#define AVERAGE_LENGTH_IN_DAYS 7
+        float   lastsevendays[AVERAGE_LENGTH_IN_DAYS] = {0.0};
+        float   lastsevendayssum = 0.0;
+        
+        int i = 0;
+        float prevX = 0.0;
+        //float prevY = 0.0;
+        CGContextBeginPath(c);
+        CGContextSetLineWidth(c, 2.0);
+        CGContextSetLineJoin(c, kCGLineJoinRound);
+        for (NSNumber *revenue in revenues) 
+        {
+            float   thisdayrevenue  = [revenue floatValue];
+            uint    sevendaysindex  = i%AVERAGE_LENGTH_IN_DAYS;
+            
+            lastsevendayssum                += (thisdayrevenue - lastsevendays[sevendaysindex]);
+            lastsevendays[sevendaysindex]   = thisdayrevenue;
+            
+            float r = lastsevendayssum / AVERAGE_LENGTH_IN_DAYS;
+            float y = maxY - ((r / maxRevenue) * (maxY - minY));
+            float x = minX + ((maxX - minX) / ([revenues count] - 1)) * i;
+            if (prevX == 0.0) {
+                CGContextMoveToPoint(c, x, y);
+            }
+            else {
+                CGContextAddLineToPoint(c, x, y);
+            }
+            if( i>=AVERAGE_LENGTH_IN_DAYS )
+            {
+                prevX = x;
+            }        //	prevY = y;
             i++;
         }
         CGContextDrawPath(c, kCGPathStroke);
     }
     
-	
 	//draw average line:
 	[graphColor set];
 	CGContextSetLineWidth(c, 1.0);
