@@ -153,11 +153,26 @@
 
 - (void)reloadDays
 {
-    NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
-	NSArray *sortedDays = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+    NSSortDescriptor	*dateSorter				= [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
+	NSArray				*sortedDays				= [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
+	NSInteger			lastindexbeforeupdate	= [self.days count] - 1;
+
     self.days = sortedDays;
-    [datePicker reloadAllComponents];
-    [self reload];
+    
+	[datePicker reloadAllComponents];
+    
+	{																									// keep the datepicker selecting the last index if it was pointing to the last index before
+		NSInteger	lastindexafterupdate	= [self.days count] - 1;
+
+		for( int datepickerrow =0; datepickerrow < 2; datepickerrow++ )
+		{
+			if( lastindexbeforeupdate == [datePicker selectedRowInComponent:datepickerrow] )
+			{
+				[datePicker selectRow:lastindexafterupdate inComponent:datepickerrow animated:NO];
+			}
+		}
+	}
+	[self reload];
 }
 
 - (void)reload
