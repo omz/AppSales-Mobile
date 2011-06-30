@@ -256,7 +256,7 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 			NSMutableArray *lastWeekDays = [NSMutableArray array];
 			
 			NSString *dayString = nil;
-			NSString *weekEndDateString;
+			NSString *weekEndDateString = nil;
 			BOOL newMonth = NO;
             
             NSDateFormatter *dateFormatter = [NSDateFormatter sharedShortDateFormatter];
@@ -458,8 +458,8 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 		for(NSArray *array in self.daysByMonth){
 			for(Day *d in array){
 				for(Country *c in [d children]){
-					Country *country = newCountry(c.name, countries);
-					for (Entry *e in c.entries) {
+					Country *country = newCountry(c.countryName, countries);
+					for (Entry *e in c.entriesArray) {
 						[country addEntry:e];
 					}
 				}
@@ -490,8 +490,8 @@ static Country *newCountry(NSString *countryName, NSMutableDictionary *countries
 		
 		for(Day *d in selectedMonth){
 			for(Country *c in [d children]){
-				Country *country = newCountry(c.name, countries);
-				for (Entry *e in c.entries) {
+				Country *country = newCountry(c.countryName, countries);
+				for (Entry *e in c.entriesArray) {
 					[country addEntry:e];
 				}
 			}

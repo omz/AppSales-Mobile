@@ -55,7 +55,10 @@
 
 - (id)initWithCell:(ReviewCell *)reviewCell
 {
-	[super initWithFrame:reviewCell.bounds];
+	if( !(self = [super initWithFrame:reviewCell.bounds]) )
+    {
+        return nil;
+    }
 	self.backgroundColor = [UIColor whiteColor];
 	self.frame = CGRectMake(0,0,320,CELL_COUNTRY_HEIGHT);
 	cell = reviewCell;

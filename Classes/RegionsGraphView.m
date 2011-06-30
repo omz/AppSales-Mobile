@@ -70,31 +70,7 @@
 		//JP:
 		[regionsByCountryCode setObject:@"JP" forKey:@"JP"];
 		
-		//WW:
-		[regionsByCountryCode setObject:@"WW" forKey:@"HR"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"CN"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"HK"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"IN"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"ID"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"IL"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"KR"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"KW"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"LK"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"LB"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"MY"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"PH"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"PK"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"QA"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"RU"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"SG"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"SA"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"ZA"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"SY"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"TH"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"TR"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"AE"];
-		[regionsByCountryCode setObject:@"WW" forKey:@"VN"];
-		
+		//WW: the rest will be worldwide
     }
     return self;
 }
@@ -107,7 +83,7 @@
 	BOOL showUnits = [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowUnitsInGraphs"];
 	
 	CGPoint center = CGPointMake(90, 110);
-	float radius = 75.0;
+	float	radius = 75.0;
 	
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	[[UIColor grayColor] set];
@@ -118,48 +94,45 @@
 	if (!self.days || [self.days count] == 0)
 		return;
 	
-	NSMutableDictionary *revenueByRegion = [NSMutableDictionary dictionary];
-	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"AU"];
-	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"CA"];
-	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"EU"];
-	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"GB"];
-	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"JP"];
-	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"US"];
-	[revenueByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"WW"];
-	NSMutableDictionary *unitsByRegion = [[revenueByRegion mutableCopyWithZone: NULL] autorelease];
 	
-	int totalUnits = 0;
-	for (Day *d in self.days) {
-		for (Country *c in [d.countries allValues]) {
-			NSString *region = [regionsByCountryCode objectForKey:c.name];
+	NSMutableDictionary *unitsByRegion = [NSMutableDictionary dictionary];
+	[unitsByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"AU"];
+	[unitsByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"CA"];
+	[unitsByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"EU"];
+	[unitsByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"GB"];
+	[unitsByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"JP"];
+	[unitsByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"US"];
+	[unitsByRegion setObject:[NSNumber numberWithFloat:0.0] forKey:@"WW"];
+	
+	float	totalUnits		= 0;
+	
+	for (Day *day in self.days) {
+		for (Country *country in [day.countriesDictionary allValues]) {
+			NSString *region = [regionsByCountryCode objectForKey:country.countryName];
 			if (!region)
-				region = @"WW"; //just to be safe...
-			float revenueOfCurrentRegion = [[revenueByRegion objectForKey:region] floatValue];
-			revenueOfCurrentRegion += [c totalRevenueInBaseCurrency];
-			[revenueByRegion setObject:[NSNumber numberWithFloat:revenueOfCurrentRegion] forKey:region];
-			int unitsOfCurrentRegion = [[unitsByRegion objectForKey:region] intValue];
-			int units = [c totalUnits];
-			unitsOfCurrentRegion += units;
-			totalUnits += units;
-			[unitsByRegion setObject:[NSNumber numberWithInt:unitsOfCurrentRegion] forKey:region];
+				region = @"WW"; // if not known it's WW
+			
+			int		unitsofregion		=	[[unitsByRegion objectForKey:region] intValue];
+			int		unitsofcountry		=	showUnits?[country totalUnits]:[country totalRevenueInBaseCurrency];
+					totalUnits			+=	unitsofcountry;
+
+			[unitsByRegion setObject:[NSNumber numberWithInt:(unitsofregion+unitsofcountry)] forKey:region];
 		}
 	}
 	
-	NSArray *sortedRegions = [revenueByRegion keysSortedByValueUsingSelector:@selector(compare:)];
-	float totalRevenue = 0.0;
-	for (NSString *region in sortedRegions) {
-		totalRevenue += [[revenueByRegion objectForKey:region] floatValue];
+	NSString	*caption;
+	NSArray		*sortedRegions	= [unitsByRegion keysSortedByValueUsingSelector:@selector(compare:)];
+
+	if (showUnits)
+	{
+		caption			= [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %i sales)",nil), [self.days count],(int)totalUnits];
 	}
-	if (showUnits)
-		sortedRegions = [unitsByRegion keysSortedByValueUsingSelector:@selector(compare:)];
-	
-	//draw title:
-	[[UIColor darkGrayColor] set];
-	NSString *caption;
-	if (showUnits)
-		caption = [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %i sales)",nil), [self.days count], totalUnits];
 	else
-		caption = [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %@)",nil), [self.days count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalRevenue] withFraction:YES]];
+	{
+		caption			= [NSString stringWithFormat:NSLocalizedString(@"Regions (%i days, ∑ = %@)",nil), [self.days count], [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:totalUnits] withFraction:YES]];
+	}
+
+	[[UIColor darkGrayColor] set];
 	[caption drawInRect:CGRectMake(10, 10, 300, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentCenter];
 	float maxX = 305.0;
 	float minX = 15.0;
@@ -174,74 +147,61 @@
 	CGContextSetAllowsAntialiasing(c, YES);
 	
 	//draw pie chart:
-	NSArray *colors = [NSArray arrayWithObjects:
-					   [UIColor colorWithRed:0.58 green:0.31 blue:0.04 alpha:1.0],
-					   [UIColor colorWithRed:0.20 green:0.76 blue:0.78 alpha:1.0],
-					   [UIColor colorWithRed:0.96 green:0.11 blue:0.51 alpha:1.0],
-					   [UIColor colorWithRed:0.91 green:0.49 blue:0.06 alpha:1.0],
-					   [UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0],
-					   [UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0],
-					   [UIColor colorWithRed:0.34 green:0.65 blue:0.02 alpha:1.0], nil];
-	
-	int colorIndex = [colors count] - 1;
-	float lastAngle = 0.0;
-	for (int i = [sortedRegions count] - 1; i >= 0; i--) {
-		NSString *region = [sortedRegions objectAtIndex:i];
-		[[colors objectAtIndex:colorIndex] set];
-		colorIndex--;
-		if (colorIndex < 0) colorIndex = [colors count] - 1;
-		
-		float units = [[unitsByRegion objectForKey:region] floatValue];
-		float percentage = units / totalUnits;
-		CGContextBeginPath(c);
-		CGContextMoveToPoint(c, center.x, center.y);
-		float angle = lastAngle + (percentage * -M_PI * 2);
-		CGContextAddArc(c, center.x, center.y, radius, lastAngle, angle, 1);
-		CGContextAddLineToPoint(c, center.x, center.y);
-		CGContextClosePath(c);
-		CGContextDrawPath(c, kCGPathFill);
-		
-		lastAngle = angle;
-	}
-	
+	NSDictionary	*colorCountryDictionary	= [NSDictionary dictionaryWithObjectsAndKeys:	[UIColor colorWithRed:0.58 green:0.31 blue:0.04 alpha:1.0],	@"WW",
+																							[UIColor colorWithRed:0.20 green:0.76 blue:0.78 alpha:1.0],	@"AU",
+																							[UIColor colorWithRed:0.96 green:0.11 blue:0.51 alpha:1.0],	@"JP",
+																							[UIColor colorWithRed:0.91 green:0.49 blue:0.06 alpha:1.0],	@"CA", 
+																							[UIColor colorWithRed:0.12 green:0.35 blue:0.71 alpha:1.0],	@"EU",
+																							[UIColor colorWithRed:0.84 green:0.11 blue:0.06 alpha:1.0],	@"GB",
+																							[UIColor colorWithRed:0.34 green:0.65 blue:0.02 alpha:1.0],	@"US", nil];
+
+	float lastAngle = -M_PI_2;
+
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter new] autorelease];
 	[numberFormatter setMaximumFractionDigits:1];
 	[numberFormatter setMinimumIntegerDigits:1];
 		
-	//draw legend:
-	colorIndex = [colors count] - 1;
-	int i = 0;
-	for (int j = [sortedRegions count] - 1; j >= 0; j--) {
-		float percentage;
-		NSString *region = [sortedRegions objectAtIndex:j];
-		float revenue = [[revenueByRegion objectForKey:region] floatValue];
-		float units = [[unitsByRegion objectForKey:region] floatValue];
-		NSString *legendString;
-		if (showUnits) {
-			percentage = units / totalUnits;
-			NSString *percentString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:percentage * 100]];
-			legendString = [NSString stringWithFormat:@"%@%% (%i)", percentString, (int)units];
+	for (int i = 0; i< [sortedRegions count] ; i++ ) {
+		NSString	*region			= [sortedRegions objectAtIndex:i];
+		UIColor		*regionColor	= [colorCountryDictionary objectForKey:region];
+		float		units			= [[unitsByRegion objectForKey:region] floatValue];
+		float		percentage		= units / totalUnits;
+
+		[regionColor set];
+		{
+			float angle = lastAngle - (percentage * 2*M_PI);
+			CGContextBeginPath(c);
+			CGContextMoveToPoint(c, center.x, center.y);
+			CGContextAddArc(c, center.x, center.y, radius, lastAngle, angle, 1);
+			CGContextAddLineToPoint(c, center.x, center.y);
+			CGContextClosePath(c);
+			CGContextDrawPath(c, kCGPathFill);
+			
+			lastAngle = angle;
 		}
-		else {
-			percentage = revenue / totalRevenue;
-			NSString *percentString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:percentage * 100]];
-			legendString = [NSString stringWithFormat:@"%@%%  (%@)", percentString, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:revenue] withFraction:NO]];
+		
+		{
+			NSString *legendString;
+			if (showUnits) {
+				NSString *percentString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:percentage * 100]];
+				legendString = [NSString stringWithFormat:@"%@%% (%i)", percentString, (int)units];
+			}
+			else {
+				NSString *percentString = [numberFormatter stringFromNumber:[NSNumber numberWithFloat:percentage * 100]];
+				legendString = [NSString stringWithFormat:@"%@%%  (%@)", percentString, [[CurrencyManager sharedManager] baseCurrencyDescriptionForAmount:[NSNumber numberWithFloat:units] withFraction:NO]];
+			}
+			float y = maxY - 5  - (i * ((maxY - minY + 10) / [sortedRegions count])) ;
+			CGRect shadowFrame = CGRectMake(center.x + radius + 12 + 1, y + 1, 20, 20);
+			[[UIColor grayColor] set];
+			CGContextFillEllipseInRect(c, shadowFrame);
+			CGRect legendFrame = CGRectMake(center.x + radius + 12, y, 20, 20);
+			[regionColor set];
+			CGContextFillEllipseInRect(c, legendFrame);
+			[[UIColor whiteColor] set];
+			[region drawInRect:CGRectMake(legendFrame.origin.x, legendFrame.origin.y + 4, legendFrame.size.width, legendFrame.size.height) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
+			[[UIColor darkGrayColor] set];
+			[legendString drawInRect:CGRectMake(205, y + 3, 110, 10) withFont:[UIFont boldSystemFontOfSize:11.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
 		}
-		UIColor *color = [colors objectAtIndex:colorIndex];
-		colorIndex--;
-		if (colorIndex < 0) colorIndex = [colors count] - 1;
-		float y = (minY + 5) + i * ((maxY - minY + 10) / [sortedRegions count]);
-		CGRect shadowFrame = CGRectMake(center.x + radius + 12 + 1, y + 1, 20, 20);
-		[[UIColor grayColor] set];
-		CGContextFillEllipseInRect(c, shadowFrame);
-		CGRect legendFrame = CGRectMake(center.x + radius + 12, y, 20, 20);
-		[color set];
-		CGContextFillEllipseInRect(c, legendFrame);
-		[[UIColor whiteColor] set];
-		[region drawInRect:CGRectMake(legendFrame.origin.x, legendFrame.origin.y + 4, legendFrame.size.width, legendFrame.size.height) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
-		[[UIColor darkGrayColor] set];
-		[legendString drawInRect:CGRectMake(205, y + 3, 110, 10) withFont:[UIFont boldSystemFontOfSize:11.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
-		i++;
 	}
 }
 

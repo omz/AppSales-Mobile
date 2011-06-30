@@ -35,11 +35,63 @@
 #define kSummaryRevenue	@"revenue"
 #define kSummaryIsWeek	@"isWeek"
 
+
+/*
+on 2011-06-20 a header line looks like this:
+
+Provider	Provider Country	SKU	Developer	Title	Version	Product Type Identifier	Units	Developer Proceeds	Begin Date	End Date	Customer Currency	Country Code	Currency of Proceeds	Apple Identifier	Customer Price	Promo Code	Parent Identifier	Subscription	Period
+
+to create the following defines use the script in the commandline:
+*/
+// pbpaste |perl -ne '@fields=split(/\t/,$_);for( @fields) {$original=$_;s/\s*//g;print "#define\t kS_AppleReport_$_\t\t@\"".lc $original."\"\n";};'
+
+
+#define	 kS_AppleReport_Provider				@"provider"
+#define	 kS_AppleReport_ProviderCountry			@"provider country"
+#define	 kS_AppleReport_SKU						@"sku"
+#define	 kS_AppleReport_Developer				@"developer"
+#define	 kS_AppleReport_Title					@"title"
+#define	 kS_AppleReport_Version					@"version"
+#define	 kS_AppleReport_ProductTypeIdentifier	@"product type identifier"
+#define	 kS_AppleReport_Units					@"units"
+#define	 kS_AppleReport_DeveloperProceeds		@"developer proceeds"
+#define	 kS_AppleReport_BeginDate				@"begin date"
+#define	 kS_AppleReport_EndDate					@"end date"
+#define	 kS_AppleReport_CustomerCurrency		@"customer currency"
+#define	 kS_AppleReport_CountryCode				@"country code"
+#define	 kS_AppleReport_CurrencyofProceeds		@"currency of proceeds"
+#define	 kS_AppleReport_AppleIdentifier			@"apple identifier"
+#define	 kS_AppleReport_CustomerPrice			@"customer price"
+#define	 kS_AppleReport_PromoCode				@"promo code"
+#define	 kS_AppleReport_ParentIdentifier		@"parent identifier"
+#define	 kS_AppleReport_Subscription			@"subscription"
+#define	 kS_AppleReport_Period					@"period"
+
+
+
+// defines taken from http://www.apple.com/itunesnews/docs/AppStoreReportingInstructions.pdf
+
+#define	kS_AppleReport_ProductType_iPhoneAppPurchase	@"1"
+#define	kS_AppleReport_ProductType_iPhoneAppUpdate		@"7"
+#define	kS_AppleReport_ProductType_InAppPurchase		@"IA1"
+#define	kS_AppleReport_ProductType_InAppSubscription	@"IA9"
+#define	kS_AppleReport_ProductType_UniveralAppPurchase	@"1F"
+#define	kS_AppleReport_ProductType_UniveralAppUpdate	@"7F"
+#define	kS_AppleReport_ProductType_iPadAppPurchase		@"1T"
+#define	kS_AppleReport_ProductType_iPadAppUpdate		@"7T"
+
+// following encounterd in the wild and not (yet) described in the appstore reporting instrucitons
+#define	kS_AppleReport_ProductType_MacAppPurchase		@"F1"
+#define	kS_AppleReport_ProductType_MacAppUpdate			@"F7"
+
+
+
+
 @class Country;
 
 @interface Day : NSObject<NSCoding> {
 	NSDate *date;
-	NSMutableDictionary *countries;
+	NSMutableDictionary *countriesDictionary;
 	
     BOOL isWeek:1;
 	BOOL wasLoadedFromDisk:1;
@@ -49,45 +101,49 @@
 }
 
 @property (readonly) NSDate *date;
-@property (readonly) NSMutableDictionary *countries;
+@property (readonly) NSMutableDictionary *countriesDictionary;
 @property (readonly) BOOL isWeek;
 @property (readonly) BOOL wasLoadedFromDisk;
 @property (readonly) BOOL isFault;
 @property (readonly) NSDictionary *summary;
 
-+ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
++ (NSDate*) adjustDateToLocalTimeZone:(NSDate *)inDate;
+#
+#pragma mark initalization Methods
+#
 + (Day *)dayWithData:(NSData *)dayData compressed:(BOOL)compressed;
-
 - (id)initWithCSV:(NSString *)csv;
-
-// returns true if instances was serialized out to docPath
-- (BOOL) archiveToDocumentPathIfNeeded:(NSString*)docPath;
-
-
-- (void)generateSummary;
++ (Day *)dayFromCSVFile:(NSString *)filename atPath:(NSString *)docPath;
+- (id) initWithSummary:(NSDictionary*)summaryToUse date:(NSDate*)dateToUse isWeek:(BOOL)week isFault:(BOOL)fault;
 + (Day *)dayWithSummary:(NSDictionary *)reportSummary;
-
+- (void)dealloc;
+#
+#pragma mark Archiving / Unarchiving
+#
+- (id)initWithCoder:(NSCoder *)coder;
+- (void)encodeWithCoder:(NSCoder *)coder;
+- (BOOL)archiveToDocumentPathIfNeeded:(NSString*)docPath;
+#
+#pragma mark
+#
+- (void)generateSummary;
+- (NSMutableDictionary *)countriesDictionary;
 - (Country *)countryNamed:(NSString *)countryName;
-
+- (NSString *)description;
 - (float)totalRevenueInBaseCurrency;
 - (float)totalRevenueInBaseCurrencyForAppWithID:(NSString *)appID;
 - (int)totalUnitsForAppWithID:(NSString *)appID;
 - (int)totalUnits;
-
+- (float)customerUSPriceForAppWithID:(NSString *)appID;
 - (NSArray *)allProductIDs;
-
-- (NSString *)dayString;
-- (NSString *)weekdayString;
-- (NSString *)weekEndDateString;
-- (UIColor *)weekdayColor;
-
 - (NSString *)totalRevenueString;
 - (NSString *)totalRevenueStringForApp:(NSString *)appName;
-
-- (NSString *)proposedFilename;
-
+- (NSString *)dayString;
+- (NSString *)weekdayString;
+- (UIColor *)weekdayColor;
+- (NSString *)weekEndDateString;
 - (NSArray *)children;
-
-- (NSString *)appIDForApp:(NSString *)appName; // TODO: rename
+- (NSString *)proposedFilename;
+- (NSString *)appIDForApp:(NSString *)appName;
 
 @end

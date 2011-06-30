@@ -40,7 +40,7 @@
 	if (self) {
 		days = [NSMutableDictionary new];
 		weeks = [NSMutableDictionary new];
-		
+	
 		BOOL cacheLoaded = [self loadReportCache];
 		if (!cacheLoaded) {
 			[[ProgressHUD sharedHUD] setText:NSLocalizedString(@"Updating Cache...",nil)];
@@ -63,7 +63,9 @@
 		return NO;
 	}
 	NSDictionary *reportCache = [NSKeyedUnarchiver unarchiveObjectWithFile:reportCacheFile];
+	
 	if (!reportCache) {
+		JLog(@"reportCache could not be loaded");
 		return NO;
 	}
 	
@@ -90,11 +92,18 @@
 	NSMutableDictionary *daysCache = [NSMutableDictionary dictionary];
 	NSMutableDictionary *weeksCache = [NSMutableDictionary dictionary];
 	NSArray *filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docPath error:NULL];
-	for (NSString *filename in filenames) {
-		if (![[filename pathExtension] isEqual:@"dat"]) continue;
-		NSString *fullPath = [docPath stringByAppendingPathComponent:filename];
-		Day *report = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
-		if (report != nil) {
+	for (NSString *filename in filenames) 
+	{
+		if( ![[filename pathExtension] isEqual:@"dat"] ) 
+		{
+			continue;
+		}
+		
+		NSString	*fullPath	= [docPath stringByAppendingPathComponent:filename];
+		Day			*report		= [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+		
+		if( report )
+		{
 			[report generateSummary];
 			if (report.date) {
 				if (report.isWeek) {
@@ -144,8 +153,7 @@
 	return isRefreshing;
 }
 
-- (void)downloadReports
-{
+- (void)downloadReports {
 	if (isRefreshing) {
 		return;
 	}
@@ -226,8 +234,8 @@ static NSString* parseViewState(NSString *htmlPage) {
 }
 
 // code path shared for both day and week downloads
-static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NSString *dayString, 
-                           NSString *weekString, NSString *selectName, NSString **viewState, BOOL *error)  {
+- (Day*) downloadReportFromiTC:(NSString*)originalReportsPath ajaxName:(NSString*)ajaxName dayString:(NSString*)dayString
+             weekString:(NSString*)weekString selectName:(NSString*)selectName viewState:(NSString**)viewState uiStatus:(NSString*)uiStatus error:(BOOL*)error  {
     // set the date within the web page
     NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
                               ajaxName, @"AJAXREQUEST",
@@ -241,13 +249,15 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
                               nil];
     NSString *responseString = getPostRequestAsString(ITTS_SALES_PAGE_URL, postDict);
     *viewState = parseViewState(responseString);
-    
+	DJLog(@"original website:\n%@\n%@ %@",responseString, dayString, weekString);
     // iTC shows a (fixed?) number of date ranges in the form, even if all of them are not available 
     // if trying to download a report that doesn't exist, it'll return an error page instead of the report
     if ([responseString rangeOfString:@"theForm:errorPanel"].location != NSNotFound) {
 		APPSALESLOG(@"report not available for %@ %@", dayString, weekString);
         return nil;
     }
+    
+    [self performSelectorOnMainThread:@selector(setProgress:) withObject:uiStatus waitUntilDone:NO];
     
     // and finally...we're ready to download the report
     postDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -263,24 +273,23 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     NSData *requestResponseData = getPostRequestAsData(ITTS_SALES_PAGE_URL, postDict, &downloadResponse);
     NSString *originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"Filename"];
     
-    if( !originalFilename )
-    {
-        originalFilename    = [[downloadResponse allHeaderFields] objectForKey:@"filename"];    // iOS 5 beta 1 fix
+    if (! originalFilename ) { // iOS 5 beta 1 fix
+        originalFilename = [[downloadResponse allHeaderFields] objectForKey:@"filename"];
     }
     
     if (originalFilename) {
         [requestResponseData writeToFile:[originalReportsPath stringByAppendingPathComponent:originalFilename] atomically:YES];
         return[Day dayWithData:requestResponseData compressed:YES];
     } else {
-        responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
-        NSLog(@"unexpected response: %@", responseString);
+        NSLog(@"unexpected response: headers:\n%@",[downloadResponse allHeaderFields]);
+		responseString = [[[NSString alloc] initWithData:requestResponseData encoding:NSUTF8StringEncoding] autorelease];
+        NSLog(@"unexpected response: content:\n%@", responseString);
         *error = YES;
         return nil;
     }   
 }
 
-- (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo
-{
+- (void)fetchReportsWithUserInfo:(NSDictionary *)userInfo {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	NSScanner *scanner;
     [self performSelectorOnMainThread:@selector(setProgress:) withObject:NSLocalizedString(@"Starting Download",nil) waitUntilDone:NO];
@@ -435,11 +444,11 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     int count = 1;
     for (NSString *dayString in availableDays) {
         BOOL error = false;
-        Day *day = downloadReport(originalReportsPath, ajaxName, dayString, arbitraryWeek, daySelectName, &viewState, &error);
+        NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %d of %d",nil), count, numReportsActuallyAvailable];
+        Day *day = [self downloadReportFromiTC:originalReportsPath ajaxName:ajaxName dayString:dayString weekString:arbitraryWeek
+                                    selectName:daySelectName viewState:&viewState uiStatus:progressMessage error:&error];
         if (day) {
-            NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloaded day %d of %d",nil), count, numReportsActuallyAvailable];
             count++;
-            [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
             [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:day waitUntilDone:NO];
             numberOfReportsDownloaded++;
         } else if (error) {
@@ -472,9 +481,10 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
     count = 1;
     for (NSString *weekString in availableWeeks) {
         BOOL error = false;
-        Day *week = downloadReport(originalReportsPath, ajaxName, arbitraryDay, weekString, weekSelectName, &viewState, &error);
+        NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading week %d of %d",nil), count, numReportsActuallyAvailable];
+        Day *week = [self downloadReportFromiTC:originalReportsPath ajaxName:ajaxName dayString:arbitraryDay weekString:weekString
+                                     selectName:weekSelectName viewState:&viewState uiStatus:progressMessage error:&error];
         if (week) {
-            NSString *progressMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloaded week %d of %d",nil), count, numReportsActuallyAvailable];
             count++;
             [self performSelectorOnMainThread:@selector(setProgress:) withObject:progressMessage waitUntilDone:NO];
             [self performSelectorOnMainThread:@selector(successfullyDownloadedReport:) withObject:week waitUntilDone:NO];
@@ -536,10 +546,16 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
         [[NSNotificationCenter defaultCenter] postNotificationName:ReportManagerDownloadedWeeklyReportsNotification object:self];        
     } else {
         [days setObject:report forKey:report.date];
-        AppManager *manager = [AppManager sharedManager];
-        for (Country *c in [report.countries allValues]) {
-            for (Entry *e in c.entries) {
-				if (e.transactionType == 2 || e.transactionType == 9) {
+        AppManager	*manager	= [AppManager sharedManager];
+		NSSet		*ignoreSet	= [NSSet setWithObjects:	kS_AppleReport_ProductType_InAppSubscription,
+															kS_AppleReport_ProductType_InAppPurchase,
+															nil];
+		
+        for (Country *c in [report.countriesDictionary allValues]) {
+            for (Entry *e in c.entriesArray) 
+			{
+				if( [ignoreSet containsObject:e.transactionType] ) 
+				{
                     //skips IAPs in app manager, so IAPs don't duplicate reviews
                     [manager removeAppWithID:e.productIdentifier];
                     continue;
@@ -554,10 +570,14 @@ static Day* downloadReport(NSString *originalReportsPath, NSString *ajaxName, NS
 
 - (void)importReport:(Day *)report
 {
-	AppManager *manager = [AppManager sharedManager];
-	for (Country *c in [report.countries allValues]) {
-		for (Entry *e in c.entries) {
-            if (e.transactionType == 2 || e.transactionType == 9) {
+	AppManager	*manager	= [AppManager sharedManager];
+	NSSet		*ignoreSet	= [NSSet setWithObjects:	kS_AppleReport_ProductType_InAppSubscription,
+														kS_AppleReport_ProductType_InAppPurchase,
+														nil];
+
+	for (Country *c in [report.countriesDictionary allValues]) {
+		for (Entry *e in c.entriesArray) {
+			if( [ignoreSet containsObject:e.transactionType] ) {
                 //skips IAPs in app manager, so IAPs don't duplicate reviews
                 [manager removeAppWithID:e.productIdentifier];
                 continue;

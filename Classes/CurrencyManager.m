@@ -40,7 +40,10 @@
 
 - (id)init
 {
-	[super init];
+	if( !(self=[super init]) )
+    {
+        return nil;
+    }
 	
 	numberFormatterWithFraction = [NSNumberFormatter new];
 	[numberFormatterWithFraction setMinimumFractionDigits:2];

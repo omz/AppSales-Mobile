@@ -58,7 +58,10 @@ static NSString *presentationLanguage, *defaultCountryCode;
 }
 
 - (id)initWithCoder:(NSCoder *)coder {
-	[super init];
+	if( !(self=[super init]) )
+    {
+        return nil;
+    }
 	user = [[coder decodeObjectForKey:@"user"] retain];
 	title = [[coder decodeObjectForKey:@"title"] retain];
 	translatedTitle = [[coder decodeObjectForKey:@"translatedTitle"] retain];

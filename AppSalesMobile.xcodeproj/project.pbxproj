@@ -872,6 +872,7 @@
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B03E6A4B134BC34C00532893 /* AppleFiscalCalendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleFiscalCalendar.h; sourceTree = "<group>"; };
 		B03E6A4C134BC34C00532893 /* AppleFiscalCalendar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleFiscalCalendar.m; sourceTree = "<group>"; };
+		E0083F2813B1EC760080A707 /* Default.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Default.pch; sourceTree = "<group>"; };
 		F22984BA11DD32700067EFD2 /* Graphs_Highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphs_Highlighted@2x.png"; sourceTree = "<group>"; };
 		F22984BB11DD32700067EFD2 /* Graphs@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Graphs@2x.png"; sourceTree = "<group>"; };
 		F22984C711DD343C0067EFD2 /* 5stars_gray@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "5stars_gray@2x.png"; sourceTree = "<group>"; };
@@ -1478,6 +1479,7 @@
 			isa = PBXGroup;
 			children = (
 				28A0AAE50D9B0CCF005BE974 /* AppSalesMobile_Prefix.pch */,
+				E0083F2813B1EC760080A707 /* Default.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 			);
 			name = "Other Sources";

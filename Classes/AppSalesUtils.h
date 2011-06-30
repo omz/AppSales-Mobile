@@ -14,7 +14,7 @@
 #define RELEASE_SAFELY(__PTR) { [__PTR release]; __PTR = nil; }
 
 static inline id ASSERT_NOT_NULL(id __PTR) {
-    NSCAssert(__PTR, nil);
+    NSCAssert(__PTR, @"%p not null",__PTR);
     return __PTR;
 }
 

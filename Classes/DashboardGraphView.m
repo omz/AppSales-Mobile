@@ -175,8 +175,8 @@
 	
 	int totalUnits = 0;
 	for (Day *d in self.reports) {
-		for (Country *c in [d.countries allValues]) {
-			NSString *region = [regionsByCountryCode objectForKey:c.name];
+		for (Country *c in [d.countriesDictionary allValues]) {
+			NSString *region = [regionsByCountryCode objectForKey:c.countryName];
 			if (!region)
 				region = @"WW"; //just to be safe...
 			float revenueOfCurrentRegion = [[revenueByRegion objectForKey:region] floatValue];
@@ -234,7 +234,7 @@
 	float lastAngle = 0.0;
 	for (int i = [sortedRegions count] - 1; i >= 0; i--) {
 		NSString *region = [sortedRegions objectAtIndex:i];
-		[[colors objectAtIndex:colorIndex] set];
+		[(UIColor *)[colors objectAtIndex:colorIndex] set];
 		colorIndex--;
 		if (colorIndex < 0) colorIndex = [colors count] - 1;
 		
