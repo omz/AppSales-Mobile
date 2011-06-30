@@ -35,12 +35,13 @@
 #import "ReportManager.h"
 #import "AppManager.h"
 
+#define kS_Archiving_VersionKey			@"v"
+#define	kS_Archiving_VersionValue		@"1"
+#define	kS_Archiving_RowDictionaryKey	@"r"
+#define	kS_Archiving_CountryKey			@"c"
+
 @implementation Entry
 @synthesize theCountry;
-
-
-#define	kS_RowDictionaryCodingKey	@"rowDictionaryCodingKey"
-#define	kS_countryCodingKey			@"country"
 
 
 - (id)initWithRowDictionary:(NSDictionary *)aRowDictionary country:(Country *)aCountry
@@ -56,28 +57,33 @@
 	return self;
 }
 
+
+#pragma mark Archiving / Unarchiving
+
 - (id)initWithCoder:(NSCoder *)coder 
 {
 	if( !(self=[super init]) )
 	{
 		return nil;
 	}
-	if(     ![coder containsValueForKey:kS_RowDictionaryCodingKey]
-        ||  ![coder containsValueForKey:kS_countryCodingKey] )
+
+	if(! [[coder decodeObjectForKey:kS_Archiving_VersionKey] isEqualToString:kS_Archiving_VersionValue] )
 	{
         JLog(@"Coded values on disk seems to be a old version - should be regenerated");
+        [self release];
 		return nil;
 	}
 
-	rowDictionary	= [[coder decodeObjectForKey:kS_RowDictionaryCodingKey] retain];
-	theCountry		= [[coder decodeObjectForKey:kS_countryCodingKey] retain];
+	rowDictionary	= [[coder decodeObjectForKey:kS_Archiving_RowDictionaryKey] retain];
+	theCountry		= [[coder decodeObjectForKey:kS_Archiving_CountryKey] retain];
 	[theCountry addEntry:self]; // self escaping
 	return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-	[coder encodeObject:rowDictionary   forKey:kS_RowDictionaryCodingKey];
-	[coder encodeObject:theCountry         forKey:kS_countryCodingKey];
+	[coder encodeObject:kS_Archiving_VersionValue	forKey:kS_Archiving_VersionKey];
+	[coder encodeObject:rowDictionary				forKey:kS_Archiving_RowDictionaryKey];
+	[coder encodeObject:theCountry					forKey:kS_Archiving_CountryKey];
 }
 
 + (NSSet *)purchaseProductTypesSet;
@@ -134,7 +140,10 @@
 {
 	return [[rowDictionary objectForKey:kS_AppleReport_CustomerPrice] floatValue]; 
 }
-
+- (NSString *)promoCode
+{
+	return [rowDictionary objectForKey:kS_AppleReport_PromoCode];
+}
 
 - (float)totalRevenueInBaseCurrency {
 	if (self.isPurchase) {

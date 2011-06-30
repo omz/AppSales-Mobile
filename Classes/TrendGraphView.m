@@ -40,19 +40,25 @@
 	float totalRevenue = 0.0;
 	Day* lastDay = nil;
     
-    float maxcustomerprice	= -1.0;
-	float lastcustomerprice	= -1.0;
+	BOOL	customerpricehaschangedatleastonce	= NO;
+    int		maxcustomerprice					= -1.0;
+	int		lastcustomerprice					= -1.0;
+	
 	for( Day *d in self.days ) 
 	{
-        float customerprice		= (float)[d customerUSPriceForAppWithID:appID];        
+        int customerprice		= lrint([d customerUSPriceForAppWithID:appID]*100.0);
 		float unitsorrevenue	= (showUnits) ? (float)[d totalUnitsForAppWithID:appID] : (float)[d totalRevenueInBaseCurrencyForAppWithID:appID];
-		
-		if( customerprice < 0.0 )
+	
+		if( customerprice < 0 )
 		{
 			customerprice = lastcustomerprice;
 		}
 		else 
 		{
+			if( lastcustomerprice >= 0 && (lastcustomerprice!=customerprice) )
+			{
+				customerpricehaschangedatleastonce = YES;
+			}
 			lastcustomerprice = customerprice;
 		}
 
@@ -63,15 +69,15 @@
 			for (int j=1; [d.date timeIntervalSinceDate:lastDay.date] > 3600*24*j ; j++) 
 			{
 				[revenues		addObject:[NSNumber numberWithFloat:0.0f]]; //add zero revenue for days with no reports
-				[customerprices	addObject:[NSNumber numberWithFloat:0.0f]];
+				[customerprices	addObject:[NSNumber numberWithInt:lastcustomerprice]];
 			}
 		}
 		
 		[revenues		addObject:[NSNumber numberWithFloat:unitsorrevenue]];
-		[customerprices	addObject:[NSNumber numberWithFloat:customerprice]];
+		[customerprices	addObject:[NSNumber numberWithInt:customerprice]];
 		
-		if (unitsorrevenue > maxRevenue) maxRevenue = unitsorrevenue;
-		if (customerprice > maxcustomerprice) maxcustomerprice = customerprice;
+		if (unitsorrevenue > maxRevenue)		maxRevenue = unitsorrevenue;
+		if (customerprice > maxcustomerprice)	maxcustomerprice = customerprice;
 		
 		lastDay = d;
 	}
@@ -169,23 +175,23 @@
 	}
 	
     //draw customerprice line
-	if( maxcustomerprice > 0.0 )
+	if( customerpricehaschangedatleastonce )
     {
 		[[UIColor colorWithRed:0.0 green:0.4 blue:0.2 alpha:1.0] set];
 		[NSLocalizedString(@"/ Customer price (in US$)",nil) drawInRect:CGRectMake(155, 10, 200, 20) withFont:[UIFont boldSystemFontOfSize:12.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentLeft];
-		[[NSString stringWithFormat:@"%.2f", (float)maxcustomerprice] drawInRect:CGRectMake(0, minY - 4, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
+		[[NSString stringWithFormat:@"%.2f", (float)maxcustomerprice/100.0] drawInRect:CGRectMake(0, minY - 4, minX - 4, 10) withFont:[UIFont boldSystemFontOfSize:10.0] lineBreakMode:UILineBreakModeCharacterWrap alignment:UITextAlignmentRight];
 	
 		int i = 0;
         float prevX = 0.0;
         CGContextBeginPath(c);
-        CGContextSetLineWidth(c, 2.0);
+        CGContextSetLineWidth(c, 1.0);
         CGContextSetLineJoin(c, kCGLineJoinRound);
         for (NSNumber *productprice in customerprices) {
             float r = [productprice floatValue];
 			
 			if( r >= 0.0 )
 			{
-				float y = maxY - ((r / maxcustomerprice) * (maxY - minY));
+				float y = maxY - ((r / (float)maxcustomerprice) * (maxY - minY));
 				float x = minX + ((maxX - minX) / ([revenues count] - 1)) * i;
 				if(prevX == 0.0)
 				{

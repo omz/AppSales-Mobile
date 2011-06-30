@@ -43,6 +43,8 @@
 @property (readonly) NSString	*productIdentifier;
 @property (readonly) NSString	*currency;
 @property (readonly) NSString	*transactionType;
+@property (readonly) NSString	*promoCode;
+
 @property (readonly)		float		royalties;
 @property (readonly)		float		customerprice;
 @property (readonly)		int			units;

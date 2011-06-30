@@ -40,6 +40,16 @@
 #import "NSDateFormatter+SharedInstances.h"
 #import "AppSalesUtils.h"
 
+
+#define kS_Archiving_VersionKey			@"v"
+#define	kS_Archiving_VersionValue		@"2"
+#define	kS_Archiving_DateKey			@"t"
+#define	kS_Archiving_isWeekKey			@"w"
+#define	kS_Archiving_CountryKeysKey		@"k"
+#define	kS_Archiving_CountryObjectsKey	@"o"
+
+
+
 static BOOL arrayContainsOnlyWhiteSpaceStrings(NSArray* array) {
 	NSCharacterSet *charSet = [NSCharacterSet whitespaceCharacterSet];
 	for (NSString *string in array) {
@@ -205,9 +215,15 @@ static NSDate* reportDateFromString(NSString *dateString)
 		
 		for( NSString *columnName in columnHeadersArray )
 		{
-			if( [columnName hasSuffix:@"date"] )
+			id columnValue	= [rowDictionary objectForKey:columnName];
+			
+			if( [columnValue isEqualToString:@" "] )					// change plain space strings to zero strings
 			{
-				NSString	*fieldContents	= [rowDictionary objectForKey:columnName];
+				[rowDictionary setObject:@"" forKey:columnName];
+			}
+			else if( [columnName hasSuffix:@"date"] )
+			{
+				NSString	*fieldContents	= columnValue;
 				NSDate		*fieldDate		= reportDateFromString([fieldContents stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]);
 				
 				if( !fieldDate )
@@ -280,16 +296,23 @@ static NSDate* reportDateFromString(NSString *dateString)
 
 #pragma mark Archiving / Unarchiving
 
+
 - (id)initWithCoder:(NSCoder *)coder
 {
 	if( !(self = [self init]) )
 	{
 		return nil;
-	} 
-	date                        = [[coder decodeObjectForKey:@"date"] retain];
-    NSArray *countriesKeys      = [coder decodeObjectForKey:@"countriesKeys"];
-    NSArray *countriesObjects   = [coder decodeObjectForKey:@"countriesObjects"];
-	isWeek                      = [coder decodeBoolForKey:@"isWeek"];
+	}
+	if(! [[coder decodeObjectForKey:kS_Archiving_VersionKey] isEqualToString:kS_Archiving_VersionValue] )
+	{
+        [self release];
+        return nil;
+	}
+	
+	date                        = [[coder decodeObjectForKey:kS_Archiving_DateKey] retain];
+    NSArray *countriesKeys      = [coder decodeObjectForKey:kS_Archiving_CountryKeysKey];
+    NSArray *countriesObjects   = [coder decodeObjectForKey:kS_Archiving_CountryObjectsKey];
+	isWeek                      = [coder decodeBoolForKey:kS_Archiving_isWeekKey];
 	wasLoadedFromDisk           = YES;
 	
     if( !date || !countriesKeys || !countriesObjects || (countriesKeys.count <1) || (countriesKeys.count!=countriesObjects.count) )
@@ -305,10 +328,11 @@ static NSDate* reportDateFromString(NSString *dateString)
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:date                            forKey:@"date"];
-	[coder encodeObject:[countriesDictionary allKeys]   forKey:@"countriesKeys"];               // we encode keys and objects sperarate as a a new version in the encoding might 
-	[coder encodeObject:[countriesDictionary allValues] forKey:@"countriesObjects"];            // not be compatible and that way we don't get NSDictionary to complain about nonexisting objects
-	[coder encodeBool:isWeek                            forKey:@"isWeek"];                     
+    [coder encodeObject:kS_Archiving_VersionValue		forKey:kS_Archiving_VersionKey];
+    [coder encodeObject:date                            forKey:kS_Archiving_DateKey];
+	[coder encodeObject:[countriesDictionary allKeys]   forKey:kS_Archiving_CountryKeysKey];               // we encode keys and objects sperarate as a a new version in the encoding might 
+	[coder encodeObject:[countriesDictionary allValues] forKey:kS_Archiving_CountryObjectsKey];            // not be compatible and that way we don't get NSDictionary to complain about nonexisting objects
+	[coder encodeBool:isWeek                            forKey:kS_Archiving_isWeekKey];                     
 }
 
 
