@@ -165,7 +165,6 @@
 
 - (id) init {
 	if ((self = [super init]) != nil) {
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancel) name:UIApplicationDidEnterBackgroundNotification object:nil];
 	}
 	return self;
 }
@@ -452,6 +451,26 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	if (isDownloadingReviews) {
 		return;
 	}
+	
+	// Allow us to continue downloading in the background on devices that support it.
+	if ([[UIDevice currentDevice] respondsToSelector:@selector(isMultitaskingSupported)] && [[UIDevice currentDevice] isMultitaskingSupported]) {
+		UIApplication * app = [UIApplication sharedApplication];
+		if ([app respondsToSelector:@selector(beginBackgroundTaskWithExpirationHandler:)]) {
+			if (bgTaskId  && bgTaskId != UIBackgroundTaskInvalid) {
+				[app endBackgroundTask:bgTaskId];
+				bgTaskId = UIBackgroundTaskInvalid;
+			}
+			bgTaskId = [app beginBackgroundTaskWithExpirationHandler:^{
+				// When we have run out of time, just give up.
+				if (bgTaskId && bgTaskId != UIBackgroundTaskInvalid) {
+					UIApplication * app = [UIApplication sharedApplication];
+					[app endBackgroundTask:bgTaskId];
+					bgTaskId = UIBackgroundTaskInvalid;
+				}
+			}];
+		}
+	}
+	
 	isDownloadingReviews = YES;
 	cancelRequested = NO;
 	[self updateReviewDownloadProgress:NSLocalizedString(@"Downloading reviews...",nil)];
@@ -731,6 +750,14 @@ static NSInteger numStoreReviewsComparator(id arg1, id arg2, void *arg3) {
 	[[AppManager sharedManager] saveToDisk];
 	[self updateReviewDownloadProgress:@""];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewManagerDownloadedReviewsNotification object:self];
+	
+	if (bgTaskId && bgTaskId != UIBackgroundTaskInvalid) {
+		// We are done with our background task.
+		UIApplication * app = [UIApplication sharedApplication];
+		[app endBackgroundTask:bgTaskId];
+		bgTaskId = UIBackgroundTaskInvalid;
+	}
+
 }
 
 

@@ -25,6 +25,8 @@
 	NSMutableArray *storeInfos;
 	NSDateFormatter *defaultDateFormatter;
 	NSDate *downloadDate;
+
+	UIBackgroundTaskIdentifier bgTaskId;
 }
 
 + (ReviewManager*) sharedManager;
