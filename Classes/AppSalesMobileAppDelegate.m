@@ -33,6 +33,11 @@
 #import "PadRootViewController.h"
 #import "UIDevice+iPad.h"
 
+/*
+ Write here your security code. If it is empty then no prompt will be shown.
+*/
+#define MY_SECURITY_CODE @"1234"
+
 @implementation AppSalesMobileAppDelegate
 
 @synthesize window;
@@ -69,6 +74,67 @@
 	
 	[window addSubview:rootViewController.view];
 	[window makeKeyAndVisible];
+
+	if ([MY_SECURITY_CODE length]>0) {
+		window.hidden=YES;
+		securityPrompt=nil;
+	}
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+	securityPrompt=nil;
+	if (buttonIndex==0) {
+		UITextField *textField=(UITextField*)[alertView viewWithTag:99];
+		if ([textField.text isEqualToString:MY_SECURITY_CODE])
+			window.hidden=NO;
+		else
+			[self showSecurityAlert];
+	}
+}
+
+- (void)handleEndOnExit:(id)sender {
+	if (securityPrompt)
+		[securityPrompt dismissWithClickedButtonIndex:0 animated:YES];
+}
+
+- (void)showSecurityAlert {
+	UITextField *textField;
+	securityPrompt = [[UIAlertView alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"]
+										 message:@"Please enter the security code\n\n\n"
+										delegate:self
+							   cancelButtonTitle:nil
+							   otherButtonTitles:@"Enter",nil];
+
+	textField = [[UITextField alloc] initWithFrame:CGRectMake(12.0, 75.0, 260.0, 25.0)];
+	textField.tag=99;
+	textField.keyboardType=UIKeyboardTypeNumberPad;
+	[textField addTarget:self action:@selector(handleEndOnExit:)
+		forControlEvents:UIControlEventEditingDidEndOnExit];
+	[textField setBackgroundColor:[UIColor whiteColor]];
+	[textField setSecureTextEntry:YES];
+	[securityPrompt addSubview:textField];
+
+	if ([[[UIDevice currentDevice] systemVersion] floatValue]<4.0)
+		[securityPrompt setTransform:CGAffineTransformMakeTranslation(0.0, 110.0)];
+	[securityPrompt show];
+    [securityPrompt release];
+
+	// set cursor and show keyboard
+	[textField becomeFirstResponder];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+	if ([MY_SECURITY_CODE length]>0)
+		[self showSecurityAlert];
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+	if ([MY_SECURITY_CODE length]>0) {
+		if (securityPrompt) {
+			[securityPrompt dismissWithClickedButtonIndex:1 animated:NO];
+		}
+		window.hidden=YES;
+	}
 }
 
 - (void)dealloc 

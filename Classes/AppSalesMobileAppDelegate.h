@@ -34,10 +34,13 @@
     
     UIWindow *window;
 	UIViewController *rootViewController;
+	UIAlertView *securityPrompt;
 }
 
 @property (nonatomic, retain) UIWindow *window;
 @property (nonatomic, retain) UIViewController *rootViewController;
+
+- (void)showSecurityAlert;
 
 @end
 
