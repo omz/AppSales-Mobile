@@ -40,7 +40,9 @@
 
 - (id)init
 {
-	[super init];
+	if (!(self=[super init])) {
+		return nil;
+	}
 	
 	numberFormatterWithFraction = [NSNumberFormatter new];
 	[numberFormatterWithFraction setMinimumFractionDigits:2];
@@ -53,23 +55,35 @@
 	[numberFormatterWithoutFraction setMinimumIntegerDigits:1];
 		
 	self.availableCurrencies = [NSArray arrayWithObjects:
-								  @"USD", @"AUD", @"BHD", @"THB", @"BND", 
-								  @"CLP", @"DKK", @"EUR", @"HUF", @"HKD", @"ISK", @"CAD", 
-								  @"QAR", @"KWD", @"MYR", @"MTL", @"MUR", @"MXN", 
-								  @"NPR", @"TWD", @"NZD", @"NOK", @"PKR", @"GBP", 
-								  @"ZAR", @"BRL", @"CNY", @"OMR", @"IDR", @"RUB", 
-								  @"SAR", @"ILS", @"SEK", @"CHF", @"SGD", @"SKK", 
-								  @"LKR", @"KRW", @"KZT", @"CZK", @"AED", @"JPY", 
-								  @"CYP", @"INR", nil];
+								@"USD", @"EUR", 
+								@"AED", @"AUD", 
+								@"BHD", @"BND", @"BRL",
+								@"CAD", @"CHF", @"CLP", @"CNY", @"CZK",
+								@"DKK", 
+								@"GBP",
+								@"HUF", @"HKD",
+								@"IDR", @"ILS", @"INR", @"ISK",
+								@"JPY",
+								@"KRW", @"KWD", @"KZT",
+								@"LKR",
+								@"MUR", @"MXN", @"MYR",
+								@"NOK", @"NPR", @"NZD",
+								@"OMR",
+								@"PKR",
+								@"QAR",
+								@"RUB",
+								@"SAR", @"SEK", @"SGD",
+								@"THB", @"TWD",			
+								@"ZAR", nil];
+	
+	currencySymbols = [[NSDictionary alloc] initWithObjectsAndKeys:@"€", @"EUR", @"$", @"USD", @"¥", @"JPY", @"£", @"GBP", @"₪", @"ILS", nil];
 	
 	isRefreshing = NO;
 	self.baseCurrency = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerBaseCurrency"];
-	if (!self.baseCurrency)
-		self.baseCurrency = @"USD";
+	if (!self.baseCurrency) self.baseCurrency = @"USD";
 	
 	self.lastRefresh = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerLastRefresh"];
-	if (!self.lastRefresh)
-		self.lastRefresh = [NSDate dateWithTimeIntervalSince1970:1225397963]; //Oct, 30, 2008
+	if (!self.lastRefresh) self.lastRefresh = [NSDate dateWithTimeIntervalSince1970:1225397963]; //Oct, 30, 2008
 	
 	exchangeRates = [[[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerExchangeRates"] retain];
 	if (!exchangeRates) {
@@ -118,17 +132,19 @@
 		[exchangeRates setObject:[NSNumber numberWithFloat:0.024] forKey:@"\"TWD to EUR\""];
 		[exchangeRates setObject:[NSNumber numberWithFloat:0.8003] forKey:@"\"USD to EUR\""];
 		[exchangeRates setObject:[NSNumber numberWithFloat:0.0764] forKey:@"\"ZAR to EUR\""];
-		[self refreshIfNeeded];
+		[self forceRefresh];
 	}
 
-	self.conversionDict = [NSMutableDictionary new];
+	conversionDict = [NSMutableDictionary new];
 		
 	return self;
 }
 
-- (NSString*) baseCurrency {
+- (NSString*) baseCurrency 
+{
 	return baseCurrency;
 }
+
 - (void)setBaseCurrency:(NSString *)newBaseCurrency
 {
 	[self.conversionDict removeAllObjects];
@@ -143,27 +159,19 @@
 
 - (NSString *)baseCurrencyDescription
 {
-	if ([baseCurrency isEqual:@"EUR"])
-		return @"€";
-	if ([baseCurrency isEqual:@"USD"])
-		return @"$";
-	if ([baseCurrency isEqual:@"JPY"])
-		return @"¥";
-	if ([baseCurrency isEqual:@"GBP"])
-		return @"£";
-	else if ([baseCurrency isEqual:@"ILS"])
-		return @"₪";
-	
-	return baseCurrency;
+	NSString *currencySymbol = [currencySymbols objectForKey:baseCurrency];
+	return (currencySymbol != nil) ? currencySymbol : baseCurrency;
+}
+
+- (NSString *)currencySymbolForCurrency:(NSString *)currencyCode
+{
+	NSString *currencySymbol = [currencySymbols objectForKey:currencyCode];
+	return (currencySymbol != nil) ? currencySymbol : currencyCode;
 }
 
 - (NSString *)baseCurrencyDescriptionForAmount:(NSString *)amount
 {
-	if ([baseCurrency isEqual:@"USD"]) {
-		return [NSString stringWithFormat:@"$%@", amount];
-	} else {
-		return [NSString stringWithFormat:@"%@ %@", amount, [self baseCurrencyDescription]];
-	}
+	return [NSString stringWithFormat:@"%@%@", [self baseCurrencyDescription], amount];
 }
 
 - (NSString *)baseCurrencyDescriptionForAmount:(NSNumber *)amount withFraction:(BOOL)withFraction
@@ -177,15 +185,18 @@
 {
 	if (!isRefreshing && ([[NSDate date] timeIntervalSinceDate:self.lastRefresh] > 21600)) { 
 		isRefreshing = YES;
+		[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 		[self performSelectorInBackground:@selector(refreshExchangeRates) withObject:nil];
 	}
 }
 
 - (void)forceRefresh
 {
-	if (isRefreshing)
-		return;
-	[self performSelectorInBackground:@selector(refreshExchangeRates) withObject:nil];
+	if (!isRefreshing) {
+		isRefreshing = YES;
+		[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+		[self performSelectorInBackground:@selector(refreshExchangeRates) withObject:nil];
+	}
 }
 
 - (void)refreshFailed
@@ -193,21 +204,20 @@
 	isRefreshing = NO;
 	[self.conversionDict removeAllObjects];
 	[[NSNotificationCenter defaultCenter] postNotificationName:CurrencyManagerErrorNotification object:self];
+	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
 - (void)finishRefreshWithExchangeRates:(NSMutableDictionary *)newExchangeRates
 {
-	self.exchangeRates = newExchangeRates;
 	isRefreshing = NO;
+	self.exchangeRates = newExchangeRates;
 	self.lastRefresh = [NSDate date];
-	//NSLog(@"%@", self.exchangeRates);
-
 	[self.conversionDict removeAllObjects];
-
+	
 	[[NSUserDefaults standardUserDefaults] setObject:self.exchangeRates forKey:@"CurrencyManagerExchangeRates"];
 	[[NSUserDefaults standardUserDefaults] setObject:self.lastRefresh forKey:@"CurrencyManagerLastRefresh"];
-	
 	[[NSNotificationCenter defaultCenter] postNotificationName:CurrencyManagerDidUpdateNotification object:self];
+	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
 - (void)refreshExchangeRates
@@ -218,21 +228,20 @@
 	[newExchangeRates setObject:[NSNumber numberWithFloat:1.0] forKey:@"\"EUR to EUR\""];
 	
 	NSMutableString *urlString = [NSMutableString stringWithString:@"http://quote.yahoo.com/d/quotes.csv?s="];
-	//NSMutableArray *currencies = [NSMutableArray arrayWithObjects:@"USD", @"AUD", @"CAD", @"GBP", @"JPY", nil];
-		
 	int i = 0;
 	for (NSString *currency in self.availableCurrencies) {
-		if (i > 0)
+		if (i > 0) {
 			[urlString appendString:@"+"];
-		if (![currency isEqual:@"EUR"])
+		}
+		if (![currency isEqual:@"EUR"]) {
 			[urlString appendFormat:@"%@%@=X", currency, @"EUR"];
+		}
 		i++;
 	}
 	[urlString appendString:@"&f=nl1"];
-	
+		
 	NSString *csv = [NSString stringWithContentsOfURL:[NSURL URLWithString:urlString] usedEncoding:NULL error:NULL];
 	if (!csv) {
-		//NSLog(@"URL could not be retrieved");
 		[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
 		[pool release];
 		return;
@@ -243,8 +252,17 @@
 		if ([comps count] == 2) {
 			NSString *currenciesString = [comps objectAtIndex:0]; //ex: "USD to EUR"
 			float exchangeRate = [[comps objectAtIndex:1] floatValue];
+			
 			[newExchangeRates setObject:[NSNumber numberWithFloat:exchangeRate] forKey:currenciesString];
 		}
+	}
+	if (fabsf([[newExchangeRates objectForKey:@"\"USD to EUR\""] floatValue]) > 9999) {
+		//Yes, this could theoretically happen, but more likely, 
+		//Yahoo returned bogus values, which apparently does happen every now and then...
+		NSLog(@"Exchange rates returned by Yahoo are likely incorrect, ignoring...");
+		[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
+		[pool release];
+		return;
 	}
 	[self performSelectorOnMainThread:@selector(finishRefreshWithExchangeRates:) withObject:newExchangeRates waitUntilDone:YES];
 	[pool release];
@@ -282,7 +300,6 @@
 		/* Cache this conversion for next time */
 		[self.conversionDict setObject:[NSNumber numberWithFloat:conversionFactor] forKey:sourceCurrency];
 	}
-	
 	return (sourceValue * conversionFactor);
 }
 
@@ -303,6 +320,8 @@
 	
 	[exchangeRates release];
 	[baseCurrency release];
+	[currencySymbols release];
+	
 	[super dealloc];
 }
 

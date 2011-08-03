@@ -40,6 +40,7 @@
 	BOOL isRefreshing;
 	NSArray *availableCurrencies;
 	
+	NSDictionary *currencySymbols;
 	NSMutableDictionary *conversionDict;
 	NSNumberFormatter *numberFormatterWithFraction;
 	NSNumberFormatter *numberFormatterWithoutFraction;
@@ -53,6 +54,7 @@
 
 + (CurrencyManager *)sharedManager;
 - (NSString *)baseCurrencyDescription;
+- (NSString *)currencySymbolForCurrency:(NSString *)currencyCode;
 - (NSString *)baseCurrencyDescriptionForAmount:(NSString *)amount;
 - (NSString *)baseCurrencyDescriptionForAmount:(NSNumber *)amount withFraction:(BOOL)withFraction;
 - (void)forceRefresh;

@@ -1,38 +1,56 @@
 //
-//  DashboardView.h
-//  AppSalesMobile
+//  DashboardViewController.h
+//  AppSales
 //
-//  Created by Ole Zorn on 05.04.10.
-//  Copyright 2010 omz:software. All rights reserved.
+//  Created by Ole Zorn on 30.07.11.
+//  Copyright 2011 omz:software. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
+#import "ColorPickerViewController.h"
 
-@class DashboardGraphView;
+@class Account, Product;
 
-@interface DashboardViewController : UIViewController <UIPickerViewDelegate, UIPickerViewDataSource, UIActionSheetDelegate> {
+@interface DashboardViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, ColorPickerViewControllerDelegate> {
 
-	UIPickerView *dateRangePicker;
-	NSArray *reports;
-	DashboardGraphView *graphView;
-	UIPopoverController *reportsPopover;
+	Product *selectedProduct;
+	Account *account;
+	UITableView *productsTableView;
+	UIView *topView;
 	
-	BOOL shouldAutomaticallyShowNewReports;
-	BOOL showsWeeklyReports;
+	NSArray *products;
+	NSArray *visibleProducts;
 	
-	UIButton *viewReportsButton;
-	UIButton *calendarButton;
+	UIImageView *shadowView;
+	
+	BOOL statusVisible;
+	UIToolbar *statusToolbar;
+	UIBarButtonItem *stopButtonItem;
+	UIActivityIndicatorView *activityIndicator;
+	UILabel *statusLabel;
+	UIProgressView *progressBar;
 }
 
-@property (nonatomic, retain) UIPickerView *dateRangePicker;
-@property (nonatomic, retain) NSArray *reports;
-@property (nonatomic, retain) DashboardGraphView *graphView;
-@property (nonatomic, retain) UIPopoverController *reportsPopover;
-@property (nonatomic, assign) BOOL showsWeeklyReports;
-@property (nonatomic, retain) UIButton *viewReportsButton;
-@property (nonatomic, retain) UIButton *calendarButton;
+@property (nonatomic, retain) Account *account;
+@property (nonatomic, retain) NSArray *products;
+@property (nonatomic, retain) NSArray *visibleProducts;
+@property (nonatomic, retain) Product *selectedProduct;
+@property (nonatomic, retain) UITableView *productsTableView;
+@property (nonatomic, retain) UIView *topView;
+@property (nonatomic, retain) UIImageView *shadowView;
+@property (nonatomic, retain) UIToolbar *statusToolbar;
+@property (nonatomic, retain) UIBarButtonItem *stopButtonItem;
+@property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, retain) UILabel *statusLabel;
+@property (nonatomic, retain) UIProgressView *progressBar;
 
-- (void)resetDatePicker;
+- (id)initWithAccount:(Account *)anAccount;
+- (NSSet *)entityNamesTriggeringReload;
 - (void)reloadData;
+- (void)reloadTableView;
+- (void)showOrHideStatusBar;
+- (BOOL)shouldShowStatusBar;
+- (void)stopDownload:(id)sender;
+- (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 @end

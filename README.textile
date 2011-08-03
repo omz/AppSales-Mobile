@@ -1,17 +1,21 @@
-h1. AppSales Mobile
+h1. AppSales
 
-AppSales Mobile allows iPhone developers to download and analyze their daily and weekly sales reports from iTunes Connect.
-
-The current (universal) version has to be built with the iPhone SDK 4.0
+AppSales allows iOS and Mac App Store developers to download and analyze their sales reports from iTunes Connect on the iPhone.
 
 Features:
 * Automatic download of daily and weekly sales reports from iTunes Connect
-* Convenient graphs for viewing trends and sales by region with selectable date range
+* Stacked bar graphs to see all your sales at a glance
+* Show your sales on a world map
+* View actual payments by Apple on a calendar
+* Group daily reports by fiscal or calendar month to predict your next payment
 * Automatic conversion to your currency of choice
-* Download reviews of your apps from all App Stores
-* Import reports that you downloaded elsewhere (for example with "AppViz":http://www.ideaswarm.com/products/appviz/ on your Mac) via Bonjour
+* Download customer reviews of your apps
+* Import reports that you downloaded elsewhere (for example with "AppViz":http://www.ideaswarm.com on your Mac) via iTunes File Sharing
 
-Because there is no real API to access iTunes Connect trend reports, AppSales Mobile scrapes itts.apple.com. This means that even small changes on this website can break AppSales’s ability to download reports automatically. In most cases, this is easy to fix and I’ll try to make a new version available asap.
+AppSales requires the iOS 4.3 SDK. There is no iPad version at the moment.
 
-You can follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
-If you like, check out my commercial iPhone apps at "omz-software.com":http://omz-software.com
+Because there is no real API to access iTunes Connect trend reports, AppSales Mobile scrapes itunesconnect.apple.com. This means that even small changes on this website can break the automatic import. In most cases, this is easy to fix and I’ll try to make a new version available here.
+
+You can also follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
+
+!http://github.com/omz/AppSales-Mobile/raw/master/Screenshot.png(AppSales screenshot)!
