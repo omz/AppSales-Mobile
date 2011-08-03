@@ -1,440 +1,337 @@
 //
-//  DashboardView.m
-//  AppSalesMobile
+//  DashboardViewController.m
+//  AppSales
 //
-//  Created by Ole Zorn on 05.04.10.
-//  Copyright 2010 omz:software. All rights reserved.
+//  Created by Ole Zorn on 30.07.11.
+//  Copyright 2011 omz:software. All rights reserved.
 //
 
 #import "DashboardViewController.h"
-#import "NSDateFormatter+SharedInstances.h"
-#import "Day.h"
-#import "DashboardGraphView.h"
-#import "ReportManager.h"
-
+#import "DashboardAppCell.h"
+#import "ColorButton.h"
+#import "UIColor+Extensions.h"
+#import "Account.h"
+#import "Product.h"
 
 @implementation DashboardViewController
 
-@synthesize dateRangePicker, reports, graphView, reportsPopover, showsWeeklyReports, calendarButton, viewReportsButton;
+@synthesize account, products, visibleProducts, selectedProduct;
+@synthesize productsTableView, topView, shadowView, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
 
-- (void) loadView {
-	[super loadView];
-	self.view.backgroundColor = [UIColor clearColor];
-	
-	UIImageView *backgroundImageView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PaneBackground.png"]] autorelease];
-	backgroundImageView.contentStretch = CGRectMake(0.1, 0.1, 0.8, 0.8);
-	backgroundImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	[self.view addSubview:backgroundImageView];
-	
-	self.dateRangePicker = [[[UIPickerView alloc] initWithFrame:CGRectMake(21, 17, 215, 180)] autorelease];
-	dateRangePicker.showsSelectionIndicator = YES;
-	dateRangePicker.delegate = self;
-	dateRangePicker.dataSource = self;
-	[self.view addSubview:dateRangePicker];
-	
-	UIImageView *pickerOverlay = [[[UIImageView alloc] initWithFrame:CGRectInset(dateRangePicker.frame, -7, -7)] autorelease];
-	pickerOverlay.image = [UIImage imageNamed:@"PickerOverlay.png"];
-	[self.view addSubview:pickerOverlay];
-	
-	self.viewReportsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	viewReportsButton.frame = CGRectMake(84, 250, 149, 47);
-	UIImage *buttonImageNormal = [[UIImage imageNamed:@"PaneButtonNormal.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0];
-	UIImage *buttonImageHighlighted = [[UIImage imageNamed:@"PaneButtonHighlighted.png"] stretchableImageWithLeftCapWidth:10 topCapHeight:0];
-	[viewReportsButton setBackgroundImage:buttonImageNormal forState:UIControlStateNormal];
-	[viewReportsButton setBackgroundImage:buttonImageHighlighted forState:UIControlStateHighlighted];
-	[viewReportsButton setTitle:NSLocalizedString(@"View Reports",nil) forState:UIControlStateNormal];
-	[viewReportsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-	[viewReportsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateHighlighted];
-	[viewReportsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
-	[viewReportsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
-	viewReportsButton.titleLabel.frame = viewReportsButton.bounds;
-	viewReportsButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
-	viewReportsButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
-	[viewReportsButton addTarget:self action:@selector(viewReports:) forControlEvents:UIControlEventTouchUpInside];
-	[self.view addSubview:viewReportsButton];
-	
-	self.calendarButton = [UIButton buttonWithType:UIButtonTypeCustom];
-	calendarButton.frame = CGRectMake(24, 250, 49, 47);
-	[calendarButton setImage:[UIImage imageNamed:@"CalendarButtonNormal.png"] forState:UIControlStateNormal];
-	[calendarButton setImage:[UIImage imageNamed:@"CalendarButtonHighlighted.png"] forState:UIControlStateHighlighted];
-	[calendarButton addTarget:self action:@selector(selectQuickDateRange:) forControlEvents:UIControlEventTouchUpInside];
-	[self.view addSubview:calendarButton];
-	
-	self.graphView = [[[DashboardGraphView alloc] initWithFrame:CGRectMake(246, 17, 500, 282)] autorelease];
-	graphView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	[self.view addSubview:graphView];
-	
-	shouldAutomaticallyShowNewReports = YES;
-}
 
-- (void) viewWillAppear:(BOOL)animated {
-	[super viewWillAppear:animated];
-	
-	[self reloadData];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ReportManagerDownloadedDailyReportsNotification object:nil];
-}
-
-- (void) viewWillDisappear:(BOOL)animated {
-	[super viewWillDisappear:animated];
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void)selectQuickDateRange:(id)sender
+- (id)initWithAccount:(Account *)anAccount
 {
-	if ([self.reports count] == 0) return;
+	self = [super initWithNibName:nil bundle:nil];
+	if (self) {
+		self.account = anAccount;
+		self.title = [account displayName];
+		self.hidesBottomBarWhenPushed = YES;
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
+	}
+	return self;
+}
+
+- (void)contextDidChange:(NSNotification *)notification
+{
+	NSSet *relevantEntityNames = [self entityNamesTriggeringReload];
+	NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
+	NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
+	NSSet *deletedObjects = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
 	
-	if(self.showsWeeklyReports){
-		UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil] autorelease];
-		[sheet addButtonWithTitle:NSLocalizedString(@"Last 8 Weeks",nil)];
-		[sheet addButtonWithTitle:NSLocalizedString(@"All time",nil)];
-		[sheet showFromRect:[sender frame] inView:self.view animated:YES];
-	}else{
-		int lastMonth = -1;
-		NSMutableArray *months = [NSMutableArray array];
-		NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-		NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
-		[monthFormatter setDateFormat:@"MMMM yyyy"];
-		for (Day *d in self.reports.reverseObjectEnumerator) {
-			NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-			int month = [comps month];
-			if (month != lastMonth) {
-				[months addObject:[monthFormatter stringFromDate:d.date]];
-				lastMonth = month;
-			}
-			if ([months count] >= 3)
+	BOOL shouldReload = NO;
+	for (NSManagedObject *insertedObject in insertedObjects) {
+		if ([relevantEntityNames containsObject:insertedObject.entity.name]) {
+			shouldReload = YES;
+			break;
+		}
+	}
+	if (!shouldReload) {
+		for (NSManagedObject *updatedObject in updatedObjects) {
+			if ([relevantEntityNames containsObject:updatedObject.entity.name]) {
+				shouldReload = YES;
 				break;
-		}
-		UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil] autorelease];
-		[sheet addButtonWithTitle:NSLocalizedString(@"Last 7 Days",nil)];
-		[sheet addButtonWithTitle:NSLocalizedString(@"Last 30 Days",nil)];
-		for (NSString *monthButton in months) {
-			[sheet addButtonWithTitle:monthButton];
-		}
-		[sheet addButtonWithTitle:NSLocalizedString(@"Last year", nil)];
-		[sheet addButtonWithTitle:NSLocalizedString(@"All time", nil)];
-		[sheet showFromRect:[sender frame] inView:self.view animated:YES];
-	}
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-	if (buttonIndex == [actionSheet cancelButtonIndex]) return;
-	
-	int fromIndex = 0;
-	int toIndex = 0;
-	if(self.showsWeeklyReports){
-		if (buttonIndex == 0) {
-			//Last 8 month
-			toIndex = [self.reports count] - 1;
-			fromIndex = [self.reports count] - 8;
-			if (fromIndex < 0) fromIndex = 0;
-		}
-		else if (buttonIndex == 1) {
-			//All time
-			toIndex = [self.reports count] - 1;
-			fromIndex = 0;
-		}
-	}else{
-		if (buttonIndex == 0) {
-			//Last 7 days
-			toIndex = [self.reports count] - 1;
-			fromIndex = [self.reports count] - 7;
-			if (fromIndex < 0) fromIndex = 0;
-		}
-		else if (buttonIndex == 1) {
-			//Last 7 days
-			toIndex = [self.reports count] - 1;
-			fromIndex = [self.reports count] - 30;
-			if (fromIndex < 0) fromIndex = 0;
-		}
-		else if (buttonIndex == [actionSheet numberOfButtons]-2) {
-			//NSLog(@"Last year");
-			fromIndex = [self.reports count] - 1;
-			toIndex = fromIndex;
-			int lastYear = -1;
-			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			for (Day *d in self.reports.reverseObjectEnumerator) {
-				NSDateComponents *comps = [gregorian components:NSYearCalendarUnit fromDate:d.date];
-				int y = [comps year];
-				if(lastYear == -1)
-					lastYear = y;
-				else if(lastYear != y){
-					fromIndex++;
-					break;
-				}
-				fromIndex--;
-			}
-		}
-		else if (buttonIndex == [actionSheet numberOfButtons]-1) {
-			//NSLog(@"All time");
-			fromIndex = 0;
-			toIndex = [self.reports count]-1;
-		}
-		else if (buttonIndex == 2) {
-			//NSLog(@"This month");
-			fromIndex = [self.reports count] - 1;
-			toIndex = fromIndex;
-			int lastMonth = -1;
-			int months = 0;
-			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			for (Day *d in self.reports.reverseObjectEnumerator) {
-				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-				int month = [comps month];
-				if (month != lastMonth) {
-					months++;
-				}
-				if (months > 1) {
-					break;
-				}
-				if ((months == 1) && (lastMonth != -1)) {
-					fromIndex--;
-				}
-				lastMonth = month;
-			}
-		}
-		else if (buttonIndex == 3) {
-			//NSLog(@"Last month");
-			fromIndex = [self.reports count] - 1;
-			toIndex = fromIndex;
-			int i = toIndex;
-			int lastMonth = -1;
-			int months = 0;
-			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			for (Day *d in self.reports.reverseObjectEnumerator) {
-				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-				int month = [comps month];
-				if (month != lastMonth) {
-					months++;
-					if (months == 2) {
-						toIndex = i;
-					}
-				}
-				if (months == 3) {
-					break;
-				}
-				if ((months <= 2) && (lastMonth != -1)) {
-					fromIndex--;
-				}
-				lastMonth = month;
-				i--;
-			}
-		}
-		else if (buttonIndex == 4) {
-			//NSLog(@"Two months ago");
-			fromIndex = [self.reports count] - 1;
-			toIndex = fromIndex;
-			int i = toIndex;
-			int lastMonth = -1;
-			int months = 0;
-			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			for (Day *d in self.reports.reverseObjectEnumerator) {
-				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-				int month = [comps month];
-				if (month != lastMonth) {
-					months++;
-					if (months == 3) {
-						toIndex = i;
-					}
-				}
-				if (months == 4) {
-					break;
-				}
-				if ((months <= 3) && (lastMonth != -1)) {
-					fromIndex--;
-				}
-				lastMonth = month;
-				i--;
-			}
-		}
-		else if (buttonIndex == 5) {
-			//NSLog(@"Three months ago");
-			fromIndex = [self.reports count] - 1;
-			toIndex = fromIndex;
-			int i = toIndex;
-			int lastMonth = -1;
-			int months = 0;
-			NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-			for (Day *d in self.reports.reverseObjectEnumerator) {
-				NSDateComponents *comps = [gregorian components:NSMonthCalendarUnit fromDate:d.date];
-				int month = [comps month];
-				if (month != lastMonth) {
-					months++;
-					if (months == 4) {
-						toIndex = i;
-					}
-				}
-				if (months == 5) {
-					break;
-				}
-				if ((months <= 4) && (lastMonth != -1)) {
-					fromIndex--;
-				}
-				lastMonth = month;
-				i--;
 			}
 		}
 	}
-	
-	[dateRangePicker selectRow:fromIndex inComponent:0 animated:NO];
-	[dateRangePicker selectRow:toIndex inComponent:1 animated:NO];
-	[self pickerView:dateRangePicker didSelectRow:[dateRangePicker selectedRowInComponent:0] inComponent:0];
-	[self pickerView:dateRangePicker didSelectRow:[dateRangePicker selectedRowInComponent:1] inComponent:1];	
+	if (!shouldReload) {
+		for (NSManagedObject *deletedObject in deletedObjects) {
+			if ([relevantEntityNames containsObject:deletedObject.entity.name]) {
+				shouldReload = YES;
+				break;
+			}
+		}
+	}
+	if (shouldReload) {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		[self performSelector:@selector(reloadData) withObject:nil afterDelay:0.1];
+	}
 }
 
-- (void)setShowsWeeklyReports:(BOOL)flag
+- (NSSet *)entityNamesTriggeringReload
 {
-	if (showsWeeklyReports == flag) return;
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	showsWeeklyReports = flag;
-	if (showsWeeklyReports) {
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ReportManagerDownloadedWeeklyReportsNotification object:nil];
-		//calendarButton.hidden = YES;
-		//viewReportsButton.frame = CGRectMake(24, 250, 209, 47);
+	return [NSSet setWithObjects:@"Product", nil];
+}
+
+- (void)loadView
+{
+	[super loadView];
+	
+	statusVisible = [self shouldShowStatusBar];
+	self.topView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]] autorelease];
+	topView.userInteractionEnabled = YES;
+	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, 208);
+	[self.view addSubview:topView];
+	
+	UIImageView *graphShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
+	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+	[topView addSubview:graphShadowView];
+	
+	self.productsTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain] autorelease];
+	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+	productsTableView.dataSource = self;
+	productsTableView.delegate = self;
+	productsTableView.backgroundColor = [UIColor clearColor];
+	
+	productsTableView.tableHeaderView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]] autorelease];
+	productsTableView.tableFooterView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
+	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
+	productsTableView.contentInset = productsTableContentInset;
+	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
+	
+	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+	[self.view addSubview:self.productsTableView];
+	
+	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	shadowView.frame = graphShadowView.frame;
+	shadowView.alpha = 0.0;
+	
+	[self.view addSubview:shadowView];
+	
+	self.activityIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
+	if (statusVisible) [activityIndicator startAnimating];
+	UIBarButtonItem *activityIndicatorItem = [[[UIBarButtonItem alloc] initWithCustomView:activityIndicator] autorelease];
+	
+	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 2, 200, 20)] autorelease];
+	statusLabel.font = [UIFont boldSystemFontOfSize:14.0];
+	statusLabel.backgroundColor = [UIColor clearColor];
+	statusLabel.textColor = [UIColor whiteColor];
+	statusLabel.shadowColor = [UIColor blackColor];
+	statusLabel.shadowOffset = CGSizeMake(0, -1);
+	statusLabel.textAlignment = UITextAlignmentCenter;
+	
+	self.progressBar = [[[UIProgressView alloc] initWithFrame:CGRectMake(0, 25, 200, 10)] autorelease];
+	
+	UIView *statusView = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 40)] autorelease];
+	[statusView addSubview:statusLabel];
+	[statusView addSubview:progressBar];
+	
+	UIBarButtonItem *statusItem = [[[UIBarButtonItem alloc] initWithCustomView:statusView] autorelease];
+	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
+	self.stopButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)] autorelease];
+	
+	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - ((statusVisible) ? 44 : 0), self.view.bounds.size.width, 44);
+	self.statusToolbar = [[[UIToolbar alloc] initWithFrame:statusToolbarFrame] autorelease];
+	statusToolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+	statusToolbar.translucent = YES;
+	statusToolbar.barStyle = UIBarStyleBlackTranslucent;
+	statusToolbar.items = [NSArray arrayWithObjects:activityIndicatorItem, flexSpace, statusItem, flexSpace, stopButtonItem, nil];
+	
+	[self.view addSubview:statusToolbar];
+}
+
+- (void)stopDownload:(id)sender
+{
+	//subclasses should override this
+}
+
+- (void)viewDidLoad
+{
+	[super viewDidLoad];
+	[self reloadData];
+}
+
+- (void)viewDidUnload
+{
+	[super viewDidUnload];
+	self.productsTableView = nil;
+	self.shadowView = nil;
+	self.statusToolbar = nil;
+	self.activityIndicator = nil;
+	self.statusLabel = nil;
+	self.progressBar = nil;
+}
+
+- (BOOL)shouldShowStatusBar
+{
+	return NO;
+}
+
+- (void)showOrHideStatusBar
+{
+	BOOL statusBarShouldBeVisible = [self shouldShowStatusBar];
+	if (statusBarShouldBeVisible == statusVisible) return;
+	statusVisible = statusBarShouldBeVisible;
+	
+	[UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDuration:0.4];
+	if (statusVisible) {
+		self.stopButtonItem.enabled = YES;
+		[self.activityIndicator startAnimating];
 	} else {
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ReportManagerDownloadedDailyReportsNotification object:nil];		
-		//calendarButton.hidden = NO;
-		//viewReportsButton.frame = CGRectMake(84, 250, 149, 47);
+		[self.activityIndicator stopAnimating];
 	}
-	graphView.showsWeeklyReports = flag;
-}
-
-- (void)resetDatePicker
-{
-	if (!self.reports || [reports count] == 0) return;
-	
-	int fromRow = [reports count] - (self.showsWeeklyReports ? 8 : 7);
-	if (fromRow < 0) fromRow = 0;
-	int toRow = [reports count] - 1;
-	if (toRow < 0) toRow = 0;
-	[dateRangePicker selectRow:fromRow inComponent:0 animated:NO];
-	[dateRangePicker selectRow:toRow inComponent:1 animated:NO];
-	
-	NSRange selectedRange = NSMakeRange(fromRow, toRow - fromRow + 1);
-	NSArray *selectedReports = [reports subarrayWithRange:selectedRange];
-	graphView.reports = selectedReports;
-	[graphView setNeedsDisplay];
+	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
+	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
+	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - ((statusVisible) ? 44 : 0), self.view.bounds.size.width, 44);
+	if (statusVisible) {
+		self.statusToolbar.frame = statusToolbarFrame;
+		self.productsTableView.contentInset = productsTableContentInset;
+		self.productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
+	} else {
+		double delayInSeconds = 1.5;
+		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+			[UIView beginAnimations:nil context:nil];
+			[UIView setAnimationDuration:0.4];
+			self.statusToolbar.frame = statusToolbarFrame;
+			self.productsTableView.contentInset = productsTableContentInset;
+			self.productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
+			[UIView commitAnimations];
+		});
+	}
+	[UIView commitAnimations];
 }
 
 - (void)reloadData
 {
-	NSSortDescriptor *dateSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:YES] autorelease];
-	NSArray *sortedReports = nil;
-	if (self.showsWeeklyReports) {
-		sortedReports = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-	} else {
-		sortedReports = [[[ReportManager sharedManager].days allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:dateSorter]];
-		
-		/*
-		//insert the weeks older than the oldest daily report
-		NSMutableArray *allDays = [[sortedReports mutableCopy] autorelease];
-		
-		Day *oldestDayReport = nil;
-		
-		// This was crashing before because it ignored that some user's
-		// may not have a report downloaded, default to 0, the oldest date possible
-		NSTimeInterval oldestDayReportInterval = 0;
-		if([sortedReports count]>0) {
-			oldestDayReport = [sortedReports objectAtIndex:0];
-			oldestDayReportInterval = [oldestDayReport.date timeIntervalSince1970];
-		}
-		
-		NSSortDescriptor *weekSorter = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
-		NSArray *sortedWeeks = [[[ReportManager sharedManager].weeks allValues] sortedArrayUsingDescriptors:[NSArray arrayWithObject:weekSorter]]; 
-		BOOL weeksInserite = NO;
-		for (Day *w in sortedWeeks) {
-			if ([w.date timeIntervalSince1970] < oldestDayReportInterval) {
-				if(!weeksInserite){ //delete the days that is in the week
-					NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
-					[comp setHour:167];
-					NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:w.date options:0];
-					while ([((Day *)[allDays objectAtIndex:0]).date timeIntervalSince1970] < [dateWeekLater timeIntervalSince1970]) {
-						[allDays removeObjectAtIndex:0];
-					}				
-				}
-				[allDays insertObject:w atIndex:0];
-				weeksInserite = YES;
-			}
-			sortedReports = [[allDays copy] autorelease];
-		}
-		 */
-	}
-	self.reports = sortedReports;
-	[dateRangePicker reloadAllComponents];
+	// Sort products by ID (this will put the most recently released apps on top):
+	NSArray *allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
 	
-	if (shouldAutomaticallyShowNewReports) {
-		[self resetDatePicker];
-	} else {
-		//The user has selected a date range, so the picker selection should not change when new reports arrive
-		[self pickerView:dateRangePicker didSelectRow:[dateRangePicker selectedRowInComponent:0] inComponent:0];
-		[self pickerView:dateRangePicker didSelectRow:[dateRangePicker selectedRowInComponent:1] inComponent:1];	
-	}
+	self.products = allProducts;
+	self.visibleProducts = [allProducts filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^ (id obj, NSDictionary *bindings) { return (BOOL)![[(Product *)obj hidden] boolValue]; }]];
+	
+	[self reloadTableView];
 }
 
-- (void)viewReports:(id)sender
+- (void)reloadTableView
 {
-	[self.reportsPopover presentPopoverFromRect:[(UIButton *)sender frame] inView:[(UIView *)sender superview] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-}
-
-- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
-{
-	Day *report = [reports objectAtIndex:row];
-	if (showsWeeklyReports) {
-		if (component == 0) {
-			return [[NSDateFormatter sharedShortDateFormatter] stringFromDate:[[reports objectAtIndex:row] date]];
+	//Reload the table view, preserving the current selection:
+	NSIndexPath *selectedIndexPath = [self.productsTableView indexPathForSelectedRow];
+	if (!selectedIndexPath) {
+		if (self.selectedProduct) {
+			selectedIndexPath = [NSIndexPath indexPathForRow:[self.products indexOfObject:self.selectedProduct] + 1 inSection:0];
 		} else {
-			NSDate *fromDate = report.date;
-			NSDateComponents *comp = [[[NSDateComponents alloc] init] autorelease];
-			[comp setHour:167];
-			NSDate *dateWeekLater = [[NSCalendar currentCalendar] dateByAddingComponents:comp toDate:fromDate options:0];
-			return [[NSDateFormatter sharedShortDateFormatter] stringFromDate:dateWeekLater];
+			selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 		}
-	} else {
-		return [[NSDateFormatter sharedShortDateFormatter] stringFromDate:[[reports objectAtIndex:row] date]];
 	}
+	[self.productsTableView reloadData];
+	[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 }
 
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+- (void)changeColor:(UIButton *)sender
 {
-	return 2;
-}
-
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
-{
-	return [reports count];
-}
-
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
-{
-	if (!self.reports || [reports count] == 0) return;
+	int row = sender.tag;
+	Product *product = [self.visibleProducts objectAtIndex:row - 1];
 	
-	shouldAutomaticallyShowNewReports = NO;
-	
-	int fromIndex = [pickerView selectedRowInComponent:0];
-	int toIndex = [pickerView selectedRowInComponent:1];
-		
-	if (fromIndex > toIndex) {
-		int temp = toIndex;
-		toIndex = fromIndex;
-		fromIndex = temp;
+	NSArray *palette = [UIColor crayonColorPalette];
+	ColorPickerViewController *vc = [[[ColorPickerViewController alloc] initWithColors:palette] autorelease];
+	vc.delegate = self;
+	vc.context = product;
+	vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
+	[self presentModalViewController:vc animated:YES];
+}
+
+- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(int)colorIndex
+{
+	Product *product = (Product *)picker.context;
+	product.color = color;
+	[product.managedObjectContext save:NULL];
+	[self reloadTableView];
+	[picker dismissModalViewControllerAnimated:YES];
+}
+
+#pragma mark - Tableview data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+	return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+	return [self.visibleProducts count] + 1;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	return 40.0;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	NSString *cellIdentifier = @"DashboardApp";
+	DashboardAppCell *cell = (DashboardAppCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+	if (!cell) {
+		cell = [[[DashboardAppCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
 	}
 	
-	NSRange selectedRange = NSMakeRange(fromIndex, toIndex - fromIndex + 1);
-	NSArray *selectedReports = [self.reports subarrayWithRange:selectedRange];
-	graphView.reports = selectedReports;
-	[graphView setNeedsDisplay];
+	Product *product = nil;
+	if (indexPath.row != 0) {
+		product = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+	}
+	
+	cell.product = product;
+	cell.colorButton.tag = indexPath.row;
+	[cell.colorButton addTarget:self action:@selector(changeColor:) forControlEvents:UIControlEventTouchUpInside];
+	
+	cell.accessoryView = [self accessoryViewForRowAtIndexPath:indexPath];
+	
+	return cell;
+}
+
+- (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	return nil;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	self.selectedProduct = [(indexPath.row == 0) ? nil : self.visibleProducts objectAtIndex:indexPath.row - 1];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+	self.shadowView.alpha = MAX(0.0, MIN(1.0, (scrollView.contentOffset.y - 20) / 20.0));
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
-- (void)dealloc 
+- (void)dealloc
 {
-	[viewReportsButton release];
-	[calendarButton release];
-	[dateRangePicker release];
-	[reports release];
-	[graphView release];
-	[reportsPopover release];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[account release];
+	[products release];
+	[visibleProducts release];
+	[selectedProduct release];
+	[productsTableView release];
+	[topView release];
+	[shadowView release];
+	[statusToolbar release];
+	[stopButtonItem release];
+	[activityIndicator release];
+	[statusLabel release];
+	[progressBar release];
 	[super dealloc];
 }
-
 
 @end

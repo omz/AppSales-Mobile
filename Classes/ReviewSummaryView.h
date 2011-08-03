@@ -1,22 +1,42 @@
 //
 //  ReviewSummaryView.h
-//  AppSalesMobile
+//  AppSales
 //
-//  Created by Ole Zorn on 06.04.10.
-//  Copyright 2010 omz:software. All rights reserved.
+//  Created by Ole Zorn on 27.07.11.
+//  Copyright 2011 omz:software. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@class App;
+@class ReviewSummaryView;
 
-@interface ReviewSummaryView : UIControl {
+@protocol ReviewSummaryViewDataSource <NSObject>
 
-	App *app;
+- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfReviewsForRating:(NSInteger)rating;
+- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfUnreadReviewsForRating:(NSInteger)rating;
+
+@end
+
+@protocol ReviewSummaryViewDelegate <NSObject>
+
+- (void)reviewSummaryView:(ReviewSummaryView *)view didSelectRating:(NSInteger)rating;
+
+@end
+
+@interface ReviewSummaryView : UIView {
+
+	id<ReviewSummaryViewDataSource> dataSource;
+	id<ReviewSummaryViewDelegate> delegate;
+	NSMutableArray *barViews;
+	NSMutableArray *barLabels;
+	UILabel *averageLabel;
+	UILabel *sumLabel;
 }
 
-@property (nonatomic, retain) App *app;
+@property (nonatomic, assign) id<ReviewSummaryViewDataSource> dataSource;
+@property (nonatomic, assign) id<ReviewSummaryViewDelegate> delegate;
 
-- (id)initWithFrame:(CGRect)frame app:(App *)anApp;
+- (void)reloadDataAnimated:(BOOL)animated;
+- (CGRect)barFrameForRating:(NSInteger)rating;
 
 @end

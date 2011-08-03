@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="1" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="562" systemVersion="11A511" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Account" representedClassName="Account">
+        <attribute name="paymentsBadge" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="reportsBadge" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="sortIndex" optional="YES" attributeType="Integer 64" defaultValueString="0"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="username" optional="YES" attributeType="String"/>
+        <relationship name="dailyReports" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="DailyReport" inverseName="account" inverseEntity="DailyReport"/>
+        <relationship name="payments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Payment" inverseName="account" inverseEntity="Payment"/>
+        <relationship name="products" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="account" inverseEntity="Product" indexed="YES"/>
+        <relationship name="weeklyReports" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WeeklyReport" inverseName="account" inverseEntity="WeeklyReport" indexed="YES"/>
+    </entity>
+    <entity name="DailyReport" representedClassName="DailyReport" parentEntity="Report">
+        <relationship name="account" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Account" inverseName="dailyReports" inverseEntity="Account"/>
+    </entity>
+    <entity name="Payment">
+        <attribute name="amount" optional="YES" attributeType="Float" defaultValueString="0.0"/>
+        <attribute name="currency" optional="YES" attributeType="String"/>
+        <attribute name="month" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="vendorID" optional="YES" attributeType="String"/>
+        <attribute name="year" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <relationship name="account" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Account" inverseName="payments" inverseEntity="Account"/>
+    </entity>
+    <entity name="Product" representedClassName="Product">
+        <attribute name="color" optional="YES" attributeType="Transformable"/>
+        <attribute name="currentVersion" optional="YES" attributeType="String"/>
+        <attribute name="customName" optional="YES" attributeType="String"/>
+        <attribute name="hidden" optional="YES" attributeType="Boolean"/>
+        <attribute name="lastModified" optional="YES" attributeType="Date"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="parentSKU" optional="YES" attributeType="String"/>
+        <attribute name="platform" optional="YES" attributeType="String"/>
+        <attribute name="productID" attributeType="String" indexed="YES"/>
+        <attribute name="reviewSummary" optional="YES" attributeType="Transformable"/>
+        <attribute name="SKU" optional="YES" attributeType="String"/>
+        <relationship name="account" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Account" inverseName="products" inverseEntity="Account" indexed="YES"/>
+        <relationship name="reviews" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Review" inverseName="product" inverseEntity="Review"/>
+        <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Transaction" inverseName="product" inverseEntity="Transaction" indexed="YES"/>
+    </entity>
+    <entity name="Report" representedClassName="Report" isAbstract="YES">
+        <attribute name="startDate" attributeType="Date" indexed="YES"/>
+        <relationship name="cache" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="ReportCache" inverseName="report" inverseEntity="ReportCache"/>
+        <relationship name="originalReport" minCount="1" maxCount="1" deletionRule="Cascade" destinationEntity="ReportCSV" inverseName="report" inverseEntity="ReportCSV"/>
+        <relationship name="transactions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Transaction" inverseName="report" inverseEntity="Transaction" indexed="YES"/>
+    </entity>
+    <entity name="ReportCache" representedClassName="ReportCache">
+        <attribute name="content" optional="YES" attributeType="Transformable"/>
+        <relationship name="report" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Report" inverseName="cache" inverseEntity="Report"/>
+    </entity>
+    <entity name="ReportCSV">
+        <attribute name="content" attributeType="String"/>
+        <attribute name="filename" attributeType="String"/>
+        <relationship name="report" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Report" inverseName="originalReport" inverseEntity="Report"/>
+    </entity>
+    <entity name="Review" representedClassName="Review">
+        <attribute name="countryCode" optional="YES" attributeType="String" indexed="YES"/>
+        <attribute name="downloadDate" optional="YES" attributeType="Date"/>
+        <attribute name="productVersion" optional="YES" attributeType="String" indexed="YES"/>
+        <attribute name="rating" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="reviewDate" optional="YES" attributeType="Date"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="unread" optional="YES" attributeType="Boolean"/>
+        <attribute name="user" optional="YES" attributeType="String" indexed="YES"/>
+        <relationship name="product" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="reviews" inverseEntity="Product"/>
+    </entity>
+    <entity name="Transaction" representedClassName="Transaction">
+        <attribute name="countryCode" attributeType="String"/>
+        <attribute name="currency" attributeType="String"/>
+        <attribute name="promoType" optional="YES" attributeType="String"/>
+        <attribute name="revenue" attributeType="Float" defaultValueString="0"/>
+        <attribute name="type" attributeType="String" indexed="YES"/>
+        <attribute name="units" attributeType="Integer 32" defaultValueString="0"/>
+        <relationship name="product" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Product" inverseName="transactions" inverseEntity="Product" indexed="YES"/>
+        <relationship name="report" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Report" inverseName="transactions" inverseEntity="Report" indexed="YES"/>
+    </entity>
+    <entity name="WeeklyReport" representedClassName="WeeklyReport" parentEntity="Report">
+        <attribute name="endDate" attributeType="Date"/>
+        <relationship name="account" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Account" inverseName="weeklyReports" inverseEntity="Account"/>
+    </entity>
+    <elements>
+        <element name="Account" positionX="297" positionY="-36" width="128" height="180"/>
+        <element name="DailyReport" positionX="-63" positionY="189" width="128" height="60"/>
+        <element name="Payment" positionX="-45" positionY="-162" width="128" height="135"/>
+        <element name="Product" positionX="549" positionY="147" width="128" height="255"/>
+        <element name="Report" positionX="106" positionY="99" width="128" height="165"/>
+        <element name="ReportCache" positionX="196" positionY="-189" width="128" height="75"/>
+        <element name="ReportCSV" positionX="108" positionY="357" width="128" height="75"/>
+        <element name="Review" positionX="540" positionY="-81" width="128" height="195"/>
+        <element name="Transaction" positionX="322" positionY="270" width="128" height="165"/>
+        <element name="WeeklyReport" positionX="-153" positionY="96" width="128" height="75"/>
+    </elements>
+</model>
