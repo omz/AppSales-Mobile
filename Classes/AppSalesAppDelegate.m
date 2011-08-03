@@ -50,7 +50,7 @@
 	NSFileManager *fm = [NSFileManager defaultManager];
 	BOOL originalReportsDirectoryFound = [fm fileExistsAtPath:legacyReportDirectory];
 	if (!originalReportsDirectoryFound) {
-		return;
+		return NO;
 	}	
 	NSArray *originalReportFiles = [fm contentsOfDirectoryAtPath:legacyReportDirectory error:NULL];
 	if ([originalReportFiles count] == 0) {
@@ -60,7 +60,7 @@
 			NSString *fullPath = [documentsDirectory stringByAppendingPathComponent:file];
 			[fm removeItemAtPath:fullPath error:NULL];
 		}
-		return;
+		return NO;
 	}
 	NSString *oldUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
 	NSString *oldPassword = nil;
@@ -91,7 +91,7 @@
 								delegate:nil 
 					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
 					   otherButtonTitles:nil] autorelease] show];
-	
+	return YES;
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
