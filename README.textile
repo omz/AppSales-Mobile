@@ -18,4 +18,7 @@ Because there is no real API to access iTunes Connect trend reports, AppSales Mo
 
 You can also follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
 
+Support the development: <a href="http://flattr.com/thing/366574/AppSales" target="_blank">
+<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+
 !http://github.com/omz/AppSales-Mobile/raw/master/Screenshot.png(AppSales screenshot)!
