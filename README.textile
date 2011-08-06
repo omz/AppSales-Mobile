@@ -20,20 +20,7 @@ You can also follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
 
 Support the development:
 
-  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-  <input type="hidden" name="cmd" value="_donations">
-  <input type="hidden" name="business" value="YDQN4S3WVRCBU">
-  <input type="hidden" name="lc" value="US">
-  <input type="hidden" name="item_name" value="AppSales">
-  <input type="hidden" name="no_note" value="1">
-  <input type="hidden" name="no_shipping" value="1">
-  <input type="hidden" name="currency_code" value="USD">
-  <input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_SM.gif:NonHosted">
-  <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-  <img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1">
-  </form>
-  
-<a href="http://flattr.com/thing/366574/AppSales" target="_blank">
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YDQN4S3WVRCBU&lc=US&item_name=AppSales&no_note=1&currency_code=USD"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a> <a href="http://flattr.com/thing/366574/AppSales" target="_blank">
 <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
 
 !http://github.com/omz/AppSales-Mobile/raw/master/Screenshot.png(AppSales screenshot)!
