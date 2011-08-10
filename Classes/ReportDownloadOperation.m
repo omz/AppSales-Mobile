@@ -450,7 +450,9 @@
 										[optionScanner scanUpToString:@"value=\"" intoString:NULL];
 										[optionScanner scanString:@"value=\"" intoString:NULL];
 										[optionScanner scanUpToString:@"\"" intoString:&optionValue];
-										[vendorOptions addObject:optionValue];
+										if (optionValue) {
+											[vendorOptions addObject:optionValue];
+										}
 									}
 								}
 							}
