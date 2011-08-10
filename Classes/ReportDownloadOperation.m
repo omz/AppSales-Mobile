@@ -542,6 +542,9 @@
 						if (![amount isKindOfClass:[NSNumber class]] || ![label isKindOfClass:[NSString class]]) {
 							continue;
 						}
+						if ([amount integerValue] == 0) {
+							continue;
+						}
 						NSDate *labelDate = [paymentMonthFormatter dateFromString:label];
 						if (labelDate) {
 							NSDateComponents *dateComponents = [calendar components:NSMonthCalendarUnit | NSYearCalendarUnit fromDate:labelDate];

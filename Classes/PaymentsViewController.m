@@ -22,6 +22,7 @@
 		account = [paymentAccount retain];
 		self.title = NSLocalizedString(@"Payments", nil);
 		self.hidesBottomBarWhenPushed = YES;
+		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePayments:)] autorelease];
 	}
 	return self;
 }
@@ -118,6 +119,21 @@
 	pageControl.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 	pageControl.userInteractionEnabled = NO;
 	[self.view addSubview:pageControl];
+}
+
+- (void)deletePayments:(id)sender
+{
+	UIActionSheet *deletePaymentsSheet = [[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all payments for this account? Payments will be reloaded from iTunes Connect when sales reports are downloaded.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Payments", nil) otherButtonTitles:nil] autorelease];
+	[deletePaymentsSheet showInView:self.view];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+	if (buttonIndex != actionSheet.cancelButtonIndex) {
+		account.payments = [NSSet set];
+		[[account managedObjectContext] save:NULL];
+		[self.navigationController popViewControllerAnimated:YES];
+	}
 }
 
 - (void)viewWillDisappear:(BOOL)animated

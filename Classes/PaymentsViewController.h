@@ -10,7 +10,7 @@
 
 @class Account;
 
-@interface PaymentsViewController : UIViewController <UIScrollViewDelegate> {
+@interface PaymentsViewController : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate> {
 	
 	Account *account;
 	UIScrollView *scrollView;
