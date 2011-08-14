@@ -18,7 +18,7 @@
 #define kReportInfoClassWeekly			@"WeeklyReport"
 #define kReportInfoClassDaily			@"DailyReport"
 
-@class Account, ReportCache;
+@class ASAccount, ReportCache;
 
 @interface Report : NSManagedObject <ReportSummary> {
 
@@ -30,7 +30,7 @@
 
 + (BOOL)validateColumnHeaders:(NSArray *)columnHeaders;
 + (NSDictionary *)infoForReportCSV:(NSString *)csv;
-+ (Report *)insertNewReportWithCSV:(NSString *)csv inAccount:(Account *)account;
++ (Report *)insertNewReportWithCSV:(NSString *)csv inAccount:(ASAccount *)account;
 + (NSDate *)dateFromReportDateString:(NSString *)dateString;
 + (NSString *)identifierForDate:(NSDate *)date;
 

@@ -8,7 +8,7 @@
 
 #import "SalesViewController.h"
 #import "ReportDownloadCoordinator.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Report.h"
 #import "ReportCollection.h"
 #import "ReportSummary.h"
@@ -35,7 +35,7 @@
 @synthesize sortedDailyReports, sortedWeeklyReports, sortedCalendarMonthReports, sortedFiscalMonthReports, viewMode;
 @synthesize graphView, downloadReportsButtonItem;
 
-- (id)initWithAccount:(Account *)anAccount
+- (id)initWithAccount:(ASAccount *)anAccount
 {
 	self = [super initWithAccount:anAccount];
 	if (self) {

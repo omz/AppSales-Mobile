@@ -7,11 +7,11 @@
 //
 
 #import "AccountStatusView.h"
-#import "Account.h"
+#import "ASAccount.h"
 
 @implementation AccountStatusView
 
-- (id)initWithFrame:(CGRect)frame account:(Account *)anAccount
+- (id)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount
 {
 	self = [super initWithFrame:frame];
 	if (self) {

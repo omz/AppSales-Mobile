@@ -7,7 +7,7 @@
 //
 
 #import "WeeklyReport.h"
-#import "Account.h"
+#import "ASAccount.h"
 
 
 @implementation WeeklyReport

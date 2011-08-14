@@ -7,7 +7,7 @@
 //
 
 #import "DailyReport.h"
-#import "Account.h"
+#import "ASAccount.h"
 
 
 @implementation DailyReport

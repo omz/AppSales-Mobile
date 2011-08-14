@@ -10,7 +10,7 @@
 #import "SalesViewController.h"
 #import "ReviewsViewController.h"
 #import "SSKeychain.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Report.h"
 #import "Product.h"
 #import "CurrencyManager.h"
@@ -22,6 +22,8 @@
 #import "UIImage+Tinting.h"
 #import "AboutViewController.h"
 #import "AccountStatusView.h"
+#import "PromoCodesViewController.h"
+#import "PromoCodesLicenseViewController.h"
 
 #define kAddNewAccountEditorIdentifier	@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier	@"EditAccountEditorIdentifier"
@@ -66,6 +68,8 @@
 	
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] addObserver:self forKeyPath:@"isBusy" options:NSKeyValueObservingOptionNew context:nil];
 	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
+	
 	[self reloadAccounts];
 }
 
@@ -104,7 +108,7 @@
 
 - (void)downloadReports:(id)sender
 {
-	for (Account *account in self.accounts) {
+	for (ASAccount *account in self.accounts) {
 		[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
 	}
 }
@@ -115,6 +119,14 @@
 	UINavigationController *aboutNavController = [[[UINavigationController alloc] initWithRootViewController:aboutViewController] autorelease];
 	aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 	[self presentModalViewController:aboutNavController animated:YES];
+}
+
+- (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification
+{
+	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
+	PromoCodesLicenseViewController *vc = [[[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]] autorelease];
+	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
+	[self presentModalViewController:navController animated:YES];
 }
 
 - (void)viewDidUnload
@@ -130,7 +142,7 @@
 	if ([self.accounts count] == 0) {
 		return nil;
 	}
-	Account *account = [self.accounts objectAtIndex:section];
+	ASAccount *account = [self.accounts objectAtIndex:section];
 	NSString *title = account.title;
 	if (!title || [title isEqualToString:@""]) {
 		title = account.username;
@@ -151,7 +163,7 @@
 	if ([self.accounts count] == 0) {
 		return 0;
 	}
-	return 4;
+	return 5;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -179,18 +191,22 @@
 		cell.imageView.image = [UIImage imageNamed:@"Reviews.png"];
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Reviews.png" color:[UIColor whiteColor]];
 		
-		Account *account = [self.accounts objectAtIndex:indexPath.section];
+		ASAccount *account = [self.accounts objectAtIndex:indexPath.section];
 		NSFetchRequest *unreadReviewsRequest = [[[NSFetchRequest alloc] init] autorelease];
 		[unreadReviewsRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:[self managedObjectContext]]];
 		[unreadReviewsRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND unread == TRUE", account]];
 		cell.badgeCount = [[self managedObjectContext] countForFetchRequest:unreadReviewsRequest error:NULL];
 	} else if (indexPath.row == 3) {
+		cell.textLabel.text = NSLocalizedString(@"Promo Codes", nil);
+		cell.imageView.image = [UIImage imageNamed:@"PromoCodes.png"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor whiteColor]];
+		cell.badgeCount = 0;
+	} else if (indexPath.row == 4) {
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
 		cell.imageView.image = [UIImage imageNamed:@"Account.png"];
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Account.png" color:[UIColor whiteColor]];
 		cell.badgeCount = 0;
-	}
-	
+	}	
 	return cell;
 }
 
@@ -199,7 +215,7 @@
 	if ([self.accounts count] == 0) {
 		return nil;
 	}
-	Account *account = [self.accounts objectAtIndex:section];
+	ASAccount *account = [self.accounts objectAtIndex:section];
 	return [[[AccountStatusView alloc] initWithFrame:CGRectMake(0, 0, 320, 26) account:account] autorelease];
 }
 
@@ -225,7 +241,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	Account *account = [self.accounts objectAtIndex:indexPath.section];
+	ASAccount *account = [self.accounts objectAtIndex:indexPath.section];
 	if (indexPath.row == 0) {
 		SalesViewController *salesViewController = [[[SalesViewController alloc] initWithAccount:account] autorelease];
 		[self.navigationController pushViewController:salesViewController animated:YES];
@@ -236,6 +252,9 @@
 		ReviewsViewController *reviewsViewController = [[[ReviewsViewController alloc] initWithAccount:account] autorelease];
 		[self.navigationController pushViewController:reviewsViewController animated:YES];
 	} else if (indexPath.row == 3) {
+		PromoCodesViewController *promoCodesViewController = [[[PromoCodesViewController alloc] initWithAccount:account] autorelease];
+		[self.navigationController pushViewController:promoCodesViewController animated:YES];
+	} else if (indexPath.row == 4) {
 		[self editAccount:account];
 	}
 }
@@ -275,7 +294,7 @@
 	[self presentModalViewController:navigationController animated:YES];
 }
 
-- (void)editAccount:(Account *)account
+- (void)editAccount:(ASAccount *)account
 {
 	self.selectedAccount = account;
 	NSString *username = account.username;
@@ -373,14 +392,14 @@
 			return;
 		}
 		if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
-			Account *account = (Account *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:self.managedObjectContext];
+			ASAccount *account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:self.managedObjectContext];
 			[account setValue:title forKey:kAccountTitle];
 			[account setValue:username forKey:kAccountUsername];
 			account.sortIndex = [NSNumber numberWithLong:time(NULL)];
 			[account setPassword:password];
 		}
 		else if ([editor.editorIdentifier isEqualToString:kEditAccountEditorIdentifier]) {
-			Account *account = (Account *)editor.context;
+			ASAccount *account = (ASAccount *)editor.context;
 			[account deletePassword];
 			NSString *username = [returnValues objectForKey:kAccountUsername];
 			NSString *password = [returnValues objectForKey:kAccountPassword];
@@ -431,7 +450,7 @@
 	if ([key isEqualToString:kUpdateExchangeRatesButton]) {
 		[[CurrencyManager sharedManager] forceRefresh];
 	} else if ([key isEqualToString:kImportReportsButton]) {
-		Account *account = (Account *)editor.context;
+		ASAccount *account = (ASAccount *)editor.context;
 		if (account.isDownloadingReports) {
 			[[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"AppSales is already importing reports for this account. Please wait until the current import has finished.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
 		} else {
@@ -472,7 +491,7 @@
 	}
 }
 
-- (NSString *)folderNameForExportingReportsOfAccount:(Account *)account
+- (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account
 {
 	NSString *folder = account.title;
 	if (!folder || folder.length == 0) {
@@ -540,7 +559,7 @@
 			MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
 			[hud setLabelText:NSLocalizedString(@"Deleting Account...", nil)];
 			
-			Account *account = [[self.selectedAccount retain] autorelease];
+			ASAccount *account = [[self.selectedAccount retain] autorelease];
 			[self.navigationController popViewControllerAnimated:YES];
 			[self performSelector:@selector(deleteAccount:) withObject:account afterDelay:0.1];
 		}

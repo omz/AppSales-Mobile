@@ -10,12 +10,12 @@
 #import <CoreData/CoreData.h>
 #import "Report.h"
 
-@class Account;
+@class ASAccount;
 
 @interface WeeklyReport : Report {
 @private
 }
 @property (nonatomic, retain) NSDate * endDate;
-@property (nonatomic, retain) Account *account;
+@property (nonatomic, retain) ASAccount *account;
 
 @end

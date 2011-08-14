@@ -9,7 +9,7 @@
 #import "Report.h"
 #import "DailyReport.h"
 #import "WeeklyReport.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Product.h"
 #import "Transaction.h"
 #import "CurrencyManager.h"
@@ -89,7 +89,7 @@
 			beginDate, kReportInfoDate, nil];
 }
 
-+ (Report *)insertNewReportWithCSV:(NSString *)csv inAccount:(Account *)account
++ (Report *)insertNewReportWithCSV:(NSString *)csv inAccount:(ASAccount *)account
 {
 	NSManagedObjectContext *moc = account.managedObjectContext;
 	NSSet *allProducts = account.products;

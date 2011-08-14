@@ -8,16 +8,16 @@
 
 #import <UIKit/UIKit.h>
 
-@class Account;
+@class ASAccount;
 
 @interface AccountStatusView : UIView {
 	
-	Account *account;
+	ASAccount *account;
 	UIActivityIndicatorView *activityIndicator;
 	UILabel *statusLabel;
 }
 
-- (id)initWithFrame:(CGRect)frame account:(Account *)anAccount;
+- (id)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount;
 - (void)updateStatus;
 
 @end

@@ -8,11 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class Account;
+@class ASAccount;
 
 @interface ReportImportOperation : NSOperation {
 
-	Account *_account;
+	ASAccount *_account;
 	NSPersistentStoreCoordinator *psc;
 	NSManagedObjectID *accountObjectID;
 	
@@ -24,6 +24,6 @@
 @property (assign) BOOL deleteOriginalFilesAfterImport;
 
 + (BOOL)filesAvailableToImport;
-- (id)initWithAccount:(Account *)account;
+- (id)initWithAccount:(ASAccount *)account;
 
 @end

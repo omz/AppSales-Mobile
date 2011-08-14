@@ -9,12 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "ColorPickerViewController.h"
 
-@class Account, Product;
+@class ASAccount, Product;
 
 @interface DashboardViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, ColorPickerViewControllerDelegate> {
 
 	Product *selectedProduct;
-	Account *account;
+	ASAccount *account;
 	UITableView *productsTableView;
 	UIView *topView;
 	
@@ -31,7 +31,7 @@
 	UIProgressView *progressBar;
 }
 
-@property (nonatomic, retain) Account *account;
+@property (nonatomic, retain) ASAccount *account;
 @property (nonatomic, retain) NSArray *products;
 @property (nonatomic, retain) NSArray *visibleProducts;
 @property (nonatomic, retain) Product *selectedProduct;
@@ -44,7 +44,7 @@
 @property (nonatomic, retain) UILabel *statusLabel;
 @property (nonatomic, retain) UIProgressView *progressBar;
 
-- (id)initWithAccount:(Account *)anAccount;
+- (id)initWithAccount:(ASAccount *)anAccount;
 - (NSSet *)entityNamesTriggeringReload;
 - (void)reloadData;
 - (void)reloadTableView;
