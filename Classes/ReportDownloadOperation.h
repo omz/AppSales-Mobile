@@ -11,11 +11,11 @@
 #define kASReportDownloadErrorDescription	@"error"
 #define ASReportDownloadFailedNotification	@"ASReportDownloadFailedNotification"
 
-@class Account;
+@class ASAccount;
 
 @interface ReportDownloadOperation : NSOperation {
 	
-	Account *_account;
+	ASAccount *_account;
 	NSString *username;
 	NSString *password;
 	NSPersistentStoreCoordinator *psc;
@@ -26,6 +26,6 @@
 @property (readonly) NSInteger downloadCount;
 @property (copy) NSManagedObjectID *accountObjectID;
 
-- (id)initWithAccount:(Account *)account;
+- (id)initWithAccount:(ASAccount *)account;
 
 @end

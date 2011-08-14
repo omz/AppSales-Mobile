@@ -18,7 +18,8 @@ typedef enum FieldSpecifierType {
 	FieldSpecifierTypeSwitch,
 	FieldSpecifierTypeCheck,
 	FieldSpecifierTypeButton,
-	FieldSpecifierTypeSection
+	FieldSpecifierTypeSection,
+	FieldSpecifierTypeNumeric
 } FieldSpecifierType;
 
 
@@ -107,6 +108,7 @@ typedef enum FieldSpecifierType {
 + (FieldSpecifier *)URLFieldWithKey:(NSString *)k title:(NSString *)URLTitle defaultValue:(NSString *)defaultURL;
 + (FieldSpecifier *)passwordFieldWithKey:(NSString *)k title:(NSString *)passwordTitle defaultValue:(NSString *)defaultPassword;
 + (FieldSpecifier *)textFieldWithKey:(NSString *)k title:(NSString *)textTitle defaultValue:(NSString *)defaultText;
++ (FieldSpecifier *)numericFieldWithKey:(NSString *)k title:(NSString *)numericTitle defaultValue:(NSString *)defaultText;
 + (FieldSpecifier *)checkFieldWithKey:(NSString *)k title:(NSString *)checkmarkTitle defaultValue:(BOOL)checked;
 + (FieldSpecifier *)buttonFieldWithKey:(NSString *)k title:(NSString *)buttonTitle;
 + (FieldSpecifier *)subsectionFieldWithSections:(NSArray *)sections key:(NSString *)k title:(NSString *)t;

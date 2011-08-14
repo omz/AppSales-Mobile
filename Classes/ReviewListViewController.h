@@ -8,11 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@class Account, Product;
+@class ASAccount, Product;
 
 @interface ReviewListViewController : UITableViewController <NSFetchedResultsControllerDelegate> {
 
-	Account *account;
+	ASAccount *account;
 	Product *product;
 	NSUInteger rating;
 	
@@ -23,6 +23,6 @@
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
-- (id)initWithAccount:(Account *)acc product:(Product *)reviewProduct rating:(NSUInteger)ratingFilter;
+- (id)initWithAccount:(ASAccount *)acc product:(Product *)reviewProduct rating:(NSUInteger)ratingFilter;
 
 @end

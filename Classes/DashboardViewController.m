@@ -10,7 +10,7 @@
 #import "DashboardAppCell.h"
 #import "ColorButton.h"
 #import "UIColor+Extensions.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Product.h"
 
 @implementation DashboardViewController
@@ -19,7 +19,7 @@
 @synthesize productsTableView, topView, shadowView, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
 
 
-- (id)initWithAccount:(Account *)anAccount
+- (id)initWithAccount:(ASAccount *)anAccount
 {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {

@@ -9,7 +9,7 @@
 #import "ReportDetailViewController.h"
 #import "MapView.h"
 #import "AppIconView.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Report.h"
 #import "Product.h"
 #import "CurrencyManager.h"
@@ -282,7 +282,7 @@
 	NSMutableArray *entries = [NSMutableArray array];
 	ReportDetailEntry *allProductsEntry = [ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:nil product:nil];
 	[entries addObject:allProductsEntry];
-	Account *account = [[self.selectedReport firstReport] valueForKey:@"account"];
+	ASAccount *account = [[self.selectedReport firstReport] valueForKey:@"account"];
 	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
 	for (Product *product in allProducts) {
 		NSString *productID = product.productID;

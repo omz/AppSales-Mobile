@@ -9,7 +9,9 @@
 #import "ReportDownloadCoordinator.h"
 #import "ReportDownloadOperation.h"
 #import "ReportImportOperation.h"
-#import "Account.h"
+#import "ASAccount.h"
+#import "Product.h"
+#import "PromoCodeOperation.h"
 
 @implementation ReportDownloadCoordinator
 
@@ -43,7 +45,7 @@
 	}
 }
 
-- (void)downloadReportsForAccount:(Account *)account
+- (void)downloadReportsForAccount:(ASAccount *)account
 {
 	if (account.isDownloadingReports) {
 		return;
@@ -72,7 +74,7 @@
 	[reportDownloadQueue addOperation:operation];
 }
 
-- (void)cancelDownloadForAccount:(Account *)account
+- (void)cancelDownloadForAccount:(ASAccount *)account
 {
 	if (!account.isDownloadingReports) return;
 	account.downloadStatus = NSLocalizedString(@"Cancelling...", nil);
@@ -83,12 +85,30 @@
 	}
 }
 
-- (void)importReportsIntoAccount:(Account *)account
+- (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes
+{
+    if (product.isDownloadingPromoCodes) return;
+    product.isDownloadingPromoCodes = YES;
+    PromoCodeOperation *operation = [[[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes] autorelease];
+    operation.completionBlock = ^ {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            product.isDownloadingPromoCodes = NO;
+        });
+    };
+    [reportDownloadQueue addOperation:operation];
+}
+
+- (void)cancelAllDownloads
+{
+	[reportDownloadQueue cancelAllOperations];
+}
+
+- (void)importReportsIntoAccount:(ASAccount *)account
 {
 	[self importReportsIntoAccount:account fromDirectory:nil deleteAfterImport:NO];
 }
 
-- (void)importReportsIntoAccount:(Account *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag
+- (void)importReportsIntoAccount:(ASAccount *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag
 {
 	ReportImportOperation *operation = [[[ReportImportOperation alloc] initWithAccount:account] autorelease];
 	operation.importDirectory = path;

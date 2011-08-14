@@ -8,14 +8,14 @@
 
 #import "PaymentsViewController.h"
 #import "YearView.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "CurrencyManager.h"
 
 @implementation PaymentsViewController
 
 @synthesize scrollView, pageControl;
 
-- (id)initWithAccount:(Account *)paymentAccount
+- (id)initWithAccount:(ASAccount *)paymentAccount
 {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {

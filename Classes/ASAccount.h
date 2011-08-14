@@ -10,7 +10,7 @@
 #import <CoreData/CoreData.h>
 
 
-@interface Account : NSManagedObject {
+@interface ASAccount : NSManagedObject {
 
 	BOOL isDownloadingReports;
 	NSString *downloadStatus;

@@ -9,13 +9,13 @@
 #import "ReviewsViewController.h"
 #import "ReviewDownloadManager.h"
 #import "ReviewListViewController.h"
-#import "Account.h"
+#import "ASAccount.h"
 
 @implementation ReviewsViewController
 
 @synthesize reviewSummaryView, downloadReviewsButtonItem;
 
-- (id)initWithAccount:(Account *)anAccount
+- (id)initWithAccount:(ASAccount *)anAccount
 {
 	self = [super initWithAccount:anAccount];
 	if (self) {

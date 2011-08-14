@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-@class Report, Account;
+@class Report, ASAccount;
 
 @protocol ReportSummary <NSObject>
 

@@ -7,10 +7,12 @@
 //
 
 #import "Product.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "UIColor+Extensions.h"
 
 @implementation Product
+
+@synthesize isDownloadingPromoCodes;
 
 @dynamic name;
 @dynamic platform;
@@ -26,6 +28,7 @@
 @dynamic parentSKU;
 @dynamic currentVersion;
 @dynamic lastModified;
+@dynamic promoCodes;
 
 - (void)awakeFromInsert
 {

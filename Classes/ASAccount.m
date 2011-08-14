@@ -6,12 +6,12 @@
 //  Copyright (c) 2011 omz:software. All rights reserved.
 //
 
-#import "Account.h"
+#import "ASAccount.h"
 #import "SSKeychain.h"
 
 #define kAccountKeychainServiceIdentifier	@"iTunesConnect"
 
-@implementation Account
+@implementation ASAccount
 
 @dynamic username, title, sortIndex, dailyReports, weeklyReports, products, payments, reportsBadge, paymentsBadge;
 @synthesize isDownloadingReports, downloadStatus, downloadProgress;

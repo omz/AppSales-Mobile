@@ -8,7 +8,7 @@
 
 #import "ReviewListViewController.h"
 #import "ReviewDetailViewController.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Review.h"
 #import "Product.h"
 
@@ -17,7 +17,7 @@
 
 @synthesize fetchedResultsController, managedObjectContext;
 
-- (id)initWithAccount:(Account *)acc product:(Product *)reviewProduct rating:(NSUInteger)ratingFilter
+- (id)initWithAccount:(ASAccount *)acc product:(Product *)reviewProduct rating:(NSUInteger)ratingFilter
 {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {

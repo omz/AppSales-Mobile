@@ -11,8 +11,9 @@
 #import "CurrencyManager.h"
 #import "ReportDownloadOperation.h"
 #import "ReportDownloadCoordinator.h"
+#import "PromoCodeOperation.h"
 #import "SSKeychain.h"
-#import "Account.h"
+#import "ASAccount.h"
 
 @implementation AppSalesAppDelegate
 
@@ -39,6 +40,7 @@
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportDownloadFailed:) name:ASReportDownloadFailedNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeDownloadFailed:) name:ASPromoCodeDownloadFailedNotification object:nil];
 		
 	return YES;
 }
@@ -67,7 +69,7 @@
 	if (oldUsername) {
 		oldPassword = [SSKeychain passwordForService:@"omz:software AppSales Mobile Service" account:oldUsername];
 	}
-	Account *account = nil;
+	ASAccount *account = nil;
 	if (oldUsername) {
 		NSFetchRequest *accountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
 		[accountFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:[self managedObjectContext]]];
@@ -79,7 +81,7 @@
 		}
 	}
 	if (!account) {
-		account = (Account *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:[self managedObjectContext]];
+		account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:[self managedObjectContext]];
 		if (oldUsername) account.username = oldUsername;
 		if (oldPassword) account.password = oldPassword;
 	}
@@ -203,6 +205,17 @@
 {
 	NSString *errorMessage = [[notification userInfo] objectForKey:kASReportDownloadErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@", nil), (errorMessage) ? errorMessage : @""];
+	[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
+								 message:alertMessage 
+								delegate:nil 
+					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
+					   otherButtonTitles:nil] autorelease] show];
+}
+
+- (void)promoCodeDownloadFailed:(NSNotification *)notification
+{
+	NSString *errorDescription = [[notification userInfo] objectForKey:kASPromoCodeDownloadFailedErrorDescription];
+	NSString *alertMessage = [NSString stringWithFormat:@"An error occured while downloading the promo codes (%@).", errorDescription];
 	[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
 								 message:alertMessage 
 								delegate:nil 

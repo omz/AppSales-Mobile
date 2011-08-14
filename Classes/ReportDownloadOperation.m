@@ -7,7 +7,7 @@
 //
 
 #import "ReportDownloadOperation.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Report.h"
 #import "RegexKitLite.h"
 #import "NSData+Compression.h"
@@ -21,7 +21,7 @@
 - (NSArray *)extractFormOptionsFromPage:(NSString *)htmlPage formID:(NSString *)formID;
 - (NSData *)downloadReportFromiTCWithInfo:(NSDictionary *)downloadInfo viewState:(NSString **)viewState originalFilename:(NSString **)filename;
 - (NSDate *)dateFromPopupMenuItemName:(NSString *)menuItemName;
-- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(Account *)account vendorID:(NSString *)vendorID;
+- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID;
 
 @end
 
@@ -30,7 +30,7 @@
 
 @synthesize downloadCount, accountObjectID;
 
-- (id)initWithAccount:(Account *)account
+- (id)initWithAccount:(ASAccount *)account
 {
     self = [super init];
     if (self) {
@@ -56,7 +56,7 @@
 	[moc setPersistentStoreCoordinator:psc];
 	[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 	
-	Account *account = (Account *)[moc objectWithID:accountObjectID];
+	ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
 	
 	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
@@ -502,7 +502,7 @@
 	[pool release];
 }
 
-- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(Account *)account vendorID:(NSString *)vendorID
+- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID
 {
 	NSManagedObjectContext *moc = [account managedObjectContext];
 	

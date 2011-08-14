@@ -11,7 +11,7 @@
 #import "DashboardViewController.h"
 #import "ColorPickerViewController.h"
 
-@class Account, Report, Product;
+@class ASAccount, Report, Product;
 @protocol ReportSummary;
 
 typedef enum DashboardViewMode { 
