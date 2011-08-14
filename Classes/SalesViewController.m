@@ -408,7 +408,9 @@
 		} else {
 			NSDateComponents *dateComponents = [calendar components:NSDayCalendarUnit fromDate:report.startDate];
 			NSInteger day = [dateComponents day];
-			return [NSString stringWithFormat:@"%i", day];
+            NSDateFormatter *weekday = [[[NSDateFormatter alloc] init] autorelease];
+            [weekday setDateFormat:@"EEE"];
+			return [NSString stringWithFormat:@"%i\n%@", day, [weekday stringFromDate:report.startDate]];
 		}
 	} else {
 		NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
