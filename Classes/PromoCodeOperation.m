@@ -116,14 +116,24 @@
 				NSString *appleIDFieldName = [PromoCodeOperation scanNameForFormField:@"search-param-value-appleId" withScanner:searchFormScanner];
 				NSString *statusFieldName = [PromoCodeOperation scanNameForFormField:@"search-param-value-statusSearch" withScanner:searchFormScanner];
 				NSString *appTypeFieldName = [PromoCodeOperation scanNameForFormField:@"search-param-value-" withScanner:searchFormScanner];
-				if (nameCompareFieldName && nameValueFieldName && appleIDFieldName && statusFieldName && appTypeFieldName) {
-					NSDictionary *bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
-											  @"0", nameCompareFieldName,
-											  @"", nameValueFieldName,
-											  productID, appleIDFieldName, 
-											  @"WONoSelectionString", statusFieldName,
-											  @"WONoSelectionString", appTypeFieldName,
-											  nil];
+				if (nameCompareFieldName && nameValueFieldName && appleIDFieldName && statusFieldName) {
+					NSDictionary *bodyDict;
+					if (appTypeFieldName) {
+						bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
+									@"0", nameCompareFieldName,
+									@"", nameValueFieldName,
+									productID, appleIDFieldName, 
+									@"WONoSelectionString", statusFieldName,
+									@"WONoSelectionString", appTypeFieldName,
+									nil];
+					} else {
+						bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
+									@"0", nameCompareFieldName,
+									@"", nameValueFieldName,
+									productID, appleIDFieldName, 
+									@"WONoSelectionString", statusFieldName,
+									nil];
+					}
 					operation.request = [PromoCodeOperation postRequestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://itunesconnect.apple.com%@", searchFormAction]] body:bodyDict];
 				} else {
 					[PromoCodeOperation errorNotification:@"could not parse 'Manage Your Applications' page"];
