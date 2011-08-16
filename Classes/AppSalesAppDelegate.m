@@ -17,20 +17,47 @@
 
 @implementation AppSalesAppDelegate
 
-@synthesize window;
+@synthesize window = _window;
+
+@synthesize navigationController = _navigationController;
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	srandom(time(NULL));
-	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-	
+
+	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    [self setWindow:_window];
+    PTPasscodeViewController *passcodeViewController = [[PTPasscodeViewController alloc] initWithDelegate:self];
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults]; 
+    NSString *passcodeset = @"NO";
+    NSDictionary *appDefaults = [[NSDictionary alloc] initWithObjectsAndKeys:passcodeset, @"passcodeset",nil];
+                                 
+    [prefs  registerDefaults:appDefaults]; 
+    [appDefaults release];
+    NSString *passcoderet = [prefs stringForKey:@"passcodeset"];
+    NSLog(@" PASSCODE SET IS? %@",passcoderet);
+    UINavigationController *navController = [[UINavigationController alloc]
+        initWithRootViewController:passcodeViewController];
+    
+  //  [self setNavigationController:navController];
+	self.window.rootViewController = navController;
+  //  [_window addSubview:[navController view]];
+    //[_window makeKeyAndVisible];
+    
+   // [window release];
+    //[navController release];
+    
+
+
 	AccountsViewController *rootViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
 	rootViewController.managedObjectContext = self.managedObjectContext;
 	UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
 	navigationController.toolbarHidden = NO;
 	
-	self.window.rootViewController = navigationController;
 	[self.window makeKeyAndVisible];
+    
+    
 	
 	BOOL migrating = [self migrateDataIfNeeded];
 	if (migrating) {
@@ -44,6 +71,117 @@
 		
 	return YES;
 }
+
+- (void)didShowPasscodePanel:(PTPasscodeViewController *)passcodeViewController panelView:(UIView*)panelView
+{
+    [passcodeViewController setTitle:@"AppSales"];
+    
+    if([panelView tag] == kPasscodePanelOne) {
+        [[passcodeViewController titleLabel] setText:@"Enter a passcode"];
+    }
+    
+    if([panelView tag] == kPasscodePanelTwo) {
+        [[passcodeViewController titleLabel] setText:@"Re-enter your passcode"];
+    }
+    
+    if([panelView tag] == kPasscodePanelThree) {
+        [[passcodeViewController titleLabel] setText:@"Panel 3"];
+    }
+}
+
+- (BOOL)shouldChangePasscode:(PTPasscodeViewController *)passcodeViewController panelView:(UIView*)panelView passCode:(NSUInteger)passCode lastNumber:(NSInteger)lastNumber;
+{
+    // Clear summary text
+    [[passcodeViewController summaryLabel] setText:@""];
+    
+    return TRUE;
+}
+
+- (BOOL)didEndPasscodeEditing:(PTPasscodeViewController *)passcodeViewController panelView:(UIView*)panelView passCode:(NSUInteger)passCode
+{
+    
+    
+    NSLog(@"END PASSCODE - %d", passCode);
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    
+    // getting an NSString
+    NSString *passcoderet = [prefs stringForKey:@"passcodeset"];
+    
+   // NSLog(@"Do we think the passcode has been set:%@",passcoderet);
+    
+    if ([passcoderet isEqualToString:@"NO"]) {   
+        if([panelView tag] == kPasscodePanelOne) {
+            _passCode = passCode;
+            
+            return ![passcodeViewController nextPanel];
+        }
+        
+        if([panelView tag] == kPasscodePanelTwo) {
+            _retryPassCode = passCode;
+            
+            if(_retryPassCode != _passCode) {
+                [passcodeViewController prevPanel];
+                [[passcodeViewController summaryLabel] setText:@"Passcode did not match. Try again."];
+                return FALSE;
+            } else {
+                NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+                [prefs setInteger:passCode forKey:@"passcode"];
+                NSString *passcodeset = @"YES";
+                NSLog(@"SETTINGPASSCODESET TO BE YES");
+                [prefs setObject:passcodeset forKey:@"passcodeset"];
+                [prefs synchronize];
+
+                
+                AccountsViewController *rootViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
+                rootViewController.managedObjectContext = self.managedObjectContext;
+                UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
+                navigationController.toolbarHidden = NO;
+                self.window.rootViewController = navigationController;
+                
+            }
+            
+        }
+
+        
+    }
+
+    else {
+
+
+    if([panelView tag] == kPasscodePanelOne) {
+        _passCode = passCode;
+        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+        NSInteger passtocheck = [prefs integerForKey:@"passcode"];
+      //  NSLog(@"Passtocheck = %@",passtocheck);
+        if (passCode == passtocheck) {
+            NSLog(@"IT WORKS");
+            AccountsViewController *rootViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
+            rootViewController.managedObjectContext = self.managedObjectContext;
+            UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
+            navigationController.toolbarHidden = NO;
+            self.window.rootViewController = navigationController;
+ 
+        }
+        else{
+
+            NSLog(@"YOU FAILED");
+                
+     [[passcodeViewController summaryLabel] setText:@"Passcode Incorrect."];                    
+                
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Security" message:@"This app is meant for the use of the owner only. Press the home button to exit this application"  delegate:self cancelButtonTitle:@"Take Picture" otherButtonTitles: @"Cancel", nil];
+            [alert show];
+            [alert release];
+            
+
+
+}
+    }
+    }    
+    return TRUE;
+}
+
+
 
 - (BOOL)migrateDataIfNeeded
 {
@@ -230,7 +368,9 @@
 	[managedObjectContext release];
 	[managedObjectModel release];
 	[persistentStoreCoordinator release];
-	[super dealloc];
+    [_navigationController release];
+
+    [super dealloc];
 }
 
 

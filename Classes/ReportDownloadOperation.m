@@ -195,9 +195,15 @@
 	NSRange lastTwoChars = NSMakeRange([dailyName length] - 2, 2);
 	//NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_22" options:0 range:lastTwoChars];
 	NSString *ajaxName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_2" options:0 range:lastTwoChars];
+<<<<<<< HEAD
 	NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_47" options:0 range:lastTwoChars];
 	NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_52" options:0 range:lastTwoChars];
     
+=======
+    NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_47" options:0 range:lastTwoChars];
+    NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_52" options:0 range:lastTwoChars];
+    	
+>>>>>>> Introduced Passcode Protection and Report fix (from 8/16) Need to give credit to PTPasscodeView
 	// parse days available
 	NSMutableArray *availableDays = [[[self extractFormOptionsFromPage:salesPage formID:@"theForm:datePickerSourceSelectElement"] mutableCopy] autorelease];
 	if (availableDays == nil) {

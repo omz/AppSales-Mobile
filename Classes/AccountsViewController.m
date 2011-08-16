@@ -28,6 +28,8 @@
 #define kAddNewAccountEditorIdentifier	@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier	@"EditAccountEditorIdentifier"
 #define kSettingsEditorIdentifier		@"SettingsEditorIdentifier"
+#define kresetpassButton		        @"resetpass"
+
 #define kUpdateExchangeRatesButton		@"UpdateExchangeRatesButton"
 #define kImportReportsButton			@"ImportReportsButton"
 #define kExportReportsButton			@"ExportReportsButton"
@@ -49,7 +51,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	
+
 	self.refreshButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReports:)] autorelease];
 	UIBarButtonItem *settingsButtonItem = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Settings", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(showSettings)] autorelease];
 	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
@@ -72,6 +74,7 @@
 	
 	[self reloadAccounts];
 }
+
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
@@ -367,7 +370,9 @@
 	currencySection.exclusiveSelection = YES;
 	FieldSpecifier *currencySectionField = [FieldSpecifier subsectionFieldWithSection:currencySection key:@"currency"];
 	FieldSpecifier *updateExchangeRatesButtonField = [FieldSpecifier buttonFieldWithKey:kUpdateExchangeRatesButton title:NSLocalizedString(@"Update Exchange Rates Now", nil)];
-	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:currencySectionField, updateExchangeRatesButtonField, nil] 
+    FieldSpecifier *resetpassword = [FieldSpecifier buttonFieldWithKey:kresetpassButton title:NSLocalizedString(@"Reset Password", nil)];
+
+	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:currencySectionField, updateExchangeRatesButtonField,resetpassword, nil] 
 																			title:NSLocalizedString(@"General", nil) 
 																	  description:NSLocalizedString(@"Exchange rates will automatically be refreshed periodically.", nil)];
 	
@@ -449,6 +454,19 @@
 {
 	if ([key isEqualToString:kUpdateExchangeRatesButton]) {
 		[[CurrencyManager sharedManager] forceRefresh];
+    }
+    else if ([key isEqualToString:kresetpassButton]) {
+      //  NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+      //  NSString *passcodeset = @"NO";
+      //  NSLog(@"Reseting Passcode to NO");
+      //  [prefs setObject:passcodeset forKey:@"passcodeset"];
+      //  [prefs synchronize];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"AppSales" message:@"To reset the passcode, uncomment lines 459 - 463. (Done for Security)"  delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles: @"Okay", nil];
+		[alert show];
+		[alert release];
+
+
+
 	} else if ([key isEqualToString:kImportReportsButton]) {
 		ASAccount *account = (ASAccount *)editor.context;
 		if (account.isDownloadingReports) {

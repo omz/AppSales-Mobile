@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04AAD08813F929A00092223E /* PTPasscodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04AAD08713F929A00092223E /* PTPasscodeViewController.m */; };
 		7F06B6BF13BF73C8004DB170 /* Report.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F06B6BE13BF73C8004DB170 /* Report.m */; };
 		7F0B8A6913F77F95006E9151 /* PromoCodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F0B8A6813F77F95006E9151 /* PromoCodeOperation.m */; };
 		7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F0B8A6D13F7B941006E9151 /* PromoCode.m */; };
@@ -634,6 +635,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04AAD08613F929A00092223E /* PTPasscodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTPasscodeViewController.h; sourceTree = "<group>"; };
+		04AAD08713F929A00092223E /* PTPasscodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTPasscodeViewController.m; sourceTree = "<group>"; };
 		7F06B6BD13BF73C8004DB170 /* Report.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Report.h; sourceTree = "<group>"; };
 		7F06B6BE13BF73C8004DB170 /* Report.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Report.m; sourceTree = "<group>"; };
 		7F0B8A6713F77F95006E9151 /* PromoCodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PromoCodeOperation.h; sourceTree = "<group>"; };
@@ -1340,6 +1343,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		04AAD07713F9234A0092223E /* PasscodeLock */ = {
+			isa = PBXGroup;
+			children = (
+				04AAD08613F929A00092223E /* PTPasscodeViewController.h */,
+				04AAD08713F929A00092223E /* PTPasscodeViewController.m */,
+			);
+			name = PasscodeLock;
+			sourceTree = "<group>";
+		};
 		7F1499D113BE312100D89064 /* Report Download */ = {
 			isa = PBXGroup;
 			children = (
@@ -1369,6 +1381,7 @@
 			children = (
 				7F709D3C13BC98860008DBAD /* AppSalesAppDelegate.h */,
 				7F709D3D13BC98860008DBAD /* AppSalesAppDelegate.m */,
+				04AAD07713F9234A0092223E /* PasscodeLock */,
 				7FDF601C13DD2107005F1E2D /* Helpers */,
 				7FDF601F13DD21BB005F1E2D /* Accounts and Settings */,
 				7F7F1D0913F643F300F18143 /* Promo Codes */,
@@ -2895,6 +2908,7 @@
 				7F0B8A6913F77F95006E9151 /* PromoCodeOperation.m in Sources */,
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
 				7F0B8A7313F7E647006E9151 /* PromoCodesLicenseViewController.m in Sources */,
+				04AAD08813F929A00092223E /* PTPasscodeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2953,6 +2967,7 @@
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = AppSalesMobile;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2965,6 +2980,7 @@
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				PRODUCT_NAME = AppSalesMobile;
 				WRAPPER_EXTENSION = app;
 			};

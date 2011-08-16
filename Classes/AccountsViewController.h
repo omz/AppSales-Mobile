@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "FieldEditorViewController.h"
-
+#import "PTPasscodeViewController.h"
 @class ASAccount;
 
-@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate>
+@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, PTPasscodeViewControllerDelegate>
 {
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;

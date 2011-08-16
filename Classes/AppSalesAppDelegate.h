@@ -7,10 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate>
+#import "PTPasscodeViewController.h"
+@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate,PTPasscodeViewControllerDelegate>
 {
 	UIWindow *window;
+    UIWindow *_window;
+
+    UINavigationController *_navigationController;
+    
+    NSInteger _passCode;
+    NSInteger _retryPassCode;
+    
+
 	
 	NSManagedObjectContext *managedObjectContext;
 	NSManagedObjectModel *managedObjectModel;
@@ -22,6 +30,8 @@
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+//for passcode
+@property (nonatomic, retain) UINavigationController *navigationController;
 
 - (BOOL)migrateDataIfNeeded;
 - (void)saveContext;
