@@ -263,9 +263,9 @@
 				}
 				MFMailComposeViewController *mailComposeViewController = [[[MFMailComposeViewController alloc] init] autorelease];
 				mailComposeViewController.mailComposeDelegate = self;
-				NSString *body = [NSString stringWithFormat:@"\n%@", self.selectedPromoCode.code];
+				NSString *body = [NSString stringWithFormat:@"<br/><a href=\"https://phobos.apple.com/WebObjects/MZFinance.woa/wa/freeProductCodeWizard?code=%@\">Redeem Promo Code for %@ (%@)</a>", self.selectedPromoCode.code, [self.selectedPromoCode.product displayName], self.selectedPromoCode.code];
 				NSString *subject = [NSString stringWithFormat:@"Promo Code for %@", [product displayName]];
-				[mailComposeViewController setMessageBody:body isHTML:NO];
+				[mailComposeViewController setMessageBody:body isHTML:YES];
 				[mailComposeViewController setSubject:subject];
 				[self presentModalViewController:mailComposeViewController animated:YES];
 			} else if (buttonIndex == 1) {
