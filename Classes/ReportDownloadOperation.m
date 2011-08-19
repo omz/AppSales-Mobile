@@ -57,13 +57,18 @@
 	[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 	
 	ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
-	
 	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
-	for (NSHTTPCookie *cookie in cookies) {
+    for (NSHTTPCookie *cookie in cookies) {
 		[cookieStorage deleteCookie:cookie];
 	}
-	
+
+	cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];    
+    for (NSHTTPCookie *cookie in cookies) {
+		[cookieStorage deleteCookie:cookie];
+	}
+    
+    
 	dispatch_async(dispatch_get_main_queue(), ^ {
 		_account.downloadStatus = NSLocalizedString(@"Logging in...", nil);
 		_account.downloadProgress = 0.0;
@@ -78,7 +83,7 @@
 	NSError *loginPageError = nil;
 	NSData *loginPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:loginURL] returningResponse:&loginPageResponse error:&loginPageError];
 	NSString *loginPage = [[[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding] autorelease];
-	
+	    
 	if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
 		// find the login action
         NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
@@ -130,7 +135,8 @@
 	NSError *error = nil;
 	NSString *salesAction = @"https://reportingitc.apple.com";
 	NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:salesAction] usedEncoding:NULL error:&error];
-	if (error) {
+	
+    if (error) {
 		dispatch_async(dispatch_get_main_queue(), ^ {
 			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
 																object:self 
@@ -174,6 +180,7 @@
 	
 	// get the form field names needed to download the report
 	NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] usedEncoding:NULL error:NULL];
+    
 	if (salesPage.length == 0) {
 		dispatch_async(dispatch_get_main_queue(), ^ {
 			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
@@ -200,6 +207,7 @@
     
 	// parse days available
 	NSMutableArray *availableDays = [[[self extractFormOptionsFromPage:salesPage formID:@"theForm:datePickerSourceSelectElement"] mutableCopy] autorelease];
+        
 	if (availableDays == nil) {
 		dispatch_async(dispatch_get_main_queue(), ^ {
 			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
@@ -275,8 +283,8 @@
 		NSString *label = [Report identifierForDate:existingReportDate];
 		[existingDailyReportLabels addObject:label];
 	}
-	[availableDays removeObjectsInArray:existingDailyReportLabels];
-	
+
+    [availableDays removeObjectsInArray:existingDailyReportLabels];
 	NSFetchRequest *existingWeeklyReportsRequest = [[[NSFetchRequest alloc] init] autorelease];
 	[existingWeeklyReportsRequest setEntity:[NSEntityDescription entityForName:@"WeeklyReport" inManagedObjectContext:moc]];
 	[existingWeeklyReportsRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND endDate IN %@", account, [NSSet setWithArray:availableWeekDates]]];
@@ -316,7 +324,9 @@
 									  daySelectName, @"selectName", nil];
 		
 		NSString *originalFilename = nil;
-		NSData *dailyReportData = [self downloadReportFromiTCWithInfo:downloadInfo viewState:&viewState originalFilename:&originalFilename];
+		
+        NSData *dailyReportData = [self downloadReportFromiTCWithInfo:downloadInfo viewState:&viewState originalFilename:&originalFilename];
+        
 		NSData *uncompressedDailyReportData = [dailyReportData gzipInflate];
 		NSString *dailyReportCSV = [[[NSString alloc] initWithData:uncompressedDailyReportData encoding:NSUTF8StringEncoding] autorelease];
 		
@@ -650,6 +660,9 @@
 				nil];
 	NSHTTPURLResponse *downloadResponse = nil;
 	NSData *requestResponseData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] bodyDictionary:postDict response:&downloadResponse];
+    
+    NSData *uncompressedDailyReportData = [requestResponseData gzipInflate];
+    NSString *dailyReportCSV = [[[NSString alloc] initWithData:uncompressedDailyReportData encoding:NSUTF8StringEncoding] autorelease];
 	NSDictionary *responseHeaders = [downloadResponse allHeaderFields];
 	NSString *originalFilename = [responseHeaders objectForKey:@"Filename"];
 	if (!originalFilename) originalFilename = [responseHeaders objectForKey:@"filename"];
