@@ -288,62 +288,57 @@
 	NSMutableArray *reviews = [NSMutableArray array];
 	NSScanner *scanner = [NSScanner scannerWithString:html];
 	while (![scanner isAtEnd]) {
-		BOOL startReviewScanned = [scanner scanUpToString:@"<!-- start customer_review -->" intoString:NULL];
-		if (startReviewScanned) {
-			NSString *reviewTitle = nil;
-			[scanner scanUpToString:@"<span class=\"customerReviewTitle\">" intoString:NULL];
-			[scanner scanString:@"<span class=\"customerReviewTitle\">" intoString:NULL];
-			[scanner scanUpToString:@"</span>" intoString:&reviewTitle];
-			
-			NSString *reviewRatingString = nil;
-			NSInteger rating = 0;
-			[scanner scanUpToString:@"<div class='rating'" intoString:NULL];
-			[scanner scanUpToString:@"aria-label='" intoString:NULL];
-			[scanner scanString:@"aria-label='" intoString:NULL];
-			[scanner scanUpToString:@"'>" intoString:&reviewRatingString];
-			if (reviewRatingString && reviewRatingString.length > 1) {
-				rating = [[reviewRatingString substringToIndex:1] integerValue];
+		NSString *reviewTitle = nil;
+		[scanner scanUpToString:@"<span class=\"customerReviewTitle\">" intoString:NULL];
+		[scanner scanString:@"<span class=\"customerReviewTitle\">" intoString:NULL];
+		[scanner scanUpToString:@"</span>" intoString:&reviewTitle];
+		
+		NSString *reviewRatingString = nil;
+		NSInteger rating = 0;
+		[scanner scanUpToString:@"<div class='rating'" intoString:NULL];
+		[scanner scanUpToString:@"aria-label='" intoString:NULL];
+		[scanner scanString:@"aria-label='" intoString:NULL];
+		[scanner scanUpToString:@"'>" intoString:&reviewRatingString];
+		if (reviewRatingString && reviewRatingString.length > 1) {
+			rating = [[reviewRatingString substringToIndex:1] integerValue];
+		}
+		
+		NSString *reviewUser = nil;
+		[scanner scanUpToString:@"class=\"reviewer\">" intoString:NULL];
+		[scanner scanString:@"class=\"reviewer\">" intoString:NULL];
+		[scanner scanUpToString:@"</a>" intoString:&reviewUser];
+		[scanner scanString:@"</a>" intoString:NULL];
+		reviewUser = [reviewUser stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		
+		NSString *reviewVersion = nil;
+		NSString *reviewDateString = nil;
+		NSString *reviewVersionAndDate = nil;
+		[scanner scanUpToString:@"</span>" intoString:&reviewVersionAndDate];
+		reviewVersionAndDate = [reviewVersionAndDate stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		if (reviewVersionAndDate) {
+			NSArray *versionAndDateLines = [reviewVersionAndDate componentsSeparatedByString:@"\n"];
+			if ([versionAndDateLines count] == 6) {
+				reviewVersion = [[versionAndDateLines objectAtIndex:2] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				reviewDateString = [[versionAndDateLines objectAtIndex:5] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 			}
-			
-			NSString *reviewUser = nil;
-			[scanner scanUpToString:@"class=\"reviewer\">" intoString:NULL];
-			[scanner scanString:@"class=\"reviewer\">" intoString:NULL];
-			[scanner scanUpToString:@"</a>" intoString:&reviewUser];
-			[scanner scanString:@"</a>" intoString:NULL];
-			reviewUser = [reviewUser stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-			
-			NSString *reviewVersion = nil;
-			NSString *reviewDateString = nil;
-			NSString *reviewVersionAndDate = nil;
-			[scanner scanUpToString:@"</span>" intoString:&reviewVersionAndDate];
-			reviewVersionAndDate = [reviewVersionAndDate stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-			if (reviewVersionAndDate) {
-				NSArray *versionAndDateLines = [reviewVersionAndDate componentsSeparatedByString:@"\n"];
-				if ([versionAndDateLines count] == 6) {
-					reviewVersion = [[versionAndDateLines objectAtIndex:2] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-					reviewDateString = [[versionAndDateLines objectAtIndex:5] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-				}
-			}
-			
-			NSString *reviewText = nil;
-			[scanner scanUpToString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
-			[scanner scanString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
-			[scanner scanUpToString:@"</p>" intoString:&reviewText];
-			reviewText = [reviewText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-			
-			if (rating > 0 && reviewTitle && reviewUser && reviewVersion && reviewDateString && reviewText) {
-				NSDictionary *reviewInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-											reviewTitle, kReviewInfoTitle, 
-											reviewUser, kReviewInfoUser, 
-											reviewVersion, kReviewInfoVersion, 
-											reviewDateString, kReviewInfoDateString, 
-											reviewText, kReviewInfoText, 
-											[NSNumber numberWithInt:rating], kReviewInfoRating,
-											nil];
-				[reviews addObject:reviewInfo];
-			}
-		} else {
-			break;
+		}
+		
+		NSString *reviewText = nil;
+		[scanner scanUpToString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
+		[scanner scanString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
+		[scanner scanUpToString:@"</p>" intoString:&reviewText];
+		reviewText = [reviewText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		
+		if (rating > 0 && reviewTitle && reviewUser && reviewVersion && reviewDateString && reviewText) {
+			NSDictionary *reviewInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+										reviewTitle, kReviewInfoTitle, 
+										reviewUser, kReviewInfoUser, 
+										reviewVersion, kReviewInfoVersion, 
+										reviewDateString, kReviewInfoDateString, 
+										reviewText, kReviewInfoText, 
+										[NSNumber numberWithInt:rating], kReviewInfoRating,
+										nil];
+			[reviews addObject:reviewInfo];
 		}
 	}
 	return reviews;
