@@ -18,5 +18,6 @@
 + (UIColor *)randomColor;
 - (BOOL)red:(CGFloat *)red green:(CGFloat *)green blue:(CGFloat *)blue alpha:(CGFloat *)alpha;
 - (UIColor *)colorByMultiplyingBy:(CGFloat)f;
+- (CGFloat)luminance;
 
 @end
