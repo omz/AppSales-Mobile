@@ -480,6 +480,18 @@
 					NSString *additionalPaymentsPage = [[[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding] autorelease];
 					[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption];
 				}
+        
+        NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
+        NSString *signoutFormAction = nil;
+				[logoutFormScanner scanUpToString:@"<form name=\"signOutForm\"" intoString:NULL];
+				[logoutFormScanner scanUpToString:@"action=\"" intoString:NULL];
+				if ([logoutFormScanner scanString:@"action=\"" intoString:NULL]) {
+					[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
+          
+          NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:signoutFormAction]];
+          NSError *logoutPageError = nil;
+          [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:&logoutPageError];
+        }
 			}
 		}
 	}
