@@ -126,6 +126,10 @@
 		int i = 0;
 		int numberOfReportsAvailable = [availableReportDateStrings count];
 		for (NSString *reportDateString in availableReportDateStrings) {
+			if ([self isCancelled]) {
+				[pool release];
+				return;
+			}
 			if (i == 0) {
 				if ([dateType isEqualToString:@"Daily"]) {
 					dispatch_async(dispatch_get_main_queue(), ^ {
@@ -203,7 +207,10 @@
 			i++;
 		}
 	}
-	
+	if ([self isCancelled]) {
+		[pool release];
+		return;
+	}
 	
 	if (numberOfReportsDownloaded > 0 || [account.payments count] == 0) {
 		//==== Payments
@@ -274,7 +281,6 @@
 			[pool release];
 			return;
 		}
-			
 		
 		dispatch_async(dispatch_get_main_queue(), ^ {
 			_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
