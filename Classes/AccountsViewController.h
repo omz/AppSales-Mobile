@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "FieldEditorViewController.h"
 
+#define kAccountUsername					@"username"
+#define kAccountPassword					@"password"
+#define kAccountVendorID					@"vendorID"
+
 @class ASAccount;
 
 @interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate>

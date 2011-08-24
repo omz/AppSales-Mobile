@@ -28,7 +28,7 @@
 @implementation FieldEditorViewController
 
 @synthesize fieldSections, values, doneButtonTitle, cancelButtonTitle, delegate, context, editorIdentifier;
-@synthesize isSubSection, hasChanges;
+@synthesize isSubSection, hasChanges, selectedTextField;
 
 - (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title
 {
@@ -83,6 +83,7 @@
 				UIView *textField = [cell viewWithTag:TEXTFIELDTAG];
 				if (textField) {
 					[(UITextField *)textField performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0];
+					self.selectedTextField = (UITextField *)textField;
 				}
 			}
 		}
@@ -158,10 +159,21 @@
 	}
 }
 
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+	self.selectedTextField = textField;
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 	[textField performSelector:@selector(resignFirstResponder) withObject:nil afterDelay:0];
+	self.selectedTextField = nil;
 	return YES;
+}
+
+- (void)dismissKeyboard
+{
+	[self.selectedTextField resignFirstResponder];
 }
 
 - (void)switchValueDidChange:(NamedSwitch *)switchControl
@@ -331,6 +343,7 @@
 	UIView *textField = [cell viewWithTag:TEXTFIELDTAG];
 	if (textField) {
 		[(UITextField *)textField becomeFirstResponder];
+		self.selectedTextField = (UITextField *)textField;
 	}
 	if (field.type == FieldSpecifierTypeCheck) {
 		self.hasChanges = YES;
@@ -414,6 +427,7 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[fieldSections release];
+	[selectedTextField release];
 	[values release];
 	[doneButtonTitle release];
 	[cancelButtonTitle release];

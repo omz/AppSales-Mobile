@@ -250,7 +250,24 @@
 
 - (void)downloadReports:(id)sender
 {
-	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:self.account];
+	if (self.account.password && self.account.password.length > 0) { //Only download reports for accounts with login
+		if (!account.vendorID || account.vendorID.length == 0) {
+			[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
+										 message:NSLocalizedString(@"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.", nil) 
+										delegate:nil 
+							   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
+							   otherButtonTitles:nil] autorelease] show];
+		} else {
+			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:self.account];
+		}
+	} else {
+		[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Login Missing", nil) 
+									 message:NSLocalizedString(@"You have not entered your iTunes Connect login for this account.", nil)
+									delegate:nil 
+						   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
+						   otherButtonTitles:nil] autorelease] show];
+	}
+	
 }
 
 - (void)stopDownload:(id)sender
