@@ -12,9 +12,9 @@ Features:
 * Download customer reviews of your apps
 * Import reports that you downloaded elsewhere (for example with "AppViz":http://www.ideaswarm.com on your Mac) via iTunes File Sharing
 
-AppSales requires *Xcode 4.1* with the iOS 4.3 SDK. It will build on earlier versions of Xcode, but crashes on launch because the Core Data model file format changed in 4.1. There is no iPad version at the moment.
+AppSales requires the iOS 4.3 SDK. There is no iPad version at the moment.
 
-Because there is no real API to access iTunes Connect trend reports, AppSales Mobile scrapes itunesconnect.apple.com. This means that even small changes on this website can break the automatic import. In most cases, this is easy to fix and I’ll try to make a new version available here.
+Because there is no API to access some parts of iTunes Connect, AppSales scrapes itunesconnect.apple.com. This means that even small changes on this website can break AppSales. In most cases, this is easy to fix and I’ll try to make a new version available here.
 
 You can also follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
 
