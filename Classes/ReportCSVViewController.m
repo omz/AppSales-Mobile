@@ -9,6 +9,7 @@
 #import "ReportCSVViewController.h"
 #import "Report.h"
 
+
 @implementation ReportCSVViewController
 
 @synthesize webView;
@@ -29,6 +30,7 @@
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	self.view = webView;
 	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)] autorelease];
+	self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReport:)] autorelease];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -59,6 +61,30 @@
 - (void)done:(id)sender
 {
 	[self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)sendReport:(id)sender
+{
+	NSString *reportCSV = [report valueForKeyPath:@"originalReport.content"];
+	NSString *filename = [report valueForKeyPath:@"originalReport.filename"];
+	if ([filename hasSuffix:@".gz"]) {
+		filename = [filename substringToIndex:filename.length - 3];
+	}
+	
+	if (![MFMailComposeViewController canSendMail]) {
+		[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+	} else {
+		MFMailComposeViewController *vc = [[[MFMailComposeViewController alloc] init] autorelease];
+		[vc setSubject:filename];
+		[vc addAttachmentData:[reportCSV dataUsingEncoding:NSUTF8StringEncoding] mimeType:@"text/plain" fileName:filename];
+		[vc setMailComposeDelegate:self];
+		[self presentModalViewController:vc animated:YES];
+	}
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+	[controller dismissModalViewControllerAnimated:YES];
 }
 
 - (void)dealloc

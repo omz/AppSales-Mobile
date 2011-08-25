@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MessageUI.h>
 
 @class Report;
 
-@interface ReportCSVViewController : UIViewController {
+@interface ReportCSVViewController : UIViewController <MFMailComposeViewControllerDelegate> {
 
 	Report *report;
 	UIWebView *webView;
