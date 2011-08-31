@@ -370,6 +370,7 @@
 
 - (void)showSettings
 {
+  // main section
 	NSString *baseCurrency = [[CurrencyManager sharedManager] baseCurrency];
 	NSArray *availableCurrencies = [[CurrencyManager sharedManager] availableCurrencies];
 	NSMutableArray *currencyFields = [NSMutableArray array];
@@ -386,8 +387,28 @@
 	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:currencySectionField, updateExchangeRatesButtonField, nil] 
 																			title:NSLocalizedString(@"General", nil) 
 																	  description:NSLocalizedString(@"Exchange rates will automatically be refreshed periodically.", nil)];
-	
-	NSArray *sections = [NSArray arrayWithObjects:mainSection, nil];
+
+
+  
+  // products section
+  NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+  FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
+                                                                        defaultValue:[productSortByValue isEqualToString:@"productId"]];
+  FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
+                                                                    defaultValue:[productSortByValue isEqualToString:@"color"]];
+  NSMutableArray *productSortingFields = [NSArray arrayWithObjects:productSortingByProductIdField, productSortingByColorField, nil];
+
+
+  FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields
+                                                                              title:NSLocalizedString(@"Sort By", nil)
+                                                                        description:nil];
+  productSortingSection.exclusiveSelection = YES;
+  FieldSpecifier *productsSectionField = [FieldSpecifier subsectionFieldWithSection:productSortingSection key:@"sortby"];
+  FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productsSectionField, nil] 
+                                                                              title:NSLocalizedString(@"Products", nil) 
+                                                                        description:NSLocalizedString(@"", nil)];
+  
+	NSArray *sections = [NSArray arrayWithObjects:mainSection, productsSection, nil];
 	FieldEditorViewController *settingsViewController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)] autorelease];
 	settingsViewController.doneButtonTitle = NSLocalizedString(@"Done", nil);
 	settingsViewController.delegate = self;
@@ -459,6 +480,13 @@
 					[[CurrencyManager sharedManager] setBaseCurrency:[[key componentsSeparatedByString:@"."] lastObject]];
 				}
 			}
+      
+      if ([key hasPrefix:@"sortby."]) {
+				if ([[returnValues objectForKey:key] boolValue]) {
+          [[NSUserDefaults standardUserDefaults] setObject:[[key componentsSeparatedByString:@"."] lastObject] forKey:@"ProductSortby"];
+				}
+			}
+      
 		}
 		[self dismissModalViewControllerAnimated:YES];
 	}

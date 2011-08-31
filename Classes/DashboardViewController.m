@@ -208,19 +208,26 @@
 
 - (void)reloadData
 {
-  // Sort products by color
-  NSArray *allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^(id obj1, id obj2){
-    Product* product1 = (Product*)obj1;
-    Product* product2 = (Product*)obj2;
-    if ([product1.color luminance] < [product2.color luminance]) {
-      return (NSComparisonResult)NSOrderedAscending;
-    } else if ([product1.color luminance]> [product2.color luminance]) {
-      return (NSComparisonResult)NSOrderedDescending;
-    }
-    
-    return (NSComparisonResult)NSOrderedSame;
-  }];
+  NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 
+  NSArray *allProducts;
+  if ([productSortByValue isEqualToString:@"color"]) {
+    // Sort products by color
+    allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^(id obj1, id obj2){
+      Product* product1 = (Product*)obj1;
+      Product* product2 = (Product*)obj2;
+      if ([product1.color luminance] < [product2.color luminance]) {
+        return (NSComparisonResult)NSOrderedAscending;
+      } else if ([product1.color luminance]> [product2.color luminance]) {
+        return (NSComparisonResult)NSOrderedDescending;
+      }
+      
+      return (NSComparisonResult)NSOrderedSame;
+    }];
+  } else {
+    // Sort products by ID (this will put the most recently released apps on top):
+   allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
+  }
   
 	self.products = allProducts;
 	self.visibleProducts = [allProducts filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^ (id obj, NSDictionary *bindings) { return (BOOL)![[(Product *)obj hidden] boolValue]; }]];
