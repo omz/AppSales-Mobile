@@ -113,4 +113,33 @@
 }
 
 
+// Calculate the luminance for an arbitrary UIColor instance
+- (CGFloat)luminance
+{
+	CGColorRef cgColor = self.CGColor;
+	const CGFloat *components = CGColorGetComponents(cgColor);
+	CGFloat luminance = 0.0;
+	switch(CGColorSpaceGetModel(CGColorGetColorSpace(cgColor)))
+	{
+		case kCGColorSpaceModelMonochrome:
+			// For grayscale colors, the luminance is the color value
+			luminance = components[0];
+			break;
+			
+		case kCGColorSpaceModelRGB:
+			// For RGB colors, we calculate luminance assuming sRGB Primaries as per
+			// http://en.wikipedia.org/wiki/Luminance_(relative)
+			luminance = 0.2126 * components[0] + 0.7152 * components[1] + 0.0722 * components[2];
+			break;
+			
+		default:
+			// We don't implement support for non-gray, non-rgb colors at this time.
+			// Since our only consumer is colorSortByLuminance, we return a larger than normal
+			// value to ensure that these types of colors are sorted to the end of the list.
+			luminance = 2.0;
+	}
+	return luminance;
+}
+
+
 @end
