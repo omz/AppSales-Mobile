@@ -31,6 +31,8 @@
 #define kUpdateExchangeRatesButton			@"UpdateExchangeRatesButton"
 #define kImportReportsButton				@"ImportReportsButton"
 #define kExportReportsButton				@"ExportReportsButton"
+#define kDownloadBoxcarButton				@"DownloadBoxcarButton"
+#define kAddToBoxcarButton					@"AddToBoxcarButton"
 #define	kDeleteAccountButton				@"DeleteAccount"
 #define kAlertTagConfirmImport				1
 #define kAlertTagConfirmExport				2
@@ -370,7 +372,7 @@
 
 - (void)showSettings
 {
-  // main section
+	// main section
 	NSString *baseCurrency = [[CurrencyManager sharedManager] baseCurrency];
 	NSArray *availableCurrencies = [[CurrencyManager sharedManager] availableCurrencies];
 	NSMutableArray *currencyFields = [NSMutableArray array];
@@ -390,25 +392,34 @@
 
 
   
-  // products section
-  NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
-  FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
-                                                                        defaultValue:[productSortByValue isEqualToString:@"productId"]];
-  FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
-                                                                    defaultValue:[productSortByValue isEqualToString:@"color"]];
-  NSMutableArray *productSortingFields = [NSArray arrayWithObjects:productSortingByProductIdField, productSortingByColorField, nil];
+	// products section
+	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+	FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
+																			defaultValue:[productSortByValue isEqualToString:@"productId"]];
+	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
+																		defaultValue:[productSortByValue isEqualToString:@"color"]];
+	NSMutableArray *productSortingFields = [NSArray arrayWithObjects:productSortingByProductIdField, productSortingByColorField, nil];
 
 
-  FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields
-                                                                              title:NSLocalizedString(@"Sort By", nil)
-                                                                        description:nil];
-  productSortingSection.exclusiveSelection = YES;
-  FieldSpecifier *productsSectionField = [FieldSpecifier subsectionFieldWithSection:productSortingSection key:@"sortby"];
-  FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productsSectionField, nil] 
-                                                                              title:NSLocalizedString(@"Products", nil) 
-                                                                        description:NSLocalizedString(@"", nil)];
-  
-	NSArray *sections = [NSArray arrayWithObjects:mainSection, productsSection, nil];
+	FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields
+																				  title:NSLocalizedString(@"Sort By", nil)
+																			description:nil];
+	productSortingSection.exclusiveSelection = YES;
+	FieldSpecifier *productsSectionField = [FieldSpecifier subsectionFieldWithSection:productSortingSection key:@"sortby"];
+	FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productsSectionField, nil] 
+																				  title:NSLocalizedString(@"Products", nil) 
+																			description:NSLocalizedString(@"", nil)];
+	
+	// push section
+	FieldSpecifier *downloadBoxcarButtonField = [FieldSpecifier buttonFieldWithKey:kDownloadBoxcarButton title:NSLocalizedString(@"Install Boxcar...", nil)];
+	FieldSpecifier *addToBoxcarButtonField = [FieldSpecifier buttonFieldWithKey:kAddToBoxcarButton title:NSLocalizedString(@"Add AppSales to Boxcar...", nil)];
+	FieldSectionSpecifier *pushSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:downloadBoxcarButtonField, addToBoxcarButtonField, nil] 
+																			title:NSLocalizedString(@"Push Notifications", nil) 
+																	  description:NSLocalizedString(@"To receive push notifications when new sales reports are available you have to install the free Boxcar app.", nil)];
+	FieldSpecifier *pushSectionField = [FieldSpecifier subsectionFieldWithSection:pushSection key:@"PushSection"];
+	FieldSectionSpecifier *pushSectionFieldSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:pushSectionField] title:NSLocalizedString(@"Push Notifications", nil) description:nil];
+		  
+	NSArray *sections = [NSArray arrayWithObjects:mainSection, productsSection, pushSectionFieldSection, nil];
 	FieldEditorViewController *settingsViewController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)] autorelease];
 	settingsViewController.doneButtonTitle = NSLocalizedString(@"Done", nil);
 	settingsViewController.delegate = self;
@@ -558,6 +569,20 @@
 		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
 		hud.labelText = NSLocalizedString(@"Checking Vendor ID...", nil);
 		[hud showWhileExecuting:@selector(findVendorIDsWithLogin:) onTarget:self withObject:loginInfo animated:YES];
+	} else if ([key isEqualToString:kDownloadBoxcarButton]) {
+		if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"boxcar://provider/965"]]) {
+			[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Boxcar Already Installed", nil) 
+										 message:NSLocalizedString(@"The Boxcar app is already installed on your device. Please tap \"Add AppSales to Boxcar\" to start receiving push notifications.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+		} else {
+			[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://itunes.apple.com/app/boxcar/id321493542"]];
+		}
+	} else if ([key isEqualToString:kAddToBoxcarButton]) {
+		if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"boxcar://provider/965"]]) {
+			[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"boxcar://provider/965"]];
+		} else {
+			[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Boxcar Not Installed", nil) 
+										 message:NSLocalizedString(@"The Boxcar app is not installed on your device. Please download it from the App Store and try again.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+		}
 	}
 }
 

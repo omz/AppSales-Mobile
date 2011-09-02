@@ -29,6 +29,7 @@
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
 - (void)reloadAccounts;
+- (void)downloadReports:(id)sender;
 - (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account;
 - (void)showSettings;
 - (void)addNewAccount;

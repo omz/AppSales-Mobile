@@ -8,9 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+@class AccountsViewController;
+
 @interface AppSalesAppDelegate : NSObject <UIApplicationDelegate>
 {
 	UIWindow *window;
+	
+	AccountsViewController *accountsViewController;
 	
 	NSManagedObjectContext *managedObjectContext;
 	NSManagedObjectModel *managedObjectModel;
@@ -18,7 +22,7 @@
 }
 
 @property (nonatomic, retain) UIWindow *window;
-
+@property (nonatomic, retain) AccountsViewController *accountsViewController;
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;

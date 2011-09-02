@@ -17,7 +17,7 @@
 
 @implementation AppSalesAppDelegate
 
-@synthesize window;
+@synthesize window, accountsViewController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -28,6 +28,7 @@
 	rootViewController.managedObjectContext = self.managedObjectContext;
 	UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
 	navigationController.toolbarHidden = NO;
+	self.accountsViewController = rootViewController;
 	
 	self.window.rootViewController = navigationController;
 	[self.window makeKeyAndVisible];
@@ -38,15 +39,25 @@
 	}
 	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
-  
-  NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
-  if (productSortByValue==nil) {
-    [[NSUserDefaults standardUserDefaults] setObject:@"productId" forKey:@"ProductSortby"];
-  }
+	
+	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+	if (productSortByValue==nil) {
+		[[NSUserDefaults standardUserDefaults] setObject:@"productId" forKey:@"ProductSortby"];
+	}	
   
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportDownloadFailed:) name:ASReportDownloadFailedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeDownloadFailed:) name:ASPromoCodeDownloadFailedNotification object:nil];
-		
+	
+	if ([launchOptions objectForKey:UIApplicationLaunchOptionsURLKey]) {
+		[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
+	}
+	
+	return YES;
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+	[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
 	return YES;
 }
 
