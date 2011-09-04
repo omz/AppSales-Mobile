@@ -2,7 +2,8 @@ h1. AppSales
 
 AppSales allows iOS and Mac App Store developers to download and analyze their sales reports from iTunes Connect on the iPhone.
 
-Features:
+h2. Features
+
 * Automatic download of daily and weekly sales reports from iTunes Connect
 * Stacked bar graphs to see all your sales at a glance
 * Show your sales on a world map
@@ -11,14 +12,31 @@ Features:
 * Automatic conversion to your currency of choice
 * Download customer reviews of your apps
 * Import reports that you downloaded elsewhere (for example with "AppViz":http://www.ideaswarm.com on your Mac) via iTunes File Sharing
+* Optional push notifications when new reports are available via Boxcar
 
-AppSales requires the iOS 4.3 SDK. There is no iPad version at the moment.
+Please see the screenshot below for a visual guide to AppSales' main interface and some tips and tricks.
 
-Because there is no API to access some parts of iTunes Connect, AppSales scrapes itunesconnect.apple.com. This means that even small changes on this website can break AppSales. In most cases, this is easy to fix and I’ll try to make a new version available here.
+h2. Requirements
 
-You can also follow me on Twitter: "@olemoritz":http://twitter.com/olemoritz
+AppSales requires the iOS 4.2 SDK or later. There is no iPad version at the moment but this may change in the future.
 
-Support the development:
+Because there is no API to access some parts of iTunes Connect, AppSales scrapes "itunesconnect.apple.com":https://itunesconnect.apple.com. This means that even small changes on this website can break some functionality. In most cases, this is easy to fix and I'll try to make a new version available here. The report download itself uses Apple's auto-ingestion interface to iTunes Connect and should generally be unaffected by changes to the website.
+
+h2. Push Notifications
+
+Because sales reports are not always available at the same time, I run a web service on "Google App Engine":http://code.google.com/appengine/ to check for new reports every 15 minutes (until the report for the previous day is available).
+
+You can get a push notification when new reports are available with the free "Boxcar":http://itunes.apple.com/us/app/boxcar/id321493542 app. You can install Boxcar and add the AppSales service from the settings (in AppSales).
+
+If AppSales is installed, opening the push notification will automatically trigger the download of new reports but you can also use the push service without AppSales being installed. To do so, install "Boxcar":http://itunes.apple.com/us/app/boxcar/id321493542 and open this link from Safari to add the AppSales service: "boxcar://provider/965":boxcar://provider/965.
+
+Except for the total number of subscribers, I don't collect any data with the push service. You can stop receiving notifications at any time by simply removing AppSales from Boxcar.
+
+h2. About
+
+You can follow me on Twitter for updates on the development: "@olemoritz":http://twitter.com/olemoritz
+
+If you'd like to support this effort, please consider a donation via PayPal or Flattr:
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YDQN4S3WVRCBU&lc=US&item_name=AppSales&no_note=1&currency_code=USD"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a> <a href="http://flattr.com/thing/366574/AppSales" target="_blank">
 <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
