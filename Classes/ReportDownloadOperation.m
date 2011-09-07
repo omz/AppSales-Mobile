@@ -416,7 +416,7 @@
 			[paymentMonthFormatter setDateFormat:@"MMM yy"];
 			NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 			[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			NSArray *amounts = [[graphDict objectForKey:@"data"] objectAtIndex:1];
+			NSArray *amounts = ([[graphDict objectForKey:@"data"] count] >= 2) ? [[graphDict objectForKey:@"data"] objectAtIndex:1] : nil;
 			NSArray *labels = [graphDict objectForKey:@"labels"];
 			NSArray *legend = [graphDict objectForKey:@"legend"];
 			if (legend && [legend isKindOfClass:[NSArray class]] && [legend count] == 2) {
