@@ -429,6 +429,7 @@
 		}
 	} else {
 		NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
+		[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		[monthFormatter setDateFormat:@"MMM"];
 		if (showFiscalMonths) {
 			NSDate *date = [[self.sortedFiscalMonthReports objectAtIndex:index] startDate];
