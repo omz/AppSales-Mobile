@@ -491,7 +491,7 @@
 - (NSString *)graphView:(GraphView *)graphView labelForSectionAtIndex:(NSUInteger)index
 {
 	if (selectedTab == 0) {
-		if ([((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count] > 0) {
+		if ([((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count] > index) {
 			Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
 			NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
 			[monthFormatter setDateFormat:@"MMM '´'yy"];
@@ -500,7 +500,7 @@
 			return @"N/A";
 		}
 	} else {
-		if ([self.sortedCalendarMonthReports count] > 0) {
+		if ([self.sortedCalendarMonthReports count] > index) {
 			id<ReportSummary> report = [self.sortedCalendarMonthReports objectAtIndex:index];
 			NSDateFormatter *yearFormatter = [[[NSDateFormatter alloc] init] autorelease];
 			[yearFormatter setDateFormat:@"yyyy"];
