@@ -181,6 +181,7 @@
 	// Group daily reports by calendar month:
 	NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	[monthFormatter setDateFormat:@"MMMM yyyy"];
+	[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	[sortedCalendarMonthReports removeAllObjects];
 	NSDateComponents *prevDateComponents = nil;
 	NSMutableArray *reportsInCurrentMonth = nil;
@@ -495,6 +496,7 @@
 		if ([((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count] > index) {
 			Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
 			NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 			[monthFormatter setDateFormat:@"MMM '´'yy"];
 			return [monthFormatter stringFromDate:report.startDate];
 		} else {
@@ -504,6 +506,7 @@
 		if ([self.sortedCalendarMonthReports count] > index) {
 			id<ReportSummary> report = [self.sortedCalendarMonthReports objectAtIndex:index];
 			NSDateFormatter *yearFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			[yearFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 			[yearFormatter setDateFormat:@"yyyy"];
 			NSString *yearString = [yearFormatter stringFromDate:report.startDate];
 			if (showFiscalMonths) {
