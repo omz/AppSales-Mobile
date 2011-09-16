@@ -43,7 +43,7 @@
 
 @implementation AccountsViewController
 
-@synthesize managedObjectContext, accounts, selectedAccount, refreshButtonItem;
+@synthesize managedObjectContext, accounts, selectedAccount, refreshButtonItem, delegate;
 
 - (void)viewDidLoad
 {
@@ -66,8 +66,6 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[self managedObjectContext]];
 	
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] addObserver:self forKeyPath:@"isBusy" options:NSKeyValueObservingOptionNew context:nil];
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
 	
 	[self reloadAccounts];
 }
@@ -126,17 +124,14 @@
 {
 	AboutViewController *aboutViewController = [[[AboutViewController alloc] initWithNibName:nil bundle:nil] autorelease];
 	UINavigationController *aboutNavController = [[[UINavigationController alloc] initWithRootViewController:aboutViewController] autorelease];
-	aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		aboutNavController.modalPresentationStyle = UIModalPresentationFormSheet;
+	} else {
+		aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+	}
 	[self presentModalViewController:aboutNavController animated:YES];
 }
 
-- (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification
-{
-	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
-	PromoCodesLicenseViewController *vc = [[[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]] autorelease];
-	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
-	[self presentModalViewController:navController animated:YES];
-}
 
 - (void)viewDidUnload
 {
@@ -148,6 +143,8 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return nil;
+	
 	if ([self.accounts count] == 0) {
 		return nil;
 	}
@@ -161,6 +158,8 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return 1;
+	
 	if ([self.accounts count] == 0) {
 		return 1;
 	}
@@ -169,6 +168,8 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return self.accounts.count;
+	
 	if ([self.accounts count] == 0) {
 		return 0;
 	}
@@ -181,8 +182,13 @@
 	BadgedCell *cell = (BadgedCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (cell == nil) {
 		cell = [[[BadgedCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier] autorelease];
-		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		cell.textLabel.text = [[self.accounts objectAtIndex:indexPath.row] displayName];
+		cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
+		return cell;
+	}
+	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	if (indexPath.row == 0) {
 		NSInteger badge = [[[self.accounts objectAtIndex:indexPath.section] reportsBadge] integerValue];
 		cell.textLabel.text = NSLocalizedString(@"Sales and Trends", nil);
@@ -219,8 +225,17 @@
 	return cell;
 }
 
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+	//iPad only
+	ASAccount *account = [self.accounts objectAtIndex:indexPath.row];
+	[self editAccount:account];
+}
+
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return nil;
+	
 	if ([self.accounts count] == 0) {
 		return nil;
 	}
@@ -233,15 +248,6 @@
 	return 26.0;
 }
 
-/*
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
-{
-	if ([self.accounts count] == 0) {
-		return NSLocalizedString(@"Tap the \u271A button to add an account.", nil);
-	}
-	return nil;
-}
- */
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -250,6 +256,13 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		if (self.delegate) {
+			ASAccount *account = [self.accounts objectAtIndex:indexPath.row];
+			[self.delegate accountsViewController:self didSelectAccount:account];
+		}
+		return;
+	}
 	ASAccount *account = [self.accounts objectAtIndex:indexPath.section];
 	if (indexPath.row == 0) {
 		SalesViewController *salesViewController = [[[SalesViewController alloc] initWithAccount:account] autorelease];
@@ -304,6 +317,10 @@
 	addAccountViewController.editorIdentifier = kAddNewAccountEditorIdentifier;
 	UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:addAccountViewController] autorelease];
 	
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		navigationController.modalPresentationStyle = UIModalPresentationFormSheet;
+		
+	}
 	[self presentModalViewController:navigationController animated:YES];
 }
 
@@ -365,7 +382,11 @@
 	editAccountViewController.delegate = self;
 	editAccountViewController.editorIdentifier = kEditAccountEditorIdentifier;
 	editAccountViewController.context = account;
-	editAccountViewController.hidesBottomBarWhenPushed = YES;
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		editAccountViewController.hidesBottomBarWhenPushed = YES;
+	}
+	
+	editAccountViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
 	
 	[self.navigationController pushViewController:editAccountViewController animated:YES];
 }
@@ -426,6 +447,9 @@
 	settingsViewController.editorIdentifier = kSettingsEditorIdentifier;
 	
 	UINavigationController *settingsNavController = [[[UINavigationController alloc] initWithRootViewController:settingsViewController] autorelease];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		settingsNavController.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
 	[self presentModalViewController:settingsNavController animated:YES];
 }
 
@@ -500,6 +524,8 @@
       
 		}
 		[self dismissModalViewControllerAnimated:YES];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ASViewSettingsDidChangeNotification object:nil];
 	}
 	[self reloadAccounts];
 }

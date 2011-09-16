@@ -21,8 +21,12 @@
 	if (self) {
 		account = [paymentAccount retain];
 		self.title = NSLocalizedString(@"Payments", nil);
-		self.hidesBottomBarWhenPushed = YES;
+		self.tabBarItem.image = [UIImage imageNamed:@"Payments.png"];
+		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
 		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePayments:)] autorelease];
+		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+			[account addObserver:self forKeyPath:@"payments" options:NSKeyValueObservingOptionNew context:nil];
+		}
 	}
 	return self;
 }
@@ -38,7 +42,23 @@
 	scrollView.showsHorizontalScrollIndicator = NO;
 	scrollView.pagingEnabled = YES;
 	scrollView.delegate = self;
+	
 	[self.view addSubview:scrollView];
+	
+	self.pageControl = [[[UIPageControl alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 15, self.view.bounds.size.width, 10)] autorelease];
+	pageControl.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+	pageControl.userInteractionEnabled = NO;
+	[self.view addSubview:pageControl];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	[self reloadData];
+}
+
+- (void)reloadData
+{
+	for (UIView *v in [NSArray arrayWithArray:self.scrollView.subviews]) [v removeFromSuperview];
 	
 	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	[numberFormatter setMaximumFractionDigits:2];
@@ -103,23 +123,43 @@
 		if ([allPayments count] > 0) {
 			//We assume that all payments have the same currency:
 			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@%@", 
-							   [[CurrencyManager sharedManager] currencySymbolForCurrency:[[allPayments anyObject] valueForKey:@"currency"]], 
-							   [numberFormatter stringFromNumber:[sumsByYear objectForKey:year]]];
+								   [[CurrencyManager sharedManager] currencySymbolForCurrency:[[allPayments anyObject] valueForKey:@"currency"]], 
+								   [numberFormatter stringFromNumber:[sumsByYear objectForKey:year]]];
 		}
 		yearView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 		[scrollView addSubview:yearView];
 		x += scrollView.bounds.size.width;
 	}
+	
 	scrollView.contentSize = CGSizeMake(scrollView.bounds.size.width * [sortedYears count], 0);
-	[scrollView setContentOffset:CGPointMake(scrollView.contentSize.width, 0)];
-		
-	self.pageControl = [[[UIPageControl alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 15, self.view.bounds.size.width, 10)] autorelease];
-	pageControl.numberOfPages = [sortedYears count];
-	pageControl.currentPage = pageControl.numberOfPages - 1;
-	pageControl.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-	pageControl.userInteractionEnabled = NO;
-	[self.view addSubview:pageControl];
+	[scrollView setContentOffset:CGPointMake(scrollView.contentSize.width - scrollView.bounds.size.width, 0)];
+	
+	self.pageControl.numberOfPages = [sortedYears count];
+	self.pageControl.currentPage = pageControl.numberOfPages - 1;
 }
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[self reloadData];
+}
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+	[self reloadData];
+	CATransition *fadeTransition = [CATransition animation];
+    fadeTransition.duration = duration;
+	fadeTransition.type = kCATransitionFade;
+	fadeTransition.removedOnCompletion = YES;
+	fadeTransition.fillMode = kCAFillModeForwards;
+	
+	
+	//for (CALayer *aLayer in self.scrollView.layer.sublayers)
+      //  [aLayer removeAllAnimations];
+	
+	
+    [self.scrollView.layer addAnimation:fadeTransition forKey:@"transition"];
+}
+
 
 - (void)deletePayments:(id)sender
 {
@@ -132,7 +172,9 @@
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		account.payments = [NSSet set];
 		[[account managedObjectContext] save:NULL];
-		[self.navigationController popViewControllerAnimated:YES];
+		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+			[self.navigationController popViewControllerAnimated:YES];
+		}
 	}
 }
 
@@ -152,11 +194,17 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		return YES;
+	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (void)dealloc
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		[account removeObserver:self forKeyPath:@"payments"];
+	}
 	[scrollView release];
 	[pageControl release];
 	[account release];

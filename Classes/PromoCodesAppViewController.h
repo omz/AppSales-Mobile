@@ -23,10 +23,12 @@
 	NSArray *busyToolbarItems;
 	
 	PromoCode *selectedPromoCode;
+	UIActionSheet *activeSheet;
 }
 
 @property (nonatomic, retain) NSArray *promoCodes;
 @property (nonatomic, retain) PromoCode *selectedPromoCode;
+@property (nonatomic, retain) UIActionSheet *activeSheet;
 
 - (id)initWithProduct:(Product *)aProduct;
 - (void)reloadPromoCodes;

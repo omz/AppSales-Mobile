@@ -21,7 +21,7 @@
 
 @implementation PromoCodesAppViewController
 
-@synthesize promoCodes, selectedPromoCode;
+@synthesize promoCodes, selectedPromoCode, activeSheet;
 
 - (id)initWithProduct:(Product *)aProduct
 {
@@ -104,6 +104,9 @@
 	vc.doneButtonTitle = NSLocalizedString(@"Request", nil);
 	vc.cancelButtonTitle = NSLocalizedString(@"Cancel", nil);
 	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		navController.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
 	[self presentModalViewController:navController animated:YES];
 }
 
@@ -114,13 +117,24 @@
 
 - (void)deletePromoCodes:(id)sender
 {
+	if (self.activeSheet.visible) {
+		[self.activeSheet dismissWithClickedButtonIndex:activeSheet.cancelButtonIndex animated:NO];
+	}
     UIActionSheet *deleteSheet = [[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Promo Codes", nil) otherButtonTitles:nil] autorelease];
     deleteSheet.tag = kDeleteCodesSheetTag;
-    [deleteSheet showFromToolbar:self.navigationController.toolbar];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		self.activeSheet = deleteSheet;
+		[deleteSheet showFromBarButtonItem:sender animated:YES];
+	} else {
+		[deleteSheet showFromToolbar:self.navigationController.toolbar];
+	}
 }
 
 - (void)shareCodes:(id)sender
 {
+	if (self.activeSheet.visible) {
+		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
+	}
 	UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil
 														delegate:self 
 											   cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
@@ -129,7 +143,12 @@
 							 NSLocalizedString(@"Email All Codes", nil), 
 							 NSLocalizedString(@"Copy All Codes", nil), nil] autorelease];
 	sheet.tag = kActionsAllCodesSheetTag;
-	[sheet showFromToolbar:self.navigationController.toolbar];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		[sheet showFromBarButtonItem:sender animated:YES];
+		self.activeSheet = sheet;
+	} else {
+		[sheet showFromToolbar:self.navigationController.toolbar];
+	}
 }
 
 - (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues
@@ -159,6 +178,9 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		return YES;
+	}
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 

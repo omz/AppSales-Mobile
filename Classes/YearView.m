@@ -23,6 +23,7 @@
 
 - (void)drawRect:(CGRect)rect
 {
+	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	CGContextSaveGState(c);
 	
@@ -52,7 +53,8 @@
 	CGContextFillRect(c, yearRect);
 	yearRect.origin.y += 10;
 	[[UIColor darkGrayColor] set];
-	[[NSString stringWithFormat:@"%i", year] drawInRect:yearRect withFont:[UIFont boldSystemFontOfSize:27] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
+	UIFont *yearFont = [UIFont boldSystemFontOfSize:27];
+	[[NSString stringWithFormat:@"%i", year] drawInRect:yearRect withFont:yearFont lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
 	
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM"];
@@ -60,6 +62,9 @@
 	NSDateComponents *currentDateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:[NSDate date]];
 	NSInteger currentYear = [currentDateComponents year];
 	NSInteger currentMonth = [currentDateComponents month];
+	
+	UIFont *monthFont = [UIFont systemFontOfSize:iPad ? 24 : 12];
+	CGFloat maxPaymentFontSize = iPad ? 24 : 16;
 	
 	for (int i=0; i<12; i++) {
 		CGRect monthRect = CGRectInset(CGRectMake((margin + (i % 3) * singleMonthWidth), 
@@ -75,17 +80,18 @@
 		[monthComponents setMonth:i+1];
 		NSDate *monthDate = [calendar dateFromComponents:monthComponents];
 		NSString *month = [monthFormatter stringFromDate:monthDate];
-		[month drawInRect:monthRect withFont:[UIFont systemFontOfSize:12.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
+		
+		[month drawInRect:monthRect withFont:monthFont lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
 		
 		NSString *label = [labelsByMonth objectForKey:[NSNumber numberWithInt:i+1]];
 		if (label) {
-			CGRect labelRect = CGRectMake(monthRect.origin.x, monthRect.origin.y + 23, monthRect.size.width, 20);
 			CGSize size = CGSizeMake(FLT_MAX, FLT_MAX);
-			float fontSize = 16.0;
-			while (size.width > labelRect.size.width) {
+			float fontSize = maxPaymentFontSize;
+			while (size.width > monthRect.size.width) {
 				fontSize -= 1.0;
 				size = [label sizeWithFont:[UIFont boldSystemFontOfSize:fontSize]];
-			}			
+			}
+			CGRect labelRect = CGRectMake(monthRect.origin.x, monthRect.origin.y + monthRect.size.height/2 - size.height/2, monthRect.size.width, size.height);
 			[label drawInRect:labelRect withFont:[UIFont boldSystemFontOfSize:fontSize]];
 		}
 	}

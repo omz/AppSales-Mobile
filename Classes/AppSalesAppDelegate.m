@@ -14,28 +14,50 @@
 #import "PromoCodeOperation.h"
 #import "SSKeychain.h"
 #import "ASAccount.h"
+#import "SalesViewController.h"
+#import "ReviewsViewController.h"
+#import "PaymentsViewController.h"
+#import "PromoCodesViewController.h"
+#import "PromoCodesLicenseViewController.h"
 
 @implementation AppSalesAppDelegate
 
-@synthesize window, accountsViewController;
+@synthesize window, accountsViewController, accountsPopover;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	srandom(time(NULL));
 	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
 	
-	AccountsViewController *rootViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
-	rootViewController.managedObjectContext = self.managedObjectContext;
-	UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
-	navigationController.toolbarHidden = NO;
-	self.accountsViewController = rootViewController;
+	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	
-	self.window.rootViewController = navigationController;
-	[self.window makeKeyAndVisible];
+	if (!iPad) {
+		AccountsViewController *rootViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
+		rootViewController.managedObjectContext = self.managedObjectContext;
+		UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
+		navigationController.toolbarHidden = NO;
+		self.accountsViewController = rootViewController;
+		
+		self.window.rootViewController = navigationController;
+		[self.window makeKeyAndVisible];
+	} else {
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
+		
+		self.accountsViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
+		self.accountsViewController.managedObjectContext = self.managedObjectContext;
+		self.accountsViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
+		self.accountsViewController.delegate = self;
+		UINavigationController *accountsNavController = [[[UINavigationController alloc] initWithRootViewController:self.accountsViewController] autorelease];
+		accountsNavController.toolbarHidden = NO;
+		self.accountsPopover = [[[UIPopoverController alloc] initWithContentViewController:accountsNavController] autorelease];	
+		[self loadAccount:nil];
+		[self.window makeKeyAndVisible];
+		[self selectAccount:nil];
+	}
 	
 	BOOL migrating = [self migrateDataIfNeeded];
 	if (migrating) {
-		[rootViewController reloadAccounts];
+		[self.accountsViewController reloadAccounts];
 	}
 	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
@@ -43,8 +65,8 @@
 	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 	if (productSortByValue==nil) {
 		[[NSUserDefaults standardUserDefaults] setObject:@"productId" forKey:@"ProductSortby"];
-	}	
-  
+	}
+	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportDownloadFailed:) name:ASReportDownloadFailedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeDownloadFailed:) name:ASPromoCodeDownloadFailedNotification object:nil];
 	
@@ -53,6 +75,60 @@
 	}
 	
 	return YES;
+}
+
+- (void)selectAccount:(id)sender
+{
+	[self.accountsPopover presentPopoverFromRect:CGRectMake(50, 50, 1, 1) inView:self.window.rootViewController.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+}
+
+- (void)accountsViewController:(AccountsViewController *)viewController didSelectAccount:(ASAccount *)account
+{
+	[self.accountsPopover dismissPopoverAnimated:YES];
+	[self loadAccount:account];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if (buttonIndex != actionSheet.cancelButtonIndex) {
+		NSFetchRequest *accountsFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+		[accountsFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:self.managedObjectContext]];
+		[accountsFetchRequest setSortDescriptors:[NSArray arrayWithObjects:[[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES] autorelease], [[[NSSortDescriptor alloc] initWithKey:@"username" ascending:YES] autorelease], nil]];
+		NSArray *accounts = [self.managedObjectContext executeFetchRequest:accountsFetchRequest error:NULL];
+		ASAccount *account = [accounts objectAtIndex:buttonIndex];
+		[self loadAccount:account];
+	}
+}
+
+- (void)loadAccount:(ASAccount *)account
+{
+	UIBarButtonItem *selectAccountButtonItem1 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
+	UIBarButtonItem *selectAccountButtonItem2 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
+	UIBarButtonItem *selectAccountButtonItem3 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
+	UIBarButtonItem *selectAccountButtonItem4 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
+	
+	SalesViewController *salesVC = [[[SalesViewController alloc] initWithAccount:account] autorelease];
+	salesVC.navigationItem.leftBarButtonItem = selectAccountButtonItem1;
+	UINavigationController *salesNavController = [[[UINavigationController alloc] initWithRootViewController:salesVC] autorelease];
+	
+	ReviewsViewController *reviewsVC = [[[ReviewsViewController alloc] initWithAccount:account] autorelease];
+	reviewsVC.navigationItem.leftBarButtonItem = selectAccountButtonItem2;
+	UINavigationController *reviewsNavController = [[[UINavigationController alloc] initWithRootViewController:reviewsVC] autorelease];
+	
+	PaymentsViewController *paymentsVC = [[[PaymentsViewController alloc] initWithAccount:account] autorelease];
+	paymentsVC.navigationItem.leftBarButtonItem = selectAccountButtonItem3;
+	UINavigationController *paymentsNavController = [[[UINavigationController alloc] initWithRootViewController:paymentsVC] autorelease];
+	
+	PromoCodesViewController *promoVC = [[[PromoCodesViewController alloc] initWithAccount:account] autorelease];
+	promoVC.navigationItem.leftBarButtonItem = selectAccountButtonItem4;
+	UINavigationController *promoNavController = [[[UINavigationController alloc] initWithRootViewController:promoVC] autorelease];
+	promoNavController.toolbarHidden = NO;
+	promoNavController.toolbar.barStyle = UIBarStyleBlackOpaque;
+	
+	UITabBarController *tabController = [[[UITabBarController alloc] initWithNibName:nil bundle:nil] autorelease];
+	[tabController setViewControllers:[NSArray arrayWithObjects:salesNavController, reviewsNavController, paymentsNavController, promoNavController, nil]];
+	
+	self.window.rootViewController = tabController;	
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
@@ -130,6 +206,14 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
 	[self saveContext];
+}
+
+- (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification
+{
+	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
+	PromoCodesLicenseViewController *vc = [[[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]] autorelease];
+	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
+	[self.window.rootViewController presentModalViewController:navController animated:YES];
 }
 
 #pragma mark - Core Data
@@ -242,6 +326,7 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[accountsPopover release];
 	[window release];
 	[managedObjectContext release];
 	[managedObjectModel release];

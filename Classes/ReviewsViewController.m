@@ -13,12 +13,14 @@
 
 @implementation ReviewsViewController
 
-@synthesize reviewSummaryView, downloadReviewsButtonItem;
+@synthesize reviewSummaryView, downloadReviewsButtonItem, reviewsPopover;
 
 - (id)initWithAccount:(ASAccount *)anAccount
 {
 	self = [super initWithAccount:anAccount];
 	if (self) {
+		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
+		self.tabBarItem.image = [UIImage imageNamed:@"Reviews.png"];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reviewDownloadProgressDidChange:) name:ReviewDownloadManagerDidUpdateProgressNotification object:nil];
 	}
 	return self;
@@ -31,6 +33,7 @@
 	self.reviewSummaryView = [[[ReviewSummaryView alloc] initWithFrame:self.topView.frame] autorelease];
 	reviewSummaryView.dataSource = self;
 	reviewSummaryView.delegate = self;
+	reviewSummaryView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 	[self.view addSubview:reviewSummaryView];
 	
 	self.downloadReviewsButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReviews:)] autorelease];
@@ -51,7 +54,9 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    // Return YES for supported orientations
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		return YES;
+	}
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
@@ -99,6 +104,8 @@
 
 - (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfReviewsForRating:(NSInteger)rating
 {
+	if (!self.account) return 0;
+	
 	NSFetchRequest *reviewsCountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
 	if (!self.selectedProduct) {
@@ -112,6 +119,8 @@
 
 - (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfUnreadReviewsForRating:(NSInteger)rating
 {
+	if (!self.account) return 0;
+	
 	NSFetchRequest *reviewsCountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
 	if (!self.selectedProduct) {
@@ -125,8 +134,16 @@
 
 - (void)reviewSummaryView:(ReviewSummaryView *)view didSelectRating:(NSInteger)rating
 {
+	if (!self.account) return;
+	
 	ReviewListViewController *vc = [[[ReviewListViewController alloc] initWithAccount:self.account product:self.selectedProduct rating:rating] autorelease];
-	[self.navigationController pushViewController:vc animated:YES];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		[self.navigationController pushViewController:vc animated:YES];
+	} else {
+		UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
+		self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
+		[reviewsPopover presentPopoverFromRect:[reviewSummaryView barFrameForRating:rating]	inView:reviewSummaryView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+	}
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -137,6 +154,7 @@
 
 - (void)dealloc
 {
+	[reviewsPopover release];
 	[reviewSummaryView release];
 	[downloadReviewsButtonItem release];
 	[super dealloc];

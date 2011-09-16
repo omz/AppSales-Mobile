@@ -22,6 +22,7 @@
 	NSArray *visibleProducts;
 	
 	UIImageView *shadowView;
+	UIPopoverController *colorPopover;
 	
 	BOOL statusVisible;
 	UIToolbar *statusToolbar;
@@ -38,6 +39,7 @@
 @property (nonatomic, retain) UITableView *productsTableView;
 @property (nonatomic, retain) UIView *topView;
 @property (nonatomic, retain) UIImageView *shadowView;
+@property (nonatomic, retain) UIPopoverController *colorPopover;
 @property (nonatomic, retain) UIToolbar *statusToolbar;
 @property (nonatomic, retain) UIBarButtonItem *stopButtonItem;
 @property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;

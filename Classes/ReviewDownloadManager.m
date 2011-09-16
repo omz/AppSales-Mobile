@@ -108,8 +108,8 @@
 
 - (float)downloadProgress
 {
-	if (totalDownloadsCount == 0) return 1.0;
-	return (float)completedDownloadsCount / (float)totalDownloadsCount;
+	float progress = (totalDownloadsCount == 0) ? 1.0 : (float)completedDownloadsCount / (float)totalDownloadsCount;
+	return progress;
 }
 
 - (void)dealloc

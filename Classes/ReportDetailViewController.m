@@ -40,6 +40,7 @@
 		[revenueFormatter setMinimumFractionDigits:2];
 		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
+		self.contentSizeForViewInPopover = CGSizeMake(320, 500);
     }
     return self;
 }
@@ -132,8 +133,12 @@
 	spaceItem.width = 21.0;
 	
 	[self updateNavigationButtons];
-	toolbar.items = [NSArray arrayWithObjects:prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
-	toolbar.translucent = YES;
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		toolbar.items = [NSArray arrayWithObjects:spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+	} else {
+		toolbar.items = [NSArray arrayWithObjects:prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+		toolbar.translucent = YES;
+	}
 	
 	[self reloadData];
 	[self updateHeader];

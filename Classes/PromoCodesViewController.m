@@ -25,6 +25,7 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 				
 		self.title = NSLocalizedString(@"Promo Codes", nil);
+		self.tabBarItem.image = [UIImage imageNamed:@"PromoCodes.png"];
     }
     return self;
 }
@@ -86,6 +87,9 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		return YES;
+	}
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 

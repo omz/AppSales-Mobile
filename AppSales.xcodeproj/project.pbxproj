@@ -21,6 +21,7 @@
 		7F1499CA13BE15F500D89064 /* NSData+Compression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1499C913BE15F500D89064 /* NSData+Compression.m */; };
 		7F1499D013BE311600D89064 /* ReportDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1499CF13BE311600D89064 /* ReportDownloadOperation.m */; };
 		7F1499E113BE544F00D89064 /* ReportDownloadCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1499E013BE544F00D89064 /* ReportDownloadCoordinator.m */; };
+		7F15453014223FFA00D74A18 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F15452F14223FFA00D74A18 /* Default-Portrait~ipad.png */; };
 		7F1B14F313C51ACA00243AA3 /* CurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1B14F213C51AC900243AA3 /* CurrencyManager.m */; };
 		7F1B153713C8029700243AA3 /* ReportImportOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1B153613C8029600243AA3 /* ReportImportOperation.m */; };
 		7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F24E70613E40A0D0056EA97 /* DashboardViewController.m */; };
@@ -30,6 +31,7 @@
 		7F26DF9413E1358B001D0F33 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F26DF9313E1358B001D0F33 /* ReviewTemplate.html */; };
 		7F2946EE13D880260023F530 /* ReportDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F2946ED13D880260023F530 /* ReportDetailViewController.m */; };
 		7F2946F113D8806F0023F530 /* MapView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F2946F013D8806E0023F530 /* MapView.m */; };
+		7F2E75D214237F2500793375 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F2E75D114237F2500793375 /* Default-Landscape~ipad.png */; };
 		7F3796CC13F8245800FA6E49 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F3796C913F8244000FA6E49 /* MessageUI.framework */; };
 		7F3796CD13F8246200FA6E49 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F1499CC13BE172300D89064 /* libz.dylib */; };
 		7F398EBD13DE1F2D004BEC44 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */; };
@@ -659,6 +661,7 @@
 		7F1499CF13BE311600D89064 /* ReportDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportDownloadOperation.m; sourceTree = "<group>"; };
 		7F1499DF13BE544F00D89064 /* ReportDownloadCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportDownloadCoordinator.h; sourceTree = "<group>"; };
 		7F1499E013BE544F00D89064 /* ReportDownloadCoordinator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportDownloadCoordinator.m; sourceTree = "<group>"; };
+		7F15452F14223FFA00D74A18 /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait~ipad.png"; sourceTree = "<group>"; };
 		7F1B14F113C51AC900243AA3 /* CurrencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrencyManager.h; sourceTree = "<group>"; };
 		7F1B14F213C51AC900243AA3 /* CurrencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrencyManager.m; sourceTree = "<group>"; };
 		7F1B153513C8029600243AA3 /* ReportImportOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportImportOperation.h; sourceTree = "<group>"; };
@@ -677,6 +680,7 @@
 		7F2946ED13D880260023F530 /* ReportDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportDetailViewController.m; sourceTree = "<group>"; };
 		7F2946EF13D8806E0023F530 /* MapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapView.h; sourceTree = "<group>"; };
 		7F2946F013D8806E0023F530 /* MapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapView.m; sourceTree = "<group>"; };
+		7F2E75D114237F2500793375 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		7F3796C913F8244000FA6E49 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
@@ -1483,6 +1487,8 @@
 		7F709D6F13BCCB8B0008DBAD /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				7F15452F14223FFA00D74A18 /* Default-Portrait~ipad.png */,
+				7F2E75D114237F2500793375 /* Default-Landscape~ipad.png */,
 				7FAEB66813E6D1AF00750788 /* Badge.png */,
 				7FAEB66913E6D1AF00750788 /* Badge@2x.png */,
 				7FF88AD013E428720016AA17 /* Star.png */,
@@ -2834,6 +2840,8 @@
 				7FAEB68F13E75B0000750788 /* About.html in Resources */,
 				7FD9D36113F67CB500D76D02 /* PromoCodes.png in Resources */,
 				7F0B8A7013F7C0EC006E9151 /* RequestPromoCode.png in Resources */,
+				7F15453014223FFA00D74A18 /* Default-Portrait~ipad.png in Resources */,
+				7F2E75D214237F2500793375 /* Default-Landscape~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2960,7 +2968,9 @@
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = AppSalesMobile;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2972,7 +2982,9 @@
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = AppSalesMobile;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -12,17 +12,21 @@
 #define kAccountUsername					@"username"
 #define kAccountPassword					@"password"
 #define kAccountVendorID					@"vendorID"
+#define ASViewSettingsDidChangeNotification	@"ASViewSettingsDidChangeNotification"
 
 @class ASAccount;
+@protocol AccountsViewControllerDelegate;
 
 @interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate>
 {
+	id<AccountsViewControllerDelegate> delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;
 	ASAccount *selectedAccount;
 	UIBarButtonItem *refreshButtonItem;
 }
 
+@property (nonatomic, assign) id<AccountsViewControllerDelegate> delegate;
 @property (nonatomic, retain) UIBarButtonItem *refreshButtonItem;
 @property (nonatomic, retain) NSArray *accounts;
 @property (nonatomic, retain) ASAccount *selectedAccount;
@@ -35,5 +39,11 @@
 - (void)addNewAccount;
 - (void)editAccount:(ASAccount *)account;
 - (void)saveContext;
+
+@end
+
+@protocol AccountsViewControllerDelegate <NSObject>
+
+- (void)accountsViewController:(AccountsViewController *)viewController didSelectAccount:(ASAccount *)account;
 
 @end

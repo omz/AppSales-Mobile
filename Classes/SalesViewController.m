@@ -19,6 +19,7 @@
 #import "UIColor+Extensions.h"
 #import "ReportDetailViewController.h"
 #import "AppleFiscalCalendar.h"
+#import "AccountsViewController.h"
 
 #define kSheetTagDailyGraphOptions		1
 #define kSheetTagMonthlyGraphOptions	2
@@ -34,12 +35,15 @@
 
 @synthesize sortedDailyReports, sortedWeeklyReports, sortedCalendarMonthReports, sortedFiscalMonthReports, viewMode;
 @synthesize graphView, downloadReportsButtonItem;
+@synthesize selectedReportPopover;
 
 - (id)initWithAccount:(ASAccount *)anAccount
 {
 	self = [super initWithAccount:anAccount];
 	if (self) {
-		previousOrientation = UIInterfaceOrientationPortrait;
+		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
+		self.tabBarItem.image = [UIImage imageNamed:@"Sales.png"];
+		
 		sortedDailyReports = [NSMutableArray new];
 		sortedWeeklyReports = [NSMutableArray new];
 		sortedCalendarMonthReports = [NSMutableArray new];
@@ -55,6 +59,8 @@
 		selectedTab = [[NSUserDefaults standardUserDefaults] integerForKey:kSettingDashboardSelectedTab];
 		showFiscalMonths = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingShowFiscalMonths];
 		showWeeks = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDashboardShowWeeks];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 	}
 	return self;
 }
@@ -65,16 +71,27 @@
 	
 	self.viewMode = [[NSUserDefaults standardUserDefaults] integerForKey:kSettingDashboardViewMode];
 	
-	self.graphView = [[[GraphView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 208)] autorelease];
+	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
+	
+	self.graphView = [[[GraphView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, (iPad) ? 450 : 208)] autorelease];
 	graphView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	graphView.delegate = self;
 	graphView.dataSource = self;
 	[graphView setUnit:(viewMode != DashboardViewModeRevenue) ? @"" : [[CurrencyManager sharedManager] baseCurrencyDescription]];
-	[graphView.sectionLabelButton addTarget:self action:@selector(showGraphOptions:) forControlEvents:UIControlEventTouchUpInside];
-	[graphView setNumberOfBarsPerPage:7];
+	if (!iPad) {
+		[graphView.sectionLabelButton addTarget:self action:@selector(showGraphOptions:) forControlEvents:UIControlEventTouchUpInside];	
+	} else {
+		graphView.sectionLabelButton.enabled = NO;
+	}
+	[graphView setNumberOfBarsPerPage:iPad ? 14 : 7];
 	[self.topView addSubview:graphView];
 	
-	NSArray *segments = [NSArray arrayWithObjects:NSLocalizedString(@"Reports", nil), NSLocalizedString(@"Months", nil), nil];
+	NSArray *segments;
+	if (iPad) {
+		segments = [NSArray arrayWithObjects:NSLocalizedString(@"Daily Reports", nil), NSLocalizedString(@"Weekly Reports", nil), NSLocalizedString(@"Calendar Months", nil), NSLocalizedString(@"Fiscal Months", nil), nil];
+	} else {
+		segments = [NSArray arrayWithObjects:NSLocalizedString(@"Reports", nil), NSLocalizedString(@"Months", nil), nil];
+	}
 	UISegmentedControl *tabControl = [[[UISegmentedControl alloc] initWithItems:segments] autorelease];
 	tabControl.segmentedControlStyle = UISegmentedControlStyleBar;
 	[tabControl addTarget:self action:@selector(switchTab:) forControlEvents:UIControlEventValueChanged];
@@ -100,6 +117,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
+	previousOrientation = self.interfaceOrientation;
 	[self reloadData];
 }
 
@@ -128,6 +146,9 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		return YES;
+	}
 	return UIInterfaceOrientationIsLandscape(interfaceOrientation) || interfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
@@ -139,8 +160,9 @@
 		self.productsTableView.alpha = 0.0;
 		[self.graphView reloadValuesAnimated:NO];
 	} else {
-		self.graphView.frame = CGRectMake(0, 0, self.view.bounds.size.width, 208);
-		self.topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, 208);
+		CGFloat graphHeight = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 450 : 208;
+		self.graphView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
+		self.topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
 		self.productsTableView.alpha = 1.0;
 		[self.graphView reloadValuesAnimated:NO];
 	}
@@ -280,6 +302,21 @@
 - (void)switchTab:(UISegmentedControl *)modeControl
 {
 	selectedTab = modeControl.selectedSegmentIndex;
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		if (selectedTab == 0) {
+			showWeeks = NO;
+		} else if (selectedTab == 1) {
+			selectedTab = 0;
+			showWeeks = YES;
+		} else if (selectedTab == 2) {
+			selectedTab = 1;
+			showFiscalMonths = NO;
+		} else if (selectedTab == 3) {
+			selectedTab = 1;
+			showFiscalMonths = YES;
+		}
+	}
+	
 	[[NSUserDefaults standardUserDefaults] setInteger:selectedTab forKey:kSettingDashboardSelectedTab];
 	[self reloadTableView];
 	[self.graphView reloadData];
@@ -552,7 +589,7 @@
 
 #pragma mark - Graph view delegate
 
-- (void)graphView:(GraphView *)view didSelectBarAtIndex:(NSUInteger)index
+- (void)graphView:(GraphView *)view didSelectBarAtIndex:(NSUInteger)index withFrame:(CGRect)barFrame
 {
 	NSArray *reports = nil;
 	if (selectedTab == 0) {
@@ -566,7 +603,24 @@
 	}
 	ReportDetailViewController *vc = [[[ReportDetailViewController alloc] initWithReports:reports selectedIndex:index] autorelease];
 	vc.selectedProduct = self.selectedProduct;
-	[self.navigationController pushViewController:vc animated:YES];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		[self.navigationController pushViewController:vc animated:YES];
+	} else {
+		if (self.selectedReportPopover.isPopoverVisible) {
+			ReportDetailViewController *selectedReportDetailViewController = (ReportDetailViewController *)[[(UINavigationController *)self.selectedReportPopover.contentViewController viewControllers] objectAtIndex:0];
+			if (selectedReportDetailViewController.selectedReportIndex == index) {
+				[self.selectedReportPopover dismissPopoverAnimated:YES];
+				return;
+			} else {
+				[self.selectedReportPopover dismissPopoverAnimated:NO];
+			}
+		}
+		UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
+		self.selectedReportPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
+		self.selectedReportPopover.passthroughViews = [NSArray arrayWithObjects:self.graphView, nil];
+		
+		[self.selectedReportPopover presentPopoverFromRect:barFrame inView:self.graphView permittedArrowDirections:UIInterfaceOrientationIsPortrait(self.interfaceOrientation) ? UIPopoverArrowDirectionUp : UIPopoverArrowDirectionDown animated:YES];
+	}
 }
 
 - (BOOL)graphView:(GraphView *)view canDeleteBarAtIndex:(NSUInteger)index
@@ -680,6 +734,8 @@
 
 - (void)dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:ASViewSettingsDidChangeNotification object:nil];
+	
 	[account removeObserver:self forKeyPath:@"isDownloadingReports"];
 	[account removeObserver:self forKeyPath:@"downloadProgress"];
 	[account removeObserver:self forKeyPath:@"downloadStatus"];

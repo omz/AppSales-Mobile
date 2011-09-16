@@ -104,6 +104,14 @@
 	}
 }
 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		return YES;
+	}
+	return toInterfaceOrientation == UIInterfaceOrientationPortrait;
+}
+
 - (void)done
 {
 	if (self.delegate && [self.delegate respondsToSelector:@selector(fieldEditor:didFinishEditingWithValues:)]) {
@@ -391,6 +399,7 @@
 		}
 	}
 	FieldEditorViewController *subController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:@""] autorelease];
+	subController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
 	subController.title = subsectionField.title;
 	subController.delegate = self;
 	subController.doneButtonTitle = NSLocalizedString(@"Save",nil);

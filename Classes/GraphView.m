@@ -170,11 +170,10 @@
 - (void)barSelected:(StackedBarView *)barView
 {
 	if ([[UIMenuController sharedMenuController] isMenuVisible]) return;
-	
 	for (NSNumber *barIndex in visibleBarViews) {
 		StackedBarView *view = [visibleBarViews objectForKey:barIndex];
 		if (view == barView) {
-			[self.delegate graphView:self didSelectBarAtIndex:[barIndex unsignedIntegerValue]];
+			[self.delegate graphView:self didSelectBarAtIndex:[barIndex unsignedIntegerValue] withFrame:[self convertRect:view.frame fromView:view.superview]];
 			break;
 		}
 	}

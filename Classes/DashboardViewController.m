@@ -16,7 +16,7 @@
 @implementation DashboardViewController
 
 @synthesize account, products, visibleProducts, selectedProduct;
-@synthesize productsTableView, topView, shadowView, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
+@synthesize productsTableView, topView, shadowView, colorPopover, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
 
 
 - (id)initWithAccount:(ASAccount *)anAccount
@@ -24,8 +24,7 @@
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		self.account = anAccount;
-		self.title = [account displayName];
-		self.hidesBottomBarWhenPushed = YES;
+		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 	}
 	return self;
@@ -75,21 +74,22 @@
 - (void)loadView
 {
 	[super loadView];
+	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
 	statusVisible = [self shouldShowStatusBar];
 	self.topView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]] autorelease];
 	topView.userInteractionEnabled = YES;
 	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, 208);
+	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450 : 208);
 	[self.view addSubview:topView];
 	
 	UIImageView *graphShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
 	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
-	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	[topView addSubview:graphShadowView];
 	
 	self.productsTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain] autorelease];
-	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	productsTableView.dataSource = self;
 	productsTableView.delegate = self;
@@ -107,6 +107,7 @@
 	
 	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
 	shadowView.frame = graphShadowView.frame;
+	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	shadowView.alpha = 0.0;
 	
 	[self.view addSubview:shadowView];
@@ -260,8 +261,14 @@
 	ColorPickerViewController *vc = [[[ColorPickerViewController alloc] initWithColors:palette] autorelease];
 	vc.delegate = self;
 	vc.context = product;
-	vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
-	[self presentModalViewController:vc animated:YES];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
+		[self presentModalViewController:vc animated:YES];
+	} else {
+		vc.contentSizeForViewInPopover = CGSizeMake(320, 210);
+		self.colorPopover = [[[UIPopoverController alloc] initWithContentViewController:vc] autorelease];
+		[self.colorPopover presentPopoverFromRect:sender.bounds inView:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	}
 }
 
 - (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(int)colorIndex
@@ -270,7 +277,11 @@
 	product.color = color;
 	[product.managedObjectContext save:NULL];
 	[self reloadTableView];
-	[picker dismissModalViewControllerAnimated:YES];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		[picker dismissModalViewControllerAnimated:YES];
+	} else {
+		[self.colorPopover dismissPopoverAnimated:YES];
+	}
 }
 
 #pragma mark - Tableview data source
@@ -350,6 +361,7 @@
 	[activityIndicator release];
 	[statusLabel release];
 	[progressBar release];
+	[colorPopover release];
 	[super dealloc];
 }
 
