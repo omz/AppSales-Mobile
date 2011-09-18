@@ -9,6 +9,7 @@
 #import "ReviewDownloadManager.h"
 #import "Product.h"
 #import "Review.h"
+#import "LKGoogleTranslator.h"
 
 #define kReviewInfoTitle		@"title"
 #define kReviewInfoUser			@"user"
@@ -145,7 +146,9 @@
 
 - (void)start
 {
-    NSAssert(canceled == false, nil, nil);
+    if (canceled) {
+        return;
+    }
     // method may be called by connectionDidFinishLoading, and don't want to clobber the existing taskID
     if (backgroundTaskID == UIBackgroundTaskInvalid) {
         backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
@@ -238,6 +241,7 @@
 			BOOL changesMade = NO;
             NSDate *today = [NSDate date];
             NSNumber *yesObject = [NSNumber numberWithBool:YES];
+            NSMutableArray *updatedOrNewReviews = [NSMutableArray array];
 			for (NSDictionary *reviewInfo in [reviewInfos reverseObjectEnumerator]) {
 				Review *existingReview = [existingReviewsByUser objectForKey:[reviewInfo objectForKey:kReviewInfoUser]];
 				if (!existingReview) {
@@ -253,6 +257,7 @@
 					newReview.unread = yesObject;
 					newReview.reviewDate = [reviewDateFormatter dateFromString:[reviewInfo objectForKey:kReviewInfoDateString]];
 					[existingReviewsByUser setObject:newReview forKey:newReview.user];
+                    [updatedOrNewReviews addObject:newReview];
 					changesMade = YES;
 				} else {
 					NSString *existingText = existingReview.text;
@@ -265,10 +270,30 @@
 						existingReview.text = newText;
 						existingReview.title = newTitle;
 						existingReview.rating = newRating;
+                        [updatedOrNewReviews addObject:existingReview];
 						changesMade = YES;
 					}
 				}
 			}
+            
+            if (updatedOrNewReviews.count) {
+                // update translations
+                NSMutableArray *textToTranslate = [NSMutableArray arrayWithCapacity:2*updatedOrNewReviews.count];
+                for (Review *rev in updatedOrNewReviews) {
+                    [textToTranslate addObject:rev.title];
+                    [textToTranslate addObject:rev.text];
+                }
+                LKGoogleTranslator *translator = [[LKGoogleTranslator new] autorelease];
+                NSString *presentationLanguage = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
+                NSArray *translated = [translator translateMultipleText:textToTranslate toLanguage:presentationLanguage];
+                
+                for (NSUInteger i=0, count=updatedOrNewReviews.count; i < count; i++) {
+                    Review *review = [updatedOrNewReviews objectAtIndex:i];
+                    review.title = [translated objectAtIndex:2*i];
+                    review.text = [translated objectAtIndex:2*i+1];
+                }
+            }
+            
 			
             if (changesMade) {
                 [psc lock];
