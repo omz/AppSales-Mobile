@@ -51,7 +51,7 @@
 	
 	UIBackgroundTaskIdentifier backgroundTaskID;
 	
-	BOOL canceled;
+	volatile BOOL canceled; // read/write from different threads without synchronization, hence volatile
 }
 
 @property (nonatomic, assign) id<ReviewDownloadDelegate> delegate;
