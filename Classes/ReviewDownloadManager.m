@@ -268,7 +268,8 @@
                 [psc unlock];
             }
 			
-			if (changesMade && [reviewInfos count] >= 20) {
+            const NSUInteger NUM_REVIEWS_PER_PAGE = 20;
+			if (changesMade && [reviewInfos count] >= NUM_REVIEWS_PER_PAGE) {
 				dispatch_async(dispatch_get_main_queue(), ^ {
 					page = page + 1;
 					[self start];
