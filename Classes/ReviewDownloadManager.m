@@ -85,10 +85,11 @@
 	if ([downloadQueue count] == 0) return;
 	if ([activeDownloads count] >= MAX_CONCURRENT_REVIEW_DOWNLOADS) return;
 	
-	ReviewDownload *nextDownload = [[[downloadQueue objectAtIndex:0] retain] autorelease];
+	ReviewDownload *nextDownload = [[downloadQueue objectAtIndex:0] retain];
 	[downloadQueue removeObjectAtIndex:0];
 	[activeDownloads addObject:nextDownload];
 	[nextDownload start];
+    [nextDownload release];
 	
 	[self dequeueDownload];
 }
@@ -125,7 +126,7 @@
 
 @implementation ReviewDownload
 
-@synthesize delegate, downloadConnection;
+@synthesize delegate;
 
 - (id)initWithProduct:(Product *)app storeFront:(NSString *)storeFrontID countryCode:(NSString *)countryCode
 {
@@ -136,33 +137,49 @@
 		productObjectID = [[app objectID] copy];
 		psc = [[[app managedObjectContext] persistentStoreCoordinator] retain];
 		storeFront = [storeFrontID retain];
-		data = [NSMutableData new];
 		page = 1;
+        backgroundTaskID = UIBackgroundTaskInvalid;
 	}
 	return self;
 }
 
 - (void)start
 {
-	backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
+    NSAssert(canceled == false, nil, nil);
+    // method may be called by connectionDidFinishLoading, and don't want to clobber the existing taskID
+    if (backgroundTaskID == UIBackgroundTaskInvalid) {
+        backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
+    }
+    [data release]; // release fields from potential previous page downloads
+    data = [NSMutableData new];
 	
 	NSString *productID = _product.productID;
-	NSString *URLString = [NSString stringWithFormat:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/customerReviews?s=%@&id=%@&displayable-kind=11&page=%i&sort=4", storeFront, productID, page];
-	NSURL *URL = [NSURL URLWithString:URLString];
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+	NSString *URLString = [[NSString alloc] initWithFormat:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/customerReviews?s=%@&id=%@&displayable-kind=11&page=%i&sort=4", storeFront, productID, page];
+	NSURL *URL = [[NSURL alloc] initWithString:URLString];
+    [URLString release];
+	NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:URL];
+    [URL release];
 	[request setValue:@"iTunes/10.1.1 (Macintosh; Intel Mac OS X 10.6.5) AppleWebKit/533.19.4" forHTTPHeaderField:@"User-Agent"];
 	[request setValue:[NSString stringWithFormat:@"%@-1,12", storeFront] forHTTPHeaderField:@"X-Apple-Store-Front"];
 	
-	self.downloadConnection = [NSURLConnection connectionWithRequest:request delegate:self];
+    [downloadConnection release];
+    downloadConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    [request release];
+}
+
+- (void)endBackgroundTask
+{
+    if (backgroundTaskID != UIBackgroundTaskInvalid) {
+        [[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+        backgroundTaskID = UIBackgroundTaskInvalid;
+    }
 }
 
 - (void)cancel
 {
-	if (backgroundTaskID != UIBackgroundTaskInvalid) {
-		[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-	}
+    [self endBackgroundTask];
 	canceled = YES;
-	[self.downloadConnection cancel];
+	[downloadConnection cancel];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)dataChunk
@@ -214,12 +231,14 @@
 			[existingReviewsFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:moc]];
 			[existingReviewsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND countryCode == %@ AND user IN %@", product, country, downloadedUsers]];
 			NSArray *existingReviews = [moc executeFetchRequest:existingReviewsFetchRequest error:NULL];
-			NSMutableDictionary *existingReviewsByUser = [NSMutableDictionary dictionary];
+			NSMutableDictionary *existingReviewsByUser = [NSMutableDictionary dictionaryWithCapacity:existingReviews.count];
 			for (Review *existingReview in existingReviews) {
 				[existingReviewsByUser setObject:existingReview forKey:existingReview.user];
 			}
 			
 			BOOL changesMade = NO;
+            NSDate *today = [NSDate date];
+            NSNumber *yesObject = [NSNumber numberWithBool:YES];
 			for (NSDictionary *reviewInfo in [reviewInfos reverseObjectEnumerator]) {
 				Review *existingReview = [existingReviewsByUser objectForKey:[reviewInfo objectForKey:kReviewInfoUser]];
 				if (!existingReview) {
@@ -228,11 +247,11 @@
 					newReview.title = [reviewInfo objectForKey:kReviewInfoTitle];
 					newReview.text = [reviewInfo objectForKey:kReviewInfoText];
 					newReview.rating = [reviewInfo objectForKey:kReviewInfoRating];
-					newReview.downloadDate = [NSDate date];
 					newReview.productVersion = [reviewInfo objectForKey:kReviewInfoVersion];
+					newReview.downloadDate = today;
 					newReview.product = product;
 					newReview.countryCode = country;
-					newReview.unread = [NSNumber numberWithBool:YES];
+					newReview.unread = yesObject;
 					newReview.reviewDate = [reviewDateFormatter dateFromString:[reviewInfo objectForKey:kReviewInfoDateString]];
 					[existingReviewsByUser setObject:newReview forKey:newReview.user];
 					changesMade = YES;
@@ -252,34 +271,37 @@
 				}
 			}
 			
-			[psc lock];
-			NSError *saveError = nil;
-			[moc save:&saveError];
-			if (saveError) {
-				NSLog(@"Could not save context: %@", saveError);
-			}
-			[psc unlock];
+            if (changesMade) {
+                [psc lock];
+                NSError *saveError = nil;
+                [moc save:&saveError];
+                if (saveError) {
+                    NSLog(@"Could not save context: %@", saveError);
+                }
+                [psc unlock];
+            }
 			
-			if (changesMade && [reviewInfos count] >= 20) {
+            const NSUInteger NUM_REVIEWS_PER_PAGE = 20;
+			if (changesMade && [reviewInfos count] >= NUM_REVIEWS_PER_PAGE) {
 				dispatch_async(dispatch_get_main_queue(), ^ {
 					page = page + 1;
 					[self start];
 				});
 			} else {
-				dispatch_async(dispatch_get_main_queue(), ^ {
-					if (!canceled) {
-						[self.delegate reviewDownloadDidFinish:self];
-					}
-				});
+                if (!canceled) {
+                    dispatch_async(dispatch_get_main_queue(), ^ {
+                        [self.delegate reviewDownloadDidFinish:self];
+                    });
+                }
 			}
 		});
 	} else {
 		if (!canceled) {
-			[self.delegate reviewDownloadDidFinish:self];
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                [self.delegate reviewDownloadDidFinish:self];
+            });
 		}
-		if (backgroundTaskID != UIBackgroundTaskInvalid) {
-			[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-		}
+		[self endBackgroundTask];
 	}
 }
 
@@ -287,6 +309,8 @@
 {
 	NSMutableArray *reviews = [NSMutableArray array];
 	NSScanner *scanner = [NSScanner scannerWithString:html];
+    NSCharacterSet *whitespaceAndNewlineCharacterSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    
 	while (![scanner isAtEnd]) {
 		NSString *reviewTitle = nil;
 		[scanner scanUpToString:@"<span class=\"customerReviewTitle\">" intoString:NULL];
@@ -308,18 +332,18 @@
 		[scanner scanString:@"class=\"reviewer\">" intoString:NULL];
 		[scanner scanUpToString:@"</a>" intoString:&reviewUser];
 		[scanner scanString:@"</a>" intoString:NULL];
-		reviewUser = [reviewUser stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		reviewUser = [reviewUser stringByTrimmingCharactersInSet:whitespaceAndNewlineCharacterSet];
 		
 		NSString *reviewVersion = nil;
 		NSString *reviewDateString = nil;
 		NSString *reviewVersionAndDate = nil;
 		[scanner scanUpToString:@"</span>" intoString:&reviewVersionAndDate];
-		reviewVersionAndDate = [reviewVersionAndDate stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		reviewVersionAndDate = [reviewVersionAndDate stringByTrimmingCharactersInSet:whitespaceAndNewlineCharacterSet];
 		if (reviewVersionAndDate) {
 			NSArray *versionAndDateLines = [reviewVersionAndDate componentsSeparatedByString:@"\n"];
 			if ([versionAndDateLines count] == 6) {
-				reviewVersion = [[versionAndDateLines objectAtIndex:2] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-				reviewDateString = [[versionAndDateLines objectAtIndex:5] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				reviewVersion = [[versionAndDateLines objectAtIndex:2] stringByTrimmingCharactersInSet:whitespaceAndNewlineCharacterSet];
+				reviewDateString = [[versionAndDateLines objectAtIndex:5] stringByTrimmingCharactersInSet:whitespaceAndNewlineCharacterSet];
 			}
 		}
 		
@@ -327,7 +351,7 @@
 		[scanner scanUpToString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
 		[scanner scanString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
 		[scanner scanUpToString:@"</p>" intoString:&reviewText];
-		reviewText = [reviewText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		reviewText = [reviewText stringByTrimmingCharactersInSet:whitespaceAndNewlineCharacterSet];
 		
 		if (rating > 0 && reviewTitle && reviewUser && reviewVersion && reviewDateString && reviewText) {
 			NSDictionary *reviewInfo = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -346,9 +370,7 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-	if (backgroundTaskID != UIBackgroundTaskInvalid) {
-		[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-	}
+    [self endBackgroundTask];
 	[self.delegate reviewDownloadDidFinish:self];
 }
 
