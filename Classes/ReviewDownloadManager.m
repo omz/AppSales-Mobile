@@ -258,13 +258,15 @@
 				}
 			}
 			
-			[psc lock];
-			NSError *saveError = nil;
-			[moc save:&saveError];
-			if (saveError) {
-				NSLog(@"Could not save context: %@", saveError);
-			}
-			[psc unlock];
+            if (changesMade) {
+                [psc lock];
+                NSError *saveError = nil;
+                [moc save:&saveError];
+                if (saveError) {
+                    NSLog(@"Could not save context: %@", saveError);
+                }
+                [psc unlock];
+            }
 			
 			if (changesMade && [reviewInfos count] >= 20) {
 				dispatch_async(dispatch_get_main_queue(), ^ {
