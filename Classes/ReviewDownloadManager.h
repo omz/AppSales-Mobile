@@ -55,7 +55,6 @@
 }
 
 @property (nonatomic, assign) id<ReviewDownloadDelegate> delegate;
-@property (nonatomic, retain) NSURLConnection *downloadConnection;
 
 - (id)initWithProduct:(Product *)app storeFront:(NSString *)storeFrontID countryCode:(NSString *)countryCode;
 - (void)start;
