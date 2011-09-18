@@ -136,15 +136,21 @@
 		productObjectID = [[app objectID] copy];
 		psc = [[[app managedObjectContext] persistentStoreCoordinator] retain];
 		storeFront = [storeFrontID retain];
-		data = [NSMutableData new];
 		page = 1;
+        backgroundTaskID = UIBackgroundTaskInvalid;
 	}
 	return self;
 }
 
 - (void)start
 {
-	backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
+    NSAssert(canceled == false, nil, nil);
+    // method may be called by connectionDidFinishLoading, and don't want to clobber the existing taskID
+    if (backgroundTaskID == UIBackgroundTaskInvalid) {
+        backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
+    }
+    [data release]; // release fields from potential previous page downloads
+    data = [NSMutableData new];
 	
 	NSString *productID = _product.productID;
 	NSString *URLString = [NSString stringWithFormat:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/customerReviews?s=%@&id=%@&displayable-kind=11&page=%i&sort=4", storeFront, productID, page];
