@@ -51,9 +51,8 @@
 	template = [template stringByReplacingOccurrencesOfString:@"[[[SUBTITLE]]]" withString:reviewSubtitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.text];
 	
-	UIBarButtonItem *sendReview = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(sendReviewViaEmail)];
-	self.navigationItem.rightBarButtonItem = sendReview;
-	[sendReview release];
+	UIBarButtonItem *sendReviewButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)] autorelease];
+	self.navigationItem.rightBarButtonItem = sendReviewButtonItem;
 	
 	[self.webView loadHTMLString:template baseURL:nil];
 }
@@ -88,6 +87,9 @@
 	NSString *subject = [NSString stringWithFormat:@"Review from %@", review.user];
 	[mailComposeViewController setMessageBody:body isHTML:YES];
 	[mailComposeViewController setSubject:subject];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		mailComposeViewController.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
 	[self presentModalViewController:mailComposeViewController animated:YES];
 }
 
