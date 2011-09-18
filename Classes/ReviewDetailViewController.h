@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MessageUI.h>
 
 @class Review;
 
-@interface ReviewDetailViewController : UIViewController {
+@interface ReviewDetailViewController : UIViewController <MFMailComposeViewControllerDelegate> {
 
 	Review *review;
 	UIWebView *webView;
