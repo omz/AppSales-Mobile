@@ -192,7 +192,6 @@
 	NSString *html = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 	if (html) {
 		dispatch_async(dispatch_get_global_queue(0, 0), ^ {
-			
 			NSArray *reviewInfos = [self reviewInfosFromHTML:html];
 			
 			NSManagedObjectContext *moc = [[[NSManagedObjectContext alloc] init] autorelease];
@@ -297,9 +296,7 @@
 		});
 	} else {
 		if (!canceled) {
-            dispatch_async(dispatch_get_main_queue(), ^ {
-                [self.delegate reviewDownloadDidFinish:self];
-            });
+            [self.delegate reviewDownloadDidFinish:self];
 		}
 		[self endBackgroundTask];
 	}
