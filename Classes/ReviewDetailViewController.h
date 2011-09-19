@@ -17,8 +17,6 @@
 	UIWebView *webView;
 }
 
-@property (nonatomic, retain) UIWebView *webView;
-
 - (id)initWithReview:(Review *)review;
 
 @end

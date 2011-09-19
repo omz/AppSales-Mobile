@@ -80,7 +80,7 @@
 	cell.imageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", review.countryCode]];
 	NSString *ratingString = [@"" stringByPaddingToLength:[review.rating integerValue] withString:@"\u2605" startingAtIndex:0];
 	cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ - %@", ratingString, [review.product displayName]];
-	cell.textLabel.text = review.title;
+	cell.textLabel.text = review.presentationTitle;
 	if ([review.unread boolValue]) {
 		cell.textLabel.textColor = [UIColor blackColor];
 	} else {

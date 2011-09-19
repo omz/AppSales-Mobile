@@ -24,11 +24,13 @@
 #import "AccountStatusView.h"
 #import "PromoCodesViewController.h"
 #import "PromoCodesLicenseViewController.h"
+#import "Review.h"
 
 #define kAddNewAccountEditorIdentifier		@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier		@"EditAccountEditorIdentifier"
 #define kSettingsEditorIdentifier			@"SettingsEditorIdentifier"
 #define kUpdateExchangeRatesButton			@"UpdateExchangeRatesButton"
+#define kTranslateReviews                   @"TranslateReviewsSwitch"
 #define kImportReportsButton				@"ImportReportsButton"
 #define kExportReportsButton				@"ExportReportsButton"
 #define kDownloadBoxcarButton				@"DownloadBoxcarButton"
@@ -411,7 +413,6 @@
 																			title:NSLocalizedString(@"General", nil) 
 																	  description:NSLocalizedString(@"Exchange rates will automatically be refreshed periodically.", nil)];
 
-
   
 	// products section
 	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
@@ -427,7 +428,14 @@
 																			description:nil];
 	productSortingSection.exclusiveSelection = YES;
 	FieldSpecifier *productsSectionField = [FieldSpecifier subsectionFieldWithSection:productSortingSection key:@"sortby"];
-	FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productsSectionField, nil] 
+    
+    BOOL translateForeignReviews = [Review showTranslatedReviews];
+    FieldSpecifier *translateSection = [FieldSpecifier switchFieldWithKey:kTranslateReviews
+                                                                    title:NSLocalizedString(@"Translate Foreign Reviews", nil)
+                                                             defaultValue:translateForeignReviews];
+
+    
+	FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productsSectionField, translateSection, nil] 
 																				  title:NSLocalizedString(@"Products", nil) 
 																			description:NSLocalizedString(@"", nil)];
 	
@@ -515,18 +523,20 @@
 					[[CurrencyManager sharedManager] setBaseCurrency:[[key componentsSeparatedByString:@"."] lastObject]];
 				}
 			}
-      
-      if ([key hasPrefix:@"sortby."]) {
+            
+            if ([key hasPrefix:@"sortby."]) {
 				if ([[returnValues objectForKey:key] boolValue]) {
-          [[NSUserDefaults standardUserDefaults] setObject:[[key componentsSeparatedByString:@"."] lastObject] forKey:@"ProductSortby"];
+                    [[NSUserDefaults standardUserDefaults] setObject:[[key componentsSeparatedByString:@"."] lastObject] forKey:@"ProductSortby"];
 				}
 			}
-      
+            
 		}
 		[self dismissModalViewControllerAnimated:YES];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASViewSettingsDidChangeNotification object:nil];
-	}
+    }
+    NSNumber *translate = [returnValues objectForKey:kTranslateReviews];
+    [Review setShowTranslatedReviews:translate.boolValue];
 	[self reloadAccounts];
 }
 
@@ -609,7 +619,7 @@
 			[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Boxcar Not Installed", nil) 
 										 message:NSLocalizedString(@"The Boxcar app is not installed on your device. Please download it from the App Store and try again.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
 		}
-	}
+    }
 }
 
 - (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account
