@@ -634,6 +634,8 @@
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
+		FA41EC971427C66900AD45CC /* LKGoogleTranslator.m in Sources */ = {isa = PBXBuildFile; fileRef = FA41EC941427C66900AD45CC /* LKGoogleTranslator.m */; };
+		FA41EC981427C66900AD45CC /* NSString+UnescapeHtml.m in Sources */ = {isa = PBXBuildFile; fileRef = FA41EC961427C66900AD45CC /* NSString+UnescapeHtml.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1327,6 +1329,11 @@
 		7FFFB39513D4573700AD18E3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
 		7FFFB39713D4573700AD18E3 /* Sales.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Sales.png; sourceTree = "<group>"; };
 		7FFFB39C13D4599300AD18E3 /* DateButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButton.png; sourceTree = "<group>"; };
+		FA41EC911427C62A00AD45CC /* AppSales 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 4.xcdatamodel"; sourceTree = "<group>"; };
+		FA41EC931427C66900AD45CC /* LKGoogleTranslator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LKGoogleTranslator.h; sourceTree = "<group>"; };
+		FA41EC941427C66900AD45CC /* LKGoogleTranslator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LKGoogleTranslator.m; sourceTree = "<group>"; };
+		FA41EC951427C66900AD45CC /* NSString+UnescapeHtml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+UnescapeHtml.h"; sourceTree = "<group>"; };
+		FA41EC961427C66900AD45CC /* NSString+UnescapeHtml.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+UnescapeHtml.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1655,16 +1662,20 @@
 			children = (
 				7F7F4A0313E4F4AD006C6651 /* JSONKit.h */,
 				7F7F4A0413E4F4AD006C6651 /* JSONKit.m */,
-				7F454F9E13D5C24F00AE47D1 /* UIColor+Extensions.h */,
-				7F454F9F13D5C24F00AE47D1 /* UIColor+Extensions.m */,
+				FA41EC931427C66900AD45CC /* LKGoogleTranslator.h */,
+				FA41EC941427C66900AD45CC /* LKGoogleTranslator.m */,
+				7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */,
+				7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */,
 				7F1499C813BE15F500D89064 /* NSData+Compression.h */,
 				7F1499C913BE15F500D89064 /* NSData+Compression.m */,
 				7FFE4BB313BD4B9700D9D078 /* NSDictionary+HTTP.h */,
 				7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */,
+				FA41EC951427C66900AD45CC /* NSString+UnescapeHtml.h */,
+				FA41EC961427C66900AD45CC /* NSString+UnescapeHtml.m */,
 				7FFE4BAF13BD497A00D9D078 /* RegexKitLite.h */,
 				7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */,
-				7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */,
-				7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */,
+				7F454F9E13D5C24F00AE47D1 /* UIColor+Extensions.h */,
+				7F454F9F13D5C24F00AE47D1 /* UIColor+Extensions.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -2910,6 +2921,8 @@
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
 				7F0B8A7313F7E647006E9151 /* PromoCodesLicenseViewController.m in Sources */,
 				7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */,
+				FA41EC971427C66900AD45CC /* LKGoogleTranslator.m in Sources */,
+				FA41EC981427C66900AD45CC /* NSString+UnescapeHtml.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3016,11 +3029,12 @@
 		7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				FA41EC911427C62A00AD45CC /* AppSales 4.xcdatamodel */,
 				7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */,
 				7F0B8A6B13F7B776006E9151 /* AppSales 2.xcdatamodel */,
 				7F709D4013BC98860008DBAD /* AppSales.xcdatamodel */,
 			);
-			currentVersion = 7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */;
+			currentVersion = FA41EC911427C62A00AD45CC /* AppSales 4.xcdatamodel */;
 			path = AppSales.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

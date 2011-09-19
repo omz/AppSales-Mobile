@@ -19,7 +19,7 @@
 
 @implementation ReviewDetailViewController
 
-@synthesize webView;
+//@synthesize webView;
 
 - (id)initWithReview:(Review *)aReview
 {
@@ -32,7 +32,7 @@
 
 - (void)loadView
 {
-	self.webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
+	webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	self.view = webView;
@@ -41,7 +41,7 @@
 - (void)viewDidLoad
 {
 	NSString *template = [[[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:NULL] autorelease];
-	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.title];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.presentationTitle];
 	NSString *ratingString = [@"" stringByPaddingToLength:[review.rating integerValue] withString:@"\u2605" startingAtIndex:0];
 	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 	[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
@@ -49,12 +49,12 @@
 	NSString *reviewSubtitle = [NSString stringWithFormat:@"%@<br/>%@ – %@<br/>%@ %@", ratingString, review.user, reviewDateString, [review.product displayName], review.productVersion];
 	
 	template = [template stringByReplacingOccurrencesOfString:@"[[[SUBTITLE]]]" withString:reviewSubtitle];
-	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.text];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.presentationText];
 	
 	UIBarButtonItem *sendReviewButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)] autorelease];
 	self.navigationItem.rightBarButtonItem = sendReviewButtonItem;
 	
-	[self.webView loadHTMLString:template baseURL:nil];
+	[webView loadHTMLString:template baseURL:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -83,7 +83,7 @@
 	}
 	MFMailComposeViewController *mailComposeViewController = [[[MFMailComposeViewController alloc] init] autorelease];
 	mailComposeViewController.mailComposeDelegate = self;
-	NSString *body = [self.webView stringByEvaluatingJavaScriptFromString: @"document.body.innerHTML"];
+	NSString *body = [webView stringByEvaluatingJavaScriptFromString: @"document.body.innerHTML"];
 	NSString *subject = [NSString stringWithFormat:@"Review from %@", review.user];
 	[mailComposeViewController setMessageBody:body isHTML:YES];
 	[mailComposeViewController setSubject:subject];
