@@ -58,6 +58,7 @@
 	
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM"];
+	[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 	NSDateComponents *currentDateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:[NSDate date]];
 	NSInteger currentYear = [currentDateComponents year];

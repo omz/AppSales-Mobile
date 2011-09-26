@@ -37,6 +37,7 @@
 {
 	NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
 	[formatter setDateStyle:NSDateFormatterShortStyle];
+	[formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	self.navigationItem.title = [formatter stringFromDate:report.startDate];
 	
 	NSString *csv = [report valueForKeyPath:@"originalReport.content"];
@@ -105,6 +106,7 @@
 	if (self) {
 		reports = [allReports retain];
 		dateFormatter = [[NSDateFormatter alloc] init];
+		[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
 	}
 	return self;

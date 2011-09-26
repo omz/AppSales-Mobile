@@ -613,6 +613,7 @@
 - (NSString *)title
 {
 	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 	return [dateFormatter stringFromDate:self.startDate];
 }
