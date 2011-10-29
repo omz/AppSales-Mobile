@@ -11,7 +11,7 @@
 
 @class ASAccount, Product, Review;
 
-@interface ReviewDetailViewController : UIViewController <NSFetchedResultsControllerDelegate, MFMailComposeViewControllerDelegate> {
+@interface ReviewDetailViewController : UIViewController <MFMailComposeViewControllerDelegate> {
 	UIToolbar *toolbar;
 	UIBarButtonItem *prevItem;
 	UIBarButtonItem *nextItem;

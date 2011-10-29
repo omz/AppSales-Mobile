@@ -132,12 +132,12 @@
 	[self dismissModalViewControllerAnimated:YES];
 }
 
-
 - (void)selectPreviousReview:(id)sender
 {
   [review release];
   index--;
   review = [[self fetchedReviewAtIndex:index] retain];
+  
   [self reloadData];
 }
 
@@ -146,6 +146,7 @@
   [review release];
   index++;
   review = [[self fetchedReviewAtIndex:index] retain];
+  
   [self reloadData];
 }
 
