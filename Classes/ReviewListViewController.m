@@ -99,8 +99,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	Review *selectedReview = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	ReviewDetailViewController *vc = [[[ReviewDetailViewController alloc] initWithReview:selectedReview] autorelease];
+  NSUInteger indexPosition = [indexPath indexAtPosition:1];
+	ReviewDetailViewController *vc = [[[ReviewDetailViewController alloc] initWithAccount:account product:product rating:rating index:indexPosition] autorelease];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
