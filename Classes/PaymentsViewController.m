@@ -60,11 +60,6 @@
 {
 	for (UIView *v in [NSArray arrayWithArray:self.scrollView.subviews]) [v removeFromSuperview];
 	
-	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-	[numberFormatter setMaximumFractionDigits:2];
-	[numberFormatter setGroupingSize:3];
-	[numberFormatter setUsesGroupingSeparator:YES];
-	
 	NSMutableDictionary *paymentsByYear = [NSMutableDictionary dictionary];
 	NSMutableDictionary *sumsByYear = [NSMutableDictionary dictionary];
 	NSSet *allPayments = account.payments;
@@ -95,7 +90,7 @@
             if ([payments count] > 0) {
                 NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
                 NSString *currency = [[payments objectAtIndex:0] valueForKey:@"currency"];
-                NSString *label = [NSString stringWithFormat:@"%@%@", [numberFormatter stringFromNumber:sum], [[CurrencyManager sharedManager] currencySymbolForCurrency:currency]];
+                NSString *label = [[CurrencyManager sharedManager] descriptionForAmount:sum currency:currency withFraction:YES];
                 NSMutableDictionary *labelsForYear = [labelsByYear objectForKey:year];
                 if (!labelsForYear) {
                     labelsForYear = [NSMutableDictionary dictionary];
@@ -122,9 +117,10 @@
 		yearView.labelsByMonth = [labelsByYear objectForKey:year];
 		if ([allPayments count] > 0) {
 			//We assume that all payments have the same currency:
-			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@%@", 
-								   [[CurrencyManager sharedManager] currencySymbolForCurrency:[[allPayments anyObject] valueForKey:@"currency"]], 
-								   [numberFormatter stringFromNumber:[sumsByYear objectForKey:year]]];
+			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@",
+                                   [[CurrencyManager sharedManager] descriptionForAmount:[sumsByYear objectForKey:year]
+                                                                                currency:[[allPayments anyObject] valueForKey:@"currency"]
+                                                                            withFraction:YES]];
 		}
 		yearView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 		[scrollView addSubview:yearView];

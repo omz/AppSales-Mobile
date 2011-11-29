@@ -55,6 +55,8 @@
 + (CurrencyManager *)sharedManager;
 - (NSString *)baseCurrencyDescription;
 - (NSString *)currencySymbolForCurrency:(NSString *)currencyCode;
+- (NSString *)descriptionForAmount:(NSString *)amount currency:(NSString *)currencyCode;
+- (NSString *)descriptionForAmount:(NSNumber *)amount currency:(NSString *)currencyCode withFraction:(BOOL)withFraction;
 - (NSString *)baseCurrencyDescriptionForAmount:(NSString *)amount;
 - (NSString *)baseCurrencyDescriptionForAmount:(NSNumber *)amount withFraction:(BOOL)withFraction;
 - (void)forceRefresh;
