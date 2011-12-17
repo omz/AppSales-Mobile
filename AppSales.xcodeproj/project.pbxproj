@@ -80,7 +80,7 @@
 		7F958AC713D46DD000FDFF75 /* DateButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F958AC613D46DD000FDFF75 /* DateButton@2x.png */; };
 		7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F963B4113E98B8600CA62FD /* AccountStatusView.m */; };
 		7FA2C58413E0370B00BA9875 /* ReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA2C58313E0370B00BA9875 /* ReviewListViewController.m */; };
-		7FA3EA9913F76E3500C80C07 /* DownloadStepOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9813F76E3500C80C07 /* DownloadStepOperation.m */; };
+		7FA3EA9913F76E3500C80C07 /* DownloadStepOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9813F76E3500C80C07 /* DownloadStepOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7FA3EA9D13F77DF000C80C07 /* MultiOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9C13F77DF000C80C07 /* MultiOperation.m */; };
 		7FAB532613DCC1270027274F /* Back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAB532413DCC1260027274F /* Back@2x.png */; };
 		7FAB532713DCC1270027274F /* Forward@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAB532513DCC1270027274F /* Forward@2x.png */; };
@@ -628,7 +628,7 @@
 		7FF88AD513E428720016AA17 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD113E428720016AA17 /* Star@2x.png */; };
 		7FF88AD613E428720016AA17 /* Star_Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD213E428720016AA17 /* Star_Highlighted.png */; };
 		7FF88AD713E428720016AA17 /* Star_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD313E428720016AA17 /* Star_Highlighted@2x.png */; };
-		7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */; };
+		7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */; };
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
@@ -2958,6 +2958,7 @@
 		7F709D4E13BC98860008DBAD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -2973,6 +2974,7 @@
 		7F709D4F13BC98860008DBAD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;

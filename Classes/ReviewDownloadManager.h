@@ -38,7 +38,7 @@
 
 
 @interface ReviewDownload : NSObject {
-	id<ReviewDownloadDelegate> delegate;
+	id<ReviewDownloadDelegate> __unsafe_unretained delegate;
 	NSPersistentStoreCoordinator *psc;
 	Product *_product;
 	NSManagedObjectID *productObjectID;
@@ -54,8 +54,8 @@
 	BOOL canceled;
 }
 
-@property (nonatomic, assign) id<ReviewDownloadDelegate> delegate;
-@property (nonatomic, retain) NSURLConnection *downloadConnection;
+@property (nonatomic, unsafe_unretained) id<ReviewDownloadDelegate> delegate;
+@property (nonatomic, strong) NSURLConnection *downloadConnection;
 
 - (id)initWithProduct:(Product *)app storeFront:(NSString *)storeFrontID countryCode:(NSString *)countryCode;
 - (void)start;

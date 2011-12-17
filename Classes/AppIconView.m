@@ -20,8 +20,6 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconDownloaded:) name:IconManagerDownloadedIconNotification object:nil];
 	}
 	
-	[newProductID retain];
-	[productID release];
 	productID = newProductID;
 	
 	if (productID) {
@@ -41,8 +39,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[productID release];
-	[super dealloc];
 }
 
 @end

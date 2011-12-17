@@ -14,100 +14,96 @@
 
 - (void)findVendorIDsWithLogin:(NSDictionary *)loginInfo
 {
-	NSAutoreleasePool *pool = [NSAutoreleasePool new];
+	@autoreleasepool {
 	
-	NSString *username = [loginInfo objectForKey:kAccountUsername];
-	NSString *password = [loginInfo objectForKey:kAccountPassword];
-	
-	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
-	for (NSHTTPCookie *cookie in cookies) {
-		[cookieStorage deleteCookie:cookie];
-	}
-	
-	cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];    
-	for (NSHTTPCookie *cookie in cookies) {
-		[cookieStorage deleteCookie:cookie];
-	}
-	
-	NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
-	NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
-	NSString *signoutSentinel = @"name=\"signOutForm\"";
-	
-	NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
-	NSHTTPURLResponse *loginPageResponse = nil;
-	NSError *loginPageError = nil;
-	NSData *loginPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:loginURL] returningResponse:&loginPageResponse error:&loginPageError];
-	NSString *loginPage = [[[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding] autorelease];
-	
-	if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
-		// find the login action
-		NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
-		[loginPageScanner scanUpToString:@"action=\"" intoString:nil];
-		if (![loginPageScanner scanString:@"action=\"" intoString:nil]) {
-			[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-			[pool release];
-			return;
-		}
-		NSString *loginAction = nil;
-		[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
+		NSString *username = [loginInfo objectForKey:kAccountUsername];
+		NSString *password = [loginInfo objectForKey:kAccountPassword];
 		
-		NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-								  username, @"theAccountName",
-								  password, @"theAccountPW", 
-								  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
-								  @"7", @"1.Continue.y",
-								  nil];
-		loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
-		
-		if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
-			[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-			[pool release];
-			return;
+		NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+		NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
 		}
-	}
-	
-	NSError *error = nil;
-	NSString *salesAction = @"https://reportingitc.apple.com";
-	NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:salesAction] usedEncoding:NULL error:&error];
-	
+		
+		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];    
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
+		}
+		
+		NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
+		NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
+		NSString *signoutSentinel = @"name=\"signOutForm\"";
+		
+		NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
+		NSHTTPURLResponse *loginPageResponse = nil;
+		NSError *loginPageError = nil;
+		NSData *loginPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:loginURL] returningResponse:&loginPageResponse error:&loginPageError];
+		NSString *loginPage = [[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding];
+		
+		if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
+			// find the login action
+			NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
+			[loginPageScanner scanUpToString:@"action=\"" intoString:nil];
+			if (![loginPageScanner scanString:@"action=\"" intoString:nil]) {
+				[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
+				return;
+			}
+			NSString *loginAction = nil;
+			[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
+			
+			NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+									  username, @"theAccountName",
+									  password, @"theAccountPW", 
+									  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
+									  @"7", @"1.Continue.y",
+									  nil];
+			loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
+			
+			if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
+				[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
+				return;
+			}
+		}
+		
+		NSError *error = nil;
+		NSString *salesAction = @"https://reportingitc.apple.com";
+		NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:salesAction] usedEncoding:NULL error:&error];
+		
     if (error) {
-		[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-		[pool release];
-		return;
-	}
-	
-	NSScanner *salesRedirectScanner = [NSScanner scannerWithString:salesRedirectPage];
-	NSString *viewState = [salesRedirectPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
-	[salesRedirectScanner scanUpToString:@"script id=\"defaultVendorPage:" intoString:nil];
-	if (![salesRedirectScanner scanString:@"script id=\"defaultVendorPage:" intoString:nil]) {
-		[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-		[pool release];
-		return;
-	}
-	NSString *defaultVendorPage = nil;
-	[salesRedirectScanner scanUpToString:@"\"" intoString:&defaultVendorPage];
-	
-	// click though from the dashboard to the sales page
+			[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
+			return;
+		}
+		
+		NSScanner *salesRedirectScanner = [NSScanner scannerWithString:salesRedirectPage];
+		NSString *viewState = [salesRedirectPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
+		[salesRedirectScanner scanUpToString:@"script id=\"defaultVendorPage:" intoString:nil];
+		if (![salesRedirectScanner scanString:@"script id=\"defaultVendorPage:" intoString:nil]) {
+			[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
+			return;
+		}
+		NSString *defaultVendorPage = nil;
+		[salesRedirectScanner scanUpToString:@"\"" intoString:&defaultVendorPage];
+		
+		// click though from the dashboard to the sales page
     NSDictionary *reportPostData = [NSDictionary dictionaryWithObjectsAndKeys:
-									[defaultVendorPage stringByReplacingOccurrencesOfString:@"_2" withString:@"_0"], @"AJAXREQUEST",
-									viewState, @"javax.faces.ViewState",
-									defaultVendorPage, @"defaultVendorPage",
-									[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],
-									nil];
-	
-	[self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/vendor_default.faces"] bodyDictionary:reportPostData response:NULL];
-	
-	NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] usedEncoding:NULL error:NULL];
+										[defaultVendorPage stringByReplacingOccurrencesOfString:@"_2" withString:@"_0"], @"AJAXREQUEST",
+										viewState, @"javax.faces.ViewState",
+										defaultVendorPage, @"defaultVendorPage",
+										[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],
+										nil];
+		
+		[self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/vendor_default.faces"] bodyDictionary:reportPostData response:NULL];
+		
+		NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] usedEncoding:NULL error:NULL];
     
-	NSString *defaultVendorID = [salesPage stringByMatching:@">.*?\\s(8[0-9]{7})" capture:1];
-	if (!defaultVendorID) {
-		[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-	} else {
-		[self performSelectorOnMainThread:@selector(finishedLoadingVendorID:) withObject:defaultVendorID waitUntilDone:YES];
-	}
+		NSString *defaultVendorID = [salesPage stringByMatching:@">.*?\\s(8[0-9]{7})" capture:1];
+		if (!defaultVendorID) {
+			[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
+		} else {
+			[self performSelectorOnMainThread:@selector(finishedLoadingVendorID:) withObject:defaultVendorID waitUntilDone:YES];
+		}
 	
-	[pool release];
+	}
 }
 
 - (void)finishedLoadingVendorID:(NSString *)vendorID
@@ -127,14 +123,14 @@
 
 - (void)failedToLoadVendorIDs
 {
-	[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"The vendor ID could not be filled automatically. Please check your username and password or enter your vendor ID manually.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"The vendor ID could not be filled automatically. Please check your username and password or enter your vendor ID manually.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 }
 
 - (NSString *)stringFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary
 {
 	NSData *data = [self dataFromSynchronousPostRequestWithURL:URL bodyDictionary:bodyDictionary response:NULL];
 	if (data) {
-		return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+		return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	}
 	return nil;
 }

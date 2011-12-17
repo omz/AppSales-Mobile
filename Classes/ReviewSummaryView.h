@@ -25,16 +25,16 @@
 
 @interface ReviewSummaryView : UIView {
 
-	id<ReviewSummaryViewDataSource> dataSource;
-	id<ReviewSummaryViewDelegate> delegate;
+	id<ReviewSummaryViewDataSource> __unsafe_unretained dataSource;
+	id<ReviewSummaryViewDelegate> __unsafe_unretained delegate;
 	NSMutableArray *barViews;
 	NSMutableArray *barLabels;
 	UILabel *averageLabel;
 	UILabel *sumLabel;
 }
 
-@property (nonatomic, assign) id<ReviewSummaryViewDataSource> dataSource;
-@property (nonatomic, assign) id<ReviewSummaryViewDelegate> delegate;
+@property (nonatomic, unsafe_unretained) id<ReviewSummaryViewDataSource> dataSource;
+@property (nonatomic, unsafe_unretained) id<ReviewSummaryViewDelegate> delegate;
 
 - (void)reloadDataAnimated:(BOOL)animated;
 - (CGRect)barFrameForRating:(NSInteger)rating;

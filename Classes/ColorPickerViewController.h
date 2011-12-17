@@ -21,15 +21,15 @@
 
 	NSArray *colors;
 	UIColor *selectedColor;
-	id<ColorPickerViewControllerDelegate> delegate;
+	id<ColorPickerViewControllerDelegate> __unsafe_unretained delegate;
 	NSString *name;
 	id context;
 }
 
-@property (nonatomic, assign) id<ColorPickerViewControllerDelegate> delegate;
-@property (nonatomic, retain) NSString *name;
-@property (nonatomic, retain) UIColor *selectedColor;
-@property (nonatomic, retain) id context;
+@property (nonatomic, unsafe_unretained) id<ColorPickerViewControllerDelegate> delegate;
+@property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) UIColor *selectedColor;
+@property (nonatomic, strong) id context;
 
 - (id)initWithColors:(NSArray *)colorArray;
 

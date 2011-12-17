@@ -16,7 +16,7 @@
 }
 
 @property (nonatomic, assign) NSInteger year;
-@property (nonatomic, retain) NSDictionary *labelsByMonth;
-@property (nonatomic, retain) NSString *footerText;
+@property (nonatomic, strong) NSDictionary *labelsByMonth;
+@property (nonatomic, strong) NSString *footerText;
 
 @end

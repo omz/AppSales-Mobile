@@ -38,10 +38,5 @@
 	return countryCode;
 }
 
-- (void)dealloc
-{
-	[countryNamesByISOCode release];
-	[super dealloc];
-}
 
 @end

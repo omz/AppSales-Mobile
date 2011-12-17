@@ -15,6 +15,6 @@
 @interface DailyReport : Report {
 @private
 }
-@property (nonatomic, retain) ASAccount *account;
+@property (nonatomic, strong) ASAccount *account;
 
 @end

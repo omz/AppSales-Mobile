@@ -15,7 +15,7 @@
 	NSString *title;
 }
 
-@property (nonatomic, retain) NSString *title;
+@property (nonatomic, strong) NSString *title;
 
 - (id)initWithReports:(NSArray *)reportsArray;
 

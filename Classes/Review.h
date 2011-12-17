@@ -14,15 +14,15 @@
 @interface Review : NSManagedObject {
 @private
 }
-@property (nonatomic, retain) NSString * text;
-@property (nonatomic, retain) NSString * countryCode;
-@property (nonatomic, retain) NSNumber * rating;
-@property (nonatomic, retain) NSString * title;
-@property (nonatomic, retain) NSString * user;
-@property (nonatomic, retain) NSDate * downloadDate;
-@property (nonatomic, retain) NSDate * reviewDate;
-@property (nonatomic, retain) NSNumber * unread;
-@property (nonatomic, retain) Product *product;
-@property (nonatomic, retain) NSString *productVersion;
+@property (nonatomic, strong) NSString * text;
+@property (nonatomic, strong) NSString * countryCode;
+@property (nonatomic, strong) NSNumber * rating;
+@property (nonatomic, strong) NSString * title;
+@property (nonatomic, strong) NSString * user;
+@property (nonatomic, strong) NSDate * downloadDate;
+@property (nonatomic, strong) NSDate * reviewDate;
+@property (nonatomic, strong) NSNumber * unread;
+@property (nonatomic, strong) Product *product;
+@property (nonatomic, strong) NSString *productVersion;
 
 @end

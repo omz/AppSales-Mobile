@@ -18,7 +18,7 @@
 	Product *product;
 }
 
-@property (nonatomic, retain) Product *product;
+@property (nonatomic, strong) Product *product;
 @property (nonatomic, readonly) ColorButton *colorButton;
 
 @end

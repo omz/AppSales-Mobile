@@ -13,6 +13,6 @@
 	NSString *productID;
 }
 
-@property (nonatomic, retain) NSString *productID;
+@property (nonatomic, strong) NSString *productID;
 
 @end
