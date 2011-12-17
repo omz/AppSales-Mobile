@@ -27,7 +27,7 @@
 {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-		product = [aProduct retain];
+		product = aProduct;
 		queue = [[NSOperationQueue alloc] init];
 		[queue setMaxConcurrentOperationCount:1];
 		dateFormatter = [[NSDateFormatter alloc] init];
@@ -37,16 +37,16 @@
 		[product addObserver:self forKeyPath:@"promoCodes" options:NSKeyValueObservingOptionNew context:nil];
 		[product addObserver:self forKeyPath:@"isDownloadingPromoCodes" options:NSKeyValueObservingOptionNew context:nil];
 		
-		UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
-		UIBarButtonItem *deleteItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePromoCodes:)] autorelease];
-		UIBarButtonItem *actionItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareCodes:)] autorelease];
+		UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+		UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePromoCodes:)];
+		UIBarButtonItem *actionItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareCodes:)];
 		idleToolbarItems = [[NSArray alloc] initWithObjects:deleteItem, flexSpace, actionItem, nil];
 		
-		UIActivityIndicatorView *spinner = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
+		UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 		[spinner startAnimating];
-		UIBarButtonItem *spinnerItem = [[[UIBarButtonItem alloc] initWithCustomView:spinner] autorelease];
+		UIBarButtonItem *spinnerItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
 		
-		UILabel *statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 10, 200, 20)] autorelease];
+		UILabel *statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 200, 20)];
 		statusLabel.font = [UIFont boldSystemFontOfSize:14.0];
 		statusLabel.backgroundColor = [UIColor clearColor];
 		statusLabel.textColor = [UIColor whiteColor];
@@ -55,11 +55,11 @@
 		statusLabel.textAlignment = UITextAlignmentCenter;
 		statusLabel.text = NSLocalizedString(@"Loading Promo Codes...", nil);
 		
-		UIView *statusView = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 40)] autorelease];
+		UIView *statusView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 40)];
 		[statusView addSubview:statusLabel];
-		UIBarButtonItem *statusItem = [[[UIBarButtonItem alloc] initWithCustomView:statusView] autorelease];
+		UIBarButtonItem *statusItem = [[UIBarButtonItem alloc] initWithCustomView:statusView];
 		
-		UIBarButtonItem *stopItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)] autorelease];
+		UIBarButtonItem *stopItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)];
 		busyToolbarItems = [[NSArray alloc] initWithObjects:spinnerItem, flexSpace, statusItem, flexSpace, stopItem, nil];
 		
 		self.toolbarItems = (product.isDownloadingPromoCodes) ? busyToolbarItems : idleToolbarItems;
@@ -71,7 +71,7 @@
 {
     [super viewDidLoad];
 	self.title = [product displayName];
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshHistory:)] autorelease];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshHistory:)];
 	
 	[self reloadPromoCodes];
 }
@@ -87,7 +87,7 @@
 
 - (void)reloadPromoCodes
 {
-	self.promoCodes = [[product.promoCodes allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"requestDate" ascending:NO] autorelease]]];
+	self.promoCodes = [[product.promoCodes allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"requestDate" ascending:NO]]];
 	
 	[self.tableView reloadData];
 }
@@ -99,11 +99,11 @@
 	FieldSectionSpecifier *numberOfCodesSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:numberOfCodesField] 
 																					 title:@"" 
 																			   description:NSLocalizedString(@"AppSales will automatically adjust the number you enter to the number of codes that are available.", nil)];
-	FieldEditorViewController *vc = [[[FieldEditorViewController alloc] initWithFieldSections:[NSArray arrayWithObject:numberOfCodesSection] title:NSLocalizedString(@"Promo Codes", nil)] autorelease];
+	FieldEditorViewController *vc = [[FieldEditorViewController alloc] initWithFieldSections:[NSArray arrayWithObject:numberOfCodesSection] title:NSLocalizedString(@"Promo Codes", nil)];
 	vc.delegate = self;
 	vc.doneButtonTitle = NSLocalizedString(@"Request", nil);
 	vc.cancelButtonTitle = NSLocalizedString(@"Cancel", nil);
-	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
+	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		navController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
@@ -120,7 +120,7 @@
 	if (self.activeSheet.visible) {
 		[self.activeSheet dismissWithClickedButtonIndex:activeSheet.cancelButtonIndex animated:NO];
 	}
-    UIActionSheet *deleteSheet = [[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Promo Codes", nil) otherButtonTitles:nil] autorelease];
+    UIActionSheet *deleteSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Promo Codes", nil) otherButtonTitles:nil];
     deleteSheet.tag = kDeleteCodesSheetTag;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		self.activeSheet = deleteSheet;
@@ -135,13 +135,13 @@
 	if (self.activeSheet.visible) {
 		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
 	}
-	UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil
+	UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil
 														delegate:self 
 											   cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
 										  destructiveButtonTitle:nil
 											   otherButtonTitles:
 							 NSLocalizedString(@"Email All Codes", nil), 
-							 NSLocalizedString(@"Copy All Codes", nil), nil] autorelease];
+							 NSLocalizedString(@"Copy All Codes", nil), nil];
 	sheet.tag = kActionsAllCodesSheetTag;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		[sheet showFromBarButtonItem:sender animated:YES];
@@ -155,10 +155,10 @@
 {
 	NSInteger numberOfCodes = [[returnValues objectForKey:@"numberOfCodes"] integerValue];
 	if (numberOfCodes <= 0) {
-		[[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+		[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 		return;
 	} else if (numberOfCodes > 50) {
-		[[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter a smaller number. You have a maximum of 50 promo codes per version of your app.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+		[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter a smaller number. You have a maximum of 50 promo codes per version of your app.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 		return;
 	}
 	[self dismissModalViewControllerAnimated:YES];
@@ -227,7 +227,7 @@
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
 	
 	if (indexPath.section == 0) {
@@ -255,14 +255,14 @@
 	if (indexPath.section == 1) {
 		self.selectedPromoCode = [self.promoCodes objectAtIndex:indexPath.row];
 		BOOL used = [selectedPromoCode.used boolValue];
-		UIActionSheet *sheet = [[[UIActionSheet alloc] initWithTitle:nil
+		UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil
 															delegate:self 
 												   cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
 											  destructiveButtonTitle:nil
 												   otherButtonTitles:
 								 NSLocalizedString(@"Email Code", nil), 
 								 NSLocalizedString(@"Copy", nil),
-								 (used) ? NSLocalizedString(@"Mark as Unused", nil) : NSLocalizedString(@"Mark as Used", nil) , nil] autorelease];
+								 (used) ? NSLocalizedString(@"Mark as Unused", nil) : NSLocalizedString(@"Mark as Used", nil) , nil];
         sheet.tag = kActionsSheetTag;
 		[sheet showFromToolbar:self.navigationController.toolbar];
 	} else {
@@ -280,10 +280,10 @@
 			if (buttonIndex == 0) {
 				//email
 				if (![MFMailComposeViewController canSendMail]) {
-					[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+					[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 					return;
 				}
-				MFMailComposeViewController *mailComposeViewController = [[[MFMailComposeViewController alloc] init] autorelease];
+				MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
 				mailComposeViewController.mailComposeDelegate = self;
 				NSString *body = [NSString stringWithFormat:@"<br/><a href=\"https://phobos.apple.com/WebObjects/MZFinance.woa/wa/freeProductCodeWizard?code=%@\">Redeem Promo Code for %@ (%@)</a>", self.selectedPromoCode.code, [self.selectedPromoCode.product displayName], self.selectedPromoCode.code];
 				NSString *subject = [NSString stringWithFormat:@"Promo Code for %@", [product displayName]];
@@ -303,10 +303,10 @@
 		if (buttonIndex != actionSheet.cancelButtonIndex) {
 			if (buttonIndex == 0) {
 				if (![MFMailComposeViewController canSendMail]) {
-					[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+					[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 					return;
 				}
-				MFMailComposeViewController *mailComposeViewController = [[[MFMailComposeViewController alloc] init] autorelease];
+				MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
 				mailComposeViewController.mailComposeDelegate = self;
 				NSMutableString *body = [NSMutableString stringWithString:@"\n"];
 				for (PromoCode *promoCode in self.promoCodes) {
@@ -347,13 +347,6 @@
 {
 	[product removeObserver:self forKeyPath:@"promoCodes"];
 	[product removeObserver:self forKeyPath:@"isDownloadingPromoCodes"];
-	[product release];
-	[selectedPromoCode release];
-	[queue release];
-	[dateFormatter release];
-	[idleToolbarItems release];
-	[busyToolbarItems release];
-	[super dealloc];
 }
 
 @end

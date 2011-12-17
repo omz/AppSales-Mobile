@@ -18,22 +18,22 @@
 }
 
 @property (nonatomic, assign) BOOL isDownloadingReports;
-@property (nonatomic, retain) NSString *password;	// this property encapsulates the keychain access,
+@property (nonatomic, strong) NSString *password;	// this property encapsulates the keychain access,
 													// it is not actually stored in the Core Data model
-@property (nonatomic, retain) NSString *downloadStatus;
+@property (nonatomic, strong) NSString *downloadStatus;
 @property (nonatomic, assign) float downloadProgress;
 
 // Core Data properties:
-@property (nonatomic, retain) NSString *username;
-@property (nonatomic, retain) NSString *vendorID;
-@property (nonatomic, retain) NSString *title;
-@property (nonatomic, retain) NSNumber *sortIndex;
-@property (nonatomic, retain) NSSet *dailyReports;
-@property (nonatomic, retain) NSSet *weeklyReports;
-@property (nonatomic, retain) NSSet *products;
-@property (nonatomic, retain) NSSet *payments;
-@property (nonatomic, retain) NSNumber *reportsBadge;
-@property (nonatomic, retain) NSNumber *paymentsBadge;
+@property (nonatomic, strong) NSString *username;
+@property (nonatomic, strong) NSString *vendorID;
+@property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSNumber *sortIndex;
+@property (nonatomic, strong) NSSet *dailyReports;
+@property (nonatomic, strong) NSSet *weeklyReports;
+@property (nonatomic, strong) NSSet *products;
+@property (nonatomic, strong) NSSet *payments;
+@property (nonatomic, strong) NSNumber *reportsBadge;
+@property (nonatomic, strong) NSNumber *paymentsBadge;
 
 - (void)deletePassword;
 - (NSString *)displayName;

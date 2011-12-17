@@ -20,7 +20,7 @@
 	BOOL deleteOriginalFilesAfterImport;
 }
 
-@property (retain) NSString *importDirectory;
+@property (strong) NSString *importDirectory;
 @property (assign) BOOL deleteOriginalFilesAfterImport;
 
 + (BOOL)filesAvailableToImport;

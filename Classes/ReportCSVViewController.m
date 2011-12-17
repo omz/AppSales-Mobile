@@ -18,24 +18,24 @@
 {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
-		report = [selectedReport retain];
+		report = selectedReport;
     }
     return self;
 }
 
 - (void)loadView
 {
-	self.webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
+	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	self.view = webView;
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)] autorelease];
-	self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReport:)] autorelease];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
+	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReport:)];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 	[formatter setDateStyle:NSDateFormatterShortStyle];
 	[formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	self.navigationItem.title = [formatter stringFromDate:report.startDate];
@@ -73,9 +73,9 @@
 	}
 	
 	if (![MFMailComposeViewController canSendMail]) {
-		[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 	} else {
-		MFMailComposeViewController *vc = [[[MFMailComposeViewController alloc] init] autorelease];
+		MFMailComposeViewController *vc = [[MFMailComposeViewController alloc] init];
 		[vc setSubject:filename];
 		[vc addAttachmentData:[reportCSV dataUsingEncoding:NSUTF8StringEncoding] mimeType:@"text/plain" fileName:filename];
 		[vc setMailComposeDelegate:self];
@@ -88,12 +88,6 @@
 	[controller dismissModalViewControllerAnimated:YES];
 }
 
-- (void)dealloc
-{
-	[webView release];
-	[report release];
-	[super dealloc];
-}
 
 @end
 
@@ -104,7 +98,7 @@
 {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
-		reports = [allReports retain];
+		reports = allReports;
 		dateFormatter = [[NSDateFormatter alloc] init];
 		[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
@@ -115,7 +109,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)] autorelease];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -133,7 +127,7 @@
 	NSString *cellIdentifier = @"Cell";
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (!cell) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
 	Report *report = [reports objectAtIndex:indexPath.row];
@@ -143,7 +137,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	ReportCSVViewController *vc = [[[ReportCSVViewController alloc] initWithReport:[reports objectAtIndex:indexPath.row]] autorelease];
+	ReportCSVViewController *vc = [[ReportCSVViewController alloc] initWithReport:[reports objectAtIndex:indexPath.row]];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -152,11 +146,5 @@
 	[self dismissModalViewControllerAnimated:YES];
 }
 
-- (void)dealloc
-{
-	[dateFormatter release];
-	[reports release];
-	[super dealloc];
-}
 
 @end

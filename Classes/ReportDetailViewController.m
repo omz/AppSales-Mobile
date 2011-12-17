@@ -32,7 +32,7 @@
 {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
-		reports = [reportsArray retain];
+		reports = reportsArray;
 		selectedReportIndex = selectedIndex;
 		self.selectedReport = [reports objectAtIndex:selectedReportIndex];
 		revenueFormatter = [[NSNumberFormatter alloc] init];
@@ -53,7 +53,7 @@
 	viewMode = (self.selectedProduct) ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
 	
 	mapHidden = mapHidden || UIInterfaceOrientationIsLandscape(self.interfaceOrientation);
-	self.mapView = [[[MapView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 208)] autorelease];
+	self.mapView = [[MapView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 208)];
 	mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	mapView.alpha = (mapHidden) ? 0.0 : 1.0;
 	if (!mapHidden) {
@@ -61,24 +61,24 @@
 	}
 	[self.view addSubview:mapView];
 	
-	self.mapShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	self.mapShadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	mapShadowView.frame = CGRectMake(0, CGRectGetMaxY(mapView.frame), self.view.bounds.size.width, 20);
 	mapShadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	mapShadowView.alpha = (mapHidden) ? 0.0 : 1.0;
 	[self.view addSubview:mapShadowView];
 	
 	CGRect headerFrame = (mapHidden) ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 208-20, self.view.bounds.size.width, 20);
-	self.headerView = [[[UIImageView alloc] initWithFrame:headerFrame] autorelease];
+	self.headerView = [[UIImageView alloc] initWithFrame:headerFrame];
 	headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	headerView.image = [UIImage imageNamed:@"DetailHeader.png"];
-	self.headerLabel = [[[UILabel alloc] initWithFrame:CGRectMake(30, 0, headerView.bounds.size.width - 40, 20)] autorelease];
+	self.headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 0, headerView.bounds.size.width - 40, 20)];
 	headerLabel.textColor = [UIColor darkGrayColor];
 	headerLabel.shadowColor = [UIColor whiteColor];
 	headerLabel.shadowOffset = CGSizeMake(0, 1);
 	headerLabel.backgroundColor = [UIColor clearColor];
 	headerLabel.font = [UIFont boldSystemFontOfSize:13.0];
 	[headerView addSubview:headerLabel];
-	self.headerIconView = [[[AppIconView alloc] initWithFrame:CGRectMake(7, 2, 16, 16)] autorelease];
+	self.headerIconView = [[AppIconView alloc] initWithFrame:CGRectMake(7, 2, 16, 16)];
 	headerIconView.image = [UIImage imageNamed:@"AllApps.png"];
 	[headerView addSubview:headerIconView];
 	[self.view addSubview:headerView];
@@ -86,7 +86,7 @@
 	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(self.interfaceOrientation) ? 32.0 : 44.0;
 	
 	CGRect tableViewFrame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
-	self.tableView = [[[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain] autorelease];
+	self.tableView = [[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain];
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	tableView.backgroundColor = [UIColor clearColor];
@@ -94,42 +94,42 @@
 	tableView.dataSource = self;
 	tableView.delegate = self;
 	
-	self.tableView.tableHeaderView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]] autorelease];
-	self.tableView.tableFooterView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	self.tableView.tableHeaderView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]];
+	self.tableView.tableFooterView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
 	
 	[self.view addSubview:tableView];
 	
-	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	self.shadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	shadowView.frame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, 20) : CGRectMake(0, 208, self.view.bounds.size.width, 20);
 	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	shadowView.alpha = 0.0;
 	[self.view addSubview:shadowView];
 	
 	if (!UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)] autorelease];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)];
 	}
 	
-	self.toolbar = [[[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight)] autorelease];
+	self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight)];
 	toolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	[self.view addSubview:toolbar];
 	
 	float segmentWidth = 75.0;
-	UISegmentedControl *modeControl = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil), nil]] autorelease];
+	UISegmentedControl *modeControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil), nil]];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:0];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:1];
 	modeControl.segmentedControlStyle = UISegmentedControlStyleBar;
 	modeControl.selectedSegmentIndex = (viewMode == ReportDetailViewModeProducts) ? 0 : 1;
 	[modeControl addTarget:self action:@selector(switchMode:) forControlEvents:UIControlEventValueChanged];
-	UIBarButtonItem *modeItem = [[[UIBarButtonItem alloc] initWithCustomView:modeControl] autorelease];
+	UIBarButtonItem *modeItem = [[UIBarButtonItem alloc] initWithCustomView:modeControl];
 	modeItem.width = 2 * segmentWidth;
 	
-	UIBarButtonItem *csvItem = [[[UIBarButtonItem alloc] initWithTitle:@"CSV" style:UIBarButtonItemStyleBordered target:self action:@selector(showCSV:)] autorelease];
+	UIBarButtonItem *csvItem = [[UIBarButtonItem alloc] initWithTitle:@"CSV" style:UIBarButtonItemStyleBordered target:self action:@selector(showCSV:)];
 	csvItem.width = 40.0;
-	self.prevItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectPreviousReport:)] autorelease];
-	self.nextItem  = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectNextReport:)] autorelease];
-	UIBarButtonItem *flexSpaceItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
-	UIBarButtonItem *spaceItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil] autorelease];
+	self.prevItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectPreviousReport:)];
+	self.nextItem  = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectNextReport:)];
+	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+	UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
 	spaceItem.width = 21.0;
 	
 	[self updateNavigationButtons];
@@ -158,7 +158,7 @@
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
 	if (!UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)] autorelease];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)];
 	} else {
 		self.navigationItem.rightBarButtonItem = nil;
 	}
@@ -226,12 +226,12 @@
 {
 	NSArray *allReports = [self.selectedReport allReports];
 	if ([allReports count] == 1) {
-		ReportCSVViewController *csvViewController = [[[ReportCSVViewController alloc] initWithReport:self.selectedReport] autorelease];
-		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:csvViewController] autorelease];
+		ReportCSVViewController *csvViewController = [[ReportCSVViewController alloc] initWithReport:self.selectedReport];
+		UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:csvViewController];
 		[self presentModalViewController:navController animated:YES];
 	} else {
-		ReportCSVSelectionViewController *csvSelectionController = [[[ReportCSVSelectionViewController alloc] initWithReports:allReports] autorelease];
-		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:csvSelectionController] autorelease];
+		ReportCSVSelectionViewController *csvSelectionController = [[ReportCSVSelectionViewController alloc] initWithReports:allReports];
+		UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:csvSelectionController];
 		[self presentModalViewController:navController animated:YES];
 	}
 }
@@ -239,8 +239,6 @@
 - (void)setSelectedReport:(Report *)report
 {
 	if (report == selectedReport) return;
-	[report retain];
-	[selectedReport release];
 	selectedReport = report;
 	
 	[self reloadData];
@@ -288,7 +286,7 @@
 	ReportDetailEntry *allProductsEntry = [ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:nil product:nil];
 	[entries addObject:allProductsEntry];
 	ASAccount *account = [[self.selectedReport firstReport] valueForKey:@"account"];
-	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
+	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
 	for (Product *product in allProducts) {
 		NSString *productID = product.productID;
 		float revenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:productID inCountry:self.selectedCountry];
@@ -305,7 +303,7 @@
 		ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:nil product:product];
 		[entries addObject:entry];
 	}
-	[entries sortUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO] autorelease]]];
+	[entries sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO]]];
 	
 	self.productEntries = [NSArray arrayWithArray:entries];
 	[self reloadTableView];
@@ -418,7 +416,7 @@
 	NSString *cellIdentifier = @"Cell";
 	ReportDetailEntryCell *cell = (ReportDetailEntryCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (!cell) {
-		cell = [[[ReportDetailEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+		cell = [[ReportDetailEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 	}
 	ReportDetailEntry *entry = [(viewMode == ReportDetailViewModeCountries) ? self.countryEntries : self.productEntries objectAtIndex:indexPath.row];
 	cell.entry = entry;
@@ -452,17 +450,6 @@
 	self.shadowView.alpha = MAX(0.0, MIN(1.0, (scrollView.contentOffset.y - 20) / 20.0));
 }
 
-- (void)dealloc
-{
-	[toolbar release];
-	[headerView release];
-	[headerLabel release];
-	[headerIconView release];
-	[revenueFormatter release];
-	[reports release];
-	[selectedReport release];
-	[super dealloc];
-}
 
 @end
 

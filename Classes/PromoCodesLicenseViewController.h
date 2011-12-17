@@ -17,7 +17,7 @@
 	UIWebView *webView;
 }
 
-@property (nonatomic, retain) UIWebView *webView;
+@property (nonatomic, strong) UIWebView *webView;
 
 - (id)initWithLicenseAgreement:(NSString *)licenseAgreement operation:(DownloadStepOperation *)operation;
 

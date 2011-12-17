@@ -39,8 +39,6 @@
 - (void)setColor:(UIColor *)newColor
 {
 	if (newColor == color) return;
-	[newColor retain];
-	[color release];
 	color = newColor;
 	[self setNeedsDisplay];
 }

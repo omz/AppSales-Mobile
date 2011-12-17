@@ -16,7 +16,7 @@
 	BOOL showOutline;
 }
 
-@property (nonatomic, retain) UIColor *color;
+@property (nonatomic, strong) UIColor *color;
 @property (nonatomic, assign) BOOL displayAsEllipse;
 @property (nonatomic, assign) BOOL showOutline;
 

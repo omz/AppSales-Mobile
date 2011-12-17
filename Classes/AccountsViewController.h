@@ -19,18 +19,18 @@
 
 @interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate>
 {
-	id<AccountsViewControllerDelegate> delegate;
+	id<AccountsViewControllerDelegate> __unsafe_unretained delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;
 	ASAccount *selectedAccount;
 	UIBarButtonItem *refreshButtonItem;
 }
 
-@property (nonatomic, assign) id<AccountsViewControllerDelegate> delegate;
-@property (nonatomic, retain) UIBarButtonItem *refreshButtonItem;
-@property (nonatomic, retain) NSArray *accounts;
-@property (nonatomic, retain) ASAccount *selectedAccount;
-@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, unsafe_unretained) id<AccountsViewControllerDelegate> delegate;
+@property (nonatomic, strong) UIBarButtonItem *refreshButtonItem;
+@property (nonatomic, strong) NSArray *accounts;
+@property (nonatomic, strong) ASAccount *selectedAccount;
+@property (nonatomic, strong) NSManagedObjectContext *managedObjectContext;
 
 - (void)reloadAccounts;
 - (void)downloadReports:(id)sender;

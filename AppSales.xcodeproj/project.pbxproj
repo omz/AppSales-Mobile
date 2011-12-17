@@ -69,7 +69,6 @@
 		7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F709D8E13BD064D0008DBAD /* ASAccount.m */; };
 		7F7F1D0C13F6442C00F18143 /* PromoCodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F1D0B13F6442C00F18143 /* PromoCodesViewController.m */; };
 		7F7F1D0F13F6455A00F18143 /* PromoCodesAppViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F1D0E13F6455900F18143 /* PromoCodesAppViewController.m */; };
-		7F7F4A0513E4F4AD006C6651 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F4A0413E4F4AD006C6651 /* JSONKit.m */; };
 		7F7F4A3F13E50A52006C6651 /* PaymentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F4A3E13E50A52006C6651 /* PaymentsViewController.m */; };
 		7F7F4A4213E51A99006C6651 /* YearView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F4A4113E51A99006C6651 /* YearView.m */; };
 		7F89BCDE13DFA45F001C607F /* ReviewDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F89BCDD13DFA45F001C607F /* ReviewDownloadManager.m */; };
@@ -81,7 +80,7 @@
 		7F958AC713D46DD000FDFF75 /* DateButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F958AC613D46DD000FDFF75 /* DateButton@2x.png */; };
 		7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F963B4113E98B8600CA62FD /* AccountStatusView.m */; };
 		7FA2C58413E0370B00BA9875 /* ReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA2C58313E0370B00BA9875 /* ReviewListViewController.m */; };
-		7FA3EA9913F76E3500C80C07 /* DownloadStepOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9813F76E3500C80C07 /* DownloadStepOperation.m */; };
+		7FA3EA9913F76E3500C80C07 /* DownloadStepOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9813F76E3500C80C07 /* DownloadStepOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7FA3EA9D13F77DF000C80C07 /* MultiOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9C13F77DF000C80C07 /* MultiOperation.m */; };
 		7FAB532613DCC1270027274F /* Back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAB532413DCC1260027274F /* Back@2x.png */; };
 		7FAB532713DCC1270027274F /* Forward@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAB532513DCC1270027274F /* Forward@2x.png */; };
@@ -629,7 +628,7 @@
 		7FF88AD513E428720016AA17 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD113E428720016AA17 /* Star@2x.png */; };
 		7FF88AD613E428720016AA17 /* Star_Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD213E428720016AA17 /* Star_Highlighted.png */; };
 		7FF88AD713E428720016AA17 /* Star_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD313E428720016AA17 /* Star_Highlighted@2x.png */; };
-		7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */; };
+		7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */; };
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
@@ -739,8 +738,6 @@
 		7F7F1D0B13F6442C00F18143 /* PromoCodesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PromoCodesViewController.m; sourceTree = "<group>"; };
 		7F7F1D0D13F6455900F18143 /* PromoCodesAppViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PromoCodesAppViewController.h; sourceTree = "<group>"; };
 		7F7F1D0E13F6455900F18143 /* PromoCodesAppViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PromoCodesAppViewController.m; sourceTree = "<group>"; };
-		7F7F4A0313E4F4AD006C6651 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
-		7F7F4A0413E4F4AD006C6651 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 		7F7F4A3D13E50A52006C6651 /* PaymentsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaymentsViewController.h; sourceTree = "<group>"; };
 		7F7F4A3E13E50A52006C6651 /* PaymentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaymentsViewController.m; sourceTree = "<group>"; };
 		7F7F4A4013E51A99006C6651 /* YearView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YearView.h; sourceTree = "<group>"; };
@@ -1653,8 +1650,6 @@
 		7FDF601C13DD2107005F1E2D /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				7F7F4A0313E4F4AD006C6651 /* JSONKit.h */,
-				7F7F4A0413E4F4AD006C6651 /* JSONKit.m */,
 				7F454F9E13D5C24F00AE47D1 /* UIColor+Extensions.h */,
 				7F454F9F13D5C24F00AE47D1 /* UIColor+Extensions.m */,
 				7F1499C813BE15F500D89064 /* NSData+Compression.h */,
@@ -2895,7 +2890,6 @@
 				7F26DF9113E13319001D0F33 /* ReviewDetailViewController.m in Sources */,
 				7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */,
 				7F24E70A13E4187A0056EA97 /* ReviewsViewController.m in Sources */,
-				7F7F4A0513E4F4AD006C6651 /* JSONKit.m in Sources */,
 				7F7F4A3F13E50A52006C6651 /* PaymentsViewController.m in Sources */,
 				7F7F4A4213E51A99006C6651 /* YearView.m in Sources */,
 				7FAEB66613E6D0EE00750788 /* BadgedCell.m in Sources */,
@@ -2964,11 +2958,13 @@
 		7F709D4E13BC98860008DBAD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = AppSalesMobile;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -2978,11 +2974,13 @@
 		7F709D4F13BC98860008DBAD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = AppSalesMobile;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;

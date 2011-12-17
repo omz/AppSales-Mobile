@@ -25,6 +25,6 @@
 	UILabel *subtitleLabel;
 }
 
-@property (nonatomic, retain) ReportDetailEntry *entry;
+@property (nonatomic, strong) ReportDetailEntry *entry;
 
 @end

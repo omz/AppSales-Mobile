@@ -69,11 +69,11 @@
 	[super viewWillAppear:animated];
 	if (!self.isSubSection) {
 		if (self.doneButtonTitle) {
-			UIBarButtonItem *doneButtonItem = [[[UIBarButtonItem alloc] initWithTitle:self.doneButtonTitle style:UIBarButtonItemStyleDone target:self action:@selector(done)] autorelease];
+			UIBarButtonItem *doneButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.doneButtonTitle style:UIBarButtonItemStyleDone target:self action:@selector(done)];
 			self.navigationItem.rightBarButtonItem = doneButtonItem;
 		}
 		if (self.cancelButtonTitle) {
-			UIBarButtonItem *cancelButtonItem = [[[UIBarButtonItem alloc] initWithTitle:self.cancelButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(cancel)] autorelease];
+			UIBarButtonItem *cancelButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.cancelButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(cancel)];
 			self.navigationItem.leftBarButtonItem = cancelButtonItem;
 		}
 		if ([self.fieldSections count] == 1 && [[[self.fieldSections objectAtIndex:0] fields] count] == 1) {
@@ -240,7 +240,7 @@
 										   11, 
 										   cell.contentView.frame.size.width - textLabelFrame.size.width - textLabelFrame.origin.x - 20, 
 										   25);
-		NamedTextField *textField = [[[NamedTextField alloc] initWithFrame:textFieldFrame] autorelease];
+		NamedTextField *textField = [[NamedTextField alloc] initWithFrame:textFieldFrame];
 		if (self.navigationController.navigationBar.barStyle == UIBarStyleBlack)
 			textField.keyboardAppearance = UIKeyboardAppearanceAlert;
 		else
@@ -282,7 +282,7 @@
 		[cell.contentView addSubview:textField];
 	}
 	else if (type == FieldSpecifierTypeSwitch) {
-		NamedSwitch *switchControl = [[[NamedSwitch alloc] init] autorelease];
+		NamedSwitch *switchControl = [[NamedSwitch alloc] init];
 		CGSize switchSize = switchControl.frame.size;
 		CGSize contentSize = cell.contentView.bounds.size;
 		CGRect switchFrame = CGRectMake(contentSize.width - switchSize.width - 8,
@@ -327,7 +327,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {    
-	UITableViewCell *cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"] autorelease];
+	UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"];
 	
 	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:indexPath.section];
 	NSArray *fields = section.fields;
@@ -398,7 +398,7 @@
 			}
 		}
 	}
-	FieldEditorViewController *subController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:@""] autorelease];
+	FieldEditorViewController *subController = [[FieldEditorViewController alloc] initWithFieldSections:sections title:@""];
 	subController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
 	subController.title = subsectionField.title;
 	subController.delegate = self;
@@ -435,13 +435,6 @@
 - (void)dealloc 
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[fieldSections release];
-	[selectedTextField release];
-	[values release];
-	[doneButtonTitle release];
-	[cancelButtonTitle release];
-	[context release];
-	[super dealloc];
 }
 
 
@@ -453,11 +446,6 @@
 
 @synthesize name;
 
-- (void)dealloc
-{
-	self.name = nil;
-	[super dealloc];
-}
 
 @end
 
@@ -470,8 +458,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	self.name = nil;
-	[super dealloc];
 }
 
 @end
@@ -484,7 +470,7 @@
 
 + (FieldSectionSpecifier *)sectionWithFields:(NSArray *)f title:(NSString *)t description:(NSString *)d
 {
-	FieldSectionSpecifier *section = [[FieldSectionSpecifier new] autorelease];
+	FieldSectionSpecifier *section = [FieldSectionSpecifier new];
 	section.fields = f;
 	section.title = t;
 	section.description = d;
@@ -492,13 +478,6 @@
 	return section;
 }
 
-- (void)dealloc
-{
-	self.fields = nil;
-	self.title = nil;
-	self.description = nil;
-	[super dealloc];
-}
 
 @end
 
@@ -510,7 +489,7 @@
 
 + (FieldSpecifier *)fieldWithType:(FieldSpecifierType)t key:(NSString *)k
 {
-	FieldSpecifier *field = [[FieldSpecifier new] autorelease];
+	FieldSpecifier *field = [FieldSpecifier new];
 	field.type = t;
 	field.key = k;
 	return field;
@@ -594,14 +573,6 @@
 	return [self subsectionFieldWithSections:[NSArray arrayWithObject:section] key:k title:section.title];
 }
 
-- (void)dealloc
-{
-	[key release];
-	[defaultValue release];
-	[title release];
-	[placeholder release];
-	[super dealloc];
-}
 
 
 @end

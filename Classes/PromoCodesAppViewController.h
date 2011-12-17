@@ -26,9 +26,9 @@
 	UIActionSheet *activeSheet;
 }
 
-@property (nonatomic, retain) NSArray *promoCodes;
-@property (nonatomic, retain) PromoCode *selectedPromoCode;
-@property (nonatomic, retain) UIActionSheet *activeSheet;
+@property (nonatomic, strong) NSArray *promoCodes;
+@property (nonatomic, strong) PromoCode *selectedPromoCode;
+@property (nonatomic, strong) UIActionSheet *activeSheet;
 
 - (id)initWithProduct:(Product *)aProduct;
 - (void)reloadPromoCodes;

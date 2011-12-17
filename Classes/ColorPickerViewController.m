@@ -16,8 +16,8 @@
 
 - (id)initWithColors:(NSArray *)colorArray
 {
-	[super initWithNibName:nil bundle:nil];
-	colors = [colorArray retain];
+	self = [super initWithNibName:nil bundle:nil];
+	colors = colorArray;
 	return self;
 }
 
@@ -57,14 +57,6 @@
 	self.selectedColor = pickedColor;
 }
 
-- (void)dealloc 
-{
-	[context release];
-	[selectedColor release];
-	[colors release];
-	[name release];
-    [super dealloc];
-}
 
 
 @end

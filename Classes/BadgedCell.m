@@ -51,11 +51,5 @@
 	}
 }
 
-- (void)dealloc
-{
-	[badgeView release];
-	[badgeLabel release];
-	[super dealloc];
-}
 
 @end
