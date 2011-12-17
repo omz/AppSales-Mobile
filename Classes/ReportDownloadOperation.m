@@ -13,7 +13,6 @@
 #import "RegexKitLite.h"
 #import "NSData+Compression.h"
 #import "NSDictionary+HTTP.h"
-#import "JSONKit.h"
 
 @interface ReportDownloadOperation ()
 
@@ -402,8 +401,10 @@
 	if (graphDataJSON) {
 		graphDataJSON = [graphDataJSON stringByAppendingString:@"}"];
 		graphDataJSON = [graphDataJSON stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
-		NSError *jsonError = nil;
-		NSDictionary *graphDict = [graphDataJSON objectFromJSONStringWithParseOptions:JKParseOptionUnicodeNewlines | JKParseOptionLooseUnicode error:&jsonError];
+        graphDataJSON = [graphDataJSON stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        graphDataJSON = [graphDataJSON stringByReplacingOccurrencesOfString:@"\t" withString:@""];
+		NSError *jsonError = nil;     
+        NSDictionary *graphDict = [NSJSONSerialization JSONObjectWithData:[graphDataJSON dataUsingEncoding:NSStringEncodingConversionAllowLossy] options:0 error:&jsonError ];
 		if (graphDict) {
 			NSSet *allExistingPayments = account.payments;
 			NSMutableSet *existingPaymentIdentifiers = [NSMutableSet set];
