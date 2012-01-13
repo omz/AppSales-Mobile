@@ -42,8 +42,8 @@ If you'd like to support this effort, please consider a donation via PayPal or F
 ##License
 In addition to the BSD-2 license below, I ask that you do not publicly distribute the app as a whole in binary form (e.g. on the App Store).
 
-Copyright (c) 2011, Ole Zorn
-All rights reserved.
+    Copyright (c) 2011, Ole Zorn
+    All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
