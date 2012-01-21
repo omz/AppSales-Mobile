@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574914CB3C2B005E8F3F /* KKKeychain.m */; };
+		6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */; };
+		6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */; };
+		6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */; };
+		6D81576514CB44BE005E8F3F /* passcode_square_empty.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D81576114CB44BE005E8F3F /* passcode_square_empty.png */; };
+		6D81576614CB44BE005E8F3F /* passcode_square_empty@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */; };
+		6D81576714CB44BE005E8F3F /* passcode_square_filled.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D81576314CB44BE005E8F3F /* passcode_square_filled.png */; };
+		6D81576814CB44BE005E8F3F /* passcode_square_filled@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D81576414CB44BE005E8F3F /* passcode_square_filled@2x.png */; };
 		7F06B6BF13BF73C8004DB170 /* Report.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F06B6BE13BF73C8004DB170 /* Report.m */; };
 		7F0B8A6913F77F95006E9151 /* PromoCodeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F0B8A6813F77F95006E9151 /* PromoCodeOperation.m */; };
 		7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F0B8A6D13F7B941006E9151 /* PromoCode.m */; };
@@ -637,6 +645,18 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6D81574814CB3C2B005E8F3F /* KKKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKKeychain.h; sourceTree = "<group>"; };
+		6D81574914CB3C2B005E8F3F /* KKKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKKeychain.m; sourceTree = "<group>"; };
+		6D81574A14CB3C2B005E8F3F /* KKPasscodeLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKPasscodeLock.h; sourceTree = "<group>"; };
+		6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKPasscodeLock.m; sourceTree = "<group>"; };
+		6D81574C14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKPasscodeSettingsViewController.h; sourceTree = "<group>"; };
+		6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKPasscodeSettingsViewController.m; sourceTree = "<group>"; };
+		6D81574E14CB3C2B005E8F3F /* KKPasscodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKPasscodeViewController.h; sourceTree = "<group>"; };
+		6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKPasscodeViewController.m; sourceTree = "<group>"; };
+		6D81576114CB44BE005E8F3F /* passcode_square_empty.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = passcode_square_empty.png; sourceTree = "<group>"; };
+		6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_empty@2x.png"; sourceTree = "<group>"; };
+		6D81576314CB44BE005E8F3F /* passcode_square_filled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = passcode_square_filled.png; sourceTree = "<group>"; };
+		6D81576414CB44BE005E8F3F /* passcode_square_filled@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_filled@2x.png"; sourceTree = "<group>"; };
 		7F06B6BD13BF73C8004DB170 /* Report.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Report.h; sourceTree = "<group>"; };
 		7F06B6BE13BF73C8004DB170 /* Report.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Report.m; sourceTree = "<group>"; };
 		7F0B8A6713F77F95006E9151 /* PromoCodeOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PromoCodeOperation.h; sourceTree = "<group>"; };
@@ -1487,6 +1507,10 @@
 		7F709D6F13BCCB8B0008DBAD /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				6D81576114CB44BE005E8F3F /* passcode_square_empty.png */,
+				6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */,
+				6D81576314CB44BE005E8F3F /* passcode_square_filled.png */,
+				6D81576414CB44BE005E8F3F /* passcode_square_filled@2x.png */,
 				7F15452F14223FFA00D74A18 /* Default-Portrait~ipad.png */,
 				7F2E75D114237F2500793375 /* Default-Landscape~ipad.png */,
 				7FAEB66813E6D1AF00750788 /* Badge.png */,
@@ -1653,6 +1677,14 @@
 		7FDF601C13DD2107005F1E2D /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				6D81574814CB3C2B005E8F3F /* KKKeychain.h */,
+				6D81574914CB3C2B005E8F3F /* KKKeychain.m */,
+				6D81574A14CB3C2B005E8F3F /* KKPasscodeLock.h */,
+				6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */,
+				6D81574C14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.h */,
+				6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */,
+				6D81574E14CB3C2B005E8F3F /* KKPasscodeViewController.h */,
+				6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */,
 				7F7F4A0313E4F4AD006C6651 /* JSONKit.h */,
 				7F7F4A0413E4F4AD006C6651 /* JSONKit.m */,
 				7F454F9E13D5C24F00AE47D1 /* UIColor+Extensions.h */,
@@ -2842,6 +2874,10 @@
 				7F0B8A7013F7C0EC006E9151 /* RequestPromoCode.png in Resources */,
 				7F15453014223FFA00D74A18 /* Default-Portrait~ipad.png in Resources */,
 				7F2E75D214237F2500793375 /* Default-Landscape~ipad.png in Resources */,
+				6D81576514CB44BE005E8F3F /* passcode_square_empty.png in Resources */,
+				6D81576614CB44BE005E8F3F /* passcode_square_empty@2x.png in Resources */,
+				6D81576714CB44BE005E8F3F /* passcode_square_filled.png in Resources */,
+				6D81576814CB44BE005E8F3F /* passcode_square_filled@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2910,6 +2946,10 @@
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
 				7F0B8A7313F7E647006E9151 /* PromoCodesLicenseViewController.m in Sources */,
 				7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */,
+				6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */,
+				6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */,
+				6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */,
+				6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

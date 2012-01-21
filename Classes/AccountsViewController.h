@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "FieldEditorViewController.h"
+#import "KKPasscodeSettingsViewController.h"
 
 #define kAccountUsername					@"username"
 #define kAccountPassword					@"password"
@@ -17,13 +18,17 @@
 @class ASAccount;
 @protocol AccountsViewControllerDelegate;
 
-@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate>
+@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate>
 {
 	id<AccountsViewControllerDelegate> delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;
 	ASAccount *selectedAccount;
 	UIBarButtonItem *refreshButtonItem;
+  
+  FieldSpecifier *passcodeLockField;
+  FieldEditorViewController *settingsViewController;
+  UINavigationController *settingsNavController;
 }
 
 @property (nonatomic, assign) id<AccountsViewControllerDelegate> delegate;
