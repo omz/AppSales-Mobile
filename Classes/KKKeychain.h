@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 @interface KKKeychain : NSObject {
+	
 }
 
 + (BOOL)setString:(NSString*)string forKey:(NSString*)key;

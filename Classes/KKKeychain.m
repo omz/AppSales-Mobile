@@ -18,34 +18,28 @@
 #import "KKKeychain.h"
 #import <Security/Security.h>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation KKKeychain
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSString*)appName {    
++ (NSString*)appName 
+{	
 	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-  
 	NSString *appName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (!appName) {
 		appName = [bundle objectForInfoDictionaryKey:@"CFBundleName"];	
 	}
-  return appName;
+	return appName;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (BOOL)setString:(NSString*)string forKey:(NSString*)key {
++ (BOOL)setString:(NSString*)string forKey:(NSString*)key 
+{
 	if (string == nil || key == nil) {
 		return NO;
 	}
+	
+	key = [NSString stringWithFormat:@"%@ - %@", [KKKeychain appName], key];
   
-  key = [NSString stringWithFormat:@"%@ - %@", [KKKeychain appName], key];
-  
-	// First check if it already exists, by creating a search dictionary and requesting that 
-  // nothing be returned, and performing the search anyway.
+	// First check if it already exists, by creating a search dictionary and requesting that
+	// nothing be returned, and performing the search anyway.
 	NSMutableDictionary *existsQueryDictionary = [NSMutableDictionary dictionary];
 	
 	NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
@@ -69,25 +63,18 @@
 		// Modify an existing one
 		// Actually pull it now of the keychain at this point.
 		NSDictionary *attributeDict = [NSDictionary dictionaryWithObject:data forKey:(id)kSecValueData];
-    
 		res = SecItemUpdate((CFDictionaryRef)existsQueryDictionary, (CFDictionaryRef)attributeDict);
 		NSAssert1(res == errSecSuccess, @"SecItemUpdated returned %d!", res);
-		
 	} else {
 		NSAssert1(NO, @"Received %d from SecItemCopyMatching!", res);
 	}
-	
 	return YES;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-+ (NSString*)getStringForKey:(NSString*)key {
-  
-  key = [NSString stringWithFormat:@"%@ - %@", [KKKeychain appName], key];
-  
++ (NSString*)getStringForKey:(NSString*)key 
+{  
+	key = [NSString stringWithFormat:@"%@ - %@", [KKKeychain appName], key];
 	NSMutableDictionary *existsQueryDictionary = [NSMutableDictionary dictionary];
-	
 	[existsQueryDictionary setObject:(id)kSecClassGenericPassword forKey:(id)kSecClass];
 	
 	// Add the keys to the search dict
@@ -110,7 +97,6 @@
 	
 	return nil;
 }
-
 
 
 @end

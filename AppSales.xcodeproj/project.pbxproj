@@ -1403,6 +1403,7 @@
 				7FDF601D13DD2125005F1E2D /* Dashboard */,
 				7FDF602013DD21D5005F1E2D /* Common UI */,
 				7F7F1D0413F63F7F00F18143 /* Promo Code Download */,
+				7F88897A14CD4C9A007604D7 /* Passcode Lock */,
 				7F1499D113BE312100D89064 /* Report Download */,
 				7F89BCDA13DFA43E001C607F /* Review Download */,
 				7F709D9013BD06570008DBAD /* Model */,
@@ -1643,6 +1644,21 @@
 			name = Payments;
 			sourceTree = "<group>";
 		};
+		7F88897A14CD4C9A007604D7 /* Passcode Lock */ = {
+			isa = PBXGroup;
+			children = (
+				6D81574814CB3C2B005E8F3F /* KKKeychain.h */,
+				6D81574914CB3C2B005E8F3F /* KKKeychain.m */,
+				6D81574A14CB3C2B005E8F3F /* KKPasscodeLock.h */,
+				6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */,
+				6D81574C14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.h */,
+				6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */,
+				6D81574E14CB3C2B005E8F3F /* KKPasscodeViewController.h */,
+				6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */,
+			);
+			name = "Passcode Lock";
+			sourceTree = "<group>";
+		};
 		7F89BCDA13DFA43E001C607F /* Review Download */ = {
 			isa = PBXGroup;
 			children = (
@@ -1677,14 +1693,6 @@
 		7FDF601C13DD2107005F1E2D /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				6D81574814CB3C2B005E8F3F /* KKKeychain.h */,
-				6D81574914CB3C2B005E8F3F /* KKKeychain.m */,
-				6D81574A14CB3C2B005E8F3F /* KKPasscodeLock.h */,
-				6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */,
-				6D81574C14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.h */,
-				6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */,
-				6D81574E14CB3C2B005E8F3F /* KKPasscodeViewController.h */,
-				6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */,
 				7F7F4A0313E4F4AD006C6651 /* JSONKit.h */,
 				7F7F4A0413E4F4AD006C6651 /* JSONKit.m */,
 				7F454F9E13D5C24F00AE47D1 /* UIColor+Extensions.h */,

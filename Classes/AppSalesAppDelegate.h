@@ -38,5 +38,6 @@
 - (NSURL *)applicationSupportDirectory;
 - (void)loadAccount:(ASAccount *)account;
 - (void)selectAccount:(id)sender;
+- (void)showPasscodeLockIfNeeded;
 
 @end
