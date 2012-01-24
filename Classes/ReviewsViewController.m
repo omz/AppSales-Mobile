@@ -22,8 +22,17 @@
 		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
 		self.tabBarItem.image = [UIImage imageNamed:@"Reviews.png"];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reviewDownloadProgressDidChange:) name:ReviewDownloadManagerDidUpdateProgressNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}
 	return self;
+}
+
+- (void)willShowPasscodeLock:(NSNotification *)notification
+{
+	[super willShowPasscodeLock:notification];
+	if (self.reviewsPopover.popoverVisible) {
+		[self.reviewsPopover dismissPopoverAnimated:NO];
+	}
 }
 
 - (void)loadView

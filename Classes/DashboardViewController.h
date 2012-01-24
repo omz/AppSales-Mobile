@@ -30,6 +30,8 @@
 	UIActivityIndicatorView *activityIndicator;
 	UILabel *statusLabel;
 	UIProgressView *progressBar;
+	
+	UIActionSheet *activeSheet;
 }
 
 @property (nonatomic, retain) ASAccount *account;
@@ -45,8 +47,10 @@
 @property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, retain) UILabel *statusLabel;
 @property (nonatomic, retain) UIProgressView *progressBar;
+@property (nonatomic, retain) UIActionSheet *activeSheet;
 
 - (id)initWithAccount:(ASAccount *)anAccount;
+- (void)willShowPasscodeLock:(NSNotification *)notification;
 - (NSSet *)entityNamesTriggeringReload;
 - (void)reloadData;
 - (void)reloadTableView;

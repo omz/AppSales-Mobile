@@ -212,7 +212,8 @@
 		return;
 	}
 	
-	if (numberOfReportsDownloaded > 0 || [account.payments count] == 0) {
+	BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
+	if (downloadPayments && (numberOfReportsDownloaded > 0 || [account.payments count] == 0)) {
 		//==== Payments
 		NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 		NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];

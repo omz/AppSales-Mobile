@@ -26,13 +26,20 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+	[[KKPasscodeLock sharedLock] setDefaultSettings];
+	[[KKPasscodeLock sharedLock] setEraseOption:NO];
+	
 	srandom(time(NULL));
 	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
 	
+	NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
+							  [NSNumber numberWithBool:YES], kSettingDownloadPayments,
+							  nil];
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
-    
-	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	
+	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	if (!iPad) {
 		AccountsViewController *rootViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
 		rootViewController.managedObjectContext = self.managedObjectContext;
@@ -42,7 +49,7 @@
 		
 		self.window.rootViewController = navigationController;
 		[self.window makeKeyAndVisible];
-	} else {		
+	} else {
 		self.accountsViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
 		self.accountsViewController.managedObjectContext = self.managedObjectContext;
 		self.accountsViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
@@ -52,7 +59,6 @@
 		self.accountsPopover = [[[UIPopoverController alloc] initWithContentViewController:accountsNavController] autorelease];	
 		[self loadAccount:nil];
 		[self.window makeKeyAndVisible];
-		[self selectAccount:nil];
 	}
 	
 	BOOL migrating = [self migrateDataIfNeeded];
@@ -74,12 +80,19 @@
 		[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
 	}
 	
+	[self showPasscodeLockIfNeeded];
+	if (iPad) {
+		[self selectAccount:nil];
+	}
+	
 	return YES;
 }
 
 - (void)selectAccount:(id)sender
 {
-	[self.accountsPopover presentPopoverFromRect:CGRectMake(50, 50, 1, 1) inView:self.window.rootViewController.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+	if (!self.window.rootViewController.modalViewController) {
+		[self.accountsPopover presentPopoverFromRect:CGRectMake(50, 50, 1, 1) inView:self.window.rootViewController.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+	}
 }
 
 - (void)accountsViewController:(AccountsViewController *)viewController didSelectAccount:(ASAccount *)account
@@ -128,7 +141,7 @@
 	UITabBarController *tabController = [[[UITabBarController alloc] initWithNibName:nil bundle:nil] autorelease];
 	[tabController setViewControllers:[NSArray arrayWithObjects:salesNavController, reviewsNavController, paymentsNavController, promoNavController, nil]];
 	
-	self.window.rootViewController = tabController;	
+	self.window.rootViewController = tabController;
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
@@ -201,6 +214,50 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
 	[[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+	[self showPasscodeLockIfNeeded];
+}
+
+- (void)showPasscodeLockIfNeeded
+{
+	if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
+		
+		KKPasscodeViewController *vc = [[[KKPasscodeViewController alloc] initWithNibName:nil bundle:nil] autorelease];
+		vc.mode = KKPasscodeModeEnter;
+		vc.delegate = self;
+		
+		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			nav.modalPresentationStyle = UIModalPresentationFullScreen;
+			nav.navigationBar.barStyle = UIBarStyleBlack;
+			nav.navigationBar.opaque = NO;
+		} else {
+			nav.navigationBar.tintColor = accountsViewController.navigationController.navigationBar.tintColor;
+			nav.navigationBar.translucent = accountsViewController.navigationController.navigationBar.translucent;
+			nav.navigationBar.opaque = accountsViewController.navigationController.navigationBar.opaque;
+			nav.navigationBar.barStyle = accountsViewController.navigationController.navigationBar.barStyle;    
+		}
+		UIViewController *viewControllerForPresentingPasscode = nil;
+		if (self.window.rootViewController.modalViewController) {
+			if ([self.window.rootViewController.modalViewController isKindOfClass:[UINavigationController class]] 
+				&& [[[(UINavigationController *)self.window.rootViewController.modalViewController viewControllers] objectAtIndex:0] isKindOfClass:[KKPasscodeViewController class]]) {
+				//The passcode dialog is already shown...
+				return;
+			}
+			//We're in the settings or add account dialog...
+			viewControllerForPresentingPasscode = self.window.rootViewController.modalViewController;
+		} else {
+			viewControllerForPresentingPasscode = self.window.rootViewController;
+		}
+		if (self.accountsPopover.popoverVisible) {
+			[self.accountsPopover dismissPopoverAnimated:NO];
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ASWillShowPasscodeLockNotification object:self];
+		[viewControllerForPresentingPasscode presentModalViewController:nav animated:NO];
+	}
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

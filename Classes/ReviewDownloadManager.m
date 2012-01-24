@@ -324,8 +324,8 @@
 		}
 		
 		NSString *reviewText = nil;
-		[scanner scanUpToString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
-		[scanner scanString:@"<p class=\"content more-text\" truncate-style=\"paragraph\" truncate-length=\"5\">" intoString:NULL];
+		[scanner scanUpToString:@"<p class=\"content\" will-truncate-max-height=\"0\" data-text-truncate-lines=\"5\">" intoString:NULL];
+		[scanner scanString:@"<p class=\"content\" will-truncate-max-height=\"0\" data-text-truncate-lines=\"5\">" intoString:NULL];
 		[scanner scanUpToString:@"</p>" intoString:&reviewText];
 		reviewText = [reviewText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		
