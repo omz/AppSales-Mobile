@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "AccountsViewController.h"
+#import "KKPasscodeLock.h"
 
 @class ASAccount;
 
-@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate, UIActionSheetDelegate, AccountsViewControllerDelegate>
+@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate, UIActionSheetDelegate, AccountsViewControllerDelegate, KKPasscodeViewControllerDelegate>
 {
 	UIWindow *window;
 	
@@ -37,5 +38,6 @@
 - (NSURL *)applicationSupportDirectory;
 - (void)loadAccount:(ASAccount *)account;
 - (void)selectAccount:(id)sender;
+- (void)showPasscodeLockIfNeeded;
 
 @end

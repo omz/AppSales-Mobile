@@ -24,11 +24,13 @@
 #import "AccountStatusView.h"
 #import "PromoCodesViewController.h"
 #import "PromoCodesLicenseViewController.h"
+#import "KKPasscodeLock.h"
 
 #define kAddNewAccountEditorIdentifier		@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier		@"EditAccountEditorIdentifier"
 #define kSettingsEditorIdentifier			@"SettingsEditorIdentifier"
 #define kUpdateExchangeRatesButton			@"UpdateExchangeRatesButton"
+#define kPasscodeLockButton         @"PasscodeLockButton"
 #define kImportReportsButton				@"ImportReportsButton"
 #define kExportReportsButton				@"ExportReportsButton"
 #define kDownloadBoxcarButton				@"DownloadBoxcarButton"
@@ -394,6 +396,13 @@
 - (void)showSettings
 {
 	// main section
+	passcodeLockField = [FieldSpecifier buttonFieldWithKey:kPasscodeLockButton title:NSLocalizedString(@"Passcode Lock", nil)];
+  if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
+    passcodeLockField.defaultValue = @"On";
+  } else {
+    passcodeLockField.defaultValue = @"Off";
+  }
+  
 	NSString *baseCurrency = [[CurrencyManager sharedManager] baseCurrency];
 	NSArray *availableCurrencies = [[CurrencyManager sharedManager] availableCurrencies];
 	NSMutableArray *currencyFields = [NSMutableArray array];
@@ -407,7 +416,8 @@
 	currencySection.exclusiveSelection = YES;
 	FieldSpecifier *currencySectionField = [FieldSpecifier subsectionFieldWithSection:currencySection key:@"currency"];
 	FieldSpecifier *updateExchangeRatesButtonField = [FieldSpecifier buttonFieldWithKey:kUpdateExchangeRatesButton title:NSLocalizedString(@"Update Exchange Rates Now", nil)];
-	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:currencySectionField, updateExchangeRatesButtonField, nil] 
+	FieldSpecifier *downloadPaymentsField = [FieldSpecifier switchFieldWithKey:kSettingDownloadPayments title:NSLocalizedString(@"Download Payments", nil) defaultValue:[[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments]];
+	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:passcodeLockField, currencySectionField, updateExchangeRatesButtonField, downloadPaymentsField, nil] 
 																			title:NSLocalizedString(@"General", nil) 
 																	  description:NSLocalizedString(@"Exchange rates will automatically be refreshed periodically.", nil)];
 
@@ -441,12 +451,12 @@
 	FieldSectionSpecifier *pushSectionFieldSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:pushSectionField] title:NSLocalizedString(@"Push Notifications", nil) description:nil];
 		  
 	NSArray *sections = [NSArray arrayWithObjects:mainSection, productsSection, pushSectionFieldSection, nil];
-	FieldEditorViewController *settingsViewController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)] autorelease];
+	settingsViewController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)] autorelease];
 	settingsViewController.doneButtonTitle = NSLocalizedString(@"Done", nil);
 	settingsViewController.delegate = self;
 	settingsViewController.editorIdentifier = kSettingsEditorIdentifier;
 	
-	UINavigationController *settingsNavController = [[[UINavigationController alloc] initWithRootViewController:settingsViewController] autorelease];
+	settingsNavController = [[[UINavigationController alloc] initWithRootViewController:settingsViewController] autorelease];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		settingsNavController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
@@ -515,14 +525,13 @@
 					[[CurrencyManager sharedManager] setBaseCurrency:[[key componentsSeparatedByString:@"."] lastObject]];
 				}
 			}
-      
-      if ([key hasPrefix:@"sortby."]) {
+			if ([key hasPrefix:@"sortby."]) {
 				if ([[returnValues objectForKey:key] boolValue]) {
-          [[NSUserDefaults standardUserDefaults] setObject:[[key componentsSeparatedByString:@"."] lastObject] forKey:@"ProductSortby"];
+					[[NSUserDefaults standardUserDefaults] setObject:[[key componentsSeparatedByString:@"."] lastObject] forKey:@"ProductSortby"];
 				}
 			}
-      
 		}
+		[[NSUserDefaults standardUserDefaults] setBool:[[returnValues objectForKey:kSettingDownloadPayments] boolValue] forKey:kSettingDownloadPayments];
 		[self dismissModalViewControllerAnimated:YES];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASViewSettingsDidChangeNotification object:nil];
@@ -532,7 +541,12 @@
 
 - (void)fieldEditor:(FieldEditorViewController *)editor pressedButtonWithKey:(NSString *)key
 {
-	if ([key isEqualToString:kUpdateExchangeRatesButton]) {
+	
+  if ([key isEqualToString:kPasscodeLockButton]) {
+    KKPasscodeSettingsViewController *vc = [[[KKPasscodeSettingsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
+    vc.delegate = self;
+    [settingsNavController pushViewController:vc animated:YES];
+     } else if ([key isEqualToString:kUpdateExchangeRatesButton]) {
 		[[CurrencyManager sharedManager] forceRefresh];
 	} else if ([key isEqualToString:kImportReportsButton]) {
 		ASAccount *account = (ASAccount *)editor.context;
@@ -690,6 +704,18 @@
 - (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
 {
 	[editor dismissModalViewControllerAnimated:YES];
+}
+
+- (void)didSettingsChanged:(KKPasscodeSettingsViewController*)viewController
+{
+  
+  if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
+    passcodeLockField.defaultValue = @"On";
+  } else {
+    passcodeLockField.defaultValue = @"Off";
+  }
+  
+  [settingsViewController.tableView reloadData];
 }
 
 #pragma mark -

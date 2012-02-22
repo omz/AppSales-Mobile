@@ -320,6 +320,9 @@
 			}
 		}
 	}
+  if (field.type == FieldSpecifierTypeButton) {
+    cell.detailTextLabel.text = field.defaultValue;
+  }
 	if (field.type == FieldSpecifierTypeButton && field.shouldDisplayDisclosureIndicator) {
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
@@ -576,7 +579,6 @@
 {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeButton key:k];
 	field.title = buttonTitle;
-	field.defaultValue = @"";
 	return field;
 }
 

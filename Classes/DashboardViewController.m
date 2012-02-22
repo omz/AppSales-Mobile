@@ -17,7 +17,7 @@
 
 @synthesize account, products, visibleProducts, selectedProduct;
 @synthesize productsTableView, topView, shadowView, colorPopover, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
-
+@synthesize activeSheet;
 
 - (id)initWithAccount:(ASAccount *)anAccount
 {
@@ -26,8 +26,19 @@
 		self.account = anAccount;
 		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}
 	return self;
+}
+
+- (void)willShowPasscodeLock:(NSNotification *)notification
+{
+	if (self.colorPopover.popoverVisible) {
+		[self.colorPopover dismissPopoverAnimated:NO];
+	}
+	if (self.activeSheet.visible) {
+		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
+	}
 }
 
 - (void)contextDidChange:(NSNotification *)notification
@@ -362,6 +373,7 @@
 	[statusLabel release];
 	[progressBar release];
 	[colorPopover release];
+	[activeSheet release];
 	[super dealloc];
 }
 
