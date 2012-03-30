@@ -644,7 +644,11 @@
 		self.selectedReportPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
 		self.selectedReportPopover.passthroughViews = [NSArray arrayWithObjects:self.graphView, nil];
 		
-		[self.selectedReportPopover presentPopoverFromRect:barFrame inView:self.graphView permittedArrowDirections:UIInterfaceOrientationIsPortrait(self.interfaceOrientation) ? UIPopoverArrowDirectionUp : UIPopoverArrowDirectionDown animated:YES];
+        if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
+            [self.selectedReportPopover presentPopoverFromRect:barFrame inView:self.graphView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        } else {
+            [self.selectedReportPopover presentPopoverFromRect:barFrame inView:self.graphView permittedArrowDirections: (barFrame.origin.x > self.view.frame.size.width - 400) ? UIPopoverArrowDirectionRight : UIPopoverArrowDirectionLeft animated:YES];
+        }
 	}
 }
 

@@ -78,7 +78,9 @@
 			[[UIColor darkGrayColor] set];
 		}
 		NSDateComponents *monthComponents = [[[NSDateComponents alloc] init] autorelease];
-		[monthComponents setMonth:i+1];
+		[monthComponents setMonth:i + 1];
+		[monthComponents setDay:2];
+		[monthComponents setYear:year];
 		NSDate *monthDate = [calendar dateFromComponents:monthComponents];
 		NSString *month = [monthFormatter stringFromDate:monthDate];
 		
