@@ -104,7 +104,21 @@
 	UISegmentedControl *tabControl = [[[UISegmentedControl alloc] initWithItems:segments] autorelease];
 	tabControl.segmentedControlStyle = UISegmentedControlStyleBar;
 	[tabControl addTarget:self action:@selector(switchTab:) forControlEvents:UIControlEventValueChanged];
-	tabControl.selectedSegmentIndex = selectedTab;
+	
+	if (iPad) {
+		if (selectedTab == 0 && showWeeks) {
+			tabControl.selectedSegmentIndex = 1;
+		} else if (selectedTab == 0 && !showWeeks) {
+			tabControl.selectedSegmentIndex = 0;
+		} else if (showFiscalMonths) {
+			tabControl.selectedSegmentIndex = 3;
+		} else {
+			tabControl.selectedSegmentIndex = 2;
+		}
+	} else {
+		tabControl.selectedSegmentIndex = selectedTab;
+	}
+	
 	self.navigationItem.titleView = tabControl;
 	
 	self.downloadReportsButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
@@ -327,6 +341,9 @@
 	}
 	
 	[[NSUserDefaults standardUserDefaults] setInteger:selectedTab forKey:kSettingDashboardSelectedTab];
+	[[NSUserDefaults standardUserDefaults] setBool:showWeeks forKey:kSettingDashboardShowWeeks];
+	[[NSUserDefaults standardUserDefaults] setBool:showFiscalMonths forKey:kSettingShowFiscalMonths];
+	
 	[self reloadTableView];
 	[self.graphView reloadData];
 }
