@@ -87,7 +87,7 @@
 - (void)setSegmentValues:(NSArray *)values;
 - (void)setSegmentValues:(NSArray *)values label:(NSString *)labelText;
 - (UIView *)selectedBackgroundView;
-- (int)getStackHeight;
+- (CGFloat)stackHeight;
 
 @end
 

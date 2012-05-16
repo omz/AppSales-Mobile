@@ -173,9 +173,9 @@
 	for (NSNumber *barIndex in visibleBarViews) {
 		StackedBarView *view = [visibleBarViews objectForKey:barIndex];
 		if (view == barView) {
-      int stackHeight = [view getStackHeight];
-      CGRect stackRect = CGRectMake(barView.frame.origin.x, barView.frame.origin.y + (barView.frame.size.height - stackHeight), barView.frame.size.width, stackHeight);
-      [self.delegate graphView:self didSelectBarAtIndex:[barIndex unsignedIntegerValue] withFrame:[self convertRect:stackRect fromView:view.superview]];
+			CGFloat stackHeight = [view stackHeight];
+			CGRect stackRect = CGRectMake(barView.frame.origin.x, barView.frame.origin.y + (barView.frame.size.height - stackHeight), barView.frame.size.width, stackHeight);
+			[self.delegate graphView:self didSelectBarAtIndex:[barIndex unsignedIntegerValue] withFrame:[self convertRect:stackRect fromView:view.superview]];
 			break;
 		}
 	}
@@ -496,14 +496,13 @@
 	}
 }
 
-- (int)getStackHeight
+- (CGFloat)stackHeight
 {
-  int stackHeight = 0;
-  for (UIView *segmentView in segmentViews) {
-    stackHeight += segmentView.frame.size.height;
-  }
-  
-  return stackHeight;
+	int stackHeight = 0;
+	for (UIView *segmentView in segmentViews) {
+		stackHeight += segmentView.frame.size.height;
+	}
+	return stackHeight;
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
