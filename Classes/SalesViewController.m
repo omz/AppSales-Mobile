@@ -177,6 +177,9 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
+	if (self.selectedReportPopover.popoverVisible) {
+		[self.selectedReportPopover dismissPopoverAnimated:YES];
+	}
 	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
 		self.graphView.frame = self.view.bounds;
 		self.topView.frame = self.view.bounds;
