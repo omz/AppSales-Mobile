@@ -498,7 +498,7 @@
 
 - (CGFloat)stackHeight
 {
-	int stackHeight = 0;
+	CGFloat stackHeight = 0.0;
 	for (UIView *segmentView in segmentViews) {
 		stackHeight += segmentView.frame.size.height;
 	}
