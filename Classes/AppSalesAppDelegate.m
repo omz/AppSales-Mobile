@@ -82,7 +82,17 @@
 	
 	[self showPasscodeLockIfNeeded];
 	if (iPad) {
-		[self selectAccount:nil];
+		//Restore previously-selected account:
+		NSString *accountIDURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kSettingSelectedAccountID];
+		if (accountIDURIString) {
+			NSManagedObjectID *accountID = [self.managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:accountIDURIString]];
+			ASAccount *account = (ASAccount *)[self.managedObjectContext objectWithID:accountID];
+			if (account) {
+				[self accountsViewController:nil didSelectAccount:account];
+			}
+		} else {
+			[self selectAccount:nil];
+		}
 	}
 	
 	return YES;
@@ -99,6 +109,9 @@
 {
 	[self.accountsPopover dismissPopoverAnimated:YES];
 	[self loadAccount:account];
+	
+	NSString *accountIDURIString = [[[account objectID] URIRepresentation] absoluteString];
+	[[NSUserDefaults standardUserDefaults] setObject:accountIDURIString forKey:kSettingSelectedAccountID];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
