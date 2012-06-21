@@ -356,9 +356,9 @@
         
         if (cell.product) {
             if (self.selectedProducts) {
-                self.selectedProducts = [self.selectedProducts arrayByAddingObject:cell.product];
+                [self.selectedProducts addObject:cell.product];
             } else {
-                self.selectedProducts = [NSArray arrayWithObject:cell.product];
+                self.selectedProducts = [NSMutableArray arrayWithObject:cell.product];
             }
         } else {
             self.selectedProducts = nil;
@@ -383,10 +383,22 @@
     }
 }
 
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+    Product * p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+    
+    [self.selectedProducts removeObject:p];
+    
+    if ([self.selectedProducts count] == 0) {
+        self.selectedProducts = nil;
+        NSIndexPath * ip = [NSIndexPath indexPathForRow:0 inSection:0];
+        [tableView selectRowAtIndexPath:ip animated:NO scrollPosition:UITableViewScrollPositionNone];
+    }
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
-	self.selectedProducts = (indexPath.row == 0) ? nil : [NSArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
+	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView

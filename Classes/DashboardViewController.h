@@ -13,7 +13,7 @@
 
 @interface DashboardViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, ColorPickerViewControllerDelegate> {
 
-	NSArray *selectedProducts;
+	NSMutableArray *selectedProducts;
 	ASAccount *account;
 	UITableView *productsTableView;
 	UIView *topView;
@@ -37,7 +37,7 @@
 @property (nonatomic, retain) ASAccount *account;
 @property (nonatomic, retain) NSArray *products;
 @property (nonatomic, retain) NSArray *visibleProducts;
-@property (nonatomic, retain) NSArray *selectedProducts;
+@property (nonatomic, retain) NSMutableArray *selectedProducts;
 @property (nonatomic, retain) UITableView *productsTableView;
 @property (nonatomic, retain) UIView *topView;
 @property (nonatomic, retain) UIImageView *shadowView;

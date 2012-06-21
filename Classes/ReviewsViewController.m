@@ -179,6 +179,11 @@
 	}
 }
 
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [super tableView:tableView didDeselectRowAtIndexPath:indexPath];
+    [self.reviewSummaryView reloadDataAnimated:YES];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[super tableView:tableView didSelectRowAtIndexPath:indexPath];
