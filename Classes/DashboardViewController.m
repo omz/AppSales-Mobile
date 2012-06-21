@@ -15,7 +15,7 @@
 
 @implementation DashboardViewController
 
-@synthesize account, products, visibleProducts, selectedProduct;
+@synthesize account, products, visibleProducts, selectedProducts;
 @synthesize productsTableView, topView, shadowView, colorPopover, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
 @synthesize activeSheet;
 
@@ -24,6 +24,7 @@
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		self.account = anAccount;
+        self.selectedProducts = nil;
 		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
@@ -112,6 +113,7 @@
 	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
 	productsTableView.contentInset = productsTableContentInset;
 	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
+    productsTableView.allowsMultipleSelection = YES;
 	
 	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
 	[self.view addSubview:self.productsTableView];
@@ -251,16 +253,16 @@
 - (void)reloadTableView
 {
 	//Reload the table view, preserving the current selection:
-	NSIndexPath *selectedIndexPath = [self.productsTableView indexPathForSelectedRow];
-	if (!selectedIndexPath) {
-		if (self.selectedProduct) {
-			selectedIndexPath = [NSIndexPath indexPathForRow:[self.products indexOfObject:self.selectedProduct] + 1 inSection:0];
-		} else {
-			selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-		}
-	}
 	[self.productsTableView reloadData];
-	[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+    NSArray *selectedIndexPaths = [self.productsTableView indexPathsForSelectedRows];
+    if ([selectedIndexPaths count]) {
+        for (NSIndexPath* selectedIndexPath in selectedIndexPaths) {            
+            [self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+        }
+    } else {
+        NSIndexPath* selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        [self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+  	}
 }
 
 - (void)changeColor:(UIButton *)sender
@@ -330,8 +332,41 @@
 	[cell.colorButton addTarget:self action:@selector(changeColor:) forControlEvents:UIControlEventTouchUpInside];
 	
 	cell.accessoryView = [self accessoryViewForRowAtIndexPath:indexPath];
-	
+    
+    bool t = [self.selectedProducts containsObject:product];
+    if (t) {
+        [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+    }
+    
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] 
+                                          initWithTarget:self action:@selector(handleLongPress:)];
+    [cell addGestureRecognizer:lpgr];
+    [lpgr release];
+    
 	return cell;
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+        DashboardAppCell * cell = ((DashboardAppCell*)gestureRecognizer.view);
+        int i = [self.visibleProducts indexOfObject:cell.product];
+        NSIndexPath * indexPath = [NSIndexPath indexPathForRow:i+1 inSection:0];
+        [self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+        
+        if (cell.product) {
+            if (self.selectedProducts) {
+                self.selectedProducts = [self.selectedProducts arrayByAddingObject:cell.product];
+            } else {
+                self.selectedProducts = [NSArray arrayWithObject:cell.product];
+            }
+        } else {
+            self.selectedProducts = nil;
+            [self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
+            NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+            [self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+        }
+    }
 }
 
 - (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -341,9 +376,17 @@
 
 #pragma mark - Table view delegate
 
+- (void)deselectAllRowsInTableView:(UITableView*)tableView exceptForIndexPath:(NSIndexPath*)indexPath {
+    for (NSIndexPath * i in [tableView indexPathsForSelectedRows]) {
+        if ((indexPath.row == i.row) && (indexPath.section == i.section)) continue;
+        [tableView deselectRowAtIndexPath:i animated:NO];
+    }
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	self.selectedProduct = [(indexPath.row == 0) ? nil : self.visibleProducts objectAtIndex:indexPath.row - 1];
+    [self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
+	self.selectedProducts = (indexPath.row == 0) ? nil : [NSArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -363,7 +406,7 @@
 	[account release];
 	[products release];
 	[visibleProducts release];
-	[selectedProduct release];
+	[selectedProducts release];
 	[productsTableView release];
 	[topView release];
 	[shadowView release];

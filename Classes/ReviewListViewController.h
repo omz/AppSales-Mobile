@@ -13,7 +13,7 @@
 @interface ReviewListViewController : UITableViewController <NSFetchedResultsControllerDelegate> {
 
 	ASAccount *account;
-	Product *product;
+	NSArray *products;
 	NSUInteger rating;
 	
 	NSFetchedResultsController *fetchedResultsController;
@@ -23,6 +23,6 @@
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
-- (id)initWithAccount:(ASAccount *)acc product:(Product *)reviewProduct rating:(NSUInteger)ratingFilter;
+- (id)initWithAccount:(ASAccount *)acc products:(NSArray *)reviewProducts rating:(NSUInteger)ratingFilter;
 
 @end

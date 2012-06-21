@@ -62,7 +62,7 @@
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
-	}
+    }
 	return self;
 }
 
@@ -533,26 +533,37 @@
 			report = [self.sortedCalendarMonthReports objectAtIndex:index];
 		}
 	}
-	if (viewMode == DashboardViewModeRevenue) {
-		float revenue = [report totalRevenueInBaseCurrencyForProductWithID:self.selectedProduct.productID];
-		NSString *labelText = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf(revenue)];
-		return labelText;
-	} else {
-		int value = 0;
-		if (viewMode == DashboardViewModeSales) {
-			value = [report totalNumberOfPaidDownloadsForProductWithID:self.selectedProduct.productID];
-		} else if (viewMode == DashboardViewModeUpdates) {
-			value = [report totalNumberOfUpdatesForProductWithID:self.selectedProduct.productID];
-		} else if (viewMode == DashboardViewModeEducationalSales) {
-			value = [report totalNumberOfEducationalSalesForProductWithID:self.selectedProduct.productID];
-		} else if (viewMode == DashboardViewModeGiftPurchases) {
-			value = [report totalNumberOfGiftPurchasesForProductWithID:self.selectedProduct.productID];
-		} else if (viewMode == DashboardViewModePromoCodes) {
-			value = [report totalNumberOfPromoCodeTransactionsForProductWithID:self.selectedProduct.productID];
-		}
-		NSString *labelText = [NSString stringWithFormat:@"%i", value];
-		return labelText;
-	}
+    
+    float value = 0;
+    
+    NSArray* tProducts = ((self.selectedProducts) ? self.selectedProducts : self.visibleProducts);
+    
+    for (Product * selectedProduct in tProducts) {
+        if (viewMode == DashboardViewModeRevenue) {
+            value += [report totalRevenueInBaseCurrencyForProductWithID:selectedProduct.productID];
+        } else {
+            if (viewMode == DashboardViewModeSales) {
+                value += [report totalNumberOfPaidDownloadsForProductWithID:selectedProduct.productID];
+            } else if (viewMode == DashboardViewModeUpdates) {
+                value += [report totalNumberOfUpdatesForProductWithID:selectedProduct.productID];
+            } else if (viewMode == DashboardViewModeEducationalSales) {
+                value += [report totalNumberOfEducationalSalesForProductWithID:selectedProduct.productID];
+            } else if (viewMode == DashboardViewModeGiftPurchases) {
+                value += [report totalNumberOfGiftPurchasesForProductWithID:selectedProduct.productID];
+            } else if (viewMode == DashboardViewModePromoCodes) {
+                value += [report totalNumberOfPromoCodeTransactionsForProductWithID:selectedProduct.productID];
+            }
+        }
+    }
+    
+    NSString *labelText = @"";
+    if (viewMode == DashboardViewModeRevenue) {
+        labelText = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf(value)];
+    } else {
+        labelText = [NSString stringWithFormat:@"%i", (int)value];
+    }
+    
+    return labelText;
 }
 
 - (NSString *)graphView:(GraphView *)graphView labelForSectionAtIndex:(NSUInteger)index
@@ -590,7 +601,7 @@
 	NSMutableArray *stackedValues = [NSMutableArray array];
 	for (Product *product in self.products) {
 		NSString *productID = product.productID;
-		if (!self.selectedProduct || self.selectedProduct == product) {
+		if (!self.selectedProducts || [self.selectedProducts containsObject:product]) {
 			float valueForProduct = 0.0;
 			if (viewMode == DashboardViewModeRevenue) {
 				valueForProduct = [report totalRevenueInBaseCurrencyForProductWithID:productID];
@@ -630,7 +641,7 @@
 		}
 	}
 	ReportDetailViewController *vc = [[[ReportDetailViewController alloc] initWithReports:reports selectedIndex:index] autorelease];
-	vc.selectedProduct = self.selectedProduct;
+	vc.selectedProduct = [self.selectedProducts lastObject];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		[self.navigationController pushViewController:vc animated:YES];
 	} else {
@@ -758,6 +769,11 @@
 }
 
 #pragma mark - Table view delegate
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    [super handleLongPress:gestureRecognizer];
+    [self.graphView reloadValuesAnimated:YES];
+}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
