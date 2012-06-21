@@ -24,7 +24,7 @@
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		self.account = anAccount;
-        self.selectedProducts = nil;
+		self.selectedProducts = nil;
 		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
@@ -113,7 +113,7 @@
 	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
 	productsTableView.contentInset = productsTableContentInset;
 	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
-    productsTableView.allowsMultipleSelection = YES;
+	productsTableView.allowsMultipleSelection = YES;
 	
 	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
 	[self.view addSubview:self.productsTableView];
@@ -226,20 +226,20 @@
 
   NSArray *allProducts;
   if ([productSortByValue isEqualToString:@"color"]) {
-    // Sort products by color
-    allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^(id obj1, id obj2){
-      Product* product1 = (Product*)obj1;
-      Product* product2 = (Product*)obj2;
-      if ([product1.color luminance] < [product2.color luminance]) {
-        return (NSComparisonResult)NSOrderedAscending;
-      } else if ([product1.color luminance]> [product2.color luminance]) {
-        return (NSComparisonResult)NSOrderedDescending;
-      }
-      
-      return (NSComparisonResult)NSOrderedSame;
-    }];
+	// Sort products by color
+	allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^(id obj1, id obj2){
+	  Product* product1 = (Product*)obj1;
+	  Product* product2 = (Product*)obj2;
+	  if ([product1.color luminance] < [product2.color luminance]) {
+		return (NSComparisonResult)NSOrderedAscending;
+	  } else if ([product1.color luminance]> [product2.color luminance]) {
+		return (NSComparisonResult)NSOrderedDescending;
+	  }
+	  
+	  return (NSComparisonResult)NSOrderedSame;
+	}];
   } else {
-    // Sort products by ID (this will put the most recently released apps on top):
+	// Sort products by ID (this will put the most recently released apps on top):
    allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
   }
   
@@ -254,14 +254,14 @@
 {
 	//Reload the table view, preserving the current selection:
 	[self.productsTableView reloadData];
-    NSArray *selectedIndexPaths = [self.productsTableView indexPathsForSelectedRows];
-    if ([selectedIndexPaths count]) {
-        for (NSIndexPath* selectedIndexPath in selectedIndexPaths) {            
-            [self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
-        }
-    } else {
-        NSIndexPath* selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-        [self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+	NSArray *selectedIndexPaths = [self.productsTableView indexPathsForSelectedRows];
+	if ([selectedIndexPaths count]) {
+		for (NSIndexPath* selectedIndexPath in selectedIndexPaths) {			
+			[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+		}
+	} else {
+		NSIndexPath* selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+		[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
   	}
 }
 
@@ -380,32 +380,29 @@
 
 #pragma mark - Table view delegate
 
-- (void)deselectAllRowsInTableView:(UITableView*)tableView exceptForIndexPath:(NSIndexPath*)indexPath {
-    for (NSIndexPath * i in [tableView indexPathsForSelectedRows]) {
-        if ((indexPath.row == i.row) && (indexPath.section == i.section)) continue;
-        [tableView deselectRowAtIndexPath:i animated:NO];
-    }
+- (void)deselectAllRowsInTableView:(UITableView*)tableView exceptForIndexPath:(NSIndexPath*)indexPath 
+{
+	for (NSIndexPath *i in [tableView indexPathsForSelectedRows]) {
+		if ([i isEqual:indexPath]) continue;
+		[tableView deselectRowAtIndexPath:i animated:NO];
+	}
 }
 
-- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row != 0) {
-        Product * p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
-        
-        [self.selectedProducts removeObject:p];
-        
-        if ([self.selectedProducts count] == 0) {
-            self.selectedProducts = nil;
-            NSIndexPath * ip = [NSIndexPath indexPathForRow:0 inSection:0];
-            [tableView selectRowAtIndexPath:ip animated:NO scrollPosition:UITableViewScrollPositionNone];
-        }
-    } else {
-        [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
-    }
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
+	[tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+	if (indexPath.row != 0) {
+		Product *p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+		self.selectedProducts = [NSMutableArray arrayWithObject:p];
+	} else {
+		self.selectedProducts = nil;
+	}
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
+	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
 	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
 }
 
@@ -416,7 +413,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
