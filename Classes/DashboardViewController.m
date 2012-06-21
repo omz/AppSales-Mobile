@@ -356,9 +356,13 @@
         
         if (cell.product) {
             if (self.selectedProducts) {
-                [self.selectedProducts addObject:cell.product];
+                if (![self.selectedProducts containsObject:cell.product]) {
+                    [self.selectedProducts addObject:cell.product];
+                }
             } else {
                 self.selectedProducts = [NSMutableArray arrayWithObject:cell.product];
+                NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                [self.productsTableView deselectRowAtIndexPath:indexPath animated:NO];
             }
         } else {
             self.selectedProducts = nil;
@@ -384,14 +388,18 @@
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Product * p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
-    
-    [self.selectedProducts removeObject:p];
-    
-    if ([self.selectedProducts count] == 0) {
-        self.selectedProducts = nil;
-        NSIndexPath * ip = [NSIndexPath indexPathForRow:0 inSection:0];
-        [tableView selectRowAtIndexPath:ip animated:NO scrollPosition:UITableViewScrollPositionNone];
+    if (indexPath.row != 0) {
+        Product * p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+        
+        [self.selectedProducts removeObject:p];
+        
+        if ([self.selectedProducts count] == 0) {
+            self.selectedProducts = nil;
+            NSIndexPath * ip = [NSIndexPath indexPathForRow:0 inSection:0];
+            [tableView selectRowAtIndexPath:ip animated:NO scrollPosition:UITableViewScrollPositionNone];
+        }
+    } else {
+        [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
     }
 }
 
