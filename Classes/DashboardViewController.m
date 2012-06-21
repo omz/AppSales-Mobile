@@ -332,45 +332,52 @@
 	[cell.colorButton addTarget:self action:@selector(changeColor:) forControlEvents:UIControlEventTouchUpInside];
 	
 	cell.accessoryView = [self accessoryViewForRowAtIndexPath:indexPath];
-    
-    bool t = [self.selectedProducts containsObject:product];
-    if (t) {
-        [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
-    }
-    
-    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] 
-                                          initWithTarget:self action:@selector(handleLongPress:)];
-    [cell addGestureRecognizer:lpgr];
-    [lpgr release];
-    
+	
+	if ([self.selectedProducts containsObject:product]) {
+		[tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+	}
+	
+	UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+	[cell addGestureRecognizer:longPressRecognizer];
+	[longPressRecognizer release];
+	
 	return cell;
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
 {
-    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        DashboardAppCell * cell = ((DashboardAppCell*)gestureRecognizer.view);
-        int i = [self.visibleProducts indexOfObject:cell.product];
-        NSIndexPath * indexPath = [NSIndexPath indexPathForRow:i+1 inSection:0];
-        [self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
-        
-        if (cell.product) {
-            if (self.selectedProducts) {
-                if (![self.selectedProducts containsObject:cell.product]) {
-                    [self.selectedProducts addObject:cell.product];
-                }
-            } else {
-                self.selectedProducts = [NSMutableArray arrayWithObject:cell.product];
-                NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-                [self.productsTableView deselectRowAtIndexPath:indexPath animated:NO];
-            }
-        } else {
-            self.selectedProducts = nil;
-            [self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
-            NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-            [self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
-        }
-    }
+	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+		DashboardAppCell * cell = ((DashboardAppCell*)gestureRecognizer.view);
+		NSUInteger i = [self.visibleProducts indexOfObject:cell.product];
+		NSIndexPath * indexPath = [NSIndexPath indexPathForRow:i + 1 inSection:0];
+		[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+		
+		if (cell.product) {
+			if (self.selectedProducts) {
+				if (![self.selectedProducts containsObject:cell.product]) {
+					[self.selectedProducts addObject:cell.product];
+				} else {
+					[self.selectedProducts removeObject:cell.product];
+					[self.productsTableView deselectRowAtIndexPath:indexPath animated:NO];
+					if (self.selectedProducts.count == 0) {
+						self.selectedProducts = nil;
+						[self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
+						NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+						[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+					}
+				}
+			} else {
+				self.selectedProducts = [NSMutableArray arrayWithObject:cell.product];
+				NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+				[self.productsTableView deselectRowAtIndexPath:indexPath animated:NO];
+			}
+		} else {
+			self.selectedProducts = nil;
+			[self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
+			NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+			[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+		}
+	}
 }
 
 - (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath
