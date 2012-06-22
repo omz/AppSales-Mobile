@@ -253,14 +253,14 @@
 - (void)reloadTableView
 {
 	//Reload the table view, preserving the current selection:
-	[self.productsTableView reloadData];
 	NSArray *selectedIndexPaths = [self.productsTableView indexPathsForSelectedRows];
-	if ([selectedIndexPaths count]) {
-		for (NSIndexPath* selectedIndexPath in selectedIndexPaths) {			
+	[self.productsTableView reloadData];
+	if ([selectedIndexPaths count] > 0) {
+		for (NSIndexPath *selectedIndexPath in selectedIndexPaths) {
 			[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 		}
 	} else {
-		NSIndexPath* selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+		NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 		[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
   	}
 }
