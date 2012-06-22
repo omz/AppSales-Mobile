@@ -25,19 +25,21 @@
 #import "PromoCodesViewController.h"
 #import "PromoCodesLicenseViewController.h"
 #import "KKPasscodeLock.h"
+#import "ZipFile.h"
+#import "ZipWriteStream.h"
 
 #define kAddNewAccountEditorIdentifier		@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier		@"EditAccountEditorIdentifier"
 #define kSettingsEditorIdentifier			@"SettingsEditorIdentifier"
 #define kUpdateExchangeRatesButton			@"UpdateExchangeRatesButton"
-#define kPasscodeLockButton         @"PasscodeLockButton"
+#define kPasscodeLockButton					@"PasscodeLockButton"
 #define kImportReportsButton				@"ImportReportsButton"
 #define kExportReportsButton				@"ExportReportsButton"
 #define kDownloadBoxcarButton				@"DownloadBoxcarButton"
 #define kAddToBoxcarButton					@"AddToBoxcarButton"
 #define	kDeleteAccountButton				@"DeleteAccount"
 #define kAlertTagConfirmImport				1
-#define kAlertTagConfirmExport				2
+#define kAlertTagExportCompleted			2
 #define kAlertTagConfirmDelete				3
 #define kAccountTitle						@"title"
 #define kKeychainServiceIdentifier			@"iTunesConnect"
@@ -45,7 +47,7 @@
 
 @implementation AccountsViewController
 
-@synthesize managedObjectContext, accounts, selectedAccount, refreshButtonItem, delegate;
+@synthesize managedObjectContext, accounts, selectedAccount, refreshButtonItem, delegate, exportedReportsZipPath, documentInteractionController;
 
 - (void)viewDidLoad
 {
@@ -567,14 +569,7 @@
 			}
 		}
 	} else if ([key isEqualToString:kExportReportsButton]) {
-		NSString *folderName = [self folderNameForExportingReportsOfAccount:self.selectedAccount];
-		UIAlertView *confirmExportAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Export Reports?", nil) 
-																	  message:[NSString stringWithFormat:NSLocalizedString(@"The original report files for this account will be exported to the folder \"%@\" in your Documents. You can access the exported files using iTunes File Sharing.", nil), folderName] 
-																	 delegate:self 
-															cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-															otherButtonTitles:NSLocalizedString(@"Continue", nil), nil] autorelease];
-		confirmExportAlert.tag = kAlertTagConfirmExport;
-		[confirmExportAlert show];
+		[self doExport];
 	} else if ([key hasPrefix:@"product.appstore."]) {
 		NSString *productID = [key substringFromIndex:[@"product.appstore." length]];
 		NSString *appStoreURLString = [NSString stringWithFormat:@"http://itunes.apple.com/app/id%@", productID];
@@ -626,6 +621,64 @@
 	}
 }
 
+- (void)doExport
+{
+	NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+	NSString *exportFolder = [self folderNameForExportingReportsOfAccount:self.selectedAccount];
+	NSString *exportPath = [docPath stringByAppendingPathComponent:exportFolder];
+	
+	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+	hud.labelText = NSLocalizedString(@"Exporting...", nil);
+	double delayInSeconds = 0.25;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		[[NSFileManager defaultManager] createDirectoryAtPath:exportPath withIntermediateDirectories:YES attributes:nil error:NULL];
+		
+		void (^exportBlock)(Report *report) = ^ (Report *report) { 
+			NSString *csv = [report valueForKeyPath:@"originalReport.content"];
+			NSString *filename = [report valueForKeyPath:@"originalReport.filename"];
+			if ([filename hasSuffix:@".gz"]) {
+				filename = [filename substringToIndex:filename.length - 3];
+			}
+			NSString *reportPath = [exportPath stringByAppendingPathComponent:filename];
+			[csv writeToFile:reportPath atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+		};
+		for (Report *dailyReport in self.selectedAccount.dailyReports) {
+			exportBlock(dailyReport);
+		}
+		for (Report *weeklyReport in self.selectedAccount.weeklyReports) {
+			exportBlock(weeklyReport);
+		}
+		
+		self.exportedReportsZipPath = [exportPath stringByAppendingPathExtension:@"zip"];
+		ZipFile *zipFile = [[ZipFile alloc] initWithFileName:self.exportedReportsZipPath mode:ZipFileModeCreate];
+		NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:exportPath error:NULL];
+		for (NSString *filename in files) {
+			NSString *path = [exportPath stringByAppendingPathComponent:filename];
+			NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
+			NSDate *date = [attributes fileCreationDate];
+			ZipWriteStream *stream = [zipFile writeFileInZipWithName:filename fileDate:date compressionLevel:ZipCompressionLevelBest];
+			NSData *data = [NSData dataWithContentsOfFile:path];
+			[stream writeData:data];
+			[stream finishedWriting];
+		}
+		[zipFile close];
+		[zipFile release];
+		
+		[[NSFileManager defaultManager] removeItemAtPath:exportPath error:NULL];
+		
+		[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+		
+		UIAlertView *exportCompletedAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Export Completed", nil) 
+																		message:NSLocalizedString(@"The report files of this account have been exported as a Zip archive. You can now access the archive via iTunes file sharing or open it in a suitable app.", nil) 
+																	   delegate:self 
+															  cancelButtonTitle:NSLocalizedString(@"Done", nil) 
+															  otherButtonTitles:NSLocalizedString(@"Open in...", nil), nil] autorelease];
+		exportCompletedAlert.tag = kAlertTagExportCompleted;
+		[exportCompletedAlert show];
+	});
+}
+
 - (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account
 {
 	NSString *folder = account.title;
@@ -637,18 +690,13 @@
 	}
 	folder = [folder stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
 	folder = [folder stringByReplacingOccurrencesOfString:@":" withString:@"-"];
-	NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-	NSString *path = [docPath stringByAppendingPathComponent:folder];
 	
-	NSString *destPath = path;
-	BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:destPath];
-	int i = 1;
-	while (exists) {
-		destPath = [path stringByAppendingFormat:@" %i", i];
-		exists = [[NSFileManager defaultManager] fileExistsAtPath:destPath];
-		i++;
-	}
-	return [destPath lastPathComponent];
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+	[dateFormatter setDateFormat:@"YYYY-MM-dd"];
+	NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
+	[dateFormatter release];
+	folder = [folder stringByAppendingFormat:@" %@", dateString];
+	return folder;
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -657,37 +705,6 @@
 		if (buttonIndex != [alertView cancelButtonIndex]) {
 			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:self.selectedAccount];
 			[self.navigationController popViewControllerAnimated:YES];
-		}
-	} else if (alertView.tag == kAlertTagConfirmExport) {
-		if (buttonIndex != [alertView cancelButtonIndex]) {
-			NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-			NSString *exportFolder = [self folderNameForExportingReportsOfAccount:self.selectedAccount];
-			NSString *exportPath = [docPath stringByAppendingPathComponent:exportFolder];
-			
-			MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-			hud.labelText = NSLocalizedString(@"Exporting...", nil);
-			double delayInSeconds = 0.25;
-			dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-			dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-				[[NSFileManager defaultManager] createDirectoryAtPath:exportPath withIntermediateDirectories:YES attributes:nil error:NULL];
-				
-				void (^exportBlock)(Report *report) = ^ (Report *report) { 
-					NSString *csv = [report valueForKeyPath:@"originalReport.content"];
-					NSString *filename = [report valueForKeyPath:@"originalReport.filename"];
-					if ([filename hasSuffix:@".gz"]) {
-						filename = [filename substringToIndex:filename.length - 3];
-					}
-					NSString *reportPath = [exportPath stringByAppendingPathComponent:filename];
-					[csv writeToFile:reportPath atomically:YES encoding:NSUTF8StringEncoding error:NULL];
-				};
-				for (Report *dailyReport in self.selectedAccount.dailyReports) {
-					exportBlock(dailyReport);
-				}
-				for (Report *weeklyReport in self.selectedAccount.weeklyReports) {
-					exportBlock(weeklyReport);
-				}
-				[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
-			});
 		}
 	} else if (alertView.tag == kAlertTagConfirmDelete) {
 		if (buttonIndex != [alertView cancelButtonIndex]) {
@@ -699,6 +716,25 @@
 			[self performSelector:@selector(deleteAccount:) withObject:account afterDelay:0.1];
 		}
 	}
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+	if (alertView.tag == kAlertTagExportCompleted) {
+		if (buttonIndex != alertView.cancelButtonIndex) {
+			self.documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:[NSURL fileURLWithPath:self.exportedReportsZipPath]];
+			self.documentInteractionController.delegate = self;
+			BOOL couldPresentAppSelection = [self.documentInteractionController presentOpenInMenuFromRect:self.navigationController.view.bounds inView:self.navigationController.view animated:YES];
+			if (!couldPresentAppSelection) {
+				[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"You don't seem to have any app installed that can open Zip files.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+			}
+		}
+	}
+}
+
+- (void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller
+{
+	self.documentInteractionController = nil;
 }
 
 - (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
@@ -735,6 +771,8 @@
 	[accounts release];
 	[selectedAccount release];
 	[managedObjectContext release];
+	[exportedReportsZipPath release];
+	[documentInteractionController release];
     [super dealloc];
 }
 
