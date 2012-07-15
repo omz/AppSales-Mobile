@@ -470,6 +470,7 @@
 							@"1T",		//iPad App
 							@"F1",		//Mac App
 							@"IA1",		//In-App Purchase
+							@"IA1. ",	//In-App Purchase
 							@"IA9",		//In-App Subscription
 							@"1.GP",	//GP = Gift Purchase
 							@"1F.GP",
