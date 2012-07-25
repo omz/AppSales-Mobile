@@ -32,8 +32,14 @@
 	srandom(time(NULL));
 	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
 	
+	NSString *currencyCode = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
+	if (![[CurrencyManager sharedManager].availableCurrencies containsObject:currencyCode]) {
+		currencyCode = @"USD";
+	}
+	
 	NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
 							  [NSNumber numberWithBool:YES], kSettingDownloadPayments,
+							  currencyCode, @"CurrencyManagerBaseCurrency",
 							  nil];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 
