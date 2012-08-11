@@ -250,7 +250,7 @@
 		
 		NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
 		NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
-		NSString *signoutSentinel = @"name=\"signOutForm\"";
+		NSString *signoutSentinel = @"Sign Out";
 		
 		NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
 		NSHTTPURLResponse *loginPageResponse = nil;
