@@ -13,7 +13,6 @@
 #import "RegexKitLite.h"
 #import "NSData+Compression.h"
 #import "NSDictionary+HTTP.h"
-#import "JSONKit.h"
 
 @interface ReportDownloadOperation ()
 
