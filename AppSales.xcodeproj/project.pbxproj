@@ -87,6 +87,7 @@
 		7F89BCF113E0171D001C607F /* AllReviewsButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F89BCF013E0171D001C607F /* AllReviewsButtonHighlighted.png */; };
 		7F958AC713D46DD000FDFF75 /* DateButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F958AC613D46DD000FDFF75 /* DateButton@2x.png */; };
 		7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F963B4113E98B8600CA62FD /* AccountStatusView.m */; };
+		7F97CFD5160CF9CF00313B1D /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F97CFD4160CF9CF00313B1D /* Default-568h@2x.png */; };
 		7FA2C58413E0370B00BA9875 /* ReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA2C58313E0370B00BA9875 /* ReviewListViewController.m */; };
 		7FA3EA9913F76E3500C80C07 /* DownloadStepOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9813F76E3500C80C07 /* DownloadStepOperation.m */; };
 		7FA3EA9D13F77DF000C80C07 /* MultiOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA3EA9C13F77DF000C80C07 /* MultiOperation.m */; };
@@ -794,6 +795,7 @@
 		7F958AC613D46DD000FDFF75 /* DateButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DateButton@2x.png"; sourceTree = "<group>"; };
 		7F963B4013E98B8600CA62FD /* AccountStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountStatusView.h; sourceTree = "<group>"; };
 		7F963B4113E98B8600CA62FD /* AccountStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountStatusView.m; sourceTree = "<group>"; };
+		7F97CFD4160CF9CF00313B1D /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		7FA2C58213E0370B00BA9875 /* ReviewListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewListViewController.h; sourceTree = "<group>"; };
 		7FA2C58313E0370B00BA9875 /* ReviewListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewListViewController.m; sourceTree = "<group>"; };
 		7FA3EA9713F76E3500C80C07 /* DownloadStepOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadStepOperation.h; sourceTree = "<group>"; };
@@ -1591,6 +1593,7 @@
 				7F398ECD13DE835C004BEC44 /* Unlock@2x.png */,
 				7FDF727E13DAEBFE00B8CC4E /* Default.png */,
 				7FDF727F13DAEBFE00B8CC4E /* Default@2x.png */,
+				7F97CFD4160CF9CF00313B1D /* Default-568h@2x.png */,
 				7FDF727613D9C39100B8CC4E /* InApp.png */,
 				7FDF728413DAED8D00B8CC4E /* InApp@2x.png */,
 				7FAB532D13DD00470027274F /* Pin.png */,
@@ -2987,6 +2990,7 @@
 				6D81576614CB44BE005E8F3F /* passcode_square_empty@2x.png in Resources */,
 				6D81576714CB44BE005E8F3F /* passcode_square_filled.png in Resources */,
 				6D81576814CB44BE005E8F3F /* passcode_square_filled@2x.png in Resources */,
+				7F97CFD5160CF9CF00313B1D /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3106,6 +3110,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = "-licucore";
 				SDKROOT = iphoneos;
+				VALID_ARCHS = armv7;
 			};
 			name = Debug;
 		};
@@ -3126,6 +3131,7 @@
 				OTHER_LDFLAGS = "-licucore";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = armv7;
 			};
 			name = Release;
 		};
