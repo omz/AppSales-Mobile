@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class Account;
+@class ASAccount, Product;
 
 @interface ReportDownloadCoordinator : NSObject {
 	
@@ -19,9 +19,11 @@
 @property (nonatomic, assign) BOOL isBusy;
 
 + (id)sharedReportDownloadCoordinator;
-- (void)downloadReportsForAccount:(Account *)account;
-- (void)cancelDownloadForAccount:(Account *)account;
-- (void)importReportsIntoAccount:(Account *)account;
-- (void)importReportsIntoAccount:(Account *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag;
+- (void)downloadReportsForAccount:(ASAccount *)account;
+- (void)cancelDownloadForAccount:(ASAccount *)account;
+- (void)cancelAllDownloads;
+- (void)importReportsIntoAccount:(ASAccount *)account;
+- (void)importReportsIntoAccount:(ASAccount *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag;
+- (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes;
 
 @end

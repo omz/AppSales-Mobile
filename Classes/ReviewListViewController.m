@@ -8,7 +8,7 @@
 
 #import "ReviewListViewController.h"
 #import "ReviewDetailViewController.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Review.h"
 #import "Product.h"
 
@@ -17,14 +17,14 @@
 
 @synthesize fetchedResultsController, managedObjectContext;
 
-- (id)initWithAccount:(Account *)acc product:(Product *)reviewProduct rating:(NSUInteger)ratingFilter
+- (id)initWithAccount:(ASAccount *)acc products:(NSArray *)reviewProducts rating:(NSUInteger)ratingFilter
 {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
 		account = [acc retain];
 		managedObjectContext = [[account managedObjectContext] retain];
 		rating = ratingFilter;
-		product = [reviewProduct retain];
+		products = [reviewProducts retain];
 		self.title = NSLocalizedString(@"Reviews", nil);
 		
 		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Check.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)] autorelease];
@@ -114,19 +114,28 @@
 	}
 	NSFetchRequest *fetchRequest = [[[NSFetchRequest alloc] init] autorelease];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.managedObjectContext];
-	if (product) {
-		if (rating == 0) {
-			[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@", product]];
-		} else {
-			[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND rating == %@", product, [NSNumber numberWithInteger:rating]]];
-		}
-	} else {
-		if (rating == 0) {
-			[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@", account]];
-		} else {
-			[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND rating == %@", account, [NSNumber numberWithInteger:rating]]];
-		}
-	}
+    
+    NSMutableArray* args = [NSMutableArray arrayWithArray:products];
+    NSMutableString* pred = [NSMutableString stringWithString:@""];
+
+    if (products) {
+        [pred appendString:@"(product == nil"];
+        for (Product* p in products) {
+            [pred appendString:@" OR product == %@"];
+        }
+        [pred appendString:@")"];
+    } else {
+        [pred appendString:@"product.account == %@"];
+        [args addObject:account];
+    }
+    
+    if (rating != 0) {
+        [pred appendString:@" AND rating = %@"];
+        [args addObject:[NSNumber numberWithInt:rating]];
+    }
+
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
+    
 	[fetchRequest setEntity:entity];
 	[fetchRequest setFetchBatchSize:20];
     
@@ -163,7 +172,7 @@
 
 - (void)dealloc
 {
-	[product release];
+	[products release];
 	[account release];
 	[fetchedResultsController release];
 	[managedObjectContext release];

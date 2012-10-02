@@ -7,7 +7,7 @@
 //
 
 #import "ReportImportOperation.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Report.h"
 #import "NSData+Compression.h"
 
@@ -28,7 +28,7 @@
 	return NO;
 }
 
-- (id)initWithAccount:(Account *)account
+- (id)initWithAccount:(ASAccount *)account
 {
 	self = [super init];
 	if (self) {
@@ -52,7 +52,7 @@
 	[moc setPersistentStoreCoordinator:psc];
 	[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 	
-	Account *account = (Account *)[moc objectWithID:accountObjectID];
+	ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
 	NSInteger numberOfReportsImported = 0;
 	NSInteger i = 0;
 	
@@ -135,7 +135,7 @@
 					if (i % 10 == 0) {
 						//Reset the context periodically to avoid excessive memory growth:
 						[moc reset];
-						account = (Account *)[moc objectWithID:accountObjectID];
+						account = (ASAccount *)[moc objectWithID:accountObjectID];
 					}
 					if (!saveError && deleteOriginalFilesAfterImport) {
 						[fm removeItemAtPath:fullPath error:NULL];

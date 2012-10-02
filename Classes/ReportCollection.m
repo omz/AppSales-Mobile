@@ -168,7 +168,7 @@
 	return [NSArray arrayWithArray:reports];
 }
 
-- (Account *)account
+- (ASAccount *)account
 {
 	return [[self firstReport] valueForKey:@"account"];
 }

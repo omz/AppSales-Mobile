@@ -28,7 +28,7 @@
 @implementation FieldEditorViewController
 
 @synthesize fieldSections, values, doneButtonTitle, cancelButtonTitle, delegate, context, editorIdentifier;
-@synthesize isSubSection, hasChanges;
+@synthesize isSubSection, hasChanges, selectedTextField;
 
 - (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title
 {
@@ -76,6 +76,17 @@
 			UIBarButtonItem *cancelButtonItem = [[[UIBarButtonItem alloc] initWithTitle:self.cancelButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(cancel)] autorelease];
 			self.navigationItem.leftBarButtonItem = cancelButtonItem;
 		}
+		if ([self.fieldSections count] == 1 && [[[self.fieldSections objectAtIndex:0] fields] count] == 1) {
+			FieldSpecifierType singleFieldType = [(FieldSpecifier *)[[[self.fieldSections objectAtIndex:0] fields] objectAtIndex:0] type];
+			if (singleFieldType == FieldSpecifierTypeNumeric || singleFieldType == FieldSpecifierTypeEmail || singleFieldType == FieldSpecifierTypePassword || singleFieldType == FieldSpecifierTypeText || singleFieldType == FieldSpecifierTypeURL) {
+				UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+				UIView *textField = [cell viewWithTag:TEXTFIELDTAG];
+				if (textField) {
+					[(UITextField *)textField performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0];
+					self.selectedTextField = (UITextField *)textField;
+				}
+			}
+		}
 	}
 }
 
@@ -91,6 +102,14 @@
 			[self done];
 		}
 	}
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		return YES;
+	}
+	return toInterfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
 - (void)done
@@ -148,10 +167,21 @@
 	}
 }
 
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+	self.selectedTextField = textField;
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 	[textField performSelector:@selector(resignFirstResponder) withObject:nil afterDelay:0];
+	self.selectedTextField = nil;
 	return YES;
+}
+
+- (void)dismissKeyboard
+{
+	[self.selectedTextField resignFirstResponder];
 }
 
 - (void)switchValueDidChange:(NamedSwitch *)switchControl
@@ -205,7 +235,7 @@
 	NSString *key = field.key;
 	FieldSpecifierType type = field.type;
 	
-	if ((type == FieldSpecifierTypeEmail) || (type == FieldSpecifierTypePassword) || (type == FieldSpecifierTypeURL) || (type == FieldSpecifierTypeText)) {
+	if ((type == FieldSpecifierTypeEmail) || (type == FieldSpecifierTypePassword) || (type == FieldSpecifierTypeURL) || (type == FieldSpecifierTypeText) || (type == FieldSpecifierTypeNumeric)) {
 		CGRect textFieldFrame = CGRectMake(textLabelFrame.origin.x + textLabelFrame.size.width + 10, 
 										   11, 
 										   cell.contentView.frame.size.width - textLabelFrame.size.width - textLabelFrame.origin.x - 20, 
@@ -241,6 +271,9 @@
 		}
 		else if (type == FieldSpecifierTypeText) {
 			textField.keyboardType = UIKeyboardTypeDefault;
+			textField.secureTextEntry = NO;
+		} else if (type == FieldSpecifierTypeNumeric) {
+			textField.keyboardType = UIKeyboardTypeNumberPad;
 			textField.secureTextEntry = NO;
 		}
 		if (field.placeholder) {
@@ -287,6 +320,9 @@
 			}
 		}
 	}
+  if (field.type == FieldSpecifierTypeButton) {
+    cell.detailTextLabel.text = field.defaultValue;
+  }
 	if (field.type == FieldSpecifierTypeButton && field.shouldDisplayDisclosureIndicator) {
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
@@ -318,6 +354,7 @@
 	UIView *textField = [cell viewWithTag:TEXTFIELDTAG];
 	if (textField) {
 		[(UITextField *)textField becomeFirstResponder];
+		self.selectedTextField = (UITextField *)textField;
 	}
 	if (field.type == FieldSpecifierTypeCheck) {
 		self.hasChanges = YES;
@@ -365,6 +402,7 @@
 		}
 	}
 	FieldEditorViewController *subController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:@""] autorelease];
+	subController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
 	subController.title = subsectionField.title;
 	subController.delegate = self;
 	subController.doneButtonTitle = NSLocalizedString(@"Save",nil);
@@ -401,6 +439,7 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[fieldSections release];
+	[selectedTextField release];
 	[values release];
 	[doneButtonTitle release];
 	[cancelButtonTitle release];
@@ -520,6 +559,14 @@
 	return field;
 }
 
++ (FieldSpecifier *)numericFieldWithKey:(NSString *)k title:(NSString *)numericTitle defaultValue:(NSString *)defaultText
+{
+	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeNumeric key:k];
+	field.title = numericTitle;
+	field.defaultValue = defaultText;
+	return field;
+}
+
 + (FieldSpecifier *)checkFieldWithKey:(NSString *)k title:(NSString *)checkmarkTitle defaultValue:(BOOL)checked
 {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeCheck key:k];
@@ -532,7 +579,6 @@
 {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeButton key:k];
 	field.title = buttonTitle;
-	field.defaultValue = @"";
 	return field;
 }
 

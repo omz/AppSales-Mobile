@@ -10,11 +10,11 @@
 #import <CoreData/CoreData.h>
 #import "Report.h"
 
-@class Account;
+@class ASAccount;
 
 @interface DailyReport : Report {
 @private
 }
-@property (nonatomic, retain) Account *account;
+@property (nonatomic, retain) ASAccount *account;
 
 @end

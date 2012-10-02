@@ -43,6 +43,7 @@
 		NSMutableArray *names = [NSMutableArray array];
 		
         NSDateFormatter *sectionTitleFormatter = [[NSDateFormatter new] autorelease];
+		[sectionTitleFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		[sectionTitleFormatter setDateFormat:@"MMMM yyyy"];
         
         for (NSDate *date in dates) {

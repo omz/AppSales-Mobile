@@ -7,21 +7,18 @@
 //
 
 #import "ReportDownloadOperation.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Report.h"
+#import "WeeklyReport.h"
 #import "RegexKitLite.h"
 #import "NSData+Compression.h"
 #import "NSDictionary+HTTP.h"
-#import "JSONKit.h"
 
 @interface ReportDownloadOperation ()
 
 - (NSData *)dataFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary response:(NSHTTPURLResponse **)response;
 - (NSString *)stringFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary;
-- (NSArray *)extractFormOptionsFromPage:(NSString *)htmlPage formID:(NSString *)formID;
-- (NSData *)downloadReportFromiTCWithInfo:(NSDictionary *)downloadInfo viewState:(NSString **)viewState originalFilename:(NSString **)filename;
-- (NSDate *)dateFromPopupMenuItemName:(NSString *)menuItemName;
-- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(Account *)account vendorID:(NSString *)vendorID;
+- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID;
 
 @end
 
@@ -30,7 +27,7 @@
 
 @synthesize downloadCount, accountObjectID;
 
-- (id)initWithAccount:(Account *)account
+- (id)initWithAccount:(ASAccount *)account
 {
     self = [super init];
     if (self) {
@@ -47,6 +44,7 @@
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	
+	int numberOfReportsDownloaded = 0;
 	dispatch_async(dispatch_get_main_queue(), ^ {
 		_account.downloadStatus = NSLocalizedString(@"Starting download", nil);
 		_account.downloadProgress = 0.0;
@@ -56,357 +54,254 @@
 	[moc setPersistentStoreCoordinator:psc];
 	[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 	
-	Account *account = (Account *)[moc objectWithID:accountObjectID];
+	ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
+	NSInteger previousBadge = [account.reportsBadge integerValue];
+	NSString *vendorID = account.vendorID;
 	
-	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
-	for (NSHTTPCookie *cookie in cookies) {
-		[cookieStorage deleteCookie:cookie];
-	}
-	
-	dispatch_async(dispatch_get_main_queue(), ^ {
-		_account.downloadStatus = NSLocalizedString(@"Logging in...", nil);
-		_account.downloadProgress = 0.0;
-	});
-	
-	NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
-	NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
-	NSString *signoutSentinel = @"name=\"signOutForm\"";
-    
-	NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
-	NSHTTPURLResponse *loginPageResponse = nil;
-	NSError *loginPageError = nil;
-	NSData *loginPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:loginURL] returningResponse:&loginPageResponse error:&loginPageError];
-	NSString *loginPage = [[[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding] autorelease];
-	
-	if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
-		// find the login action
-        NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
-        [loginPageScanner scanUpToString:@"action=\"" intoString:nil];
-		if (![loginPageScanner scanString:@"action=\"" intoString:nil]) {
-			dispatch_async(dispatch_get_main_queue(), ^ {
-				[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																	object:self 
-																  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not parse iTunes Connect login page", nil)
-																									   forKey:kASReportDownloadErrorDescription]];
-			});
-			[pool release];
-			return;
+	for (NSString *dateType in [NSArray arrayWithObjects:@"Daily", @"Weekly", nil]) {
+		//Determine which reports should be available for download:
+		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+		[dateFormatter setDateFormat:@"yyyyMMdd"];
+		[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+		NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+		[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]]; 
+		
+		NSDate *today = [NSDate date];
+		if ([dateType isEqualToString:@"Weekly"]) {
+			//Find the next sunday:
+			NSInteger weekday = -1;
+			while (YES) {
+				NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:today];
+				weekday = [weekdayComponents weekday];
+				if (weekday == 1) {
+					break;
+				} else {
+					today = [today dateByAddingTimeInterval:24 * 60 * 60];
+				}
+			}
 		}
-		NSString *loginAction = nil;
-		[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
 		
-		NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-								  username, @"theAccountName",
-								  password, @"theAccountPW", 
-								  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
-								  @"7", @"1.Continue.y",
-								  nil];
-		loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
+		NSMutableArray *availableReportDateStrings = [NSMutableArray array];
+		NSMutableSet *availableReportDates = [NSMutableSet set];
 		
-		if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
-			dispatch_async(dispatch_get_main_queue(), ^ {
-				[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																	object:self 
-																  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not login. Please check your username and password.", nil) 
-																									   forKey:kASReportDownloadErrorDescription]];
-			});
-			[pool release];
-			return;
+		NSInteger maxNumberOfAvailableReports = [dateType isEqualToString:@"Daily"] ? 14 : 13;
+		for (int i=1; i<=maxNumberOfAvailableReports; i++) {
+			NSDate *date = nil;
+			if ([dateType isEqualToString:@"Daily"]) {
+				date = [today dateByAddingTimeInterval:i * -24 * 60 * 60];
+			} else { //weekly
+				date = [today dateByAddingTimeInterval:i * -7 * 24 * 60 * 60];
+			}
+			NSDateComponents *components = [calendar components:NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit fromDate:date];
+			NSDate *normalizedDate = [calendar dateFromComponents:components];
+			NSString *dateString = [dateFormatter stringFromDate:normalizedDate];
+			[availableReportDateStrings insertObject:dateString atIndex:0];
+			[availableReportDates addObject:normalizedDate];
 		}
-	}
-	
-	if ([self isCancelled]) {
-		[pool release];
-		return;
-	}
-	
-	dispatch_async(dispatch_get_main_queue(), ^ {
-		_account.downloadStatus = NSLocalizedString(@"Checking for new reports...", nil);
-		_account.downloadProgress = 0.1;
-	});
-	
-	// load sales/trends page.
-	NSError *error = nil;
-	NSString *salesAction = @"https://reportingitc.apple.com";
-	NSString *salesRedirectPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:salesAction] usedEncoding:NULL error:&error];
-	if (error) {
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																object:self 
-															  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"The sales redirect page could not be loaded. Please try again later.", nil)
-																								   forKey:kASReportDownloadErrorDescription]];
-		});
-		[pool release];
-		return;
-	}
-	
-	NSScanner *salesRedirectScanner = [NSScanner scannerWithString:salesRedirectPage];
-	NSString *viewState = [salesRedirectPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
-	[salesRedirectScanner scanUpToString:@"script id=\"defaultVendorPage:" intoString:nil];
-	if (![salesRedirectScanner scanString:@"script id=\"defaultVendorPage:" intoString:nil]) {
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																object:self 
-															  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"The sales redirect page could not be parsed.", nil)
-																								   forKey:kASReportDownloadErrorDescription]];
-		});
-		[pool release];
-		return;
-	}
-	NSString *defaultVendorPage = nil;
-	[salesRedirectScanner scanUpToString:@"\"" intoString:&defaultVendorPage];
-	
-	// click though from the dashboard to the sales page
-    NSDictionary *reportPostData = [NSDictionary dictionaryWithObjectsAndKeys:
-									[defaultVendorPage stringByReplacingOccurrencesOfString:@"_2" withString:@"_0"], @"AJAXREQUEST",
-									viewState, @"javax.faces.ViewState",
-									defaultVendorPage, @"defaultVendorPage",
-									[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],
-									nil];
-	
-	if ([self isCancelled]) {
-		[pool release];
-		return;
-	}
-	
-	[self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/vendor_default.faces"] bodyDictionary:reportPostData response:NULL];
-	
-	// get the form field names needed to download the report
-	NSString *salesPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] usedEncoding:NULL error:NULL];
-	if (salesPage.length == 0) {
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																object:self 
-															  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not parse iTunes Connect login page", nil)
-																								   forKey:kASReportDownloadErrorDescription]];
-		});
-		[pool release];
-		return;
-	}
-	
-	if ([self isCancelled]) {
-		[pool release];
-		return;
-	}
-	
-	viewState = [salesPage stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
-	NSString *dailyName = [salesPage stringByMatching:@"theForm:j_id_jsp_[0-9]*_6"];
-	NSRange lastTwoChars = NSMakeRange([dailyName length] - 2, 2);
-	//NSString *weeklyName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_22" options:0 range:lastTwoChars];
-	NSString *ajaxName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_2" options:0 range:lastTwoChars];
-	NSString *daySelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_43" options:0 range:lastTwoChars];
-	NSString *weekSelectName = [dailyName stringByReplacingOccurrencesOfString:@"_6" withString:@"_48" options:0 range:lastTwoChars];
-    
-	// parse days available
-	NSMutableArray *availableDays = [[[self extractFormOptionsFromPage:salesPage formID:@"theForm:datePickerSourceSelectElement"] mutableCopy] autorelease];
-	if (availableDays == nil) {
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																object:self 
-															  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Unexpected date selector form.", nil)
-																								   forKey:kASReportDownloadErrorDescription]];
-		});
-		[pool release];
-		return;
-    }
-	NSString *arbitraryDay = [availableDays objectAtIndex:0];
-	
-	[availableDays sortUsingSelector:@selector(compare:)]; // download older reports first
-	
-	NSMutableArray *availableDates = [NSMutableArray array];
-	for (NSString *availableDayName in availableDays) {
-		NSDate *date = [self dateFromPopupMenuItemName:availableDayName];
-		[availableDates addObject:date];
-	}
-	
-	NSMutableArray *availableWeeks = [[[self extractFormOptionsFromPage:salesPage formID:@"theForm:weekPickerSourceSelectElement"] mutableCopy] autorelease];
-	NSMutableArray *availableWeekDates = [NSMutableArray array];
-	for (NSString *availableWeekName in availableWeeks) {
-		NSDate *date = [self dateFromPopupMenuItemName:availableWeekName];
-		[availableWeekDates addObject:date];
-	}
-	
-	if (availableWeeks == nil) {
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																object:self 
-															  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Unexpected week selector form.", nil)
-																								   forKey:kASReportDownloadErrorDescription]];
-		});
-		[pool release];
-		return;
-	}
-	NSString *arbitraryWeek = [availableWeeks objectAtIndex:0];
-	
-	[availableWeeks sortUsingSelector:@selector(compare:)];
-	
-	if ([self isCancelled]) {
-		[pool release];
-		return;
-	}
-	
-	// click though from the dashboard to the sales page
-	NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-							  ajaxName, @"AJAXREQUEST",
-							  @"theForm", @"theForm",
-							  @"notnormal", @"theForm:xyz",
-							  @"Y", @"theForm:vendorType",
-							  viewState, @"javax.faces.ViewState",
-							  dailyName, dailyName,
-							  nil];
-	NSString *responseString = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] bodyDictionary:postDict];
-	
-	viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
-	
-	int numberOfReportsDownloaded = 0;
-	
-	// Fetch existing daily reports to not download them again:
-	NSFetchRequest *existingDailyReportsRequest = [[[NSFetchRequest alloc] init] autorelease];
-	[existingDailyReportsRequest setEntity:[NSEntityDescription entityForName:@"DailyReport" inManagedObjectContext:moc]];
-	[existingDailyReportsRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND startDate IN %@", account, [NSSet setWithArray:availableDates]]];
-	[existingDailyReportsRequest setPropertiesToFetch:[NSArray arrayWithObject:@"startDate"]];
-	[existingDailyReportsRequest setResultType:NSDictionaryResultType];
-	[existingDailyReportsRequest setSortDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"startDate" ascending:YES] autorelease]]];
-	NSArray *existingDailyReportDates = [[moc executeFetchRequest:existingDailyReportsRequest error:NULL] valueForKey:@"startDate"];
-	
-	NSMutableArray *existingDailyReportLabels = [NSMutableArray array];
-	for (NSDate *existingReportDate in existingDailyReportDates) {
-		NSString *label = [Report identifierForDate:existingReportDate];
-		[existingDailyReportLabels addObject:label];
-	}
-	[availableDays removeObjectsInArray:existingDailyReportLabels];
-	
-	NSFetchRequest *existingWeeklyReportsRequest = [[[NSFetchRequest alloc] init] autorelease];
-	[existingWeeklyReportsRequest setEntity:[NSEntityDescription entityForName:@"WeeklyReport" inManagedObjectContext:moc]];
-	[existingWeeklyReportsRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND endDate IN %@", account, [NSSet setWithArray:availableWeekDates]]];
-	[existingWeeklyReportsRequest setPropertiesToFetch:[NSArray arrayWithObject:@"endDate"]];
-	[existingWeeklyReportsRequest setResultType:NSDictionaryResultType];
-	[existingWeeklyReportsRequest setSortDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"endDate" ascending:YES] autorelease]]];
-	NSArray *existingWeeklyReportDates = [[moc executeFetchRequest:existingWeeklyReportsRequest error:NULL] valueForKey:@"endDate"];
-	
-	NSMutableArray *existingWeeklyReportLabels = [NSMutableArray array];
-	for (NSDate *existingWeeklyReportDate in existingWeeklyReportDates) {
-		NSString *label = [Report identifierForDate:existingWeeklyReportDate];
-		[existingWeeklyReportLabels addObject:label];
-	}
-	[availableWeeks removeObjectsInArray:existingWeeklyReportLabels];
-	
-	NSInteger previousBadge = [account.reportsBadge integerValue];	
-	
-	// download new daily reports
-	int numReportsActuallyAvailable = availableDays.count;
-	int count = 1;
-	for (NSString *dayString in availableDays) {
-		if ([self isCancelled]) {
-			[pool release];
-			return;
-		}
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			float progress = (float)(count - 1) / (float)numReportsActuallyAvailable;
-			_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Downloading day %i / %i", nil), count, numReportsActuallyAvailable];
-			_account.downloadProgress = 0.2 + (0.35 * progress);
-		});
-		count++;
 		
-		NSDictionary *downloadInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-									  ajaxName, @"ajaxName", 
-									  dayString, @"dayString", 
-									  arbitraryWeek, @"weekString", 
-									  daySelectName, @"selectName", nil];
-		
-		NSString *originalFilename = nil;
-		NSData *dailyReportData = [self downloadReportFromiTCWithInfo:downloadInfo viewState:&viewState originalFilename:&originalFilename];
-		NSData *uncompressedDailyReportData = [dailyReportData gzipInflate];
-		NSString *dailyReportCSV = [[[NSString alloc] initWithData:uncompressedDailyReportData encoding:NSUTF8StringEncoding] autorelease];
-		
-		Report *report = [Report insertNewReportWithCSV:dailyReportCSV inAccount:account];
-		if (report && originalFilename) {
-			//report.identifier = dayString;
-			NSManagedObject *originalReport = [NSEntityDescription insertNewObjectForEntityForName:@"ReportCSV" inManagedObjectContext:moc];
-			[originalReport setValue:dailyReportCSV forKey:@"content"];
-			[originalReport setValue:report forKey:@"report"];
-			[originalReport setValue:originalFilename forKey:@"filename"];
-			[report generateCache];
+		//Filter out reports we already have:
+		NSFetchRequest *existingReportsFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+		if ([dateType isEqualToString:@"Daily"]) {
+			[existingReportsFetchRequest setEntity:[NSEntityDescription entityForName:@"DailyReport" inManagedObjectContext:moc]];
+			[existingReportsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND startDate IN %@", account, availableReportDates]];
 		} else {
-			NSLog(@"Could not parse report %@", dayString);
+			[existingReportsFetchRequest setEntity:[NSEntityDescription entityForName:@"WeeklyReport" inManagedObjectContext:moc]];
+			[existingReportsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND endDate IN %@", account, availableReportDates]];
+		}
+		NSArray *existingReports = [moc executeFetchRequest:existingReportsFetchRequest error:NULL];
+		
+		for (Report *report in existingReports) {
+			if ([dateType isEqualToString:@"Daily"]) {
+				NSDate *startDate = report.startDate;
+				NSString *startDateString = [dateFormatter stringFromDate:startDate];
+				[availableReportDateStrings removeObject:startDateString];
+			} else {
+				NSDate *endDate = ((WeeklyReport *)report).endDate;
+				NSString *endDateString = [dateFormatter stringFromDate:endDate];
+				[availableReportDateStrings removeObject:endDateString];
+			}
 		}
 		
-		if (dailyReportCSV) {
-			numberOfReportsDownloaded++;
-			account.reportsBadge = [NSNumber numberWithInteger:previousBadge + numberOfReportsDownloaded];
+		int i = 0;
+		int numberOfReportsAvailable = [availableReportDateStrings count];
+		for (NSString *reportDateString in availableReportDateStrings) {
+			if ([self isCancelled]) {
+				[pool release];
+				return;
+			}
+			if (i == 0) {
+				if ([dateType isEqualToString:@"Daily"]) {
+					dispatch_async(dispatch_get_main_queue(), ^ {
+						_account.downloadStatus = NSLocalizedString(@"Checking for daily reports...", nil);
+						_account.downloadProgress = 0.1;
+					});
+				} else {
+					dispatch_async(dispatch_get_main_queue(), ^ {
+						_account.downloadStatus = NSLocalizedString(@"Checking for weekly reports...", nil);
+						_account.downloadProgress = 0.5;
+					});
+				}
+			} else {
+				if ([dateType isEqualToString:@"Daily"]) {
+					float progress = 0.5 * ((float)i / (float)numberOfReportsAvailable);
+					dispatch_async(dispatch_get_main_queue(), ^ {
+						_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %i", nil), i+1, numberOfReportsAvailable];
+						_account.downloadProgress = progress;
+					});
+				} else {
+					float progress = 0.5 + 0.4 * ((float)i / (float)numberOfReportsAvailable);
+					dispatch_async(dispatch_get_main_queue(), ^ {
+						_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %i", nil), i+1, numberOfReportsAvailable];
+						_account.downloadProgress = progress;
+					});
+				}
+			}
+			
+			NSString *escapedUsername = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)username, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8) autorelease];
+			NSString *escapedPassword = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)password, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8) autorelease];
+			NSString *reportDownloadBodyString = [NSString stringWithFormat:@"USERNAME=%@&PASSWORD=%@&VNDNUMBER=%@&TYPEOFREPORT=%@&DATETYPE=%@&REPORTTYPE=%@&REPORTDATE=%@",
+												  escapedUsername, escapedPassword, vendorID, @"Sales", dateType, @"Summary", reportDateString];
+			
+			NSData *reportDownloadBodyData = [reportDownloadBodyString dataUsingEncoding:NSUTF8StringEncoding];
+			NSMutableURLRequest *reportDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/autoingestion.tft"]];
+			[reportDownloadRequest setHTTPMethod:@"POST"];
+			[reportDownloadRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+			[reportDownloadRequest setValue:@"java/1.6.0_26" forHTTPHeaderField:@"User-Agent"];
+			[reportDownloadRequest setHTTPBody:reportDownloadBodyData];
+			
+			NSHTTPURLResponse *response = nil;
+			NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:NULL];
+			
+			NSString *errorMessage = [[response allHeaderFields] objectForKey:@"Errormsg"];
+			if (errorMessage) {
+				NSLog(@"  %@", errorMessage);
+			} else if (reportData) {
+				NSString *originalFilename = [[response allHeaderFields] objectForKey:@"Filename"];
+				NSData *inflatedReportData = [reportData gzipInflate];
+				NSString *reportCSV = [[[NSString alloc] initWithData:inflatedReportData encoding:NSUTF8StringEncoding] autorelease];
+				if (originalFilename && [reportCSV length] > 0) {
+					//Parse report CSV:
+					Report *report = [Report insertNewReportWithCSV:reportCSV inAccount:account];
+					
+					//Check if the downloaded report is actually the one we expect
+					//(mostly to work around a bug in iTC that causes the wrong weekly report to be downloaded):
+					NSString *downloadedReportDateString = nil;
+					if ([report isKindOfClass:[WeeklyReport class]]) {
+						WeeklyReport *weeklyReport = (WeeklyReport *)report;
+						downloadedReportDateString = [dateFormatter stringFromDate:weeklyReport.endDate];
+					} else {
+						downloadedReportDateString = [dateFormatter stringFromDate:report.startDate];
+					}
+					if (![reportDateString isEqualToString:downloadedReportDateString]) {
+						NSLog(@"Downloaded report has incorrect date, ignoring");
+						[[report managedObjectContext] deleteObject:report];
+						report = nil;
+						continue;
+					}
+					
+					if (report && originalFilename) {
+						NSManagedObject *originalReport = [NSEntityDescription insertNewObjectForEntityForName:@"ReportCSV" inManagedObjectContext:moc];
+						[originalReport setValue:reportCSV forKey:@"content"];
+						[originalReport setValue:report forKey:@"report"];
+						[originalReport setValue:originalFilename forKey:@"filename"];
+						[report generateCache];
+						numberOfReportsDownloaded++;
+						account.reportsBadge = [NSNumber numberWithInteger:previousBadge + numberOfReportsDownloaded];
+					} else {
+						NSLog(@"Could not parse report %@", originalFilename);
+					}
+					//Save data:
+					[psc lock];
+					NSError *saveError = nil;
+					[moc save:&saveError];
+					if (saveError) {
+						NSLog(@"Could not save context: %@", saveError);
+					}
+					[psc unlock];
+				}
+			}
+			i++;
 		}
-		
-		[psc lock];
-		NSError *saveError = nil;
-		[moc save:&saveError];
-		if (saveError) {
-			NSLog(@"Could not save context: %@", saveError);
-		}
-		[psc unlock];
-    }
-	
-	// download weekly reports
-	numReportsActuallyAvailable = availableWeeks.count;
-	count = 1;
-	for (NSString *weekString in availableWeeks) {
-		if ([self isCancelled]) {
-			[pool release];
-			return;
-		}
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			float progress = (float)(count - 1) / (float)numReportsActuallyAvailable;
-			_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Downloading week %i / %i", nil), count, numReportsActuallyAvailable];
-			_account.downloadProgress = 0.55 + (0.35 * progress);
-		});
-		count++;
-		
-		NSDictionary *downloadInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-									  ajaxName, @"ajaxName", 
-									  arbitraryDay, @"dayString", 
-									  weekString, @"weekString", 
-									  weekSelectName, @"selectName", nil];
-		
-		NSString *originalFilename = nil;
-		NSData *weeklyReportData = [self downloadReportFromiTCWithInfo:downloadInfo viewState:&viewState originalFilename:&originalFilename];
-		NSData *uncompressedWeeklyReportData = [weeklyReportData gzipInflate];
-		NSString *weeklyReportCSV = [[[NSString alloc] initWithData:uncompressedWeeklyReportData encoding:NSUTF8StringEncoding] autorelease];
-		
-		Report *report = [Report insertNewReportWithCSV:weeklyReportCSV inAccount:account];
-		if (report && originalFilename) {
-			//report.identifier = dayString;
-			NSManagedObject *originalReport = [NSEntityDescription insertNewObjectForEntityForName:@"ReportCSV" inManagedObjectContext:moc];
-			[originalReport setValue:weeklyReportCSV forKey:@"content"];
-			[originalReport setValue:report forKey:@"report"];
-			[originalReport setValue:originalFilename forKey:@"filename"];
-			[report generateCache];
-		} else {
-			NSLog(@"Could not parse report %@", weekString);
-		}
-		
-		if (weeklyReportCSV) {
-			numberOfReportsDownloaded++;
-			account.reportsBadge = [NSNumber numberWithInteger:previousBadge + numberOfReportsDownloaded];
-		}
-		
-		[psc lock];
-		NSError *saveError = nil;
-		[moc save:&saveError];
-		if (saveError) {
-			NSLog(@"Could not save context: %@", saveError);
-		}
-		[psc unlock];
-		
-    }
+	}
 	if ([self isCancelled]) {
 		[pool release];
 		return;
 	}
-	//==== Payments
-	if (numberOfReportsDownloaded > 0 || [account.payments count] == 0) {
+	
+	BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
+	if (downloadPayments && (numberOfReportsDownloaded > 0 || [account.payments count] == 0)) {
+		//==== Payments
+		NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+		NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
+		}
+
+		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];    
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
+		}
+		
 		dispatch_async(dispatch_get_main_queue(), ^ {
-			_account.downloadStatus = NSLocalizedString(@"Loading Payments...", nil);
+			_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
 			_account.downloadProgress = 0.9;
+		});
+		
+		NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
+		NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
+		NSString *signoutSentinel = @"Sign Out";
+		
+		NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
+		NSHTTPURLResponse *loginPageResponse = nil;
+		NSError *loginPageError = nil;
+		NSData *loginPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:loginURL] returningResponse:&loginPageResponse error:&loginPageError];
+		NSString *loginPage = [[[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding] autorelease];
+			
+		if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
+			// find the login action
+			NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
+			[loginPageScanner scanUpToString:@"action=\"" intoString:nil];
+			if (![loginPageScanner scanString:@"action=\"" intoString:nil]) {
+				dispatch_async(dispatch_get_main_queue(), ^ {
+					[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
+																		object:self 
+																	  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not parse iTunes Connect login page", nil)
+																										   forKey:kASReportDownloadErrorDescription]];
+				});
+				[pool release];
+				return;
+			}
+			NSString *loginAction = nil;
+			[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
+			
+			NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+									  username, @"theAccountName",
+									  password, @"theAccountPW", 
+									  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
+									  @"7", @"1.Continue.y",
+									  nil];
+			loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
+			
+			if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
+				dispatch_async(dispatch_get_main_queue(), ^ {
+					[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
+																		object:self 
+																	  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not login. Please check your username and password.", nil) 
+																										   forKey:kASReportDownloadErrorDescription]];
+				});
+				[pool release];
+				return;
+			}
+		}
+		
+		if ([self isCancelled]) {
+			[pool release];
+			return;
+		}
+		
+		dispatch_async(dispatch_get_main_queue(), ^ {
+			_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
+			_account.downloadProgress = 0.95;
 		});
 		NSScanner *paymentsScanner = [NSScanner scannerWithString:loginPage];
 		NSString *paymentsAction = nil;
@@ -463,19 +358,29 @@
 				[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
 				for (NSString *additionalVendorOption in vendorOptions) {
 					NSString *paymentsFormURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", switchVendorAction];
-                    
+					
 					NSData *additionalPaymentsPageData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:paymentsFormURLString] 
 																					  bodyDictionary:[NSDictionary dictionaryWithObjectsAndKeys:additionalVendorOption, vendorSelectName, nil]
 																							response:NULL];
 					NSString *additionalPaymentsPage = [[[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding] autorelease];
 					[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption];
 				}
+		
+				NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
+				NSString *signoutFormAction = nil;
+				[logoutFormScanner scanUpToString:@"<form name=\"signOutForm\"" intoString:NULL];
+				[logoutFormScanner scanUpToString:@"action=\"" intoString:NULL];
+				if ([logoutFormScanner scanString:@"action=\"" intoString:NULL]) {
+					[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
+					NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:signoutFormAction]];
+					NSError *logoutPageError = nil;
+					[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:&logoutPageError];
+				}
 			}
 		}
+		
+		//==== /Payments
 	}
-	//==== /Payments
-	
-	downloadCount = numberOfReportsDownloaded;
 	
 	if ([moc hasChanges]) {
 		[psc lock];
@@ -502,7 +407,7 @@
 	[pool release];
 }
 
-- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(Account *)account vendorID:(NSString *)vendorID
+- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID
 {
 	NSManagedObjectContext *moc = [account managedObjectContext];
 	
@@ -515,7 +420,8 @@
 		graphDataJSON = [graphDataJSON stringByAppendingString:@"}"];
 		graphDataJSON = [graphDataJSON stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
 		NSError *jsonError = nil;
-		NSDictionary *graphDict = [graphDataJSON objectFromJSONStringWithParseOptions:JKParseOptionUnicodeNewlines | JKParseOptionLooseUnicode error:&jsonError];
+		
+		NSDictionary *graphDict = [NSJSONSerialization JSONObjectWithData:[graphDataJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&jsonError];
 		if (graphDict) {
 			NSSet *allExistingPayments = account.payments;
 			NSMutableSet *existingPaymentIdentifiers = [NSMutableSet set];
@@ -528,7 +434,7 @@
 			[paymentMonthFormatter setDateFormat:@"MMM yy"];
 			NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 			[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			NSArray *amounts = [[graphDict objectForKey:@"data"] objectAtIndex:1];
+			NSArray *amounts = ([[graphDict objectForKey:@"data"] count] >= 2) ? [[graphDict objectForKey:@"data"] objectAtIndex:1] : nil;
 			NSArray *labels = [graphDict objectForKey:@"labels"];
 			NSArray *legend = [graphDict objectForKey:@"legend"];
 			if (legend && [legend isKindOfClass:[NSArray class]] && [legend count] == 2) {
@@ -588,87 +494,6 @@
 		return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 	}
 	return nil;
-}
-
-- (NSArray *)extractFormOptionsFromPage:(NSString *)htmlPage formID:(NSString *)formID
-{
-	NSScanner *scanner = [NSScanner scannerWithString:htmlPage];
-	NSString *selectionForm = nil;
-	[scanner scanUpToString:formID intoString:nil];
-	if (! [scanner scanString:formID intoString:nil]) {
-		return nil;
-	}
-	[scanner scanUpToString:@"</select>" intoString:&selectionForm];
-	if (![scanner scanString:@"</select>" intoString:nil]) {
-		return nil;
-	}
-    
-	NSMutableArray *options = [NSMutableArray array];
-	NSScanner *selectionScanner = [NSScanner scannerWithString:selectionForm];
-	while ([selectionScanner scanUpToString:@"<option value=\"" intoString:nil] && [selectionScanner scanString:@"<option value=\"" intoString:nil]) {
-		NSString *selectorValue = nil;
-		[selectionScanner scanUpToString:@"\"" intoString:&selectorValue];
-		if (![selectionScanner scanString:@"\"" intoString:nil]) {
-			return nil;
-		}
-		[options addObject:selectorValue];
-	}
-	return [NSArray arrayWithArray:options];
-}
-
-- (NSData *)downloadReportFromiTCWithInfo:(NSDictionary *)downloadInfo viewState:(NSString **)viewState originalFilename:(NSString **)filename
-{
-	// set the date within the web page
-    NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                              [downloadInfo objectForKey:@"ajaxName"], @"AJAXREQUEST",
-                              @"theForm", @"theForm",
-                              @"theForm:xyz", @"notnormal",
-                              @"Y", @"theForm:vendorType",
-                              [downloadInfo objectForKey:@"dayString"], @"theForm:datePickerSourceSelectElementSales",
-                              [downloadInfo objectForKey:@"weekString"], @"theForm:weekPickerSourceSelectElement",
-                              *viewState, @"javax.faces.ViewState",
-							  [downloadInfo objectForKey:@"selectName"], [downloadInfo objectForKey:@"selectName"],
-                              nil];
-	NSString *responseString = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] 
-															  bodyDictionary:postDict];
-	*viewState = [responseString stringByMatching:@"\"javax.faces.ViewState\" value=\"(.*?)\"" capture:1];
-	
-	// iTC shows a (fixed?) number of date ranges in the form, even if not all of them are available.
-	// When trying to download a report that doesn't exist, it'll return an error page instead of the report
-	if ([responseString rangeOfString:@"theForm:errorPanel"].location != NSNotFound) {
-		return nil;
-	}
-    // and finally...we're ready to download the report
-    postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-				@"theForm", @"theForm",
-				@"notnormal", @"theForm:xyz",
-				@"Y", @"theForm:vendorType",
-				[downloadInfo objectForKey:@"dayString"], @"theForm:datePickerSourceSelectElementSales",
-				[downloadInfo objectForKey:@"weekString"], @"theForm:weekPickerSourceSelectElement",
-				*viewState, @"javax.faces.ViewState",
-				@"theForm:downloadLabel2", @"theForm:downloadLabel2",
-				nil];
-	NSHTTPURLResponse *downloadResponse = nil;
-	NSData *requestResponseData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/sales.faces"] bodyDictionary:postDict response:&downloadResponse];
-	NSDictionary *responseHeaders = [downloadResponse allHeaderFields];
-	NSString *originalFilename = [responseHeaders objectForKey:@"Filename"];
-	if (!originalFilename) originalFilename = [responseHeaders objectForKey:@"filename"];
-	
-	if (originalFilename) {
-		*filename = originalFilename;
-		return requestResponseData;
-	}
-	return nil;
-}
-
-- (NSDate *)dateFromPopupMenuItemName:(NSString *)menuItemName
-{
-	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-	[formatter setDateFormat:@"MM/dd/yyyy"];
-	[formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-	NSDate *date = [formatter dateFromString:menuItemName];
-	[formatter release];
-	return date;
 }
 
 - (void)dealloc

@@ -9,7 +9,7 @@
 #import "ReportDetailViewController.h"
 #import "MapView.h"
 #import "AppIconView.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Report.h"
 #import "Product.h"
 #import "CurrencyManager.h"
@@ -40,6 +40,7 @@
 		[revenueFormatter setMinimumFractionDigits:2];
 		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
+		self.contentSizeForViewInPopover = CGSizeMake(320, 500);
     }
     return self;
 }
@@ -132,8 +133,12 @@
 	spaceItem.width = 21.0;
 	
 	[self updateNavigationButtons];
-	toolbar.items = [NSArray arrayWithObjects:prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
-	toolbar.translucent = YES;
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		toolbar.items = [NSArray arrayWithObjects:spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+	} else {
+		toolbar.items = [NSArray arrayWithObjects:prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+		toolbar.translucent = YES;
+	}
 	
 	[self reloadData];
 	[self updateHeader];
@@ -203,7 +208,7 @@
 		mapShadowView.alpha = 0.0;
 		self.navigationItem.rightBarButtonItem.image = [UIImage imageNamed:@"ShowMap.png"];
 	} else {
-		tableView.frame = CGRectMake(0, 208, self.view.bounds.size.width, 208);
+		tableView.frame = CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
 		headerView.frame = CGRectMake(0, 208-20, self.view.bounds.size.width, 20);
 		shadowView.frame = CGRectMake(0, 208, self.view.bounds.size.width, 20);
 		shadowView.alpha = 0.0;
@@ -273,7 +278,7 @@
 			NSDictionary *salesByProduct = [paidDownloadsByCountryAndProduct objectForKey:[country uppercaseString]];
 			sales = [[[salesByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
 		}
-		NSString *subtitle = [NSString stringWithFormat:@"%@: %i sales", [[CountryDictionary sharedDictionary] nameForCountryCode:country], sales];
+		NSString *subtitle = [NSString stringWithFormat:@"%@: %i %@", [[CountryDictionary sharedDictionary] nameForCountryCode:country], sales, sales == 1 ? @"sale" : @"sales"];
 		ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:country product:nil];
 		[sortedEntries addObject:entry];
 	}
@@ -282,7 +287,7 @@
 	NSMutableArray *entries = [NSMutableArray array];
 	ReportDetailEntry *allProductsEntry = [ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:nil product:nil];
 	[entries addObject:allProductsEntry];
-	Account *account = [[self.selectedReport firstReport] valueForKey:@"account"];
+	ASAccount *account = [[self.selectedReport firstReport] valueForKey:@"account"];
 	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
 	for (Product *product in allProducts) {
 		NSString *productID = product.productID;

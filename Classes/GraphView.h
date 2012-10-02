@@ -10,10 +10,9 @@
 
 @class GraphView, ScaleView;
 
-
 @protocol GraphViewDelegate <NSObject>
 
-- (void)graphView:(GraphView *)view didSelectBarAtIndex:(NSUInteger)index;
+- (void)graphView:(GraphView *)view didSelectBarAtIndex:(NSUInteger)index withFrame:(CGRect)barFrame;
 @optional
 - (BOOL)graphView:(GraphView *)view canDeleteBarAtIndex:(NSUInteger)index;
 - (void)graphView:(GraphView *)view deleteBarAtIndex:(NSUInteger)index;
@@ -88,6 +87,7 @@
 - (void)setSegmentValues:(NSArray *)values;
 - (void)setSegmentValues:(NSArray *)values label:(NSString *)labelText;
 - (UIView *)selectedBackgroundView;
+- (CGFloat)stackHeight;
 
 @end
 

@@ -16,13 +16,14 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+		BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 		barViews = [NSMutableArray new];
 		barLabels = [NSMutableArray new];
 		
 		for (int rating = 5; rating >= 1; rating--) {
 			CGRect barFrame = [self barFrameForRating:rating];
 			
-			UILabel *starLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, barFrame.origin.y-2, 90, 29)] autorelease];
+			UILabel *starLabel = [[[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, CGRectGetMidY(barFrame) - 15, 90, 29))] autorelease];
 			starLabel.backgroundColor = [UIColor clearColor];
 			starLabel.textAlignment = UITextAlignmentRight;
 			starLabel.textColor = [UIColor darkGrayColor];
@@ -33,18 +34,18 @@
 			[self addSubview:starLabel];
 			
 			UIView *barBackgroundView = [[[UIView alloc] initWithFrame:barFrame] autorelease];
-			barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0]; //[UIColor lightGrayColor];
+			barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 			barBackgroundView.userInteractionEnabled = NO;
 			[self addSubview:barBackgroundView];
 			
 			UIView *barView = [[[UIView alloc] initWithFrame:barBackgroundView.frame] autorelease];
-			barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];// [UIColor darkGrayColor];
+			barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];
 			barView.userInteractionEnabled = NO;
 			[self addSubview:barView];
 			[barViews addObject:barView];
 			
 			UIButton *showReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-			CGRect showReviewsButtonFrame = CGRectMake(10, barBackgroundView.frame.origin.y - 2, self.bounds.size.width - 20, 28);
+			CGRect showReviewsButtonFrame = CGRectMake(10, barBackgroundView.frame.origin.y - 2, self.bounds.size.width - 20, CGRectGetHeight(barFrame) + 4);
 			[showReviewsButton setBackgroundImage:[[UIImage imageNamed:@"ReviewBarButton.png"] stretchableImageWithLeftCapWidth:8 topCapHeight:0] forState:UIControlStateHighlighted];
 			showReviewsButton.frame = showReviewsButtonFrame;
 			showReviewsButton.tag = rating;
@@ -63,12 +64,19 @@
 			[barLabels addObject:barLabel];
 		}
 		
-		UIView *separator = [[[UIView alloc] initWithFrame:CGRectMake(10, self.bounds.size.height - 44, self.bounds.size.width - 20, 1)] autorelease];
-		separator.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
-		[self addSubview:separator];
+		if (!iPad) {
+			UIView *separator = [[[UIView alloc] initWithFrame:CGRectMake(10, self.bounds.size.height - 44, self.bounds.size.width - 20, 1)] autorelease];
+			separator.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
+			[self addSubview:separator];
+		}
 		
 		UIButton *allReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		allReviewsButton.frame = CGRectMake(110, self.bounds.size.height - 37, 145, 28);
+		if (iPad) {
+			CGRect barFrame = [self barFrameForRating:0];
+			allReviewsButton.frame = CGRectMake(CGRectGetMaxX(barFrame) - 145 - 5, CGRectGetMinY(barFrame), 145, 28);
+		} else {
+			allReviewsButton.frame = CGRectMake(110, self.bounds.size.height - 37, 145, 28);
+		}
 		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButton.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateNormal];
 		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButtonHighlighted.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateHighlighted];
 		[allReviewsButton setTitle:NSLocalizedString(@"Show All Reviews", nil) forState:UIControlStateNormal];
@@ -80,15 +88,24 @@
 		allReviewsButton.tag = 0;
 		[self addSubview:allReviewsButton];
 		[allReviewsButton addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
-		
-		averageLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, allReviewsButton.frame.origin.y, 90, 29)] autorelease];
+		if (iPad) {
+			CGRect barFrame = [self barFrameForRating:0];
+			averageLabel = [[[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, allReviewsButton.frame.origin.y, 90, 29)] autorelease];
+		} else {
+			averageLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, allReviewsButton.frame.origin.y, 90, 29)] autorelease];
+		}
 		averageLabel.font = [UIFont boldSystemFontOfSize:15.0];
 		averageLabel.backgroundColor = [UIColor clearColor];
 		averageLabel.textColor = [UIColor darkGrayColor];
 		averageLabel.textAlignment = UITextAlignmentRight;
 		[self addSubview:averageLabel];
 		
-		sumLabel = [[[UILabel alloc] initWithFrame:CGRectMake(260, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)] autorelease];
+		if (iPad) {
+			CGRect barFrame = [self barFrameForRating:0];
+			sumLabel = [[[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(barFrame) + 5, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)] autorelease];
+		} else {
+			sumLabel = [[[UILabel alloc] initWithFrame:CGRectMake(260, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)] autorelease];
+		}
 		sumLabel.font = [UIFont systemFontOfSize:13.0];
 		sumLabel.backgroundColor = [UIColor clearColor];
 		sumLabel.textColor = [UIColor darkGrayColor];
@@ -151,8 +168,14 @@
 
 - (CGRect)barFrameForRating:(NSInteger)rating
 {
-	CGRect barFrame = CGRectMake(110, 12 + (5-rating) * 30, 145, 24);
-	return barFrame;
+	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
+	if (!iPad) {
+		CGRect barFrame = CGRectMake(110, 12 + (5-rating) * 30, 145, 24);
+		return barFrame;
+	} else {
+		CGRect barFrame = CGRectMake(150, 105 + (5 - rating) * 45, 467, 35);
+		return barFrame;
+	}
 }
 
 - (void)showReviews:(UIButton *)button

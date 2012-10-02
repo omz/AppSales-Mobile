@@ -57,14 +57,6 @@
 	self.selectedColor = pickedColor;
 }
 
-- (CGSize)contentSizeForViewInPopover
-{
-	if ([colors count] < 8) {
-		return CGSizeMake([colors count] * 40, 40);
-	}
-	return CGSizeMake(8 * 40, [colors count] / 8 * 40);
-}
-
 - (void)dealloc 
 {
 	[context release];

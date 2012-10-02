@@ -15,18 +15,21 @@
 #define kProductPlatformMac			@"Mac"
 #define kProductPlatformInApp		@"In-App"
 
-@class Account;
+@class ASAccount;
 
 @interface Product : NSManagedObject {
 
+    BOOL isDownloadingPromoCodes;
 }
+
+@property (nonatomic, assign) BOOL isDownloadingPromoCodes;
 
 @property (nonatomic, retain) NSString *name;
 @property (nonatomic, retain) NSString *platform;
 @property (nonatomic, retain) NSString *productID;
 @property (nonatomic, retain) NSDictionary *reviewSummary;
 @property (nonatomic, retain) UIColor *color;
-@property (nonatomic, retain) Account *account;
+@property (nonatomic, retain) ASAccount *account;
 @property (nonatomic, retain) NSSet *reviews;
 @property (nonatomic, retain) NSSet *transactions;
 @property (nonatomic, retain) NSNumber *hidden;
@@ -35,6 +38,7 @@
 @property (nonatomic, retain) NSString *parentSKU;
 @property (nonatomic, retain) NSString *currentVersion;
 @property (nonatomic, retain) NSDate *lastModified;
+@property (nonatomic, retain) NSSet *promoCodes;
 
 - (NSString *)displayName;
 - (NSString *)defaultDisplayName;

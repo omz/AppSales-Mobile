@@ -11,7 +11,7 @@
 #import "DashboardViewController.h"
 #import "ColorPickerViewController.h"
 
-@class Account, Report, Product;
+@class ASAccount, Report, Product;
 @protocol ReportSummary;
 
 typedef enum DashboardViewMode { 
@@ -42,6 +42,8 @@ typedef enum DashboardViewMode {
 	NSMutableArray *sortedFiscalMonthReports;
 	
 	UIBarButtonItem *downloadReportsButtonItem;
+	
+	UIPopoverController *selectedReportPopover;
 }
 
 @property (nonatomic, retain) NSMutableArray *sortedDailyReports;
@@ -51,5 +53,6 @@ typedef enum DashboardViewMode {
 @property (nonatomic, assign) DashboardViewMode viewMode;
 @property (nonatomic, retain) GraphView *graphView;
 @property (nonatomic, retain) UIBarButtonItem *downloadReportsButtonItem;
+@property (nonatomic, retain) UIPopoverController *selectedReportPopover;
 
 @end

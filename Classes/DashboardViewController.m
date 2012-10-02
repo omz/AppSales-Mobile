@@ -10,25 +10,36 @@
 #import "DashboardAppCell.h"
 #import "ColorButton.h"
 #import "UIColor+Extensions.h"
-#import "Account.h"
+#import "ASAccount.h"
 #import "Product.h"
 
 @implementation DashboardViewController
 
-@synthesize account, products, visibleProducts, selectedProduct;
-@synthesize productsTableView, topView, shadowView, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
+@synthesize account, products, visibleProducts, selectedProducts;
+@synthesize productsTableView, topView, shadowView, colorPopover, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
+@synthesize activeSheet;
 
-
-- (id)initWithAccount:(Account *)anAccount
+- (id)initWithAccount:(ASAccount *)anAccount
 {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		self.account = anAccount;
-		self.title = [account displayName];
-		self.hidesBottomBarWhenPushed = YES;
+		self.selectedProducts = nil;
+		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}
 	return self;
+}
+
+- (void)willShowPasscodeLock:(NSNotification *)notification
+{
+	if (self.colorPopover.popoverVisible) {
+		[self.colorPopover dismissPopoverAnimated:NO];
+	}
+	if (self.activeSheet.visible) {
+		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
+	}
 }
 
 - (void)contextDidChange:(NSNotification *)notification
@@ -75,21 +86,22 @@
 - (void)loadView
 {
 	[super loadView];
+	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
 	statusVisible = [self shouldShowStatusBar];
 	self.topView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]] autorelease];
 	topView.userInteractionEnabled = YES;
 	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, 208);
+	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5);
 	[self.view addSubview:topView];
 	
 	UIImageView *graphShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
 	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
-	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	[topView addSubview:graphShadowView];
 	
 	self.productsTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain] autorelease];
-	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	productsTableView.dataSource = self;
 	productsTableView.delegate = self;
@@ -101,12 +113,14 @@
 	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
 	productsTableView.contentInset = productsTableContentInset;
 	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
+	productsTableView.allowsMultipleSelection = YES;
 	
 	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
 	[self.view addSubview:self.productsTableView];
 	
 	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
 	shadowView.frame = graphShadowView.frame;
+	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	shadowView.alpha = 0.0;
 	
 	[self.view addSubview:shadowView];
@@ -208,28 +222,47 @@
 
 - (void)reloadData
 {
+  NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+
+  NSArray *allProducts;
+  if ([productSortByValue isEqualToString:@"color"]) {
+	// Sort products by color
+	allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^(id obj1, id obj2){
+	  Product* product1 = (Product*)obj1;
+	  Product* product2 = (Product*)obj2;
+	  if ([product1.color luminance] < [product2.color luminance]) {
+		return (NSComparisonResult)NSOrderedAscending;
+	  } else if ([product1.color luminance]> [product2.color luminance]) {
+		return (NSComparisonResult)NSOrderedDescending;
+	  }
+	  
+	  return (NSComparisonResult)NSOrderedSame;
+	}];
+  } else {
 	// Sort products by ID (this will put the most recently released apps on top):
-	NSArray *allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
-	
+   allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
+  }
+  
 	self.products = allProducts;
 	self.visibleProducts = [allProducts filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^ (id obj, NSDictionary *bindings) { return (BOOL)![[(Product *)obj hidden] boolValue]; }]];
 	
 	[self reloadTableView];
 }
 
+
 - (void)reloadTableView
 {
 	//Reload the table view, preserving the current selection:
-	NSIndexPath *selectedIndexPath = [self.productsTableView indexPathForSelectedRow];
-	if (!selectedIndexPath) {
-		if (self.selectedProduct) {
-			selectedIndexPath = [NSIndexPath indexPathForRow:[self.products indexOfObject:self.selectedProduct] + 1 inSection:0];
-		} else {
-			selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-		}
-	}
+	NSArray *selectedIndexPaths = [self.productsTableView indexPathsForSelectedRows];
 	[self.productsTableView reloadData];
-	[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+	if ([selectedIndexPaths count] > 0) {
+		for (NSIndexPath *selectedIndexPath in selectedIndexPaths) {
+			[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+		}
+	} else {
+		NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+		[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+  	}
 }
 
 - (void)changeColor:(UIButton *)sender
@@ -241,8 +274,14 @@
 	ColorPickerViewController *vc = [[[ColorPickerViewController alloc] initWithColors:palette] autorelease];
 	vc.delegate = self;
 	vc.context = product;
-	vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
-	[self presentModalViewController:vc animated:YES];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
+		[self presentModalViewController:vc animated:YES];
+	} else {
+		vc.contentSizeForViewInPopover = CGSizeMake(320, 210);
+		self.colorPopover = [[[UIPopoverController alloc] initWithContentViewController:vc] autorelease];
+		[self.colorPopover presentPopoverFromRect:sender.bounds inView:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	}
 }
 
 - (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(int)colorIndex
@@ -251,7 +290,11 @@
 	product.color = color;
 	[product.managedObjectContext save:NULL];
 	[self reloadTableView];
-	[picker dismissModalViewControllerAnimated:YES];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		[picker dismissModalViewControllerAnimated:YES];
+	} else {
+		[self.colorPopover dismissPopoverAnimated:YES];
+	}
 }
 
 #pragma mark - Tableview data source
@@ -290,7 +333,51 @@
 	
 	cell.accessoryView = [self accessoryViewForRowAtIndexPath:indexPath];
 	
+	if ([self.selectedProducts containsObject:product]) {
+		[tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+	}
+	
+	UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+	[cell addGestureRecognizer:longPressRecognizer];
+	[longPressRecognizer release];
+	
 	return cell;
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+		DashboardAppCell * cell = ((DashboardAppCell*)gestureRecognizer.view);
+		NSUInteger i = [self.visibleProducts indexOfObject:cell.product];
+		NSIndexPath * indexPath = [NSIndexPath indexPathForRow:i + 1 inSection:0];
+		[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+		
+		if (cell.product) {
+			if (self.selectedProducts) {
+				if (![self.selectedProducts containsObject:cell.product]) {
+					[self.selectedProducts addObject:cell.product];
+				} else {
+					[self.selectedProducts removeObject:cell.product];
+					[self.productsTableView deselectRowAtIndexPath:indexPath animated:NO];
+					if (self.selectedProducts.count == 0) {
+						self.selectedProducts = nil;
+						[self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
+						NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+						[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+					}
+				}
+			} else {
+				self.selectedProducts = [NSMutableArray arrayWithObject:cell.product];
+				NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+				[self.productsTableView deselectRowAtIndexPath:indexPath animated:NO];
+			}
+		} else {
+			self.selectedProducts = nil;
+			[self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
+			NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+			[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+		}
+	}
 }
 
 - (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -300,9 +387,30 @@
 
 #pragma mark - Table view delegate
 
+- (void)deselectAllRowsInTableView:(UITableView*)tableView exceptForIndexPath:(NSIndexPath*)indexPath 
+{
+	for (NSIndexPath *i in [tableView indexPathsForSelectedRows]) {
+		if ([i isEqual:indexPath]) continue;
+		[tableView deselectRowAtIndexPath:i animated:NO];
+	}
+}
+
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
+	[tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+	if (indexPath.row != 0) {
+		Product *p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+		self.selectedProducts = [NSMutableArray arrayWithObject:p];
+	} else {
+		self.selectedProducts = nil;
+	}
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	self.selectedProduct = [(indexPath.row == 0) ? nil : self.visibleProducts objectAtIndex:indexPath.row - 1];
+	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
+	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -312,7 +420,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
@@ -322,7 +430,7 @@
 	[account release];
 	[products release];
 	[visibleProducts release];
-	[selectedProduct release];
+	[selectedProducts release];
 	[productsTableView release];
 	[topView release];
 	[shadowView release];
@@ -331,6 +439,8 @@
 	[activityIndicator release];
 	[statusLabel release];
 	[progressBar release];
+	[colorPopover release];
+	[activeSheet release];
 	[super dealloc];
 }
 

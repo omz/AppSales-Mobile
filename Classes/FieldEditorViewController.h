@@ -18,7 +18,8 @@ typedef enum FieldSpecifierType {
 	FieldSpecifierTypeSwitch,
 	FieldSpecifierTypeCheck,
 	FieldSpecifierTypeButton,
-	FieldSpecifierTypeSection
+	FieldSpecifierTypeSection,
+	FieldSpecifierTypeNumeric
 } FieldSpecifierType;
 
 
@@ -37,7 +38,6 @@ typedef enum FieldSpecifierType {
 	id delegate;
 	id context;
 	NSString *editorIdentifier;
-	NSMutableArray *textFields;
 	NSArray *fieldSections;
 	NSMutableDictionary *values;
 	NSString *doneButtonTitle;
@@ -45,6 +45,7 @@ typedef enum FieldSpecifierType {
 	BOOL isSubSection;
 	BOOL isOpeningSubsection;
 	BOOL hasChanges;
+	UITextField *selectedTextField;
 }
 
 @property (nonatomic, assign) id<FieldEditorViewControllerDelegate> delegate;
@@ -56,10 +57,12 @@ typedef enum FieldSpecifierType {
 @property (nonatomic, retain) NSString *editorIdentifier;
 @property (nonatomic, assign) BOOL isSubSection;
 @property (nonatomic, assign) BOOL hasChanges;
+@property (nonatomic, retain) UITextField *selectedTextField;
 
 - (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title;
 - (void)openSubsection:(FieldSpecifier *)subsectionField;
 - (void)done;
+- (void)dismissKeyboard;
 
 @end
 
@@ -107,6 +110,7 @@ typedef enum FieldSpecifierType {
 + (FieldSpecifier *)URLFieldWithKey:(NSString *)k title:(NSString *)URLTitle defaultValue:(NSString *)defaultURL;
 + (FieldSpecifier *)passwordFieldWithKey:(NSString *)k title:(NSString *)passwordTitle defaultValue:(NSString *)defaultPassword;
 + (FieldSpecifier *)textFieldWithKey:(NSString *)k title:(NSString *)textTitle defaultValue:(NSString *)defaultText;
++ (FieldSpecifier *)numericFieldWithKey:(NSString *)k title:(NSString *)numericTitle defaultValue:(NSString *)defaultText;
 + (FieldSpecifier *)checkFieldWithKey:(NSString *)k title:(NSString *)checkmarkTitle defaultValue:(BOOL)checked;
 + (FieldSpecifier *)buttonFieldWithKey:(NSString *)k title:(NSString *)buttonTitle;
 + (FieldSpecifier *)subsectionFieldWithSections:(NSArray *)sections key:(NSString *)k title:(NSString *)t;

@@ -8,16 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
-@class Account;
+@class ASAccount;
 
 @interface PaymentsViewController : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate> {
 	
-	Account *account;
+	ASAccount *account;
 	UIScrollView *scrollView;
 	UIPageControl *pageControl;
 }
 
-- (id)initWithAccount:(Account *)paymentAccount;
+- (id)initWithAccount:(ASAccount *)paymentAccount;
+- (void)reloadData;
 
 @property (nonatomic, retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UIPageControl *pageControl;

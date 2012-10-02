@@ -10,6 +10,13 @@
 #import "Review.h"
 #import "Product.h"
 
+@interface ReviewDetailViewController ()
+
+- (void)sendReviewViaEmail;
+
+@end
+
+
 @implementation ReviewDetailViewController
 
 @synthesize webView;
@@ -44,6 +51,9 @@
 	template = [template stringByReplacingOccurrencesOfString:@"[[[SUBTITLE]]]" withString:reviewSubtitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.text];
 	
+	UIBarButtonItem *sendReviewButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)] autorelease];
+	self.navigationItem.rightBarButtonItem = sendReviewButtonItem;
+	
 	[self.webView loadHTMLString:template baseURL:nil];
 }
 
@@ -64,5 +74,29 @@
 	[webView release];
 	[super dealloc];
 }
+
+- (void)sendReviewViaEmail
+{
+	if (![MFMailComposeViewController canSendMail]) {
+		[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+		return;
+	}
+	MFMailComposeViewController *mailComposeViewController = [[[MFMailComposeViewController alloc] init] autorelease];
+	mailComposeViewController.mailComposeDelegate = self;
+	NSString *body = [self.webView stringByEvaluatingJavaScriptFromString: @"document.body.innerHTML"];
+	NSString *subject = [NSString stringWithFormat:@"Review from %@", review.user];
+	[mailComposeViewController setMessageBody:body isHTML:YES];
+	[mailComposeViewController setSubject:subject];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		mailComposeViewController.modalPresentationStyle = UIModalPresentationFormSheet;
+	}
+	[self presentModalViewController:mailComposeViewController animated:YES];
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+	[self dismissModalViewControllerAnimated:YES];
+}
+
 
 @end
