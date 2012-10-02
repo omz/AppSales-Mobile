@@ -344,15 +344,16 @@
 			barView.frame = frameForBar;
 			barView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 			
-			UILabel *dateLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, frameForBar.size.height, frameForBar.size.width, 20)] autorelease];
+			UILabel *dateLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, frameForBar.size.height, frameForBar.size.width, 30)] autorelease];
 			dateLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 			dateLabel.backgroundColor = [UIColor clearColor];
 			dateLabel.textColor = [UIColor darkGrayColor];
 			dateLabel.shadowColor = [UIColor whiteColor];
 			dateLabel.shadowOffset = CGSizeMake(0, 1);
 			dateLabel.textAlignment = UITextAlignmentCenter;
-			dateLabel.font = [UIFont boldSystemFontOfSize:14.0];
+			dateLabel.font = [UIFont boldSystemFontOfSize:12.0];
 			dateLabel.adjustsFontSizeToFitWidth = YES;
+            dateLabel.numberOfLines = 2;
 			[barView addSubview:dateLabel];
 			
 			NSString *xAxisLabelText = [self.dataSource graphView:self labelForXAxisAtIndex:i];
