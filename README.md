@@ -16,16 +16,16 @@ AppSales allows iOS and Mac App Store developers to download and analyze their s
 Please see the screenshot below for a visual guide to AppSales' main interface and some tips and tricks.
 
 ##Requirements
-AppSales requires the iOS 4.2 SDK or later.
+AppSales requires the iOS 5.0 SDK or later.
 
 Because there is no API to access some parts of iTunes Connect, AppSales scrapes [itunesconnect.apple.com](https://itunesconnect.apple.com). This means that even small changes on this website can break some functionality. In most cases, this is easy to fix and I'll try to make a new version available here. The report download itself uses Apple's auto-ingestion interface to iTunes Connect and should generally be unaffected by changes to the website.
 
 ##Push Notifications
-Because sales reports are not always available at the same time, I run a web service on [Google App Engine](http://code.google.com/appengine/) to check for new reports every 10 minutes (until the report for the previous day is available).
+Because sales reports are not always available at the same time, I run a web service to send out push notifications when the daily reports have been generated.
 
-You can get a push notification when new reports are available with the free [Boxcar](http://itunes.apple.com/us/app/boxcar/id321493542) app. You can install Boxcar and add the AppSales service from the settings (in AppSales).
+You can get a notification when new reports are available with the free [Boxcar](http://itunes.apple.com/us/app/boxcar/id321493542) app. Boxcar can also be installed directly from the settings in AppSales.
 
-If AppSales is installed, opening the push notification will automatically trigger the download of new reports but you can also use the push service without AppSales being installed. To do so, install [Boxcar](http://itunes.apple.com/us/app/boxcar/id321493542) and open this link from Safari (on your device) to add the AppSales service: [boxcar://provider/965](boxcar://provider/965).
+If AppSales is installed, opening the push notification will automatically trigger the download of new reports but you can also use the push service without AppSales being installed. To do so, install [Boxcar](http://itunes.apple.com/us/app/boxcar/id321493542) and just add AppSales from the list of services in Boxcar.
 
 Except for the total number of subscribers, I don't collect any data with the push service. You can stop receiving notifications at any time by simply removing AppSales from Boxcar.
 

@@ -13,4 +13,6 @@
 #define kSettingDashboardShowWeeks		@"DashboardShowWeeks"
 #define kSettingDownloadPayments		@"DownloadPayments"
 
+#define kSettingSelectedAccountID		@"SelectedAccountID"
+
 #define ASWillShowPasscodeLockNotification	@"ASWillShowPasscodeLockNotification"

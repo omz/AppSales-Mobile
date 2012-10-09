@@ -208,7 +208,7 @@
 		mapShadowView.alpha = 0.0;
 		self.navigationItem.rightBarButtonItem.image = [UIImage imageNamed:@"ShowMap.png"];
 	} else {
-		tableView.frame = CGRectMake(0, 208, self.view.bounds.size.width, 208);
+		tableView.frame = CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
 		headerView.frame = CGRectMake(0, 208-20, self.view.bounds.size.width, 20);
 		shadowView.frame = CGRectMake(0, 208, self.view.bounds.size.width, 20);
 		shadowView.alpha = 0.0;

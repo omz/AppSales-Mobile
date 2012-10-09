@@ -32,8 +32,14 @@
 	srandom(time(NULL));
 	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
 	
+	NSString *currencyCode = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
+	if (![[CurrencyManager sharedManager].availableCurrencies containsObject:currencyCode]) {
+		currencyCode = @"USD";
+	}
+	
 	NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
 							  [NSNumber numberWithBool:YES], kSettingDownloadPayments,
+							  currencyCode, @"CurrencyManagerBaseCurrency",
 							  nil];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 
@@ -82,7 +88,17 @@
 	
 	[self showPasscodeLockIfNeeded];
 	if (iPad) {
-		[self selectAccount:nil];
+		//Restore previously-selected account:
+		NSString *accountIDURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kSettingSelectedAccountID];
+		if (accountIDURIString) {
+			NSManagedObjectID *accountID = [self.managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:accountIDURIString]];
+			ASAccount *account = (ASAccount *)[self.managedObjectContext objectWithID:accountID];
+			if (account) {
+				[self accountsViewController:nil didSelectAccount:account];
+			}
+		} else {
+			[self selectAccount:nil];
+		}
 	}
 	
 	return YES;
@@ -99,6 +115,9 @@
 {
 	[self.accountsPopover dismissPopoverAnimated:YES];
 	[self loadAccount:account];
+	
+	NSString *accountIDURIString = [[[account objectID] URIRepresentation] absoluteString];
+	[[NSUserDefaults standardUserDefaults] setObject:accountIDURIString forKey:kSettingSelectedAccountID];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex

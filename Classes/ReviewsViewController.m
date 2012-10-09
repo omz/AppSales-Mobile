@@ -117,10 +117,22 @@
 	
 	NSFetchRequest *reviewsCountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
-	if (!self.selectedProduct) {
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND rating == %@", self.account, [NSNumber numberWithInt:rating]]];
+
+    NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@"];
+    NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
+    [args insertObject:[NSNumber numberWithInt:rating] atIndex:0];
+    
+	if (![self.selectedProducts count]) {
+        [pred appendString:@" AND product.account = %@"];
+        [args addObject:self.account];
+        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND rating == %@", self.selectedProduct, [NSNumber numberWithInt:rating]]];
+        [pred appendString:@" AND (product == nil"];
+        for (Product* p in self.selectedProducts) {
+            [pred appendString:@" OR product == %@"];
+        }
+        [pred appendString:@")"];
+        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	}
 	NSUInteger numberOfReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:NULL];	
 	return numberOfReviewsForRating;
@@ -132,10 +144,22 @@
 	
 	NSFetchRequest *reviewsCountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
-	if (!self.selectedProduct) {
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND rating == %@ AND unread = TRUE", self.account, [NSNumber numberWithInt:rating]]];
+    
+    NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
+    NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
+    [args insertObject:[NSNumber numberWithInt:rating] atIndex:0];
+    
+	if (![self.selectedProducts count]) {
+        [pred appendString:@" AND product.account = %@"];
+        [args addObject:self.account];
+        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND rating == %@ AND unread = TRUE", self.selectedProduct, [NSNumber numberWithInt:rating]]];
+        [pred appendString:@" AND (product == nil"];
+        for (Product* p in self.selectedProducts) {
+            [pred appendString:@" OR product == %@"];
+        }
+        [pred appendString:@")"];
+        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	}
 	NSUInteger numberOfUnreadReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:NULL];	
 	return numberOfUnreadReviewsForRating;
@@ -145,7 +169,7 @@
 {
 	if (!self.account) return;
 	
-	ReviewListViewController *vc = [[[ReviewListViewController alloc] initWithAccount:self.account product:self.selectedProduct rating:rating] autorelease];
+	ReviewListViewController *vc = [[[ReviewListViewController alloc] initWithAccount:self.account products:self.selectedProducts rating:rating] autorelease];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		[self.navigationController pushViewController:vc animated:YES];
 	} else {
@@ -155,10 +179,20 @@
 	}
 }
 
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [super tableView:tableView didDeselectRowAtIndexPath:indexPath];
+    [self.reviewSummaryView reloadDataAnimated:YES];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[super tableView:tableView didSelectRowAtIndexPath:indexPath];
 	[self.reviewSummaryView reloadDataAnimated:YES];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    [super handleLongPress:gestureRecognizer];
+    [self.reviewSummaryView reloadDataAnimated:YES];
 }
 
 - (void)dealloc

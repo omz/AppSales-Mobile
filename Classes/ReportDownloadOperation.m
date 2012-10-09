@@ -13,7 +13,6 @@
 #import "RegexKitLite.h"
 #import "NSData+Compression.h"
 #import "NSDictionary+HTTP.h"
-#import "JSONKit.h"
 
 @interface ReportDownloadOperation ()
 
@@ -183,6 +182,23 @@
 				if (originalFilename && [reportCSV length] > 0) {
 					//Parse report CSV:
 					Report *report = [Report insertNewReportWithCSV:reportCSV inAccount:account];
+					
+					//Check if the downloaded report is actually the one we expect
+					//(mostly to work around a bug in iTC that causes the wrong weekly report to be downloaded):
+					NSString *downloadedReportDateString = nil;
+					if ([report isKindOfClass:[WeeklyReport class]]) {
+						WeeklyReport *weeklyReport = (WeeklyReport *)report;
+						downloadedReportDateString = [dateFormatter stringFromDate:weeklyReport.endDate];
+					} else {
+						downloadedReportDateString = [dateFormatter stringFromDate:report.startDate];
+					}
+					if (![reportDateString isEqualToString:downloadedReportDateString]) {
+						NSLog(@"Downloaded report has incorrect date, ignoring");
+						[[report managedObjectContext] deleteObject:report];
+						report = nil;
+						continue;
+					}
+					
 					if (report && originalFilename) {
 						NSManagedObject *originalReport = [NSEntityDescription insertNewObjectForEntityForName:@"ReportCSV" inManagedObjectContext:moc];
 						[originalReport setValue:reportCSV forKey:@"content"];
@@ -233,7 +249,7 @@
 		
 		NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
 		NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
-		NSString *signoutSentinel = @"name=\"signOutForm\"";
+		NSString *signoutSentinel = @"Sign Out";
 		
 		NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
 		NSHTTPURLResponse *loginPageResponse = nil;
@@ -404,7 +420,8 @@
 		graphDataJSON = [graphDataJSON stringByAppendingString:@"}"];
 		graphDataJSON = [graphDataJSON stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
 		NSError *jsonError = nil;
-		NSDictionary *graphDict = [graphDataJSON objectFromJSONStringWithParseOptions:JKParseOptionUnicodeNewlines | JKParseOptionLooseUnicode error:&jsonError];
+		
+		NSDictionary *graphDict = [NSJSONSerialization JSONObjectWithData:[graphDataJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&jsonError];
 		if (graphDict) {
 			NSSet *allExistingPayments = account.payments;
 			NSMutableSet *existingPaymentIdentifiers = [NSMutableSet set];

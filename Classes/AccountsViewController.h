@@ -18,17 +18,18 @@
 @class ASAccount;
 @protocol AccountsViewControllerDelegate;
 
-@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate>
+@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate>
 {
 	id<AccountsViewControllerDelegate> delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;
 	ASAccount *selectedAccount;
 	UIBarButtonItem *refreshButtonItem;
-  
-  FieldSpecifier *passcodeLockField;
-  FieldEditorViewController *settingsViewController;
-  UINavigationController *settingsNavController;
+	FieldSpecifier *passcodeLockField;
+	FieldEditorViewController *settingsViewController;
+	UINavigationController *settingsNavController;
+	NSString *exportedReportsZipPath;
+	UIDocumentInteractionController *documentInteractionController;
 }
 
 @property (nonatomic, assign) id<AccountsViewControllerDelegate> delegate;
@@ -36,9 +37,12 @@
 @property (nonatomic, retain) NSArray *accounts;
 @property (nonatomic, retain) ASAccount *selectedAccount;
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) NSString *exportedReportsZipPath;
+@property (nonatomic, retain) UIDocumentInteractionController *documentInteractionController;
 
 - (void)reloadAccounts;
 - (void)downloadReports:(id)sender;
+- (void)doExport;
 - (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account;
 - (void)showSettings;
 - (void)addNewAccount;
