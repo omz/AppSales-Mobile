@@ -351,8 +351,7 @@
 			if ([licenseAgreementScanner scanUpToString:@"<html>" intoString:NULL]) {
 				NSString *licenseAgreementHTML = nil;
 				[licenseAgreementScanner scanString:@"<html>" intoString:NULL];
-				if ([licenseAgreementScanner scanUpToString:@"<html>" intoString:NULL]) {
-					[licenseAgreementScanner scanUpToString:@"</html>" intoString:&licenseAgreementHTML];
+				if ([licenseAgreementScanner scanUpToString:@"</html>" intoString:&licenseAgreementHTML]) {
 					licenseAgreementHTML = [licenseAgreementHTML stringByAppendingString:@"</html>"];
 				}
 				if (!licenseAgreementHTML) {
