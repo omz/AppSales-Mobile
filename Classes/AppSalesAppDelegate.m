@@ -11,14 +11,9 @@
 #import "CurrencyManager.h"
 #import "ReportDownloadOperation.h"
 #import "ReportDownloadCoordinator.h"
-#import "PromoCodeOperation.h"
 #import "SSKeychain.h"
 #import "ASAccount.h"
 #import "SalesViewController.h"
-#import "ReviewsViewController.h"
-#import "PaymentsViewController.h"
-#import "PromoCodesViewController.h"
-#import "PromoCodesLicenseViewController.h"
 
 @implementation AppSalesAppDelegate
 
@@ -42,8 +37,6 @@
 							  currencyCode, @"CurrencyManagerBaseCurrency",
 							  nil];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
 	
 	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	if (!iPad) {
@@ -80,7 +73,6 @@
 	}
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportDownloadFailed:) name:ASReportDownloadFailedNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeDownloadFailed:) name:ASPromoCodeDownloadFailedNotification object:nil];
 	
 	if ([launchOptions objectForKey:UIApplicationLaunchOptionsURLKey]) {
 		[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
@@ -134,33 +126,13 @@
 
 - (void)loadAccount:(ASAccount *)account
 {
-	UIBarButtonItem *selectAccountButtonItem1 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
-	UIBarButtonItem *selectAccountButtonItem2 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
-	UIBarButtonItem *selectAccountButtonItem3 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
-	UIBarButtonItem *selectAccountButtonItem4 = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
+	UIBarButtonItem *selectAccountButtonItem = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)] autorelease];
 	
 	SalesViewController *salesVC = [[[SalesViewController alloc] initWithAccount:account] autorelease];
-	salesVC.navigationItem.leftBarButtonItem = selectAccountButtonItem1;
+	salesVC.navigationItem.leftBarButtonItem = selectAccountButtonItem;
 	UINavigationController *salesNavController = [[[UINavigationController alloc] initWithRootViewController:salesVC] autorelease];
 	
-	ReviewsViewController *reviewsVC = [[[ReviewsViewController alloc] initWithAccount:account] autorelease];
-	reviewsVC.navigationItem.leftBarButtonItem = selectAccountButtonItem2;
-	UINavigationController *reviewsNavController = [[[UINavigationController alloc] initWithRootViewController:reviewsVC] autorelease];
-	
-	PaymentsViewController *paymentsVC = [[[PaymentsViewController alloc] initWithAccount:account] autorelease];
-	paymentsVC.navigationItem.leftBarButtonItem = selectAccountButtonItem3;
-	UINavigationController *paymentsNavController = [[[UINavigationController alloc] initWithRootViewController:paymentsVC] autorelease];
-	
-	PromoCodesViewController *promoVC = [[[PromoCodesViewController alloc] initWithAccount:account] autorelease];
-	promoVC.navigationItem.leftBarButtonItem = selectAccountButtonItem4;
-	UINavigationController *promoNavController = [[[UINavigationController alloc] initWithRootViewController:promoVC] autorelease];
-	promoNavController.toolbarHidden = NO;
-	promoNavController.toolbar.barStyle = UIBarStyleBlackOpaque;
-	
-	UITabBarController *tabController = [[[UITabBarController alloc] initWithNibName:nil bundle:nil] autorelease];
-	[tabController setViewControllers:[NSArray arrayWithObjects:salesNavController, reviewsNavController, paymentsNavController, promoNavController, nil]];
-	
-	self.window.rootViewController = tabController;
+	self.window.rootViewController = salesNavController;
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
@@ -284,14 +256,6 @@
 	[self saveContext];
 }
 
-- (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification
-{
-	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
-	PromoCodesLicenseViewController *vc = [[[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]] autorelease];
-	UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
-	[self.window.rootViewController presentModalViewController:navController animated:YES];
-}
-
 #pragma mark - Core Data
 
 - (void)saveContext
@@ -381,17 +345,6 @@
 {
 	NSString *errorMessage = [[notification userInfo] objectForKey:kASReportDownloadErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@", nil), (errorMessage) ? errorMessage : @""];
-	[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
-								 message:alertMessage 
-								delegate:nil 
-					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-					   otherButtonTitles:nil] autorelease] show];
-}
-
-- (void)promoCodeDownloadFailed:(NSNotification *)notification
-{
-	NSString *errorDescription = [[notification userInfo] objectForKey:kASPromoCodeDownloadFailedErrorDescription];
-	NSString *alertMessage = [NSString stringWithFormat:@"An error occured while downloading the promo codes (%@).", errorDescription];
 	[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
 								 message:alertMessage 
 								delegate:nil 

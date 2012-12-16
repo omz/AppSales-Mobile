@@ -11,7 +11,6 @@
 #import "ReportImportOperation.h"
 #import "ASAccount.h"
 #import "Product.h"
-#import "PromoCodeOperation.h"
 
 @implementation ReportDownloadCoordinator
 
@@ -83,19 +82,6 @@
 			[operation cancel];
 		}
 	}
-}
-
-- (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes
-{
-    if (product.isDownloadingPromoCodes) return;
-    product.isDownloadingPromoCodes = YES;
-    PromoCodeOperation *operation = [[[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes] autorelease];
-    operation.completionBlock = ^ {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            product.isDownloadingPromoCodes = NO;
-        });
-    };
-    [reportDownloadQueue addOperation:operation];
 }
 
 - (void)cancelAllDownloads
