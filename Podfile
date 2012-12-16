@@ -1,4 +1,5 @@
 platform :ios, '5.0'
+pod 'MagicalRecord'
 pod 'SSKeychain'
 pod 'MBProgressHUD'
 pod 'RegexKitLite'
