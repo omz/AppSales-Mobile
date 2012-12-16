@@ -67,11 +67,6 @@
 		[self.window makeKeyAndVisible];
 	}
 	
-	BOOL migrating = [self migrateDataIfNeeded];
-	if (migrating) {
-		[self.accountsViewController reloadAccounts];
-	}
-	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
 	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
@@ -166,57 +161,6 @@
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
 {
 	[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
-	return YES;
-}
-
-- (BOOL)migrateDataIfNeeded
-{
-	NSString *documentsDirectory = [self applicationDocumentsDirectory];
-	NSString *legacyReportDirectory = [documentsDirectory stringByAppendingPathComponent:@"OriginalReports"];
-	NSFileManager *fm = [NSFileManager defaultManager];
-	BOOL originalReportsDirectoryFound = [fm fileExistsAtPath:legacyReportDirectory];
-	if (!originalReportsDirectoryFound) {
-		return NO;
-	}	
-	NSArray *originalReportFiles = [fm contentsOfDirectoryAtPath:legacyReportDirectory error:NULL];
-	if ([originalReportFiles count] == 0) {
-		//All files have been migrated, delete all the clutter in the documents directory:
-		NSArray *files = [fm contentsOfDirectoryAtPath:documentsDirectory error:NULL];
-		for (NSString *file in files) {
-			NSString *fullPath = [documentsDirectory stringByAppendingPathComponent:file];
-			[fm removeItemAtPath:fullPath error:NULL];
-		}
-		return NO;
-	}
-	NSString *oldUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
-	NSString *oldPassword = nil;
-	if (oldUsername) {
-		oldPassword = [SSKeychain passwordForService:@"omz:software AppSales Mobile Service" account:oldUsername];
-	}
-	ASAccount *account = nil;
-	if (oldUsername) {
-		NSFetchRequest *accountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
-		[accountFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:[self managedObjectContext]]];
-		[accountFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"username == %@", oldUsername]];
-		[accountFetchRequest setFetchLimit:1];
-		NSArray *matchingAccounts = [[self managedObjectContext] executeFetchRequest:accountFetchRequest error:NULL];
-		if ([matchingAccounts count] > 0) {
-			account = [matchingAccounts objectAtIndex:0];
-		}
-	}
-	if (!account) {
-		account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:[self managedObjectContext]];
-		if (oldUsername) account.username = oldUsername;
-		if (oldPassword) account.password = oldPassword;
-	}
-	[self saveContext];
-	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:account fromDirectory:legacyReportDirectory deleteAfterImport:YES];
-	
-	[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Update Notice", nil) 
-								 message:NSLocalizedString(@"You have updated from an older version of AppSales. Your sales reports are currently being imported. You can start using the app while the import is running.", nil)
-								delegate:nil 
-					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-					   otherButtonTitles:nil] autorelease] show];
 	return YES;
 }
 

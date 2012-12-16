@@ -32,7 +32,6 @@
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
-- (BOOL)migrateDataIfNeeded;
 - (void)saveContext;
 - (NSString *)applicationDocumentsDirectory;
 - (NSURL *)applicationSupportDirectory;
