@@ -38,8 +38,6 @@
 - (void)setReport:(Report *)newReport
 {
 	if (report == newReport) return;
-	[newReport retain];
-	[report release];
 	report = newReport;
 	[self setNeedsDisplay];
 }
@@ -47,8 +45,6 @@
 - (void)setSelectedProduct:(Product *)product
 {
 	if (product == selectedProduct) return;
-	[product retain];
-	[selectedProduct release];
 	selectedProduct = product;
 	[self setNeedsDisplay];
 }
@@ -98,8 +94,6 @@
 - (void)setSelectedCountry:(NSString *)country
 {
 	if ([country isEqualToString:selectedCountry]) return;
-	[country retain];
-	[selectedCountry release];
 	selectedCountry = country;
 	
 	if (selectedCountry) {
@@ -144,7 +138,7 @@
 	NSArray *polygons = [[self polygonsByCountryCode] objectForKey:[country uppercaseString]];
 	for (NSArray *polygon in polygons) {
 		int i = 0;
-		UIBezierPath *currentPath = [[[UIBezierPath alloc] init] autorelease];
+		UIBezierPath *currentPath = [[UIBezierPath alloc] init];
 		for (NSString *coordinates in polygon) {
 			CGPoint coordinatesPoint = CGPointFromString(coordinates);
 			CGPoint viewCoordinates = CGPointMake(((coordinatesPoint.x + 180) / 360.0) * width, height - ((coordinatesPoint.y + 90) / 180.0) * height);
@@ -160,14 +154,6 @@
 	return paths;
 }
 
-- (void)dealloc
-{
-	[report release];
-	[selectedProduct release];
-	[polygonsByCountryCode release];
-	[pinView release];
-	[super dealloc];
-}
 
 
 @end

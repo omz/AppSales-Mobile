@@ -52,7 +52,7 @@
 	DownloadStepOperation *step2 = [DownloadStepOperation operationWithInput:step1];
 	step2.startBlock = ^(DownloadStepOperation *operation) {
 		NSData *loginPageData = operation.inputOperation.data;
-		NSString *loginPage = [[[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *loginPage = [[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding];
 		if (loginPage) {
 			NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
 			[loginPageScanner scanUpToString:@"action=\"" intoString:nil];
@@ -81,7 +81,7 @@
 	DownloadStepOperation *step3 = [DownloadStepOperation operationWithInput:step2];
 	step3.startBlock = ^(DownloadStepOperation *operation) {
 		NSData *loginPageData = operation.inputOperation.data;
-		NSString *loginPage = [[[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *loginPage = [[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding];
 		if (loginPage) {
 			NSScanner *manageAppsScanner = [NSScanner scannerWithString:loginPage];
 			NSString *paymentsAction = nil;
@@ -106,7 +106,7 @@
 	DownloadStepOperation *step4 = [DownloadStepOperation operationWithInput:step3];
 	step4.startBlock = ^(DownloadStepOperation *operation) {
 		NSData *manageAppsPageData = operation.inputOperation.data;
-		NSString *manageAppsPage = [[[NSString alloc] initWithData:manageAppsPageData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *manageAppsPage = [[NSString alloc] initWithData:manageAppsPageData encoding:NSUTF8StringEncoding];
 		if (manageAppsPage) {
 			NSScanner *searchFormScanner = [NSScanner scannerWithString:manageAppsPage];
 			NSString *searchFormAction = nil;			
@@ -151,7 +151,7 @@
 	step5.startBlock = ^(DownloadStepOperation *operation) {
 		NSData *searchResultPageData = operation.inputOperation.data;
 		
-		NSString *searchResultPage = [[[NSString alloc] initWithData:searchResultPageData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *searchResultPage = [[NSString alloc] initWithData:searchResultPageData encoding:NSUTF8StringEncoding];
 		if (searchResultPage) {
 			NSScanner *searchResultScanner = [NSScanner scannerWithString:searchResultPage];
 			if ([searchResultScanner scanUpToString:@"<div class=\"software-column-type-col-0\">" intoString:NULL]) {
@@ -175,7 +175,7 @@
 	DownloadStepOperation *step6 = [DownloadStepOperation operationWithInput:step5];
 	step6.startBlock = ^(DownloadStepOperation *operation) {
 		NSData *appPageData = operation.inputOperation.data;
-		NSString *appPage = [[[NSString alloc] initWithData:appPageData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *appPage = [[NSString alloc] initWithData:appPageData encoding:NSUTF8StringEncoding];
 		NSScanner *currentVersionScanner = [NSScanner scannerWithString:appPage];
 		if (![currentVersionScanner scanUpToString:@"<div class=\"version-container\">" intoString:NULL] || ![currentVersionScanner scanUpToString:@"<a href=\"" intoString:NULL]) {
 			[PromoCodeOperation errorNotification:@"could not parse app page"];
@@ -192,7 +192,7 @@
 	DownloadStepOperation *step7 = [DownloadStepOperation operationWithInput:step6];
 	step7.startBlock = ^(DownloadStepOperation *operation) {
 		NSData *currentVersionPageData = operation.inputOperation.data;
-		NSString *currentVersionPage = [[[NSString alloc] initWithData:currentVersionPageData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *currentVersionPage = [[NSString alloc] initWithData:currentVersionPageData encoding:NSUTF8StringEncoding];
 		NSString *promoCodesURLPath = [currentVersionPage stringByMatching:@"<a href=\"(.*?)\"><span class=\"promo-codes" capture:1];
 		if (!promoCodesURLPath) {
 			[PromoCodeOperation errorNotification:@"could not find promo codes link, perhaps the app was removed from sale?"];
@@ -206,7 +206,7 @@
 	DownloadStepOperation *step8 = [DownloadStepOperation operationWithInput:step7];
 	step8.startBlock = ^(DownloadStepOperation *operation) {
 		NSData *promoCodesPageData = operation.inputOperation.data;
-		NSString *promoCodesPage = [[[NSString alloc] initWithData:promoCodesPageData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *promoCodesPage = [[NSString alloc] initWithData:promoCodesPageData encoding:NSUTF8StringEncoding];
 		
 		NSScanner *codesRemainingScanner = [NSScanner scannerWithString:promoCodesPage];
 		if (![codesRemainingScanner scanUpToString:@"<div class=\"codeString\"" intoString:NULL]) {
@@ -290,15 +290,15 @@
 	if (numberOfCodes == 0) {
 		DownloadStepOperation *step9 = [DownloadStepOperation operationWithInput:step8];
 		step9.startBlock = ^(DownloadStepOperation *operation) {
-			NSString *historyPage = [[[NSString alloc] initWithData:operation.inputOperation.data encoding:NSUTF8StringEncoding] autorelease];
+			NSString *historyPage = [[NSString alloc] initWithData:operation.inputOperation.data encoding:NSUTF8StringEncoding];
 			
 			NSArray *downloadPaths = [historyPage componentsMatchedByRegex:@"<a href=\"(.*?)\".*?download-codes" capture:1];
 			NSArray *dateStrings = [historyPage componentsMatchedByRegex:@"<td>((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(.*?))</td>" capture:1];
 			
-			NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 			[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 			[dateFormatter setDateFormat:@"MMM dd,yyyy HH:mm:ss"];
-			[dateFormatter setLocale:[[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease]];
+			[dateFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"]];
 			
 			if ([dateStrings count] >= [downloadPaths count]) {
 				int i = 0;
@@ -313,14 +313,14 @@
 					codeDownloadStep.request = [NSURLRequest requestWithURL:[NSURL URLWithString:downloadURLString]];
 					codeDownloadStep.completionBlock = ^ {
 						dispatch_async(dispatch_get_main_queue(), ^ {
-							NSString *promoCodeFile = [[[NSString alloc] initWithData:codeDownloadStep.data encoding:NSUTF8StringEncoding] autorelease];
+							NSString *promoCodeFile = [[NSString alloc] initWithData:codeDownloadStep.data encoding:NSUTF8StringEncoding];
 							NSArray *promoCodes = [promoCodeFile componentsSeparatedByString:@"\n"];
                             if ([promoCodes count] > 51) {
                                 [PromoCodeOperation errorNotification:@"parsing the downloaded promo codes failed"];
                                 [operation cancel];
                                 return;
                             }
-							for (NSString *promoCode in promoCodes) {
+							for (__strong NSString *promoCode in promoCodes) {
                                 promoCode = [promoCode stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 								if ([promoCode length] == 12 && ![existingCodes containsObject:promoCode]) {
 									PromoCode *newPromoCode = [NSEntityDescription insertNewObjectForEntityForName:@"PromoCode" inManagedObjectContext:aProduct.managedObjectContext];
@@ -341,12 +341,12 @@
 				}
 			}
 		};
-		[super initWithOperations:[NSArray arrayWithObjects:step1, step2, step3, step4, step5, step6, step7, step8, step9, nil]];
+		if (!(self = [super initWithOperations:[NSArray arrayWithObjects:step1, step2, step3, step4, step5, step6, step7, step8, step9, nil]])) return nil;
 	} else {
 		DownloadStepOperation *step9 = [DownloadStepOperation operationWithInput:step8];
 		step9.startBlock = ^(DownloadStepOperation *operation) {
 			NSData *licenseAgreementPageData = operation.inputOperation.data;
-			NSString *licenseAgreementPage = [[[NSString alloc] initWithData:licenseAgreementPageData encoding:NSUTF8StringEncoding] autorelease];
+			NSString *licenseAgreementPage = [[NSString alloc] initWithData:licenseAgreementPageData encoding:NSUTF8StringEncoding];
 			NSScanner *licenseAgreementScanner = [NSScanner scannerWithString:licenseAgreementPage];
 			if ([licenseAgreementScanner scanUpToString:@"<html>" intoString:NULL]) {
 				NSString *licenseAgreementHTML = nil;
@@ -410,7 +410,7 @@
 		DownloadStepOperation *step10 = [DownloadStepOperation operationWithInput:step9];
 		step10.startBlock = ^(DownloadStepOperation *operation) {
 			NSData *codeDownloadPageData = operation.inputOperation.data;
-			NSString *codeDownloadPage = [[[NSString alloc] initWithData:codeDownloadPageData encoding:NSUTF8StringEncoding] autorelease];
+			NSString *codeDownloadPage = [[NSString alloc] initWithData:codeDownloadPageData encoding:NSUTF8StringEncoding];
 			
 			NSString *downloadLinkURLPath = [codeDownloadPage stringByMatching:@"<a href=\"(.*?)\".*?download-codes" capture:1];
 			NSString *downloadLinkURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", downloadLinkURLPath];
@@ -425,7 +425,7 @@
 		DownloadStepOperation *step11 = [DownloadStepOperation operationWithInput:step10];
 		step11.startBlock = ^(DownloadStepOperation *operation) {
 			NSData *promoCodeData = operation.inputOperation.data;
-			NSString *promoCodesFile = [[[NSString alloc] initWithData:promoCodeData encoding:NSUTF8StringEncoding] autorelease];
+			NSString *promoCodesFile = [[NSString alloc] initWithData:promoCodeData encoding:NSUTF8StringEncoding];
 			NSArray *promoCodes = [promoCodesFile componentsSeparatedByString:@"\n"];
 			for (NSString *promoCode in promoCodes) {
 				if ([promoCode length] > 0 && ![existingCodes containsObject:promoCode]) {
@@ -437,7 +437,7 @@
 			}
 		};
 		
-		[super initWithOperations:[NSArray arrayWithObjects:step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, nil]];
+		if (!(self = [super initWithOperations:[NSArray arrayWithObjects:step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, nil]])) return nil;
 	}
 	
     return self;
@@ -472,9 +472,5 @@
 	});
 }
 
-- (void)dealloc
-{
-	[super dealloc];
-}
 
 @end

@@ -20,7 +20,7 @@
 {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-		account = [anAccount retain];
+		account = anAccount;
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 				
@@ -73,7 +73,7 @@
 
 - (void)reloadData
 {
-	NSArray *allApps = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
+	NSArray *allApps = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
 	NSMutableArray *filteredApps = [NSMutableArray array];
 	for (Product *app in allApps) {
 		//Don't show in-app purchases
@@ -108,12 +108,12 @@
 	static NSString *CellIdentifier = @"Cell";
 	BadgedCell *cell = (BadgedCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil) {
-		cell = [[[BadgedCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+		cell = [[BadgedCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
 	}
     
 	Product *app = [sortedApps objectAtIndex:indexPath.row];
 	
-	NSFetchRequest *unusedPromoCodesRequest = [[[NSFetchRequest alloc] init] autorelease];
+	NSFetchRequest *unusedPromoCodesRequest = [[NSFetchRequest alloc] init];
 	[unusedPromoCodesRequest setEntity:[NSEntityDescription entityForName:@"PromoCode" inManagedObjectContext:[app managedObjectContext]]];
 	[unusedPromoCodesRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND used == FALSE", app]];
 	NSInteger count = [[app managedObjectContext] countForFetchRequest:unusedPromoCodesRequest error:NULL];
@@ -128,16 +128,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	Product *product = [sortedApps objectAtIndex:indexPath.row];
-	PromoCodesAppViewController *vc = [[[PromoCodesAppViewController alloc] initWithProduct:product] autorelease];
+	PromoCodesAppViewController *vc = [[PromoCodesAppViewController alloc] initWithProduct:product];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[sortedApps release];
-	[account release];
-	[super dealloc];
 }
 
 @end

@@ -3109,6 +3109,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4EA9F333193B44BE84D554BB /* Pods.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -3125,6 +3126,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4EA9F333193B44BE84D554BB /* Pods.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "$(inherited)";

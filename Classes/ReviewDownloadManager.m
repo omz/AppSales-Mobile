@@ -57,7 +57,7 @@
 		NSString *storeID = [storeInfo objectForKey:@"storeID"];
 		for (Product *product in products) {
 			if (product.parentSKU) continue; //don't download reviews for in-app-purchases
-			ReviewDownload *download = [[[ReviewDownload alloc] initWithProduct:product storeFront:storeID countryCode:country] autorelease];
+			ReviewDownload *download = [[ReviewDownload alloc] initWithProduct:product storeFront:storeID countryCode:country];
 			download.delegate = self;
 			[downloadQueue addObject:download];
 		}
@@ -85,7 +85,7 @@
 	if ([downloadQueue count] == 0) return;
 	if ([activeDownloads count] >= MAX_CONCURRENT_REVIEW_DOWNLOADS) return;
 	
-	ReviewDownload *nextDownload = [[[downloadQueue objectAtIndex:0] retain] autorelease];
+	ReviewDownload *nextDownload = [downloadQueue objectAtIndex:0];
 	[downloadQueue removeObjectAtIndex:0];
 	[activeDownloads addObject:nextDownload];
 	[nextDownload start];
@@ -112,12 +112,6 @@
 	return progress;
 }
 
-- (void)dealloc
-{
-	[activeDownloads release];
-	[downloadQueue release];
-	[super dealloc];
-}
 
 @end
 
@@ -131,11 +125,11 @@
 {
 	self = [super init];
 	if (self) {
-		_product = [app retain];
-		country = [countryCode retain];
+		_product = app;
+		country = countryCode;
 		productObjectID = [[app objectID] copy];
-		psc = [[[app managedObjectContext] persistentStoreCoordinator] retain];
-		storeFront = [storeFrontID retain];
+		psc = [[app managedObjectContext] persistentStoreCoordinator];
+		storeFront = storeFrontID;
 		data = [NSMutableData new];
 		page = 1;
 	}
@@ -172,37 +166,37 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-	NSString *html = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+	NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	if (html) {
 		dispatch_async(dispatch_get_global_queue(0, 0), ^ {
 			
 			NSArray *reviewInfos = [self reviewInfosFromHTML:html];
 			
-			NSManagedObjectContext *moc = [[[NSManagedObjectContext alloc] init] autorelease];
+			NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 			[moc setPersistentStoreCoordinator:psc];
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 			Product *product = (Product *)[moc objectWithID:productObjectID];
 			
-			NSDateFormatter *reviewDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			NSDateFormatter *reviewDateFormatter = [[NSDateFormatter alloc] init];
 			[reviewDateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 			if ([country isEqualToString:@"fr"]) {
-				NSLocale *frLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"fr"] autorelease];
+				NSLocale *frLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"fr"];
 				[reviewDateFormatter setLocale:frLocale];
 				[reviewDateFormatter setDateFormat:@"dd MMM yyyy"];
 			} else if ([country isEqualToString:@"de"]) {
-				NSLocale *deLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"de"] autorelease];
+				NSLocale *deLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"de"];
 				[reviewDateFormatter setLocale:deLocale];
 				[reviewDateFormatter setDateFormat:@"dd.MM.yyyy"];
 			} else if ([country isEqualToString:@"it"]) {
-				NSLocale *itLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"it"] autorelease];
+				NSLocale *itLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"it"];
 				[reviewDateFormatter setLocale:itLocale];
 				[reviewDateFormatter setDateFormat:@"dd-MMM-yyyy"];
 			} else if ([country isEqualToString:@"us"]) {
-				NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
+				NSLocale *usLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en-us"];
 				[reviewDateFormatter setLocale:usLocale];
 				[reviewDateFormatter setDateFormat:@"MMM dd, yyyy"];
 			} else {
-				NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
+				NSLocale *usLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en-us"];
 				[reviewDateFormatter setDateFormat:@"dd-MMM-yyyy"];
 				[reviewDateFormatter setLocale:usLocale];
 			}
@@ -210,7 +204,7 @@
 			NSSet *downloadedUsers = [NSSet setWithArray:[reviewInfos valueForKey:kReviewInfoUser]];
 			
 			//Fetch existing reviews, based on username and country:
-			NSFetchRequest *existingReviewsFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+			NSFetchRequest *existingReviewsFetchRequest = [[NSFetchRequest alloc] init];
 			[existingReviewsFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:moc]];
 			[existingReviewsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND countryCode == %@ AND user IN %@", product, country, downloadedUsers]];
 			NSArray *existingReviews = [moc executeFetchRequest:existingReviewsFetchRequest error:NULL];
@@ -353,16 +347,5 @@
 }
 
 
-- (void)dealloc
-{
-	[country release];
-	[_product release];
-	[productObjectID release];
-	[psc release];
-	[downloadConnection release];
-	[data release];
-	[storeFront release];
-	[super dealloc];
-}
 
 @end

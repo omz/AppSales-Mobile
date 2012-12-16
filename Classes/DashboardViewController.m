@@ -89,26 +89,26 @@
 	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
 	statusVisible = [self shouldShowStatusBar];
-	self.topView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]] autorelease];
+	self.topView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]];
 	topView.userInteractionEnabled = YES;
 	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5);
 	[self.view addSubview:topView];
 	
-	UIImageView *graphShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	UIImageView *graphShadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
 	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	[topView addSubview:graphShadowView];
 	
-	self.productsTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain] autorelease];
+	self.productsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain];
 	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	productsTableView.dataSource = self;
 	productsTableView.delegate = self;
 	productsTableView.backgroundColor = [UIColor clearColor];
 	
-	productsTableView.tableHeaderView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]] autorelease];
-	productsTableView.tableFooterView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	productsTableView.tableHeaderView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]];
+	productsTableView.tableFooterView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
 	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
 	productsTableView.contentInset = productsTableContentInset;
@@ -118,18 +118,18 @@
 	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
 	[self.view addSubview:self.productsTableView];
 	
-	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
+	self.shadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	shadowView.frame = graphShadowView.frame;
 	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	shadowView.alpha = 0.0;
 	
 	[self.view addSubview:shadowView];
 	
-	self.activityIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
+	self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 	if (statusVisible) [activityIndicator startAnimating];
-	UIBarButtonItem *activityIndicatorItem = [[[UIBarButtonItem alloc] initWithCustomView:activityIndicator] autorelease];
+	UIBarButtonItem *activityIndicatorItem = [[UIBarButtonItem alloc] initWithCustomView:activityIndicator];
 	
-	self.statusLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 2, 200, 20)] autorelease];
+	self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 2, 200, 20)];
 	statusLabel.font = [UIFont boldSystemFontOfSize:14.0];
 	statusLabel.backgroundColor = [UIColor clearColor];
 	statusLabel.textColor = [UIColor whiteColor];
@@ -137,18 +137,18 @@
 	statusLabel.shadowOffset = CGSizeMake(0, -1);
 	statusLabel.textAlignment = UITextAlignmentCenter;
 	
-	self.progressBar = [[[UIProgressView alloc] initWithFrame:CGRectMake(0, 25, 200, 10)] autorelease];
+	self.progressBar = [[UIProgressView alloc] initWithFrame:CGRectMake(0, 25, 200, 10)];
 	
-	UIView *statusView = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 40)] autorelease];
+	UIView *statusView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 40)];
 	[statusView addSubview:statusLabel];
 	[statusView addSubview:progressBar];
 	
-	UIBarButtonItem *statusItem = [[[UIBarButtonItem alloc] initWithCustomView:statusView] autorelease];
-	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
-	self.stopButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)] autorelease];
+	UIBarButtonItem *statusItem = [[UIBarButtonItem alloc] initWithCustomView:statusView];
+	UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+	self.stopButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)];
 	
 	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - ((statusVisible) ? 44 : 0), self.view.bounds.size.width, 44);
-	self.statusToolbar = [[[UIToolbar alloc] initWithFrame:statusToolbarFrame] autorelease];
+	self.statusToolbar = [[UIToolbar alloc] initWithFrame:statusToolbarFrame];
 	statusToolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	statusToolbar.translucent = YES;
 	statusToolbar.barStyle = UIBarStyleBlackTranslucent;
@@ -240,7 +240,7 @@
 	}];
   } else {
 	// Sort products by ID (this will put the most recently released apps on top):
-   allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO] autorelease]]];
+   allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
   }
   
 	self.products = allProducts;
@@ -271,7 +271,7 @@
 	Product *product = [self.visibleProducts objectAtIndex:row - 1];
 	
 	NSArray *palette = [UIColor crayonColorPalette];
-	ColorPickerViewController *vc = [[[ColorPickerViewController alloc] initWithColors:palette] autorelease];
+	ColorPickerViewController *vc = [[ColorPickerViewController alloc] initWithColors:palette];
 	vc.delegate = self;
 	vc.context = product;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -279,7 +279,7 @@
 		[self presentModalViewController:vc animated:YES];
 	} else {
 		vc.contentSizeForViewInPopover = CGSizeMake(320, 210);
-		self.colorPopover = [[[UIPopoverController alloc] initWithContentViewController:vc] autorelease];
+		self.colorPopover = [[UIPopoverController alloc] initWithContentViewController:vc];
 		[self.colorPopover presentPopoverFromRect:sender.bounds inView:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 	}
 }
@@ -319,7 +319,7 @@
 	NSString *cellIdentifier = @"DashboardApp";
 	DashboardAppCell *cell = (DashboardAppCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (!cell) {
-		cell = [[[DashboardAppCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+		cell = [[DashboardAppCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 	}
 	
 	Product *product = nil;
@@ -339,7 +339,6 @@
 	
 	UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
 	[cell addGestureRecognizer:longPressRecognizer];
-	[longPressRecognizer release];
 	
 	return cell;
 }
@@ -427,21 +426,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[account release];
-	[products release];
-	[visibleProducts release];
-	[selectedProducts release];
-	[productsTableView release];
-	[topView release];
-	[shadowView release];
-	[statusToolbar release];
-	[stopButtonItem release];
-	[activityIndicator release];
-	[statusLabel release];
-	[progressBar release];
-	[colorPopover release];
-	[activeSheet release];
-	[super dealloc];
 }
 
 @end

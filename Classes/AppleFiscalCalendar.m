@@ -15,17 +15,17 @@
     self = [super init];
     if (self) {
 		
-		NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-		NSDateComponents *firstDateComponents = [[[NSDateComponents alloc] init] autorelease];
+		NSDateComponents *firstDateComponents = [[NSDateComponents alloc] init];
 		[firstDateComponents setMonth:9];
 		[firstDateComponents setDay:29];
 		[firstDateComponents setYear:2007];
 		NSDate *firstDate = [calendar dateFromComponents:firstDateComponents];
 		
-		NSDateComponents *components5Weeks = [[[NSDateComponents alloc] init] autorelease];
+		NSDateComponents *components5Weeks = [[NSDateComponents alloc] init];
 		[components5Weeks setWeek:5];
-		NSDateComponents *components4Weeks = [[[NSDateComponents alloc] init] autorelease];
+		NSDateComponents *components4Weeks = [[NSDateComponents alloc] init];
 		[components4Weeks setWeek:4];
 		
 		NSMutableArray *dates = [NSMutableArray array];
@@ -42,7 +42,7 @@
 		
 		NSMutableArray *names = [NSMutableArray array];
 		
-        NSDateFormatter *sectionTitleFormatter = [[NSDateFormatter new] autorelease];
+        NSDateFormatter *sectionTitleFormatter = [NSDateFormatter new];
 		[sectionTitleFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		[sectionTitleFormatter setDateFormat:@"MMMM yyyy"];
         
@@ -51,7 +51,6 @@
             NSDateComponents *components = [NSDateComponents new];
             [components setDay:14];
             NSDate *result = [calendar dateByAddingComponents:components toDate:date options:0];
-            [components release];
             NSString *fiscalMonthName = [sectionTitleFormatter stringFromDate:result];
 			[names addObject:fiscalMonthName];
 		}
@@ -107,11 +106,5 @@
 }
 
 
-- (void)dealloc
-{
-	[sortedDates release];
-	[sortedFiscalMonthNames release];
-    [super dealloc];
-}
 
 @end

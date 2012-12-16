@@ -39,13 +39,13 @@
 {
 	[super loadView];
 	
-	self.reviewSummaryView = [[[ReviewSummaryView alloc] initWithFrame:self.topView.frame] autorelease];
+	self.reviewSummaryView = [[ReviewSummaryView alloc] initWithFrame:self.topView.frame];
 	reviewSummaryView.dataSource = self;
 	reviewSummaryView.delegate = self;
 	reviewSummaryView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 	[self.view addSubview:reviewSummaryView];
 	
-	self.downloadReviewsButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReviews:)] autorelease];
+	self.downloadReviewsButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReviews:)];
 	downloadReviewsButtonItem.enabled = ![[ReviewDownloadManager sharedManager] isDownloading];
 	self.navigationItem.rightBarButtonItem = downloadReviewsButtonItem;
 	
@@ -115,7 +115,7 @@
 {
 	if (!self.account) return 0;
 	
-	NSFetchRequest *reviewsCountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
 
     NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@"];
@@ -142,7 +142,7 @@
 {
 	if (!self.account) return 0;
 	
-	NSFetchRequest *reviewsCountFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
     
     NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
@@ -169,12 +169,12 @@
 {
 	if (!self.account) return;
 	
-	ReviewListViewController *vc = [[[ReviewListViewController alloc] initWithAccount:self.account products:self.selectedProducts rating:rating] autorelease];
+	ReviewListViewController *vc = [[ReviewListViewController alloc] initWithAccount:self.account products:self.selectedProducts rating:rating];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		[self.navigationController pushViewController:vc animated:YES];
 	} else {
-		UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
-		self.reviewsPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
+		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+		self.reviewsPopover = [[UIPopoverController alloc] initWithContentViewController:nav];
 		[reviewsPopover presentPopoverFromRect:[reviewSummaryView barFrameForRating:rating]	inView:reviewSummaryView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
 	}
 }
@@ -195,12 +195,5 @@
     [self.reviewSummaryView reloadDataAnimated:YES];
 }
 
-- (void)dealloc
-{
-	[reviewsPopover release];
-	[reviewSummaryView release];
-	[downloadReviewsButtonItem release];
-	[super dealloc];
-}
 
 @end

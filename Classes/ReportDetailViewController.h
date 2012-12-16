@@ -45,22 +45,22 @@ typedef enum ReportDetailViewMode {
 	NSNumberFormatter *revenueFormatter;
 }
 
-@property (nonatomic, retain) NSArray *countryEntries;
-@property (nonatomic, retain) NSArray *productEntries;
-@property (nonatomic, retain) id<ReportSummary> selectedReport;
+@property (nonatomic, strong) NSArray *countryEntries;
+@property (nonatomic, strong) NSArray *productEntries;
+@property (nonatomic, strong) id<ReportSummary> selectedReport;
 @property (nonatomic, assign) NSUInteger selectedReportIndex;
-@property (nonatomic, retain) MapView *mapView;
-@property (nonatomic, retain) UIImageView *mapShadowView;
-@property (nonatomic, retain) UIImageView *shadowView;
-@property (nonatomic, retain) UITableView *tableView;
-@property (nonatomic, retain) UIBarButtonItem *prevItem;
-@property (nonatomic, retain) UIBarButtonItem *nextItem;
-@property (nonatomic, retain) UIImageView *headerView;
-@property (nonatomic, retain) UILabel *headerLabel;
-@property (nonatomic, retain) AppIconView *headerIconView;
-@property (nonatomic, retain) NSString *selectedCountry;
-@property (nonatomic, retain) Product *selectedProduct;
-@property (nonatomic, retain) UIToolbar *toolbar;
+@property (nonatomic, strong) MapView *mapView;
+@property (nonatomic, strong) UIImageView *mapShadowView;
+@property (nonatomic, strong) UIImageView *shadowView;
+@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) UIBarButtonItem *prevItem;
+@property (nonatomic, strong) UIBarButtonItem *nextItem;
+@property (nonatomic, strong) UIImageView *headerView;
+@property (nonatomic, strong) UILabel *headerLabel;
+@property (nonatomic, strong) AppIconView *headerIconView;
+@property (nonatomic, strong) NSString *selectedCountry;
+@property (nonatomic, strong) Product *selectedProduct;
+@property (nonatomic, strong) UIToolbar *toolbar;
 
 - (id)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex;
 - (void)updateNavigationButtons;

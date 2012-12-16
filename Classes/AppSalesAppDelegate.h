@@ -25,12 +25,12 @@
 	UIPopoverController *accountsPopover;
 }
 
-@property (nonatomic, retain) UIWindow *window;
-@property (nonatomic, retain) AccountsViewController *accountsViewController;
-@property (nonatomic, retain) UIPopoverController *accountsPopover;
-@property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, retain, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@property (nonatomic, strong) UIWindow *window;
+@property (nonatomic, strong) AccountsViewController *accountsViewController;
+@property (nonatomic, strong) UIPopoverController *accountsPopover;
+@property (nonatomic, strong, readonly) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, strong, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
 - (void)saveContext;
 - (NSString *)applicationDocumentsDirectory;

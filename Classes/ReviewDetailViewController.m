@@ -25,14 +25,14 @@
 {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
-		review = [aReview retain];
+		review = aReview;
     }
     return self;
 }
 
 - (void)loadView
 {
-	self.webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
+	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	self.view = webView;
@@ -40,10 +40,10 @@
 
 - (void)viewDidLoad
 {
-	NSString *template = [[[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:NULL] autorelease];
+	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:NULL];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.title];
 	NSString *ratingString = [@"" stringByPaddingToLength:[review.rating integerValue] withString:@"\u2605" startingAtIndex:0];
-	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
 	NSString *reviewDateString = [dateFormatter stringFromDate:review.reviewDate];
 	NSString *reviewSubtitle = [NSString stringWithFormat:@"%@<br/>%@ – %@<br/>%@ %@", ratingString, review.user, reviewDateString, [review.product displayName], review.productVersion];
@@ -51,7 +51,7 @@
 	template = [template stringByReplacingOccurrencesOfString:@"[[[SUBTITLE]]]" withString:reviewSubtitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:review.text];
 	
-	UIBarButtonItem *sendReviewButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)] autorelease];
+	UIBarButtonItem *sendReviewButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)];
 	self.navigationItem.rightBarButtonItem = sendReviewButtonItem;
 	
 	[self.webView loadHTMLString:template baseURL:nil];
@@ -68,20 +68,14 @@
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)dealloc
-{
-	[review release];
-	[webView release];
-	[super dealloc];
-}
 
 - (void)sendReviewViaEmail
 {
 	if (![MFMailComposeViewController canSendMail]) {
-		[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
+		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 		return;
 	}
-	MFMailComposeViewController *mailComposeViewController = [[[MFMailComposeViewController alloc] init] autorelease];
+	MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
 	mailComposeViewController.mailComposeDelegate = self;
 	NSString *body = [self.webView stringByEvaluatingJavaScriptFromString: @"document.body.innerHTML"];
 	NSString *subject = [NSString stringWithFormat:@"Review from %@", review.user];

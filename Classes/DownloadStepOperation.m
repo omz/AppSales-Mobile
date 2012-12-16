@@ -27,12 +27,12 @@
 
 - (void)setStartBlock:(DownloadStepStartBlock)block
 {
-	startBlock = Block_copy(block);
+	startBlock = block;
 }
 
 + (id)operationWithInput:(DownloadStepOperation *)otherOperation
 {
-	DownloadStepOperation *operation = [[[self alloc] init] autorelease];
+	DownloadStepOperation *operation = [[self alloc] init];
 	operation.inputOperation = otherOperation;
 	return operation;
 }
@@ -133,13 +133,5 @@
 	return finished;
 }
 
-- (void)dealloc
-{
-	Block_release(startBlock);
-	[connection release];
-	[data release];
-	[inputOperation release];
-	[super dealloc];
-}
 
 @end

@@ -19,11 +19,11 @@
 {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
-		account = [paymentAccount retain];
+		account = paymentAccount;
 		self.title = NSLocalizedString(@"Payments", nil);
 		self.tabBarItem.image = [UIImage imageNamed:@"Payments.png"];
 		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
-		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePayments:)] autorelease];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePayments:)];
 		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 			[account addObserver:self forKeyPath:@"payments" options:NSKeyValueObservingOptionNew context:nil];
 		}
@@ -36,7 +36,7 @@
 	[super loadView];
 	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
 	
-	self.scrollView = [[[UIScrollView alloc] initWithFrame:self.view.bounds] autorelease];
+	self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
 	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	scrollView.alwaysBounceHorizontal = YES;
 	scrollView.showsHorizontalScrollIndicator = NO;
@@ -45,7 +45,7 @@
 	
 	[self.view addSubview:scrollView];
 	
-	self.pageControl = [[[UIPageControl alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 15, self.view.bounds.size.width, 10)] autorelease];
+	self.pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 15, self.view.bounds.size.width, 10)];
 	pageControl.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	pageControl.userInteractionEnabled = NO;
 	[self.view addSubview:pageControl];
@@ -60,7 +60,7 @@
 {
 	for (UIView *v in [NSArray arrayWithArray:self.scrollView.subviews]) [v removeFromSuperview];
 	
-	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
 	[numberFormatter setMaximumFractionDigits:2];
 	[numberFormatter setGroupingSize:3];
 	[numberFormatter setUsesGroupingSeparator:YES];
@@ -109,7 +109,7 @@
     
 	NSArray *sortedYears = [[paymentsByYear allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	if ([sortedYears count] == 0) {
-		NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		NSDateComponents *currentYearComponents = [calendar components:NSYearCalendarUnit fromDate:[NSDate date]];
 		NSInteger currentYear = [currentYearComponents year];
 		sortedYears = [NSArray arrayWithObject:[NSNumber numberWithInteger:currentYear]];
@@ -117,7 +117,7 @@
 	
 	CGFloat x = 0.0;
 	for (NSNumber *year in sortedYears) {
-		YearView *yearView = [[[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)] autorelease];
+		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)];
 		yearView.year = [year integerValue];
 		yearView.labelsByMonth = [labelsByYear objectForKey:year];
 		if ([allPayments count] > 0) {
@@ -163,7 +163,7 @@
 
 - (void)deletePayments:(id)sender
 {
-	UIActionSheet *deletePaymentsSheet = [[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all payments for this account? Payments will be reloaded from iTunes Connect when sales reports are downloaded.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Payments", nil) otherButtonTitles:nil] autorelease];
+	UIActionSheet *deletePaymentsSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all payments for this account? Payments will be reloaded from iTunes Connect when sales reports are downloaded.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Payments", nil) otherButtonTitles:nil];
 	[deletePaymentsSheet showInView:self.view];
 }
 
@@ -205,10 +205,6 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		[account removeObserver:self forKeyPath:@"payments"];
 	}
-	[scrollView release];
-	[pageControl release];
-	[account release];
-	[super dealloc];
 }
 
 @end

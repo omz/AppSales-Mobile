@@ -19,9 +19,9 @@
 	UIImageView *pinView;
 }
 
-@property (nonatomic, retain) Report *report;
-@property (nonatomic, retain) Product *selectedProduct;
-@property (nonatomic, retain) NSString *selectedCountry;
+@property (nonatomic, strong) Report *report;
+@property (nonatomic, strong) Product *selectedProduct;
+@property (nonatomic, strong) NSString *selectedCountry;
 
 - (CGPoint)centerPointForCountry:(NSString *)country;
 - (NSArray *)polygonPathsForCountry:(NSString *)country;

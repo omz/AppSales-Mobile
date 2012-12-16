@@ -22,7 +22,7 @@
 	if (self) {
 		queue = [[NSOperationQueue alloc] init];
 		queue.maxConcurrentOperationCount = 1;
-		operations = [partialOperations retain];
+		operations = partialOperations;
 	}
     return self;
 }
@@ -40,7 +40,6 @@
 	for (NSOperation *operation in operations) {
 		[queue addOperation:operation];
 	}
-	[operations release];
 	operations = nil;
 	
 	[queue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
@@ -86,12 +85,6 @@
 	return finished;
 }
 
-- (void)dealloc
-{
-	[queue release];
-	[operations release];
-	[super dealloc];
-}
 
 
 @end

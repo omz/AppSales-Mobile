@@ -35,7 +35,7 @@ typedef enum FieldSpecifierType {
 
 @interface FieldEditorViewController : UITableViewController <UITextFieldDelegate, FieldEditorViewControllerDelegate> {
 
-	id delegate;
+	id __weak delegate;
 	id context;
 	NSString *editorIdentifier;
 	NSArray *fieldSections;
@@ -48,16 +48,16 @@ typedef enum FieldSpecifierType {
 	UITextField *selectedTextField;
 }
 
-@property (nonatomic, assign) id<FieldEditorViewControllerDelegate> delegate;
-@property (nonatomic, retain) NSArray *fieldSections;
-@property (nonatomic, retain) NSMutableDictionary *values;
-@property (nonatomic, retain) NSString *doneButtonTitle;
-@property (nonatomic, retain) NSString *cancelButtonTitle;
-@property (nonatomic, retain) id context;
-@property (nonatomic, retain) NSString *editorIdentifier;
+@property (nonatomic, weak) id<FieldEditorViewControllerDelegate> delegate;
+@property (nonatomic, strong) NSArray *fieldSections;
+@property (nonatomic, strong) NSMutableDictionary *values;
+@property (nonatomic, strong) NSString *doneButtonTitle;
+@property (nonatomic, strong) NSString *cancelButtonTitle;
+@property (nonatomic, strong) id context;
+@property (nonatomic, strong) NSString *editorIdentifier;
 @property (nonatomic, assign) BOOL isSubSection;
 @property (nonatomic, assign) BOOL hasChanges;
-@property (nonatomic, retain) UITextField *selectedTextField;
+@property (nonatomic, strong) UITextField *selectedTextField;
 
 - (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title;
 - (void)openSubsection:(FieldSpecifier *)subsectionField;
@@ -75,9 +75,9 @@ typedef enum FieldSpecifierType {
 	BOOL exclusiveSelection;
 }
 
-@property (nonatomic, retain) NSArray *fields;
-@property (nonatomic, retain) NSString *title;
-@property (nonatomic, retain) NSString *description;
+@property (nonatomic, strong) NSArray *fields;
+@property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSString *description;
 @property (nonatomic, assign) BOOL exclusiveSelection;
 
 + (FieldSectionSpecifier *)sectionWithFields:(NSArray *)f title:(NSString *)t description:(NSString *)d;
@@ -97,11 +97,11 @@ typedef enum FieldSpecifierType {
 }
 
 @property (nonatomic, assign) FieldSpecifierType type;
-@property (nonatomic, retain) NSArray *subsections;
-@property (nonatomic, retain) NSString *key;
-@property (nonatomic, retain) NSString *title;
-@property (nonatomic, retain) NSString *placeholder;
-@property (nonatomic, retain) id defaultValue;
+@property (nonatomic, strong) NSArray *subsections;
+@property (nonatomic, strong) NSString *key;
+@property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSString *placeholder;
+@property (nonatomic, strong) id defaultValue;
 @property (nonatomic, assign) BOOL shouldDisplayDisclosureIndicator;
 
 + (FieldSpecifier *)fieldWithType:(FieldSpecifierType)t key:(NSString *)k;
@@ -124,7 +124,7 @@ typedef enum FieldSpecifierType {
 	NSString *name;
 }
 
-@property (nonatomic, retain) NSString *name;
+@property (nonatomic, strong) NSString *name;
 
 @end
 
@@ -134,6 +134,6 @@ typedef enum FieldSpecifierType {
 	NSString *name;
 }
 
-@property (nonatomic, retain) NSString *name;
+@property (nonatomic, strong) NSString *name;
 
 @end

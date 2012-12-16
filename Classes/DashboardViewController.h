@@ -34,20 +34,20 @@
 	UIActionSheet *activeSheet;
 }
 
-@property (nonatomic, retain) ASAccount *account;
-@property (nonatomic, retain) NSArray *products;
-@property (nonatomic, retain) NSArray *visibleProducts;
-@property (nonatomic, retain) NSMutableArray *selectedProducts;
-@property (nonatomic, retain) UITableView *productsTableView;
-@property (nonatomic, retain) UIView *topView;
-@property (nonatomic, retain) UIImageView *shadowView;
-@property (nonatomic, retain) UIPopoverController *colorPopover;
-@property (nonatomic, retain) UIToolbar *statusToolbar;
-@property (nonatomic, retain) UIBarButtonItem *stopButtonItem;
-@property (nonatomic, retain) UIActivityIndicatorView *activityIndicator;
-@property (nonatomic, retain) UILabel *statusLabel;
-@property (nonatomic, retain) UIProgressView *progressBar;
-@property (nonatomic, retain) UIActionSheet *activeSheet;
+@property (nonatomic, strong) ASAccount *account;
+@property (nonatomic, strong) NSArray *products;
+@property (nonatomic, strong) NSArray *visibleProducts;
+@property (nonatomic, strong) NSMutableArray *selectedProducts;
+@property (nonatomic, strong) UITableView *productsTableView;
+@property (nonatomic, strong) UIView *topView;
+@property (nonatomic, strong) UIImageView *shadowView;
+@property (nonatomic, strong) UIPopoverController *colorPopover;
+@property (nonatomic, strong) UIToolbar *statusToolbar;
+@property (nonatomic, strong) UIBarButtonItem *stopButtonItem;
+@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, strong) UILabel *statusLabel;
+@property (nonatomic, strong) UIProgressView *progressBar;
+@property (nonatomic, strong) UIActionSheet *activeSheet;
 
 - (id)initWithAccount:(ASAccount *)anAccount;
 - (void)willShowPasscodeLock:(NSNotification *)notification;

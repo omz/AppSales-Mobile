@@ -83,7 +83,7 @@
 	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
 	CGFloat graphHeight = iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5;
-	self.graphView = [[[GraphView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, graphHeight)] autorelease];
+	self.graphView = [[GraphView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, graphHeight)];
 	graphView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	graphView.delegate = self;
 	graphView.dataSource = self;
@@ -102,7 +102,7 @@
 	} else {
 		segments = [NSArray arrayWithObjects:NSLocalizedString(@"Reports", nil), NSLocalizedString(@"Months", nil), nil];
 	}
-	UISegmentedControl *tabControl = [[[UISegmentedControl alloc] initWithItems:segments] autorelease];
+	UISegmentedControl *tabControl = [[UISegmentedControl alloc] initWithItems:segments];
 	tabControl.segmentedControlStyle = UISegmentedControlStyleBar;
 	[tabControl addTarget:self action:@selector(switchTab:) forControlEvents:UIControlEventValueChanged];
 	
@@ -122,9 +122,9 @@
 	
 	self.navigationItem.titleView = tabControl;
 	
-	self.downloadReportsButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+	self.downloadReportsButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
 																				  target:self 
-																				  action:@selector(downloadReports:)] autorelease];
+																				  action:@selector(downloadReports:)];
 	downloadReportsButtonItem.enabled = !self.account.isDownloadingReports;
 	self.navigationItem.rightBarButtonItem = downloadReportsButtonItem;
 	if ([self shouldShowStatusBar]) {
@@ -220,7 +220,7 @@
 	[sortedDailyReports removeAllObjects];
 	[sortedWeeklyReports removeAllObjects];
 	
-	NSArray *sortDescriptors = [NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"startDate" ascending:YES] autorelease]];
+	NSArray *sortDescriptors = [NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"startDate" ascending:YES]];
 	NSSet *allDailyReports = self.account.dailyReports;
 	[sortedDailyReports addObjectsFromArray:[allDailyReports allObjects]];
 	[sortedDailyReports sortUsingDescriptors:sortDescriptors];
@@ -230,7 +230,7 @@
 	[sortedWeeklyReports sortUsingDescriptors:sortDescriptors];
 	
 	// Group daily reports by calendar month:
-	NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM yyyy"];
 	[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	[sortedCalendarMonthReports removeAllObjects];
@@ -240,7 +240,7 @@
 		NSDateComponents *dateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dailyReport.startDate];
 		if (!prevDateComponents || (dateComponents.month != prevDateComponents.month || dateComponents.year != prevDateComponents.year)) {
 			if (reportsInCurrentMonth) {
-				ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
+				ReportCollection *monthCollection = [[ReportCollection alloc] initWithReports:reportsInCurrentMonth];
 				monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
 				[sortedCalendarMonthReports addObject:monthCollection];
 			}
@@ -250,7 +250,7 @@
 		prevDateComponents = dateComponents;
 	}
 	if ([reportsInCurrentMonth count] > 0) {
-		ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
+		ReportCollection *monthCollection = [[ReportCollection alloc] initWithReports:reportsInCurrentMonth];
 		monthCollection.title = [monthFormatter stringFromDate:[monthCollection firstReport].startDate];
 		[sortedCalendarMonthReports addObject:monthCollection];
 	}
@@ -263,7 +263,7 @@
 		NSString *fiscalMonth = [[AppleFiscalCalendar sharedFiscalCalendar] fiscalMonthForDate:dailyReport.startDate];
 		if (![fiscalMonth isEqualToString:prevFiscalMonthName]) {
 			if (reportsInCurrentFiscalMonth) {
-				ReportCollection *fiscalMonthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentFiscalMonth] autorelease];
+				ReportCollection *fiscalMonthCollection = [[ReportCollection alloc] initWithReports:reportsInCurrentFiscalMonth];
 				[sortedFiscalMonthReports addObject:fiscalMonthCollection];
 				fiscalMonthCollection.title = fiscalMonth;
 			}
@@ -273,7 +273,7 @@
 		prevFiscalMonthName = fiscalMonth;
 	}
 	if ([reportsInCurrentFiscalMonth count] > 0) {
-		ReportCollection *fiscalMonthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentFiscalMonth] autorelease];
+		ReportCollection *fiscalMonthCollection = [[ReportCollection alloc] initWithReports:reportsInCurrentFiscalMonth];
 		[sortedFiscalMonthReports addObject:fiscalMonthCollection];
 		fiscalMonthCollection.title = prevFiscalMonthName;
 	}
@@ -304,20 +304,20 @@
 {
 	if (self.account.password && self.account.password.length > 0) { //Only download reports for accounts with login
 		if (!account.vendorID || account.vendorID.length == 0) {
-			[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
 										 message:NSLocalizedString(@"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.", nil) 
 										delegate:nil 
 							   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-							   otherButtonTitles:nil] autorelease] show];
+							   otherButtonTitles:nil] show];
 		} else {
 			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:self.account];
 		}
 	} else {
-		[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Login Missing", nil) 
+		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Login Missing", nil) 
 									 message:NSLocalizedString(@"You have not entered your iTunes Connect login for this account.", nil)
 									delegate:nil 
 						   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-						   otherButtonTitles:nil] autorelease] show];
+						   otherButtonTitles:nil] show];
 	}
 	
 }
@@ -357,18 +357,18 @@
 - (void)showGraphOptions:(id)sender
 {
 	if (selectedTab == 0) {
-		self.activeSheet = [[[UIActionSheet alloc] initWithTitle:nil 
+		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
 											 delegate:self 
 									cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
 							   destructiveButtonTitle:nil 
-									otherButtonTitles:NSLocalizedString(@"Daily Reports", nil), NSLocalizedString(@"Weekly Reports", nil), nil] autorelease];
+									otherButtonTitles:NSLocalizedString(@"Daily Reports", nil), NSLocalizedString(@"Weekly Reports", nil), nil];
 		self.activeSheet.tag = kSheetTagDailyGraphOptions;
 	} else {
-		self.activeSheet = [[[UIActionSheet alloc] initWithTitle:nil 
+		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
 											 delegate:self 
 									cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
 							   destructiveButtonTitle:nil 
-									otherButtonTitles:NSLocalizedString(@"Calendar Months", nil), NSLocalizedString(@"Fiscal Months", nil), nil] autorelease];
+									otherButtonTitles:NSLocalizedString(@"Calendar Months", nil), NSLocalizedString(@"Fiscal Months", nil), nil];
 		self.activeSheet.tag = kSheetTagMonthlyGraphOptions;
 	}
 	[self.activeSheet showInView:self.view];
@@ -497,7 +497,7 @@
 			return [NSString stringWithFormat:@"%i", day];
 		}
 	} else {
-		NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
+		NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 		[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		[monthFormatter setDateFormat:@"MMM"];
 		if (showFiscalMonths) {
@@ -574,7 +574,7 @@
 	if (selectedTab == 0) {
 		if ([((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count] > index) {
 			Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
-			NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 			[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 			[monthFormatter setDateFormat:@"MMM '´'yy"];
 			return [monthFormatter stringFromDate:report.startDate];
@@ -584,7 +584,7 @@
 	} else {
 		if ([self.sortedCalendarMonthReports count] > index) {
 			id<ReportSummary> report = [self.sortedCalendarMonthReports objectAtIndex:index];
-			NSDateFormatter *yearFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			NSDateFormatter *yearFormatter = [[NSDateFormatter alloc] init];
 			[yearFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 			[yearFormatter setDateFormat:@"yyyy"];
 			NSString *yearString = [yearFormatter stringFromDate:report.startDate];
@@ -643,7 +643,7 @@
 			reports = self.sortedCalendarMonthReports;
 		}
 	}
-	ReportDetailViewController *vc = [[[ReportDetailViewController alloc] initWithReports:reports selectedIndex:index] autorelease];
+	ReportDetailViewController *vc = [[ReportDetailViewController alloc] initWithReports:reports selectedIndex:index];
 	vc.selectedProduct = [self.selectedProducts lastObject];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		[self.navigationController pushViewController:vc animated:YES];
@@ -657,8 +657,8 @@
 				[self.selectedReportPopover dismissPopoverAnimated:NO];
 			}
 		}
-		UINavigationController *nav = [[[UINavigationController alloc] initWithRootViewController:vc] autorelease];
-		self.selectedReportPopover = [[[UIPopoverController alloc] initWithContentViewController:nav] autorelease];
+		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+		self.selectedReportPopover = [[UIPopoverController alloc] initWithContentViewController:nav];
 		self.selectedReportPopover.passthroughViews = [NSArray arrayWithObjects:self.graphView, nil];
 		if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
 			[self.selectedReportPopover presentPopoverFromRect:barFrame 
@@ -682,10 +682,10 @@
 {
 	Report *report = nil;
 	if (showWeeks) {
-		report = [[[self.sortedWeeklyReports objectAtIndex:index] retain] autorelease];
+		report = [self.sortedWeeklyReports objectAtIndex:index];
 		[self.sortedWeeklyReports removeObject:report];
 	} else {
-		report = [[[self.sortedDailyReports objectAtIndex:index] retain] autorelease];
+		report = [self.sortedDailyReports objectAtIndex:index];
 		[self.sortedDailyReports removeObject:report];
 	}
 	
@@ -711,7 +711,7 @@
 		[latestValueButton setBackgroundImage:[UIImage imageNamed:@"LatestValueButton.png"] forState:UIControlStateNormal];
 		[latestValueButton setBackgroundImage:[UIImage imageNamed:@"LatestValueButton.png"] forState:UIControlStateHighlighted];
 		
-		UILongPressGestureRecognizer *longPressRecognizer = [[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(selectAdvancedViewMode:)] autorelease];
+		UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(selectAdvancedViewMode:)];
 		[latestValueButton addGestureRecognizer:longPressRecognizer];
 		
 		id<ReportSummary> latestReport = nil;
@@ -755,7 +755,7 @@
 - (void)selectAdvancedViewMode:(UILongPressGestureRecognizer *)gestureRecognizer
 {
 	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-		self.activeSheet = [[[UIActionSheet alloc] initWithTitle:nil 
+		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
 															delegate:self 
 												   cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
 											  destructiveButtonTitle:nil 
@@ -765,7 +765,7 @@
 								 NSLocalizedString(@"Updates", nil), 
 								 NSLocalizedString(@"Educational Sales", nil), 
 								 NSLocalizedString(@"Gift Purchases", nil), 
-								 NSLocalizedString(@"Promo Codes", nil), nil] autorelease];
+								 NSLocalizedString(@"Promo Codes", nil), nil];
 		self.activeSheet.tag = kSheetTagAdvancedViewMode;
 		[self.activeSheet showInView:self.navigationController.view];
 	}
@@ -799,12 +799,6 @@
 	[account removeObserver:self forKeyPath:@"downloadProgress"];
 	[account removeObserver:self forKeyPath:@"downloadStatus"];
 	
-	[sortedDailyReports release];
-	[sortedWeeklyReports release];
-	[graphView release];
-	[calendar release];
-	[downloadReportsButtonItem release];
-	[super dealloc];
 }
 
 @end

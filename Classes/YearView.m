@@ -59,7 +59,7 @@
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM"];
 	[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-	NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	NSDateComponents *currentDateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:[NSDate date]];
 	NSInteger currentYear = [currentDateComponents year];
@@ -78,7 +78,7 @@
 			CGContextFillRect(c, CGRectInset(monthRect, -7, -5));
 			[[UIColor darkGrayColor] set];
 		}
-		NSDateComponents *monthComponents = [[[NSDateComponents alloc] init] autorelease];
+		NSDateComponents *monthComponents = [[NSDateComponents alloc] init];
 		[monthComponents setMonth:i + 1];
 		NSDate *monthDate = [calendar dateFromComponents:monthComponents];
 		NSString *month = [monthFormatter stringFromDate:monthDate];
@@ -103,10 +103,5 @@
 	
 }
 
-- (void)dealloc
-{
-	[labelsByMonth release];
-	[super dealloc];
-}
 
 @end
