@@ -277,8 +277,8 @@
 		[sortedFiscalMonthReports addObject:fiscalMonthCollection];
 		fiscalMonthCollection.title = prevFiscalMonthName;
 	}
-	
 	[self.graphView reloadData];
+	[self reloadTableView];
 }
 
 
