@@ -31,7 +31,7 @@
 
 - (void)iconDownloaded:(NSNotification *)notification
 {
-	if ([[[notification userInfo] objectForKey:kIconManagerDownloadedIconNotificationAppID] isEqualToString:self.productID]) {
+	if ([[notification userInfo][kIconManagerDownloadedIconNotificationAppID] isEqualToString:self.productID]) {
 		self.image = [[IconManager sharedManager] iconForAppID:productID];
 	}
 }

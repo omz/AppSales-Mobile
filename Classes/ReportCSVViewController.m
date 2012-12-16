@@ -130,14 +130,14 @@
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
-	Report *report = [reports objectAtIndex:indexPath.row];
+	Report *report = reports[indexPath.row];
 	cell.textLabel.text = [dateFormatter stringFromDate:report.startDate];
 	return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	ReportCSVViewController *vc = [[ReportCSVViewController alloc] initWithReport:[reports objectAtIndex:indexPath.row]];
+	ReportCSVViewController *vc = [[ReportCSVViewController alloc] initWithReport:reports[indexPath.row]];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 

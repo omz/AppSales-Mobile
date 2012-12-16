@@ -37,10 +37,8 @@
 		currencyCode = @"USD";
 	}
 	
-	NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
-							  [NSNumber numberWithBool:YES], kSettingDownloadPayments,
-							  currencyCode, @"CurrencyManagerBaseCurrency",
-							  nil];
+	NSDictionary *defaults = @{kSettingDownloadPayments: @YES,
+							  @"CurrencyManagerBaseCurrency": currencyCode};
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
@@ -77,7 +75,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportDownloadFailed:) name:ASReportDownloadFailedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeDownloadFailed:) name:ASPromoCodeDownloadFailedNotification object:nil];
 	
-	if ([launchOptions objectForKey:UIApplicationLaunchOptionsURLKey]) {
+	if (launchOptions[UIApplicationLaunchOptionsURLKey]) {
 		[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
 	}
 	
@@ -120,9 +118,9 @@
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		NSFetchRequest *accountsFetchRequest = [[NSFetchRequest alloc] init];
 		[accountsFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:self.managedObjectContext]];
-		[accountsFetchRequest setSortDescriptors:[NSArray arrayWithObjects:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES], [[NSSortDescriptor alloc] initWithKey:@"username" ascending:YES], nil]];
+		[accountsFetchRequest setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES], [[NSSortDescriptor alloc] initWithKey:@"username" ascending:YES]]];
 		NSArray *accounts = [self.managedObjectContext executeFetchRequest:accountsFetchRequest error:NULL];
-		ASAccount *account = [accounts objectAtIndex:buttonIndex];
+		ASAccount *account = accounts[buttonIndex];
 		[self loadAccount:account];
 	}
 }
@@ -153,7 +151,7 @@
 	promoNavController.toolbar.barStyle = UIBarStyleBlackOpaque;
 	
 	UITabBarController *tabController = [[UITabBarController alloc] initWithNibName:nil bundle:nil];
-	[tabController setViewControllers:[NSArray arrayWithObjects:salesNavController, reviewsNavController, paymentsNavController, promoNavController, nil]];
+	[tabController setViewControllers:@[salesNavController, reviewsNavController, paymentsNavController, promoNavController]];
 	
 	self.window.rootViewController = tabController;
 }
@@ -206,7 +204,7 @@
 		UIViewController *viewControllerForPresentingPasscode = nil;
 		if (self.window.rootViewController.modalViewController) {
 			if ([self.window.rootViewController.modalViewController isKindOfClass:[UINavigationController class]] 
-				&& [[[(UINavigationController *)self.window.rootViewController.modalViewController viewControllers] objectAtIndex:0] isKindOfClass:[KKPasscodeViewController class]]) {
+				&& [[(UINavigationController *)self.window.rootViewController.modalViewController viewControllers][0] isKindOfClass:[KKPasscodeViewController class]]) {
 				//The passcode dialog is already shown...
 				return;
 			}
@@ -230,7 +228,7 @@
 
 - (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification
 {
-	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
+	NSString *licenseAgreement = [notification userInfo][@"licenseAgreement"];
 	PromoCodesLicenseViewController *vc = [[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]];
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
 	[self.window.rootViewController presentModalViewController:navController animated:YES];
@@ -298,9 +296,8 @@
     
 	NSError *error = nil;
 	persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-	NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-							 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, 
-							 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+	NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, 
+							 NSInferMappingModelAutomaticallyOption: @YES};
 	if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 		abort();
@@ -323,7 +320,7 @@
 
 - (void)reportDownloadFailed:(NSNotification *)notification
 {
-	NSString *errorMessage = [[notification userInfo] objectForKey:kASReportDownloadErrorDescription];
+	NSString *errorMessage = [notification userInfo][kASReportDownloadErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@", nil), (errorMessage) ? errorMessage : @""];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
 								 message:alertMessage 
@@ -334,7 +331,7 @@
 
 - (void)promoCodeDownloadFailed:(NSNotification *)notification
 {
-	NSString *errorDescription = [[notification userInfo] objectForKey:kASPromoCodeDownloadFailedErrorDescription];
+	NSString *errorDescription = [notification userInfo][kASPromoCodeDownloadFailedErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:@"An error occured while downloading the promo codes (%@).", errorDescription];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
 								 message:alertMessage 

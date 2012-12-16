@@ -131,21 +131,21 @@
 		total += n;
 		starSum += n * rating;
 		if (n > max) max = n;
-		[ratings setObject:[NSNumber numberWithInteger:n] forKey:[NSNumber numberWithInteger:rating]];
+		ratings[@(rating)] = @(n);
 		NSInteger unread = [self.dataSource reviewSummaryView:self numberOfUnreadReviewsForRating:rating];
-		[unreadRatings setObject:[NSNumber numberWithInteger:unread] forKey:[NSNumber numberWithInteger:rating]];
+		unreadRatings[@(rating)] = @(unread);
 	}
 	
 	for (NSInteger rating = 5; rating >= 1; rating--) {
-		NSInteger numberOfReviews = [[ratings objectForKey:[NSNumber numberWithInteger:rating]] integerValue];
+		NSInteger numberOfReviews = [ratings[@(rating)] integerValue];
 		float percentage = (total == 0) ? 0 : (float)numberOfReviews / (float)max;
 		CGRect barFrame = [self barFrameForRating:rating];
 		barFrame.size.width = barFrame.size.width * percentage;
-		[[barViews objectAtIndex:5-rating] setFrame:barFrame];
+		[barViews[5-rating] setFrame:barFrame];
 		
-		UILabel *barLabel = [barLabels objectAtIndex:5-rating];
+		UILabel *barLabel = barLabels[5-rating];
 		barLabel.text = [NSString stringWithFormat:@"%i", numberOfReviews];
-		if ([[unreadRatings objectForKey:[NSNumber numberWithInteger:rating]] integerValue] > 0) {
+		if ([unreadRatings[@(rating)] integerValue] > 0) {
 			barLabel.font = [UIFont boldSystemFontOfSize:13.0];
 			barLabel.textColor = [UIColor colorWithRed:0.141 green:0.439 blue:0.847 alpha:1.0];
 		} else {
@@ -159,7 +159,7 @@
 	NSNumberFormatter *averageFormatter = [[NSNumberFormatter alloc] init];
 	[averageFormatter setMinimumFractionDigits:1];
 	[averageFormatter setMaximumFractionDigits:1];
-	averageLabel.text = [NSString stringWithFormat:@"\u2205 %@", [averageFormatter stringFromNumber:[NSNumber numberWithFloat:average]]];
+	averageLabel.text = [NSString stringWithFormat:@"\u2205 %@", [averageFormatter stringFromNumber:@(average)]];
 	
 	if (animated) {
 		[UIView commitAnimations];

@@ -13,8 +13,7 @@
 
 + (NSArray *)crayonColorPalette
 {
-	return [NSArray arrayWithObjects:
-			[UIColor colorWithRed:0.573 green:0.067 blue:0.031 alpha:1.0],
+	return @[[UIColor colorWithRed:0.573 green:0.067 blue:0.031 alpha:1.0],
 			[UIColor colorWithRed:0.573 green:0.561 blue:0.090 alpha:1.0],
 			[UIColor colorWithRed:0.047 green:0.557 blue:0.071 alpha:1.0],
 			[UIColor colorWithRed:0.051 green:0.569 blue:0.573 alpha:1.0],
@@ -66,7 +65,7 @@
 			[UIColor colorWithRed:0.835 green:0.525 blue:0.992 alpha:1.0],
 			[UIColor colorWithRed:0.996 green:0.549 blue:0.843 alpha:1.0],
 			[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:1.0],
-			[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0], nil];
+			[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0]];
 }
 
 + (UIColor *)randomColor 

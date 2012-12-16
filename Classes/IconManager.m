@@ -56,7 +56,7 @@
 		NSLog(@"Invalid app ID for icon download (%@)", appID);
 		return nil;
 	}
-	UIImage *cachedIcon = [iconCache objectForKey:appID];
+	UIImage *cachedIcon = iconCache[appID];
 	if (cachedIcon) {
 		return cachedIcon;
 	}
@@ -74,7 +74,7 @@
 {
 	if ([downloadQueue count] == 0 || isDownloading) return;
 	
-	NSString *nextAppID = [[downloadQueue objectAtIndex:0] copy];
+	NSString *nextAppID = [downloadQueue[0] copy];
 	[downloadQueue removeObjectAtIndex:0];
 	
 	dispatch_async(queue, ^ {
@@ -93,8 +93,8 @@
 				//Download was successful, write icon to file
 				NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:nextAppID];
 				[iconData writeToFile:iconPath atomically:YES];
-				[iconCache setObject:icon forKey:nextAppID];
-				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:[NSDictionary dictionaryWithObject:nextAppID forKey:kIconManagerDownloadedIconNotificationAppID]];
+				iconCache[nextAppID] = icon;
+				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:@{kIconManagerDownloadedIconNotificationAppID: nextAppID}];
 			});
 		} else if (response) {
 			dispatch_async(dispatch_get_main_queue(), ^ {

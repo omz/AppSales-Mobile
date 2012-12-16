@@ -45,9 +45,9 @@
 - (void)contextDidChange:(NSNotification *)notification
 {
 	NSSet *relevantEntityNames = [self entityNamesTriggeringReload];
-	NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
-	NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
-	NSSet *deletedObjects = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
+	NSSet *insertedObjects = [notification userInfo][NSInsertedObjectsKey];
+	NSSet *updatedObjects = [notification userInfo][NSUpdatedObjectsKey];
+	NSSet *deletedObjects = [notification userInfo][NSDeletedObjectsKey];
 	
 	BOOL shouldReload = NO;
 	for (NSManagedObject *insertedObject in insertedObjects) {
@@ -152,7 +152,7 @@
 	statusToolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	statusToolbar.translucent = YES;
 	statusToolbar.barStyle = UIBarStyleBlackTranslucent;
-	statusToolbar.items = [NSArray arrayWithObjects:activityIndicatorItem, flexSpace, statusItem, flexSpace, stopButtonItem, nil];
+	statusToolbar.items = @[activityIndicatorItem, flexSpace, statusItem, flexSpace, stopButtonItem];
 	
 	[self.view addSubview:statusToolbar];
 }
@@ -240,7 +240,7 @@
 	}];
   } else {
 	// Sort products by ID (this will put the most recently released apps on top):
-   allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
+   allProducts = [[self.account.products allObjects] sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
   }
   
 	self.products = allProducts;
@@ -268,7 +268,7 @@
 - (void)changeColor:(UIButton *)sender
 {
 	int row = sender.tag;
-	Product *product = [self.visibleProducts objectAtIndex:row - 1];
+	Product *product = (self.visibleProducts)[row - 1];
 	
 	NSArray *palette = [UIColor crayonColorPalette];
 	ColorPickerViewController *vc = [[ColorPickerViewController alloc] initWithColors:palette];
@@ -324,7 +324,7 @@
 	
 	Product *product = nil;
 	if (indexPath.row != 0) {
-		product = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+		product = (self.visibleProducts)[indexPath.row - 1];
 	}
 	
 	cell.product = product;
@@ -399,7 +399,7 @@
 	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
 	[tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 	if (indexPath.row != 0) {
-		Product *p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+		Product *p = (self.visibleProducts)[indexPath.row - 1];
 		self.selectedProducts = [NSMutableArray arrayWithObject:p];
 	} else {
 		self.selectedProducts = nil;
@@ -409,7 +409,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
-	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
+	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:(self.visibleProducts)[indexPath.row - 1]];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView

@@ -51,10 +51,10 @@
 {
 	if ([activeDownloads count] > 0 || [downloadQueue count] > 0) return;
 	
-	NSDictionary *storeInfos = [[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"stores" ofType:@"plist"]] objectForKey:@"StoreInfos"];
+	NSDictionary *storeInfos = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"stores" ofType:@"plist"]][@"StoreInfos"];
 	for (NSString *country in storeInfos) {
-		NSDictionary *storeInfo = [storeInfos objectForKey:country];
-		NSString *storeID = [storeInfo objectForKey:@"storeID"];
+		NSDictionary *storeInfo = storeInfos[country];
+		NSString *storeID = storeInfo[@"storeID"];
 		for (Product *product in products) {
 			if (product.parentSKU) continue; //don't download reviews for in-app-purchases
 			ReviewDownload *download = [[ReviewDownload alloc] initWithProduct:product storeFront:storeID countryCode:country];
@@ -85,7 +85,7 @@
 	if ([downloadQueue count] == 0) return;
 	if ([activeDownloads count] >= MAX_CONCURRENT_REVIEW_DOWNLOADS) return;
 	
-	ReviewDownload *nextDownload = [downloadQueue objectAtIndex:0];
+	ReviewDownload *nextDownload = downloadQueue[0];
 	[downloadQueue removeObjectAtIndex:0];
 	[activeDownloads addObject:nextDownload];
 	[nextDownload start];
@@ -210,33 +210,33 @@
 			NSArray *existingReviews = [moc executeFetchRequest:existingReviewsFetchRequest error:NULL];
 			NSMutableDictionary *existingReviewsByUser = [NSMutableDictionary dictionary];
 			for (Review *existingReview in existingReviews) {
-				[existingReviewsByUser setObject:existingReview forKey:existingReview.user];
+				existingReviewsByUser[existingReview.user] = existingReview;
 			}
 			
 			BOOL changesMade = NO;
 			for (NSDictionary *reviewInfo in [reviewInfos reverseObjectEnumerator]) {
-				Review *existingReview = [existingReviewsByUser objectForKey:[reviewInfo objectForKey:kReviewInfoUser]];
+				Review *existingReview = existingReviewsByUser[reviewInfo[kReviewInfoUser]];
 				if (!existingReview) {
 					Review *newReview = [NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
-					newReview.user = [reviewInfo objectForKey:kReviewInfoUser];
-					newReview.title = [reviewInfo objectForKey:kReviewInfoTitle];
-					newReview.text = [reviewInfo objectForKey:kReviewInfoText];
-					newReview.rating = [reviewInfo objectForKey:kReviewInfoRating];
+					newReview.user = reviewInfo[kReviewInfoUser];
+					newReview.title = reviewInfo[kReviewInfoTitle];
+					newReview.text = reviewInfo[kReviewInfoText];
+					newReview.rating = reviewInfo[kReviewInfoRating];
 					newReview.downloadDate = [NSDate date];
-					newReview.productVersion = [reviewInfo objectForKey:kReviewInfoVersion];
+					newReview.productVersion = reviewInfo[kReviewInfoVersion];
 					newReview.product = product;
 					newReview.countryCode = country;
-					newReview.unread = [NSNumber numberWithBool:YES];
-					newReview.reviewDate = [reviewDateFormatter dateFromString:[reviewInfo objectForKey:kReviewInfoDateString]];
-					[existingReviewsByUser setObject:newReview forKey:newReview.user];
+					newReview.unread = @YES;
+					newReview.reviewDate = [reviewDateFormatter dateFromString:reviewInfo[kReviewInfoDateString]];
+					existingReviewsByUser[newReview.user] = newReview;
 					changesMade = YES;
 				} else {
 					NSString *existingText = existingReview.text;
 					NSString *existingTitle = existingReview.title;
 					NSNumber *existingRating = existingReview.rating;
-					NSString *newText = [reviewInfo objectForKey:kReviewInfoText];
-					NSString *newTitle = [reviewInfo objectForKey:kReviewInfoTitle];
-					NSNumber *newRating = [reviewInfo objectForKey:kReviewInfoRating];
+					NSString *newText = reviewInfo[kReviewInfoText];
+					NSString *newTitle = reviewInfo[kReviewInfoTitle];
+					NSNumber *newRating = reviewInfo[kReviewInfoRating];
 					if (![existingText isEqualToString:newText] || ![existingTitle isEqualToString:newTitle] || ![existingRating isEqualToNumber:newRating]) {
 						existingReview.text = newText;
 						existingReview.title = newTitle;
@@ -312,8 +312,8 @@
 		if (reviewVersionAndDate) {
 			NSArray *versionAndDateLines = [reviewVersionAndDate componentsSeparatedByString:@"\n"];
 			if ([versionAndDateLines count] == 6) {
-				reviewVersion = [[versionAndDateLines objectAtIndex:2] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-				reviewDateString = [[versionAndDateLines objectAtIndex:5] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				reviewVersion = [versionAndDateLines[2] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				reviewDateString = [versionAndDateLines[5] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 			}
 		}
 		
@@ -324,14 +324,12 @@
 		reviewText = [reviewText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		
 		if (rating > 0 && reviewTitle && reviewUser && reviewVersion && reviewDateString && reviewText) {
-			NSDictionary *reviewInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-										reviewTitle, kReviewInfoTitle, 
-										reviewUser, kReviewInfoUser, 
-										reviewVersion, kReviewInfoVersion, 
-										reviewDateString, kReviewInfoDateString, 
-										reviewText, kReviewInfoText, 
-										[NSNumber numberWithInt:rating], kReviewInfoRating,
-										nil];
+			NSDictionary *reviewInfo = @{kReviewInfoTitle: reviewTitle, 
+										kReviewInfoUser: reviewUser, 
+										kReviewInfoVersion: reviewVersion, 
+										kReviewInfoDateString: reviewDateString, 
+										kReviewInfoText: reviewText, 
+										kReviewInfoRating: @(rating)};
 			[reviews addObject:reviewInfo];
 		}
 	}

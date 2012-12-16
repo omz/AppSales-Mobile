@@ -34,7 +34,7 @@
 	if (self) {
 		reports = reportsArray;
 		selectedReportIndex = selectedIndex;
-		self.selectedReport = [reports objectAtIndex:selectedReportIndex];
+		self.selectedReport = reports[selectedReportIndex];
 		revenueFormatter = [[NSNumberFormatter alloc] init];
 		[revenueFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
 		[revenueFormatter setMinimumFractionDigits:2];
@@ -115,7 +115,7 @@
 	[self.view addSubview:toolbar];
 	
 	float segmentWidth = 75.0;
-	UISegmentedControl *modeControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil), nil]];
+	UISegmentedControl *modeControl = [[UISegmentedControl alloc] initWithItems:@[NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil)]];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:0];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:1];
 	modeControl.segmentedControlStyle = UISegmentedControlStyleBar;
@@ -134,9 +134,9 @@
 	
 	[self updateNavigationButtons];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-		toolbar.items = [NSArray arrayWithObjects:spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+		toolbar.items = @[spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
 	} else {
-		toolbar.items = [NSArray arrayWithObjects:prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+		toolbar.items = @[prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
 		toolbar.translucent = YES;
 	}
 	
@@ -266,14 +266,14 @@
 	[sortedEntries addObject:[ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:@"world" product:nil]];
 	
 	for (NSString *country in [sortedCountries reverseObjectEnumerator]) {
-		float revenue = [[revenuesByCountry objectForKey:country] floatValue];
+		float revenue = [revenuesByCountry[country] floatValue];
 		float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
 		
 		NSInteger sales = 0;
 		if (self.selectedProduct) {
-			sales = [[[paidDownloadsByCountryAndProduct objectForKey:[country uppercaseString]] objectForKey:self.selectedProduct.productID] integerValue];
+			sales = [paidDownloadsByCountryAndProduct[[country uppercaseString]][self.selectedProduct.productID] integerValue];
 		} else {
-			NSDictionary *salesByProduct = [paidDownloadsByCountryAndProduct objectForKey:[country uppercaseString]];
+			NSDictionary *salesByProduct = paidDownloadsByCountryAndProduct[[country uppercaseString]];
 			sales = [[[salesByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
 		}
 		NSString *subtitle = [NSString stringWithFormat:@"%@: %i %@", [[CountryDictionary sharedDictionary] nameForCountryCode:country], sales, sales == 1 ? @"sale" : @"sales"];
@@ -286,16 +286,16 @@
 	ReportDetailEntry *allProductsEntry = [ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:nil product:nil];
 	[entries addObject:allProductsEntry];
 	ASAccount *account = [[self.selectedReport firstReport] valueForKey:@"account"];
-	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
+	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
 	for (Product *product in allProducts) {
 		NSString *productID = product.productID;
 		float revenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:productID inCountry:self.selectedCountry];
 		NSInteger sales = 0;
 		if (self.selectedCountry) {
-			sales = [[[paidDownloadsByCountryAndProduct objectForKey:[self.selectedCountry uppercaseString]] objectForKey:productID] integerValue];
+			sales = [paidDownloadsByCountryAndProduct[[self.selectedCountry uppercaseString]][productID] integerValue];
 		} else {
 			for (NSDictionary *salesByProduct in [paidDownloadsByCountryAndProduct allValues]) {
-				sales += [[salesByProduct objectForKey:productID] integerValue];
+				sales += [salesByProduct[productID] integerValue];
 			}
 		}		
 		float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
@@ -303,7 +303,7 @@
 		ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:nil product:product];
 		[entries addObject:entry];
 	}
-	[entries sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO]]];
+	[entries sortUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO]]];
 	
 	self.productEntries = [NSArray arrayWithArray:entries];
 	[self reloadTableView];
@@ -352,7 +352,7 @@
 {
 	if (selectedReportIndex >= [reports count] - 1) return;
 	self.selectedReportIndex = self.selectedReportIndex + 1;
-	self.selectedReport = [reports objectAtIndex:selectedReportIndex];
+	self.selectedReport = reports[selectedReportIndex];
 }
 
 - (void)updateNavigationButtons
@@ -389,7 +389,7 @@
 {
 	if (selectedReportIndex <= 0) return;
 	self.selectedReportIndex = self.selectedReportIndex - 1;
-	self.selectedReport = [reports objectAtIndex:selectedReportIndex];
+	self.selectedReport = reports[selectedReportIndex];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -418,7 +418,7 @@
 	if (!cell) {
 		cell = [[ReportDetailEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 	}
-	ReportDetailEntry *entry = [(viewMode == ReportDetailViewModeCountries) ? self.countryEntries : self.productEntries objectAtIndex:indexPath.row];
+	ReportDetailEntry *entry = ((viewMode == ReportDetailViewModeCountries) ? self.countryEntries : self.productEntries)[indexPath.row];
 	cell.entry = entry;
 	return cell;
 }
@@ -427,14 +427,14 @@
 {
 	if (viewMode == ReportDetailViewModeCountries) {
 		if (indexPath.row > 0) {
-			self.selectedCountry = [[countryEntries objectAtIndex:indexPath.row] country];
+			self.selectedCountry = [countryEntries[indexPath.row] country];
 		} else {
 			self.selectedCountry = nil;
 		}
 		mapView.selectedCountry = self.selectedCountry;
 	} else {
 		if (indexPath.row > 0) {
-			Product *product = [[productEntries objectAtIndex:indexPath.row] product];
+			Product *product = [productEntries[indexPath.row] product];
 			self.selectedProduct = product;
 			mapView.selectedProduct = product;
 		} else {

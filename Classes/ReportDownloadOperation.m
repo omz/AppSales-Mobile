@@ -58,7 +58,7 @@
 		NSInteger previousBadge = [account.reportsBadge integerValue];
 		NSString *vendorID = account.vendorID;
 		
-		for (NSString *dateType in [NSArray arrayWithObjects:@"Daily", @"Weekly", nil]) {
+		for (NSString *dateType in @[@"Daily", @"Weekly"]) {
 			//Determine which reports should be available for download:
 			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 			[dateFormatter setDateFormat:@"yyyyMMdd"];
@@ -171,11 +171,11 @@
 				NSHTTPURLResponse *response = nil;
 				NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:NULL];
 				
-				NSString *errorMessage = [[response allHeaderFields] objectForKey:@"Errormsg"];
+				NSString *errorMessage = [response allHeaderFields][@"Errormsg"];
 				if (errorMessage) {
 					NSLog(@"  %@", errorMessage);
 				} else if (reportData) {
-					NSString *originalFilename = [[response allHeaderFields] objectForKey:@"Filename"];
+					NSString *originalFilename = [response allHeaderFields][@"Filename"];
 					NSData *inflatedReportData = [reportData gzipInflate];
 					NSString *reportCSV = [[NSString alloc] initWithData:inflatedReportData encoding:NSUTF8StringEncoding];
 					if (originalFilename && [reportCSV length] > 0) {
@@ -205,7 +205,7 @@
 							[originalReport setValue:originalFilename forKey:@"filename"];
 							[report generateCache];
 							numberOfReportsDownloaded++;
-							account.reportsBadge = [NSNumber numberWithInteger:previousBadge + numberOfReportsDownloaded];
+							account.reportsBadge = @(previousBadge + numberOfReportsDownloaded);
 						} else {
 							NSLog(@"Could not parse report %@", originalFilename);
 						}
@@ -263,28 +263,24 @@
 					dispatch_async(dispatch_get_main_queue(), ^ {
 						[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
 																			object:self 
-																		  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not parse iTunes Connect login page", nil)
-																											   forKey:kASReportDownloadErrorDescription]];
+																		  userInfo:@{kASReportDownloadErrorDescription: NSLocalizedString(@"Could not parse iTunes Connect login page", nil)}];
 					});
 					return;
 				}
 				NSString *loginAction = nil;
 				[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
 				
-				NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-										  username, @"theAccountName",
-										  password, @"theAccountPW", 
-										  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
-										  @"7", @"1.Continue.y",
-										  nil];
+				NSDictionary *postDict = @{@"theAccountName": username,
+										  @"theAccountPW": password, 
+										  @"1.Continue.x": @"39", // coordinates of submit button on screen.  any values seem to work
+										  @"1.Continue.y": @"7"};
 				loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
 				
 				if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
 					dispatch_async(dispatch_get_main_queue(), ^ {
 						[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
 																			object:self 
-																		  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not login. Please check your username and password.", nil) 
-																											   forKey:kASReportDownloadErrorDescription]];
+																		  userInfo:@{kASReportDownloadErrorDescription: NSLocalizedString(@"Could not login. Please check your username and password.", nil)}];
 					});
 					return;
 				}
@@ -355,7 +351,7 @@
 						NSString *paymentsFormURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", switchVendorAction];
 						
 						NSData *additionalPaymentsPageData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:paymentsFormURLString] 
-																						  bodyDictionary:[NSDictionary dictionaryWithObjectsAndKeys:additionalVendorOption, vendorSelectName, nil]
+																						  bodyDictionary:@{vendorSelectName: additionalVendorOption}
 																								response:NULL];
 						NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
 						[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption];
@@ -429,17 +425,17 @@
 			[paymentMonthFormatter setDateFormat:@"MMM yy"];
 			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 			[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			NSArray *amounts = ([[graphDict objectForKey:@"data"] count] >= 2) ? [[graphDict objectForKey:@"data"] objectAtIndex:1] : nil;
-			NSArray *labels = [graphDict objectForKey:@"labels"];
-			NSArray *legend = [graphDict objectForKey:@"legend"];
+			NSArray *amounts = ([graphDict[@"data"] count] >= 2) ? graphDict[@"data"][1] : nil;
+			NSArray *labels = graphDict[@"labels"];
+			NSArray *legend = graphDict[@"legend"];
 			if (legend && [legend isKindOfClass:[NSArray class]] && [legend count] == 2) {
-				NSString *currencyLegend = [legend objectAtIndex:1];
+				NSString *currencyLegend = legend[1];
 				NSString *currency = [currencyLegend stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
 				NSInteger numberOfPaymentsLoaded = 0;
 				if ([amounts count] == [labels count]) {
 					for (int i=0; i<[labels count]; i++) {
-						NSString *label = [labels objectAtIndex:i];
-						NSNumber *amount = [amounts objectAtIndex:i];
+						NSString *label = labels[i];
+						NSNumber *amount = amounts[i];
 						if (![amount isKindOfClass:[NSNumber class]] || ![label isKindOfClass:[NSString class]]) {
 							continue;
 						}
@@ -455,8 +451,8 @@
 							if (![existingPaymentIdentifiers containsObject:paymentIdentifier]) {
 								NSManagedObject *payment = [NSEntityDescription insertNewObjectForEntityForName:@"Payment" inManagedObjectContext:moc];
 								[payment setValue:account forKey:@"account"];
-								[payment setValue:[NSNumber numberWithInteger:month] forKey:@"month"];
-								[payment setValue:[NSNumber numberWithInteger:year] forKey:@"year"];
+								[payment setValue:@(month) forKey:@"month"];
+								[payment setValue:@(year) forKey:@"year"];
 								[payment setValue:amount forKey:@"amount"];
 								[payment setValue:currency forKey:@"currency"];
 								[payment setValue:vendorID forKey:@"vendorID"];
@@ -465,7 +461,7 @@
 						}
 					}
 				}
-				account.paymentsBadge = [NSNumber numberWithInteger:[account.paymentsBadge integerValue] + numberOfPaymentsLoaded];
+				account.paymentsBadge = @([account.paymentsBadge integerValue] + numberOfPaymentsLoaded);
 			}
 		}
 	}

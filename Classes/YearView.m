@@ -85,7 +85,7 @@
 		
 		[month drawInRect:monthRect withFont:monthFont lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
 		
-		NSString *label = [labelsByMonth objectForKey:[NSNumber numberWithInt:i+1]];
+		NSString *label = labelsByMonth[@(i+1)];
 		if (label) {
 			CGSize size = CGSizeMake(FLT_MAX, FLT_MAX);
 			float fontSize = maxPaymentFontSize;

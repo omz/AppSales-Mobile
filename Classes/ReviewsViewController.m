@@ -120,7 +120,7 @@
 
     NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@"];
     NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
-    [args insertObject:[NSNumber numberWithInt:rating] atIndex:0];
+    [args insertObject:@(rating) atIndex:0];
     
 	if (![self.selectedProducts count]) {
         [pred appendString:@" AND product.account = %@"];
@@ -147,7 +147,7 @@
     
     NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
     NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
-    [args insertObject:[NSNumber numberWithInt:rating] atIndex:0];
+    [args insertObject:@(rating) atIndex:0];
     
 	if (![self.selectedProducts count]) {
         [pred appendString:@" AND product.account = %@"];

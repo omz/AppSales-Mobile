@@ -31,7 +31,7 @@
 
 - (NSString *)nameForCountryCode:(NSString *)countryCode
 {
-	NSString *countryName = [countryNamesByISOCode objectForKey:[countryCode uppercaseString]];
+	NSString *countryName = countryNamesByISOCode[[countryCode uppercaseString]];
 	if (countryName) {
 		return countryName;
 	}

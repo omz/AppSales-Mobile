@@ -16,8 +16,8 @@
 {
 	@autoreleasepool {
 	
-		NSString *username = [loginInfo objectForKey:kAccountUsername];
-		NSString *password = [loginInfo objectForKey:kAccountPassword];
+		NSString *username = loginInfo[kAccountUsername];
+		NSString *password = loginInfo[kAccountPassword];
 		
 		NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 		NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
@@ -51,12 +51,10 @@
 			NSString *loginAction = nil;
 			[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
 			
-			NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  username, @"theAccountName",
-									  password, @"theAccountPW", 
-									  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
-									  @"7", @"1.Continue.y",
-									  nil];
+			NSDictionary *postDict = @{@"theAccountName": username,
+									  @"theAccountPW": password, 
+									  @"1.Continue.x": @"39", // coordinates of submit button on screen.  any values seem to work
+									  @"1.Continue.y": @"7"};
 			loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
 			
 			if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
@@ -85,12 +83,10 @@
 		[salesRedirectScanner scanUpToString:@"\"" intoString:&defaultVendorPage];
 		
 		// click though from the dashboard to the sales page
-    NSDictionary *reportPostData = [NSDictionary dictionaryWithObjectsAndKeys:
-										[defaultVendorPage stringByReplacingOccurrencesOfString:@"_2" withString:@"_0"], @"AJAXREQUEST",
-										viewState, @"javax.faces.ViewState",
-										defaultVendorPage, @"defaultVendorPage",
-										[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage],
-										nil];
+    NSDictionary *reportPostData = @{@"AJAXREQUEST": [defaultVendorPage stringByReplacingOccurrencesOfString:@"_2" withString:@"_0"],
+										@"javax.faces.ViewState": viewState,
+										@"defaultVendorPage": defaultVendorPage,
+										[@"defaultVendorPage:" stringByAppendingString:defaultVendorPage]: [@"defaultVendorPage:" stringByAppendingString:defaultVendorPage]};
 		
 		[self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/vendor_default.faces"] bodyDictionary:reportPostData response:NULL];
 		
@@ -109,13 +105,13 @@
 {
 	if (self.modalViewController) {
 		//Adding new account:
-		FieldEditorViewController *vc = [[(UINavigationController *)self.modalViewController viewControllers] objectAtIndex:0];
-		[vc.values setObject:vendorID forKey:kAccountVendorID];
+		FieldEditorViewController *vc = [(UINavigationController *)self.modalViewController viewControllers][0];
+		(vc.values)[kAccountVendorID] = vendorID;
 		[vc.tableView reloadData];
 	} else {
 		//Editing existing account:
 		FieldEditorViewController *vc = self.navigationController.viewControllers.lastObject;
-		[vc.values setObject:vendorID forKey:kAccountVendorID];
+		(vc.values)[kAccountVendorID] = vendorID;
 		[vc.tableView reloadData];
 	}
 }

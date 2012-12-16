@@ -64,12 +64,10 @@
 			NSString *loginAction = nil;
 			[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
 			
-			NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  username, @"theAccountName",
-									  password, @"theAccountPW", 
-									  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
-									  @"7", @"1.Continue.y",
-									  nil];
+			NSDictionary *postDict = @{@"theAccountName": username,
+									  @"theAccountPW": password, 
+									  @"1.Continue.x": @"39", // coordinates of submit button on screen.  any values seem to work
+									  @"1.Continue.y": @"7"};
 			operation.request = [PromoCodeOperation postRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] body:postDict];
 		} else {
 			[PromoCodeOperation errorNotification:@"could not log in"];
@@ -119,20 +117,16 @@
 				if (nameCompareFieldName && nameValueFieldName && appleIDFieldName && statusFieldName) {
 					NSDictionary *bodyDict;
 					if (appTypeFieldName) {
-						bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									@"0", nameCompareFieldName,
-									@"", nameValueFieldName,
-									productID, appleIDFieldName, 
-									@"WONoSelectionString", statusFieldName,
-									@"WONoSelectionString", appTypeFieldName,
-									nil];
+						bodyDict = @{nameCompareFieldName: @"0",
+									nameValueFieldName: @"",
+									appleIDFieldName: productID, 
+									statusFieldName: @"WONoSelectionString",
+									appTypeFieldName: @"WONoSelectionString"};
 					} else {
-						bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									@"0", nameCompareFieldName,
-									@"", nameValueFieldName,
-									productID, appleIDFieldName, 
-									@"WONoSelectionString", statusFieldName,
-									nil];
+						bodyDict = @{nameCompareFieldName: @"0",
+									nameValueFieldName: @"",
+									appleIDFieldName: productID, 
+									statusFieldName: @"WONoSelectionString"};
 					}
 					operation.request = [PromoCodeOperation postRequestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://itunesconnect.apple.com%@", searchFormAction]] body:bodyDict];
 				} else {
@@ -270,19 +264,15 @@
 		
 		if (numberOfCodes == 0) {
 			NSString *viewHistoryURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", viewHistoryFormAction];
-			NSDictionary *bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  @"58", [NSString stringWithFormat:@"%@.x", viewHistoryButtonName], 
-									  @"14", [NSString stringWithFormat:@"%@.y", viewHistoryButtonName], 
-									  @"", numberOfCodesFieldName,
-									  nil];
+			NSDictionary *bodyDict = @{[NSString stringWithFormat:@"%@.x", viewHistoryButtonName]: @"58", 
+									  [NSString stringWithFormat:@"%@.y", viewHistoryButtonName]: @"14", 
+									  numberOfCodesFieldName: @""};
 			operation.request = [PromoCodeOperation postRequestWithURL:[NSURL URLWithString:viewHistoryURLString] body:bodyDict];
 		} else {
 			NSString *requestCodesURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", viewHistoryFormAction];
-			NSDictionary *bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  [NSString stringWithFormat:@"%i", numberOfCodesToRequest], numberOfCodesFieldName,
-									  @"58", [NSString stringWithFormat:@"%@.x", continueButtonName],
-									  @"14", [NSString stringWithFormat:@"%@.y", continueButtonName],
-									  nil];
+			NSDictionary *bodyDict = @{numberOfCodesFieldName: [NSString stringWithFormat:@"%i", numberOfCodesToRequest],
+									  [NSString stringWithFormat:@"%@.x", continueButtonName]: @"58",
+									  [NSString stringWithFormat:@"%@.y", continueButtonName]: @"14"};
 			operation.request = [PromoCodeOperation postRequestWithURL:[NSURL URLWithString:requestCodesURLString] body:bodyDict];
 		}
 	};
@@ -304,7 +294,7 @@
 				int i = 0;
 				NSDate *date = nil;
 				for (NSString *downloadPath in downloadPaths) {
-					NSString *dateString = [dateStrings objectAtIndex:i];
+					NSString *dateString = dateStrings[i];
 					date = [dateFormatter dateFromString:dateString];
 					
 					NSString *downloadURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", downloadPath];
@@ -341,7 +331,7 @@
 				}
 			}
 		};
-		if (!(self = [super initWithOperations:[NSArray arrayWithObjects:step1, step2, step3, step4, step5, step6, step7, step8, step9, nil]])) return nil;
+		if (!(self = [super initWithOperations:@[step1, step2, step3, step4, step5, step6, step7, step8, step9]])) return nil;
 	} else {
 		DownloadStepOperation *step9 = [DownloadStepOperation operationWithInput:step8];
 		step9.startBlock = ^(DownloadStepOperation *operation) {
@@ -387,16 +377,14 @@
 					[licenseAgreementScanner scanString:@"name=\"" intoString:NULL];
 					[licenseAgreementScanner scanUpToString:@"\"" intoString:&licenseAgreementContinueButtonName];
 					
-					NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-											  licenseAgreementCheckboxName, licenseAgreementCheckboxName,
-											  @"58", [NSString stringWithFormat:@"%@.x", licenseAgreementContinueButtonName],
-											  @"14", [NSString stringWithFormat:@"%@.y", licenseAgreementContinueButtonName],
-											  nil];
+					NSDictionary *postDict = @{licenseAgreementCheckboxName: licenseAgreementCheckboxName,
+											  [NSString stringWithFormat:@"%@.x", licenseAgreementContinueButtonName]: @"58",
+											  [NSString stringWithFormat:@"%@.y", licenseAgreementContinueButtonName]: @"14"};
 					NSString *continueURLString = [@"https://itunesconnect.apple.com" stringByAppendingString:licenseAgreementFormAction];
 					operation.request = [PromoCodeOperation postRequestWithURL:[NSURL URLWithString:continueURLString] body:postDict];
 					
 					operation.paused = YES;
-					[[NSNotificationCenter defaultCenter] postNotificationName:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:operation userInfo:[NSDictionary dictionaryWithObject:licenseAgreementHTML forKey:@"licenseAgreement"]];
+					[[NSNotificationCenter defaultCenter] postNotificationName:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:operation userInfo:@{@"licenseAgreement": licenseAgreementHTML}];
 				} else {
 					[PromoCodeOperation errorNotification:@"could not parse license agreement page"];
 					[operation cancel];
@@ -437,7 +425,7 @@
 			}
 		};
 		
-		if (!(self = [super initWithOperations:[NSArray arrayWithObjects:step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, nil]])) return nil;
+		if (!(self = [super initWithOperations:@[step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11]])) return nil;
 	}
 	
     return self;
@@ -468,7 +456,7 @@
 + (void)errorNotification:(NSString *)errorDescription
 {
 	dispatch_async(dispatch_get_main_queue(), ^ {
-		[[NSNotificationCenter defaultCenter] postNotificationName:ASPromoCodeDownloadFailedNotification object:nil userInfo:[NSDictionary dictionaryWithObject:errorDescription forKey:kASPromoCodeDownloadFailedErrorDescription]];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ASPromoCodeDownloadFailedNotification object:nil userInfo:@{kASPromoCodeDownloadFailedErrorDescription: errorDescription}];
 	});
 }
 

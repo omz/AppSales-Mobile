@@ -65,11 +65,11 @@
 	NSDictionary *revenueByCountry = [self.report revenueInBaseCurrencyByCountryForProductWithID:self.selectedProduct.productID];
 	if (totalRevenue > 0) {
 		for (NSString *country in revenueByCountry) {
-			float revenueForCountry = [[revenueByCountry objectForKey:country] floatValue];
+			float revenueForCountry = [revenueByCountry[country] floatValue];
 			if (revenueForCountry <= 0.0) continue;
 			float percentage = revenueForCountry / totalRevenue;
 			[[UIColor colorWithRed:0.0 green:0.5 blue:0.0 alpha:MIN(percentage * 2.0 + 0.15, 1.0)] set];
-			NSArray *polygons = [[self polygonsByCountryCode] objectForKey:[country uppercaseString]];
+			NSArray *polygons = [self polygonsByCountryCode][[country uppercaseString]];
 			for (NSArray *polygon in polygons) {
 				CGContextBeginPath(c);
 				int i = 0;
@@ -135,7 +135,7 @@
 	CGFloat width = self.bounds.size.width;
 	CGFloat height = self.bounds.size.height;
 	NSMutableArray *paths = [NSMutableArray array];
-	NSArray *polygons = [[self polygonsByCountryCode] objectForKey:[country uppercaseString]];
+	NSArray *polygons = [self polygonsByCountryCode][[country uppercaseString]];
 	for (NSArray *polygon in polygons) {
 		int i = 0;
 		UIBezierPath *currentPath = [[UIBezierPath alloc] init];

@@ -78,7 +78,7 @@
 {
 	entry = newEntry;
 	
-	NSString *revenueString = [revenueFormatter stringFromNumber:[NSNumber numberWithFloat:entry.revenue]];
+	NSString *revenueString = [revenueFormatter stringFromNumber:@(entry.revenue)];
 	revenueLabel.text = [NSString stringWithFormat:@"%@%@", [[CurrencyManager sharedManager] baseCurrencyDescription], revenueString];
 	
 	float percentage = entry.percentage;
@@ -91,7 +91,7 @@
 	subtitleLabel.hidden = hideBar;
 	
 	if (!hideBar) {
-		percentageLabel.text = [percentageFormatter stringFromNumber:[NSNumber numberWithFloat:percentage]];
+		percentageLabel.text = [percentageFormatter stringFromNumber:@(percentage)];
 		barView.frame = CGRectMake(0, 0, barBackgroundView.bounds.size.width * MAX(percentage, 0.0), 17);
 	}
 	

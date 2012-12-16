@@ -21,7 +21,7 @@
 	
     for (id key in e)
 	{
-        id keyObject = [self objectForKey: key];
+        id keyObject = self[key];
 		// conform with rfc 1738 3.3, also escape URL-like characters that might be in the parameters
 		NSString *escapedKey
 		= (NSString *) CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(

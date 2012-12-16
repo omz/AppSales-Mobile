@@ -87,12 +87,12 @@
 {
 	if ([recognizer state] == UIGestureRecognizerStateBegan) {
 		for (NSNumber *index in visibleBarViews) {
-			StackedBarView *barView = [visibleBarViews objectForKey:index];
+			StackedBarView *barView = visibleBarViews[index];
 			if (CGRectContainsPoint(barView.bounds, [recognizer locationInView:barView])) {
 				if ([self.delegate respondsToSelector:@selector(graphView:canDeleteBarAtIndex:)] && [self.delegate graphView:self canDeleteBarAtIndex:[index unsignedIntegerValue]]) {
 					selectedBarIndexForMenu = [index unsignedIntegerValue];
 					[self becomeFirstResponder];
-					NSArray *menuItems = [NSArray arrayWithObject:[[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Delete", nil) action:@selector(deleteBar:)]];
+					NSArray *menuItems = @[[[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Delete", nil) action:@selector(deleteBar:)]];
 					[[UIMenuController sharedMenuController] setMenuItems:menuItems];
 				
 					CGRect targetRect = [barView convertRect:barView.bounds toView:self];
@@ -171,7 +171,7 @@
 {
 	if ([[UIMenuController sharedMenuController] isMenuVisible]) return;
 	for (NSNumber *barIndex in visibleBarViews) {
-		StackedBarView *view = [visibleBarViews objectForKey:barIndex];
+		StackedBarView *view = visibleBarViews[barIndex];
 		if (view == barView) {
 			CGFloat stackHeight = [view stackHeight];
 			CGRect stackRect = CGRectMake(barView.frame.origin.x, barView.frame.origin.y + (barView.frame.size.height - stackHeight), barView.frame.size.width, stackHeight);
@@ -235,7 +235,7 @@
 		[UIView setAnimationBeginsFromCurrentState:YES];
 	}
 	for (NSNumber *barIndex in visibleBarViews) {
-		StackedBarView *barView = [visibleBarViews objectForKey:barIndex];
+		StackedBarView *barView = visibleBarViews[barIndex];
 		NSArray *stackedValues = [self stackedValuesForBarAtIndex:[barIndex unsignedIntegerValue]];
 		[barView setSegmentValues:stackedValues label:[self labelTextForIndex:[barIndex unsignedIntegerValue]]];
 	}
@@ -326,7 +326,7 @@
 	//Remove views that are no longer visible:
 	for (NSNumber *visibleBarIndex in [visibleBarViews allKeys]) {
 		if (!NSLocationInRange([visibleBarIndex intValue], visibleRange)) {
-			UIView *barView = [visibleBarViews objectForKey:visibleBarIndex];
+			UIView *barView = visibleBarViews[visibleBarIndex];
 			[barView removeFromSuperview];
 			[visibleBarViews removeObjectForKey:visibleBarIndex];
 		}
@@ -334,7 +334,7 @@
 	
 	//Add views that are visible now:
 	for (int i=visibleRange.location; i<visibleRange.location+visibleRange.length; i++) {
-		StackedBarView *barView = [visibleBarViews objectForKey:[NSNumber numberWithInt:i]];
+		StackedBarView *barView = visibleBarViews[@(i)];
 		CGRect frameForBar = [self frameForBarAtIndex:i];
 		if (!barView) {
 			NSArray *colors = [self.dataSource colorsForGraphView:self];
@@ -371,17 +371,17 @@
 			[barView setSegmentValues:stackedValues label:[self labelTextForIndex:i]];
 			
 			[scrollView addSubview:barView];
-			[visibleBarViews setObject:barView forKey:[NSNumber numberWithInt:i]];
+			visibleBarViews[@(i)] = barView;
 		}
 	}
 }
 
 - (NSArray *)stackedValuesForBarAtIndex:(NSUInteger)index
 {
-	NSArray *stackedAbsoluteValues = [cachedValues objectForKey:[NSNumber numberWithUnsignedInteger:index]];
+	NSArray *stackedAbsoluteValues = cachedValues[@(index)];
 	if (!stackedAbsoluteValues) {
 		stackedAbsoluteValues = [self.dataSource graphView:self valuesForBarAtIndex:index];
-		[cachedValues setObject:stackedAbsoluteValues forKey:[NSNumber numberWithUnsignedInteger:index]];
+		cachedValues[@(index)] = stackedAbsoluteValues;
 	}
 	float totalValue = [[stackedAbsoluteValues valueForKeyPath:@"@sum.self"] floatValue];
 	float maxHeight = self.bounds.size.height - 60;
@@ -390,7 +390,7 @@
 	for (NSNumber *absoluteValue in stackedAbsoluteValues) {
 		float percentage = (totalValue > 0) ? [absoluteValue floatValue] / totalValue : 0.0;
 		float height = percentage * totalHeight;
-		[stackedValues addObject:[NSNumber numberWithFloat:height]];
+		[stackedValues addObject:@(height)];
 	}
 	return stackedValues;
 }
@@ -413,7 +413,7 @@
 			[UIView beginAnimations:nil context:nil];
 			[UIView setAnimationDuration:ANIMATION_DURATION];
 			for (NSNumber *barIndex in visibleBarViews) {
-				StackedBarView *barView = [visibleBarViews objectForKey:barIndex];
+				StackedBarView *barView = visibleBarViews[barIndex];
 				NSArray *stackedValues = [self stackedValuesForBarAtIndex:[barIndex unsignedIntegerValue]];
 				[barView setSegmentValues:stackedValues label:[self labelTextForIndex:[barIndex unsignedIntegerValue]]];
 			}
@@ -475,7 +475,7 @@
 		CGFloat segmentHeight = [value floatValue];
 		y -= segmentHeight;
 		CGRect segmentFrame = CGRectMake(x, y, width, segmentHeight);
-		UIView *segmentView = [segmentViews objectAtIndex:i];
+		UIView *segmentView = segmentViews[i];
 		segmentView.frame = segmentFrame;
 		i++;
 	}
@@ -539,24 +539,23 @@
 	self = [super initWithFrame:frame];
 	if (self) {
 		lineViews = [NSMutableDictionary new];
-		possibleUnits = [[NSArray alloc] initWithObjects:
-						 [NSNumber numberWithInt:1], 
-						 [NSNumber numberWithInt:5], 
-						 [NSNumber numberWithInt:10], 
-						 [NSNumber numberWithInt:25],
-						 [NSNumber numberWithInt:50],
-						 [NSNumber numberWithInt:100],
-						 [NSNumber numberWithInt:250],
-						 [NSNumber numberWithInt:500], 
-						 [NSNumber numberWithInt:1000],
-						 [NSNumber numberWithInt:2500],
-						 [NSNumber numberWithInt:5000], 
-						 [NSNumber numberWithInt:10000],
-						 [NSNumber numberWithInt:25000],
-						 [NSNumber numberWithInt:50000], 
-						 [NSNumber numberWithInt:100000], 
-						 [NSNumber numberWithInt:1000000], 
-						 [NSNumber numberWithInt:10000000], nil];
+		possibleUnits = @[@1, 
+						 @5, 
+						 @10, 
+						 @25,
+						 @50,
+						 @100,
+						 @250,
+						 @500, 
+						 @1000,
+						 @2500,
+						 @5000, 
+						 @10000,
+						 @25000,
+						 @50000, 
+						 @100000, 
+						 @1000000, 
+						 @10000000];
 		unit = @"";
 	}
 	return self;
@@ -567,7 +566,7 @@
 	if ([newUnit isEqualToString:unit]) return;
 	unit = newUnit;
 	for (NSNumber *step in lineViews) {
-		LineView *lineView = [lineViews objectForKey:step];
+		LineView *lineView = lineViews[step];
 		[lineView setLabelText:[NSString stringWithFormat:@"%@%@", unit, step]];
 	}
 	
@@ -595,13 +594,13 @@
 		NSMutableArray *steps = [NSMutableSet set];
 		int step = pickedUnit;
 		while (step <= newMax && pickedUnit != 0) {
-			[steps addObject:[NSNumber numberWithInt:step]];
+			[steps addObject:@(step)];
 			step += pickedUnit;
 		}
 		
 		//Remove lines that should not be visible anymore and animate the others to their new position:
 		for (NSNumber *existingStep in [lineViews allKeys]) {
-			LineView *lineView = [lineViews objectForKey:existingStep];
+			LineView *lineView = lineViews[existingStep];
 			if (![steps containsObject:existingStep]) {
 				float y = totalHeight - (totalHeight * ([existingStep floatValue] / newMax));
 				CGRect lineFrame = CGRectMake(40, (int)y, self.superview.bounds.size.width, 1);
@@ -619,7 +618,7 @@
 		
 		//Add new lines, animating them from their hypothetical previous position (relative to the previous max value):
 		for (NSNumber *step in steps) {
-			LineView *lineView = [lineViews objectForKey:step];
+			LineView *lineView = lineViews[step];
 			if (!lineView) {
 				float oldY = totalHeight - (totalHeight * ([step floatValue] / max));
 				float newY = totalHeight - (totalHeight * ([step floatValue] / newMax));
@@ -631,7 +630,7 @@
 				[self addSubview:lineView];
 				lineView.frame = toLineFrame;
 				lineView.alpha = 1.0;
-				[lineViews setObject:lineView forKey:step];
+				lineViews[step] = lineView;
 			}
 		}
 	

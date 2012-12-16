@@ -59,7 +59,7 @@
 		NSFetchRequest *existingDailyReportsRequest = [[NSFetchRequest alloc] init];
 		[existingDailyReportsRequest setEntity:[NSEntityDescription entityForName:@"DailyReport" inManagedObjectContext:moc]];
 		[existingDailyReportsRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@", account]];
-		[existingDailyReportsRequest setPropertiesToFetch:[NSArray arrayWithObject:@"startDate"]];
+		[existingDailyReportsRequest setPropertiesToFetch:@[@"startDate"]];
 		[existingDailyReportsRequest setResultType:NSDictionaryResultType];
 		NSArray *existingDailyReportDates = [[moc executeFetchRequest:existingDailyReportsRequest error:NULL] valueForKey:@"startDate"];
 		NSMutableSet *existingDailyReportDatesSet = [NSMutableSet setWithArray:existingDailyReportDates];
@@ -67,7 +67,7 @@
 		NSFetchRequest *existingWeeklyReportsRequest = [[NSFetchRequest alloc] init];
 		[existingWeeklyReportsRequest setEntity:[NSEntityDescription entityForName:@"WeeklyReport" inManagedObjectContext:moc]];
 		[existingWeeklyReportsRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@", account]];
-		[existingWeeklyReportsRequest setPropertiesToFetch:[NSArray arrayWithObject:@"startDate"]];
+		[existingWeeklyReportsRequest setPropertiesToFetch:@[@"startDate"]];
 		[existingWeeklyReportsRequest setResultType:NSDictionaryResultType];
 		NSArray *existingWeeklyReportDates = [[moc executeFetchRequest:existingWeeklyReportsRequest error:NULL] valueForKey:@"startDate"];
 		NSMutableSet *existingWeeklyReportDatesSet = [NSMutableSet setWithArray:existingWeeklyReportDates];
@@ -105,11 +105,11 @@
 				
 				NSDictionary *reportInfo = [Report infoForReportCSV:reportCSV];
 				if (reportInfo) {
-					NSDate *reportDate = [reportInfo objectForKey:kReportInfoDate];
+					NSDate *reportDate = reportInfo[kReportInfoDate];
 					NSMutableSet *existingDates = nil;
-					if ([[reportInfo objectForKey:kReportInfoClass] isEqualToString:kReportInfoClassDaily]) {
+					if ([reportInfo[kReportInfoClass] isEqualToString:kReportInfoClassDaily]) {
 						existingDates = existingDailyReportDatesSet;
-					} else if ([[reportInfo objectForKey:kReportInfoClass] isEqualToString:kReportInfoClassWeekly]) {
+					} else if ([reportInfo[kReportInfoClass] isEqualToString:kReportInfoClassWeekly]) {
 						existingDates = existingWeeklyReportDatesSet;
 					}
 					if (![existingDates containsObject:reportDate]) {
