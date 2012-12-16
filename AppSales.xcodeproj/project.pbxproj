@@ -67,7 +67,6 @@
 		7F709D4113BC98860008DBAD /* AppSales.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */; };
 		7F709D4713BC98860008DBAD /* AccountsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F709D4613BC98860008DBAD /* AccountsViewController.m */; };
 		7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F709D6213BCB64F0008DBAD /* FieldEditorViewController.m */; };
-		7F709D6C13BCC3C80008DBAD /* SSKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F709D6B13BCC3C80008DBAD /* SSKeychain.m */; };
 		7F709D6E13BCC4270008DBAD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F709D6D13BCC4270008DBAD /* Security.framework */; };
 		7F709D8C13BD03D40008DBAD /* SalesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F709D8B13BD03D30008DBAD /* SalesViewController.m */; };
 		7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F709D8E13BD064D0008DBAD /* ASAccount.m */; };
@@ -757,8 +756,6 @@
 		7F709D4613BC98860008DBAD /* AccountsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AccountsViewController.m; sourceTree = "<group>"; };
 		7F709D6113BCB64E0008DBAD /* FieldEditorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FieldEditorViewController.h; sourceTree = "<group>"; };
 		7F709D6213BCB64F0008DBAD /* FieldEditorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FieldEditorViewController.m; sourceTree = "<group>"; };
-		7F709D6A13BCC3C80008DBAD /* SSKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSKeychain.h; sourceTree = "<group>"; };
-		7F709D6B13BCC3C80008DBAD /* SSKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychain.m; sourceTree = "<group>"; };
 		7F709D6D13BCC4270008DBAD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		7F709D8A13BD03D30008DBAD /* SalesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SalesViewController.h; sourceTree = "<group>"; };
 		7F709D8B13BD03D30008DBAD /* SalesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SalesViewController.m; sourceTree = "<group>"; };
@@ -1430,15 +1427,6 @@
 			name = "Report Download";
 			sourceTree = "<group>";
 		};
-		7F1499E313BE55C400D89064 /* Keychain */ = {
-			isa = PBXGroup;
-			children = (
-				7F709D6A13BCC3C80008DBAD /* SSKeychain.h */,
-				7F709D6B13BCC3C80008DBAD /* SSKeychain.m */,
-			);
-			name = Keychain;
-			sourceTree = "<group>";
-		};
 		7F1B159E13C9D1CA00243AA3 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -1629,7 +1617,6 @@
 		7F709D9013BD06570008DBAD /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				7F1499E313BE55C400D89064 /* Keychain */,
 				7F709D8D13BD064D0008DBAD /* ASAccount.h */,
 				7F709D8E13BD064D0008DBAD /* ASAccount.m */,
 				7FDF727A13DAAEB300B8CC4E /* ReportSummary.h */,
@@ -2996,7 +2983,6 @@
 				7F709D4113BC98860008DBAD /* AppSales.xcdatamodeld in Sources */,
 				7F709D4713BC98860008DBAD /* AccountsViewController.m in Sources */,
 				7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */,
-				7F709D6C13BCC3C80008DBAD /* SSKeychain.m in Sources */,
 				7F709D8C13BD03D40008DBAD /* SalesViewController.m in Sources */,
 				7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */,
 				7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */,
