@@ -662,6 +662,7 @@
 /* Begin PBXFileReference section */
 		4EA9F333193B44BE84D554BB /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 		53DB038F167E5BF600B2C013 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		53DB03C5167E627200B2C013 /* AppSales 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AppSales 4.xcdatamodel"; sourceTree = "<group>"; };
 		57DFEE5882DB4FFFB8596BD2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D81576114CB44BE005E8F3F /* passcode_square_empty.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = passcode_square_empty.png; sourceTree = "<group>"; };
 		6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_empty@2x.png"; sourceTree = "<group>"; };
@@ -3166,11 +3167,12 @@
 		7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				53DB03C5167E627200B2C013 /* AppSales 4.xcdatamodel */,
 				7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */,
 				7F0B8A6B13F7B776006E9151 /* AppSales 2.xcdatamodel */,
 				7F709D4013BC98860008DBAD /* AppSales.xcdatamodel */,
 			);
-			currentVersion = 7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */;
+			currentVersion = 53DB03C5167E627200B2C013 /* AppSales 4.xcdatamodel */;
 			path = AppSales.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

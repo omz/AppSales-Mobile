@@ -26,6 +26,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+    NSURL *storeURL = [[self applicationSupportDirectory] URLByAppendingPathComponent:@"AppSales.sqlite"];
+    [MagicalRecord setupCoreDataStackWithStoreNamed:storeURL];
+    
 	[[KKPasscodeLock sharedLock] setDefaultSettings];
 	[[KKPasscodeLock sharedLock] setEraseOption:NO];
 	
@@ -46,7 +50,7 @@
 	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	if (!iPad) {
 		AccountsViewController *rootViewController = [[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-		rootViewController.managedObjectContext = self.managedObjectContext;
+		rootViewController.managedObjectContext = [NSManagedObjectContext defaultContext];
 		UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:rootViewController];
 		navigationController.toolbarHidden = NO;
 		self.accountsViewController = rootViewController;
@@ -55,7 +59,7 @@
 		[self.window makeKeyAndVisible];
 	} else {
 		self.accountsViewController = [[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-		self.accountsViewController.managedObjectContext = self.managedObjectContext;
+		self.accountsViewController.managedObjectContext = [NSManagedObjectContext defaultContext];
 		self.accountsViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
 		self.accountsViewController.delegate = self;
 		UINavigationController *accountsNavController = [[UINavigationController alloc] initWithRootViewController:self.accountsViewController];
@@ -84,8 +88,8 @@
 		//Restore previously-selected account:
 		NSString *accountIDURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kSettingSelectedAccountID];
 		if (accountIDURIString) {
-			NSManagedObjectID *accountID = [self.managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:accountIDURIString]];
-			ASAccount *account = (ASAccount *)[self.managedObjectContext objectWithID:accountID];
+			NSManagedObjectID *accountID = [[NSManagedObjectContext defaultContext].persistentStoreCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:accountIDURIString]];
+			ASAccount *account = (ASAccount *)[[NSManagedObjectContext defaultContext] objectWithID:accountID];
 			if (account) {
 				[self accountsViewController:nil didSelectAccount:account];
 			}
@@ -117,9 +121,9 @@
 {
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		NSFetchRequest *accountsFetchRequest = [[NSFetchRequest alloc] init];
-		[accountsFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:self.managedObjectContext]];
+		[accountsFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:[NSManagedObjectContext defaultContext]]];
 		[accountsFetchRequest setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES], [[NSSortDescriptor alloc] initWithKey:@"username" ascending:YES]]];
-		NSArray *accounts = [self.managedObjectContext executeFetchRequest:accountsFetchRequest error:NULL];
+		NSArray *accounts = [[NSManagedObjectContext defaultContext] executeFetchRequest:accountsFetchRequest error:NULL];
 		ASAccount *account = accounts[buttonIndex];
 		[self loadAccount:account];
 	}
@@ -238,73 +242,9 @@
 
 - (void)saveContext
 {
-	[self.persistentStoreCoordinator lock];
-	NSError *error = nil;
-	NSManagedObjectContext *moc = self.managedObjectContext;
-	if ([moc hasChanges] && ![moc save:&error]) {
-		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		abort();
-	}
-	[self.persistentStoreCoordinator unlock];
+    [[NSManagedObjectContext defaultContext] save];
+    [[NSManagedObjectContext defaultContext] saveNestedContexts];
 }
-
-#pragma mark - Core Data stack
-
-- (NSManagedObjectContext *)managedObjectContext
-{
-	if (managedObjectContext != nil) {
-		return managedObjectContext;
-	}
-	NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-	if (coordinator != nil) {
-		managedObjectContext = [[NSManagedObjectContext alloc] init];
-		[managedObjectContext setPersistentStoreCoordinator:coordinator];
-		[managedObjectContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChanges:) name:NSManagedObjectContextDidSaveNotification object:nil];
-	}
-	return managedObjectContext;
-}
-
-- (void)mergeChanges:(NSNotification *)notification
-{
-	NSManagedObjectContext *moc = [notification object];
-	dispatch_async(dispatch_get_main_queue(), ^ {
-		if (moc != self.managedObjectContext && moc.persistentStoreCoordinator == self.persistentStoreCoordinator) {
-			[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-		};
-	});
-}
-
-- (NSManagedObjectModel *)managedObjectModel
-{
-    if (managedObjectModel != nil)
-    {
-		return managedObjectModel;
-    }
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AppSales" withExtension:@"momd"];
-	managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-	return managedObjectModel;
-}
-
-
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
-{
-    if (persistentStoreCoordinator != nil) {
-        return persistentStoreCoordinator;
-    }	
-	NSURL *storeURL = [[self applicationSupportDirectory] URLByAppendingPathComponent:@"AppSales.sqlite"];
-    
-	NSError *error = nil;
-	persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-	NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, 
-							 NSInferMappingModelAutomaticallyOption: @YES};
-	if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
-		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		abort();
-	}
-	return persistentStoreCoordinator;
-}
-
 
 - (NSString *)applicationDocumentsDirectory
 {
