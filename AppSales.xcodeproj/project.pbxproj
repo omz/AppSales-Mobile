@@ -7,10 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574914CB3C2B005E8F3F /* KKKeychain.m */; };
-		6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */; };
-		6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */; };
-		6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */; };
+		53DB0390167E5BF600B2C013 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 53DB038F167E5BF600B2C013 /* libicucore.dylib */; };
 		6D81576514CB44BE005E8F3F /* passcode_square_empty.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D81576114CB44BE005E8F3F /* passcode_square_empty.png */; };
 		6D81576614CB44BE005E8F3F /* passcode_square_empty@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */; };
 		6D81576714CB44BE005E8F3F /* passcode_square_filled.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D81576314CB44BE005E8F3F /* passcode_square_filled.png */; };
@@ -42,7 +39,6 @@
 		7F2E75D214237F2500793375 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F2E75D114237F2500793375 /* Default-Landscape~ipad.png */; };
 		7F3796CC13F8245800FA6E49 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F3796C913F8244000FA6E49 /* MessageUI.framework */; };
 		7F3796CD13F8246200FA6E49 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F1499CC13BE172300D89064 /* libz.dylib */; };
-		7F398EBD13DE1F2D004BEC44 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */; };
 		7F398EC313DE75B2004BEC44 /* Lock.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F398EC213DE75B2004BEC44 /* Lock.png */; };
 		7F398EC913DE7E3A004BEC44 /* Unlock.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F398EC813DE7E3A004BEC44 /* Unlock.png */; };
 		7F398ECB13DE7F14004BEC44 /* LockIndicator.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F398ECA13DE7F14004BEC44 /* LockIndicator.png */; };
@@ -657,22 +653,17 @@
 		7FF88AD513E428720016AA17 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD113E428720016AA17 /* Star@2x.png */; };
 		7FF88AD613E428720016AA17 /* Star_Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD213E428720016AA17 /* Star_Highlighted.png */; };
 		7FF88AD713E428720016AA17 /* Star_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD313E428720016AA17 /* Star_Highlighted@2x.png */; };
-		7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */; };
 		7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */; };
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
+		EB1C6C62523E499887066BE3 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 57DFEE5882DB4FFFB8596BD2 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6D81574814CB3C2B005E8F3F /* KKKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKKeychain.h; sourceTree = "<group>"; };
-		6D81574914CB3C2B005E8F3F /* KKKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKKeychain.m; sourceTree = "<group>"; };
-		6D81574A14CB3C2B005E8F3F /* KKPasscodeLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKPasscodeLock.h; sourceTree = "<group>"; };
-		6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKPasscodeLock.m; sourceTree = "<group>"; };
-		6D81574C14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKPasscodeSettingsViewController.h; sourceTree = "<group>"; };
-		6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKPasscodeSettingsViewController.m; sourceTree = "<group>"; };
-		6D81574E14CB3C2B005E8F3F /* KKPasscodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKPasscodeViewController.h; sourceTree = "<group>"; };
-		6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKPasscodeViewController.m; sourceTree = "<group>"; };
+		4EA9F333193B44BE84D554BB /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
+		53DB038F167E5BF600B2C013 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		57DFEE5882DB4FFFB8596BD2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D81576114CB44BE005E8F3F /* passcode_square_empty.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = passcode_square_empty.png; sourceTree = "<group>"; };
 		6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_empty@2x.png"; sourceTree = "<group>"; };
 		6D81576314CB44BE005E8F3F /* passcode_square_filled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = passcode_square_filled.png; sourceTree = "<group>"; };
@@ -722,8 +713,6 @@
 		7F2946F013D8806E0023F530 /* MapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapView.m; sourceTree = "<group>"; };
 		7F2E75D114237F2500793375 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		7F3796C913F8244000FA6E49 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
-		7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
-		7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		7F398EC213DE75B2004BEC44 /* Lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Lock.png; sourceTree = "<group>"; };
 		7F398EC813DE7E3A004BEC44 /* Unlock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Unlock.png; sourceTree = "<group>"; };
 		7F398ECA13DE7F14004BEC44 /* LockIndicator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LockIndicator.png; sourceTree = "<group>"; };
@@ -1398,8 +1387,6 @@
 		7FF88AD113E428720016AA17 /* Star@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Star@2x.png"; sourceTree = "<group>"; };
 		7FF88AD213E428720016AA17 /* Star_Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Star_Highlighted.png; sourceTree = "<group>"; };
 		7FF88AD313E428720016AA17 /* Star_Highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Star_Highlighted@2x.png"; sourceTree = "<group>"; };
-		7FFE4BAF13BD497A00D9D078 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
-		7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
 		7FFE4BB313BD4B9700D9D078 /* NSDictionary+HTTP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+HTTP.h"; sourceTree = "<group>"; };
 		7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+HTTP.m"; sourceTree = "<group>"; };
 		7FFFB39513D4573700AD18E3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
@@ -1412,6 +1399,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53DB0390167E5BF600B2C013 /* libicucore.dylib in Frameworks */,
 				7F709D2C13BC98860008DBAD /* UIKit.framework in Frameworks */,
 				7FD2C1EB13CE486A002868C7 /* QuartzCore.framework in Frameworks */,
 				7F709D6E13BCC4270008DBAD /* Security.framework in Frameworks */,
@@ -1420,6 +1408,7 @@
 				7F709D3213BC98860008DBAD /* CoreData.framework in Frameworks */,
 				7F3796CC13F8245800FA6E49 /* MessageUI.framework in Frameworks */,
 				7F3796CD13F8246200FA6E49 /* libz.dylib in Frameworks */,
+				EB1C6C62523E499887066BE3 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1461,7 +1450,6 @@
 				7FDF601D13DD2125005F1E2D /* Dashboard */,
 				7FDF602013DD21D5005F1E2D /* Common UI */,
 				7F7F1D0413F63F7F00F18143 /* Promo Code Download */,
-				7F88897A14CD4C9A007604D7 /* Passcode Lock */,
 				7F1499D113BE312100D89064 /* Report Download */,
 				7F89BCDA13DFA43E001C607F /* Review Download */,
 				7F709D9013BD06570008DBAD /* Model */,
@@ -1518,6 +1506,7 @@
 				7F709D3413BC98860008DBAD /* Supporting Files */,
 				7F709D2A13BC98860008DBAD /* Frameworks */,
 				7F709D2813BC98860008DBAD /* Products */,
+				4EA9F333193B44BE84D554BB /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1532,6 +1521,7 @@
 		7F709D2A13BC98860008DBAD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				53DB038F167E5BF600B2C013 /* libicucore.dylib */,
 				7F1499CC13BE172300D89064 /* libz.dylib */,
 				7F3796C913F8244000FA6E49 /* MessageUI.framework */,
 				7FD2C1EA13CE486A002868C7 /* QuartzCore.framework */,
@@ -1540,6 +1530,7 @@
 				7F709D2D13BC98860008DBAD /* Foundation.framework */,
 				7F709D2F13BC98860008DBAD /* CoreGraphics.framework */,
 				7F709D3113BC98860008DBAD /* CoreData.framework */,
+				57DFEE5882DB4FFFB8596BD2 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1703,21 +1694,6 @@
 			name = Payments;
 			sourceTree = "<group>";
 		};
-		7F88897A14CD4C9A007604D7 /* Passcode Lock */ = {
-			isa = PBXGroup;
-			children = (
-				6D81574814CB3C2B005E8F3F /* KKKeychain.h */,
-				6D81574914CB3C2B005E8F3F /* KKKeychain.m */,
-				6D81574A14CB3C2B005E8F3F /* KKPasscodeLock.h */,
-				6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */,
-				6D81574C14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.h */,
-				6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */,
-				6D81574E14CB3C2B005E8F3F /* KKPasscodeViewController.h */,
-				6D81574F14CB3C2B005E8F3F /* KKPasscodeViewController.m */,
-			);
-			name = "Passcode Lock";
-			sourceTree = "<group>";
-		};
 		7F89BCDA13DFA43E001C607F /* Review Download */ = {
 			isa = PBXGroup;
 			children = (
@@ -1805,10 +1781,6 @@
 				7F1499C913BE15F500D89064 /* NSData+Compression.m */,
 				7FFE4BB313BD4B9700D9D078 /* NSDictionary+HTTP.h */,
 				7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */,
-				7FFE4BAF13BD497A00D9D078 /* RegexKitLite.h */,
-				7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */,
-				7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */,
-				7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -2385,6 +2357,7 @@
 				7F709D2313BC98860008DBAD /* Sources */,
 				7F709D2413BC98860008DBAD /* Frameworks */,
 				7F709D2513BC98860008DBAD /* Resources */,
+				CCAB9AB521044006B30CD11F /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -2996,6 +2969,23 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		CCAB9AB521044006B30CD11F /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		7F709D2313BC98860008DBAD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -3009,7 +2999,6 @@
 				7F709D6C13BCC3C80008DBAD /* SSKeychain.m in Sources */,
 				7F709D8C13BD03D40008DBAD /* SalesViewController.m in Sources */,
 				7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */,
-				7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */,
 				7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */,
 				7F1499CA13BE15F500D89064 /* NSData+Compression.m in Sources */,
 				7F1499D013BE311600D89064 /* ReportDownloadOperation.m in Sources */,
@@ -3034,7 +3023,6 @@
 				7FAB532C13DCFA7E0027274F /* AppIconView.m in Sources */,
 				7F4065CA13DD379B006148AA /* ReportDetailEntryCell.m in Sources */,
 				7F137EB313DDDABF004655D8 /* CountryDictionary.m in Sources */,
-				7F398EBD13DE1F2D004BEC44 /* MBProgressHUD.m in Sources */,
 				7F398ED213DF21F2004BEC44 /* Transaction.m in Sources */,
 				7F398ED513DF570E004BEC44 /* ReportDetailEntry.m in Sources */,
 				7F89BCDE13DFA45F001C607F /* ReviewDownloadManager.m in Sources */,
@@ -3058,10 +3046,6 @@
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
 				7F0B8A7313F7E647006E9151 /* PromoCodesLicenseViewController.m in Sources */,
 				7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */,
-				6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */,
-				6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */,
-				6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */,
-				6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */,
 				7FDCCE7D1594316600124140 /* ioapi.c in Sources */,
 				7FDCCE7F1594316600124140 /* unzip.c in Sources */,
 				7FDCCE801594316600124140 /* zip.c in Sources */,
@@ -3137,10 +3121,11 @@
 		};
 		7F709D4E13BC98860008DBAD /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4EA9F333193B44BE84D554BB /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = AppSalesMobile;
@@ -3152,10 +3137,11 @@
 		};
 		7F709D4F13BC98860008DBAD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4EA9F333193B44BE84D554BB /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
-				HEADER_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = AppSalesMobile;

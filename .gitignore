@@ -12,3 +12,6 @@ build
 *.xcworkspacedata
 *.xcuserstate
 *xcuserdata*
+
+/Pods/
+/Podfile.lock
