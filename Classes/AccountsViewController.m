@@ -8,6 +8,7 @@
 
 #import "AccountsViewController.h"
 #import "SalesViewController.h"
+#import "ReviewsViewController.h"
 #import "SSKeychain.h"
 #import "ASAccount.h"
 #import "Report.h"
@@ -173,7 +174,7 @@
 	if ([self.accounts count] == 0) {
 		return 0;
 	}
-	return 2;
+	return 3;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -196,6 +197,16 @@
 		cell.imageView.image = [UIImage imageNamed:@"Sales.png"];
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Sales.png" color:[UIColor whiteColor]];
 	} else if (indexPath.row == 1) {
+		cell.textLabel.text = NSLocalizedString(@"Customer Reviews", nil);
+		cell.imageView.image = [UIImage imageNamed:@"Reviews.png"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Reviews.png" color:[UIColor whiteColor]];
+		
+		ASAccount *account = [self.accounts objectAtIndex:indexPath.section];
+		NSFetchRequest *unreadReviewsRequest = [[[NSFetchRequest alloc] init] autorelease];
+		[unreadReviewsRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:[self managedObjectContext]]];
+		[unreadReviewsRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND unread == TRUE", account]];
+		cell.badgeCount = [[self managedObjectContext] countForFetchRequest:unreadReviewsRequest error:NULL];
+	} else if (indexPath.row == 2) {
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
 		cell.imageView.image = [UIImage imageNamed:@"Account.png"];
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Account.png" color:[UIColor whiteColor]];
@@ -247,6 +258,9 @@
 		SalesViewController *salesViewController = [[[SalesViewController alloc] initWithAccount:account] autorelease];
 		[self.navigationController pushViewController:salesViewController animated:YES];
 	} else if (indexPath.row == 1) {
+		ReviewsViewController *reviewsViewController = [[[ReviewsViewController alloc] initWithAccount:account] autorelease];
+		[self.navigationController pushViewController:reviewsViewController animated:YES];
+	} else if (indexPath.row == 2) {
 		[self editAccount:account];
 	}
 }

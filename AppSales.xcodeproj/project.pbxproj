@@ -630,6 +630,23 @@
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
 		A7073A811681A40200F72FC0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7073A831681A40200F72FC0 /* Localizable.strings */; };
+		A7073A911681B0D100F72FC0 /* ReviewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7073A8A1681B0D100F72FC0 /* ReviewsViewController.m */; };
+		A7073A921681B0D100F72FC0 /* ReviewSummaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7073A8C1681B0D100F72FC0 /* ReviewSummaryView.m */; };
+		A7073A931681B0D100F72FC0 /* ReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7073A8E1681B0D100F72FC0 /* ReviewListViewController.m */; };
+		A7073A941681B0D100F72FC0 /* ReviewDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7073A901681B0D100F72FC0 /* ReviewDetailViewController.m */; };
+		A7073A981681B10E00F72FC0 /* ReviewDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7073A971681B10E00F72FC0 /* ReviewDownloadManager.m */; };
+		A7073A9C1681B17B00F72FC0 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = A7073A9B1681B17B00F72FC0 /* Review.m */; };
+		A7073A9F1681B3EF00F72FC0 /* XMLReader.m in Sources */ = {isa = PBXBuildFile; fileRef = A7073A9E1681B3EF00F72FC0 /* XMLReader.m */; };
+		A7073AA8168200C300F72FC0 /* ReviewBarButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA0168200C300F72FC0 /* ReviewBarButton.png */; };
+		A7073AA9168200C300F72FC0 /* ReviewBarButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA1168200C300F72FC0 /* ReviewBarButton@2x.png */; };
+		A7073AAA168200C300F72FC0 /* AllReviewsButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA2168200C300F72FC0 /* AllReviewsButton.png */; };
+		A7073AAB168200C300F72FC0 /* AllReviewsButtonHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA3168200C300F72FC0 /* AllReviewsButtonHighlighted.png */; };
+		A7073AAC168200C300F72FC0 /* AllReviewsButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA4168200C300F72FC0 /* AllReviewsButton@2x.png */; };
+		A7073AAD168200C300F72FC0 /* AllReviewsButtonHighlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA5168200C300F72FC0 /* AllReviewsButtonHighlighted@2x.png */; };
+		A7073AAE168200C300F72FC0 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA6168200C300F72FC0 /* Reviews.png */; };
+		A7073AAF168200C300F72FC0 /* Reviews@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A7073AA7168200C300F72FC0 /* Reviews@2x.png */; };
+		A7073AB116820F3600F72FC0 /* stores.plist in Resources */ = {isa = PBXBuildFile; fileRef = A7073AB016820F3600F72FC0 /* stores.plist */; };
+		A7073AB316820FCB00F72FC0 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = A7073AB216820FCB00F72FC0 /* ReviewTemplate.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1327,6 +1344,30 @@
 		7FFFB39C13D4599300AD18E3 /* DateButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButton.png; sourceTree = "<group>"; };
 		A7073A821681A40200F72FC0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A7073A841681A40A00F72FC0 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A7073A891681B0D100F72FC0 /* ReviewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsViewController.h; sourceTree = "<group>"; };
+		A7073A8A1681B0D100F72FC0 /* ReviewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsViewController.m; sourceTree = "<group>"; };
+		A7073A8B1681B0D100F72FC0 /* ReviewSummaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewSummaryView.h; sourceTree = "<group>"; };
+		A7073A8C1681B0D100F72FC0 /* ReviewSummaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewSummaryView.m; sourceTree = "<group>"; };
+		A7073A8D1681B0D100F72FC0 /* ReviewListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewListViewController.h; sourceTree = "<group>"; };
+		A7073A8E1681B0D100F72FC0 /* ReviewListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewListViewController.m; sourceTree = "<group>"; };
+		A7073A8F1681B0D100F72FC0 /* ReviewDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewDetailViewController.h; sourceTree = "<group>"; };
+		A7073A901681B0D100F72FC0 /* ReviewDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewDetailViewController.m; sourceTree = "<group>"; };
+		A7073A961681B10E00F72FC0 /* ReviewDownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewDownloadManager.h; sourceTree = "<group>"; };
+		A7073A971681B10E00F72FC0 /* ReviewDownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewDownloadManager.m; sourceTree = "<group>"; };
+		A7073A9A1681B17B00F72FC0 /* Review.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Review.h; sourceTree = "<group>"; };
+		A7073A9B1681B17B00F72FC0 /* Review.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Review.m; sourceTree = "<group>"; };
+		A7073A9D1681B3EF00F72FC0 /* XMLReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLReader.h; sourceTree = "<group>"; };
+		A7073A9E1681B3EF00F72FC0 /* XMLReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLReader.m; sourceTree = "<group>"; };
+		A7073AA0168200C300F72FC0 /* ReviewBarButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ReviewBarButton.png; sourceTree = "<group>"; };
+		A7073AA1168200C300F72FC0 /* ReviewBarButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ReviewBarButton@2x.png"; sourceTree = "<group>"; };
+		A7073AA2168200C300F72FC0 /* AllReviewsButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AllReviewsButton.png; sourceTree = "<group>"; };
+		A7073AA3168200C300F72FC0 /* AllReviewsButtonHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AllReviewsButtonHighlighted.png; sourceTree = "<group>"; };
+		A7073AA4168200C300F72FC0 /* AllReviewsButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AllReviewsButton@2x.png"; sourceTree = "<group>"; };
+		A7073AA5168200C300F72FC0 /* AllReviewsButtonHighlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AllReviewsButtonHighlighted@2x.png"; sourceTree = "<group>"; };
+		A7073AA6168200C300F72FC0 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
+		A7073AA7168200C300F72FC0 /* Reviews@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Reviews@2x.png"; sourceTree = "<group>"; };
+		A7073AB016820F3600F72FC0 /* stores.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = stores.plist; sourceTree = "<group>"; };
+		A7073AB216820FCB00F72FC0 /* ReviewTemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ReviewTemplate.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1383,6 +1424,7 @@
 				7FDF602013DD21D5005F1E2D /* Common UI */,
 				7F88897A14CD4C9A007604D7 /* Passcode Lock */,
 				7F1499D113BE312100D89064 /* Report Download */,
+				A7073A991681B11700F72FC0 /* Review Download */,
 				7F709D9013BD06570008DBAD /* Model */,
 			);
 			path = Classes;
@@ -1456,9 +1498,11 @@
 				7F709D6F13BCCB8B0008DBAD /* Images */,
 				7F709D3513BC98860008DBAD /* AppSales-Info.plist */,
 				7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */,
+				A7073AB016820F3600F72FC0 /* stores.plist */,
 				7FAB533313DD0F9A0027274F /* country_names.plist */,
 				7FDF6E8013D8962500B8CC4E /* countries.plist */,
 				7FDF6E8213D89B1000B8CC4E /* countries_simple.plist */,
+				A7073AB216820FCB00F72FC0 /* ReviewTemplate.html */,
 				7FAEB68E13E75AFF00750788 /* About.html */,
 				A7073A831681A40200F72FC0 /* Localizable.strings */,
 			);
@@ -1517,6 +1561,14 @@
 				7FAEB67713E6DD4C00750788 /* Account@2x.png */,
 				7FFFB39713D4573700AD18E3 /* Sales.png */,
 				7F454F8713D4B4CF00AE47D1 /* Sales@2x.png */,
+				A7073AA0168200C300F72FC0 /* ReviewBarButton.png */,
+				A7073AA1168200C300F72FC0 /* ReviewBarButton@2x.png */,
+				A7073AA2168200C300F72FC0 /* AllReviewsButton.png */,
+				A7073AA3168200C300F72FC0 /* AllReviewsButtonHighlighted.png */,
+				A7073AA4168200C300F72FC0 /* AllReviewsButton@2x.png */,
+				A7073AA5168200C300F72FC0 /* AllReviewsButtonHighlighted@2x.png */,
+				A7073AA6168200C300F72FC0 /* Reviews.png */,
+				A7073AA7168200C300F72FC0 /* Reviews@2x.png */,
 			);
 			name = Images;
 			path = ../Images;
@@ -1545,6 +1597,8 @@
 				7F1B14F213C51AC900243AA3 /* CurrencyManager.m */,
 				7F398ED013DF21F1004BEC44 /* Transaction.h */,
 				7F398ED113DF21F2004BEC44 /* Transaction.m */,
+				A7073A9A1681B17B00F72FC0 /* Review.h */,
+				A7073A9B1681B17B00F72FC0 /* Review.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -1645,6 +1699,8 @@
 				7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */,
 				7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */,
 				7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */,
+				A7073A9D1681B3EF00F72FC0 /* XMLReader.h */,
+				A7073A9E1681B3EF00F72FC0 /* XMLReader.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -1655,6 +1711,7 @@
 				7F24E70B13E41EA20056EA97 /* Common */,
 				7F24E70C13E41EB00056EA97 /* Sales */,
 				7FDF601E13DD2193005F1E2D /* Report Details */,
+				A7073A951681B0D600F72FC0 /* Reviews */,
 			);
 			name = Dashboard;
 			sourceTree = "<group>";
@@ -2207,6 +2264,30 @@
 			);
 			name = "Flag Images";
 			path = ../Images/Flags;
+			sourceTree = "<group>";
+		};
+		A7073A951681B0D600F72FC0 /* Reviews */ = {
+			isa = PBXGroup;
+			children = (
+				A7073A891681B0D100F72FC0 /* ReviewsViewController.h */,
+				A7073A8A1681B0D100F72FC0 /* ReviewsViewController.m */,
+				A7073A8B1681B0D100F72FC0 /* ReviewSummaryView.h */,
+				A7073A8C1681B0D100F72FC0 /* ReviewSummaryView.m */,
+				A7073A8D1681B0D100F72FC0 /* ReviewListViewController.h */,
+				A7073A8E1681B0D100F72FC0 /* ReviewListViewController.m */,
+				A7073A8F1681B0D100F72FC0 /* ReviewDetailViewController.h */,
+				A7073A901681B0D100F72FC0 /* ReviewDetailViewController.m */,
+			);
+			name = Reviews;
+			sourceTree = "<group>";
+		};
+		A7073A991681B11700F72FC0 /* Review Download */ = {
+			isa = PBXGroup;
+			children = (
+				A7073A961681B10E00F72FC0 /* ReviewDownloadManager.h */,
+				A7073A971681B10E00F72FC0 /* ReviewDownloadManager.m */,
+			);
+			name = "Review Download";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2809,6 +2890,16 @@
 				7F82B199167DB1DC00C0D9E9 /* Default-Portrait@2x.png in Resources */,
 				7F82B19A167DB1DC00C0D9E9 /* Default-Landscape.png in Resources */,
 				A7073A811681A40200F72FC0 /* Localizable.strings in Resources */,
+				A7073AA8168200C300F72FC0 /* ReviewBarButton.png in Resources */,
+				A7073AA9168200C300F72FC0 /* ReviewBarButton@2x.png in Resources */,
+				A7073AAA168200C300F72FC0 /* AllReviewsButton.png in Resources */,
+				A7073AAB168200C300F72FC0 /* AllReviewsButtonHighlighted.png in Resources */,
+				A7073AAC168200C300F72FC0 /* AllReviewsButton@2x.png in Resources */,
+				A7073AAD168200C300F72FC0 /* AllReviewsButtonHighlighted@2x.png in Resources */,
+				A7073AAE168200C300F72FC0 /* Reviews.png in Resources */,
+				A7073AAF168200C300F72FC0 /* Reviews@2x.png in Resources */,
+				A7073AB116820F3600F72FC0 /* stores.plist in Resources */,
+				A7073AB316820FCB00F72FC0 /* ReviewTemplate.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2885,6 +2976,13 @@
 				7FDCCEAF1594318400124140 /* trees.c in Sources */,
 				7FDCCEB01594318400124140 /* uncompr.c in Sources */,
 				7FDCCEB11594318400124140 /* zutil.c in Sources */,
+				A7073A911681B0D100F72FC0 /* ReviewsViewController.m in Sources */,
+				A7073A921681B0D100F72FC0 /* ReviewSummaryView.m in Sources */,
+				A7073A931681B0D100F72FC0 /* ReviewListViewController.m in Sources */,
+				A7073A941681B0D100F72FC0 /* ReviewDetailViewController.m in Sources */,
+				A7073A981681B10E00F72FC0 /* ReviewDownloadManager.m in Sources */,
+				A7073A9C1681B17B00F72FC0 /* Review.m in Sources */,
+				A7073A9F1681B3EF00F72FC0 /* XMLReader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
