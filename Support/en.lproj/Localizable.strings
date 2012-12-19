@@ -1,0 +1,347 @@
+/* Localizable.strings
+  AppSales
+
+  Created by René Bigot on 19/12/12. */
+
+/* No comment provided by engineer. */
+"" = "";
+
+/* No comment provided by engineer. */
+"About" = "About";
+
+/* No comment provided by engineer. */
+"Account Details" = "Account Details";
+
+/* No comment provided by engineer. */
+"Account" = "Account";
+
+/* No comment provided by engineer. */
+"Add AppSales to Boxcar..." = "Add AppSales to Boxcar...";
+
+/* No comment provided by engineer. */
+"All Apps" = "All Apps";
+
+/* No comment provided by engineer. */
+"All Countries" = "All Countries";
+
+/* No comment provided by engineer. */
+"Apps" = "Apps";
+
+/* No comment provided by engineer. */
+"AppSales is already importing reports for this account. Please wait until the current import has finished." = "AppSales is already importing reports for this account. Please wait until the current import has finished.";
+
+/* No comment provided by engineer. */
+"AppSales" = "AppSales";
+
+/* No comment provided by engineer. */
+"Auto-Fill Vendor ID..." = "Auto-Fill Vendor ID...";
+
+/* No comment provided by engineer. */
+"Begin Import?" = "Begin Import?";
+
+/* No comment provided by engineer. */
+"Boxcar Already Installed" = "Boxcar Already Installed";
+
+/* No comment provided by engineer. */
+"Boxcar Not Installed" = "Boxcar Not Installed";
+
+/* No comment provided by engineer. */
+"Calendar Months" = "Calendar Months";
+
+/* No comment provided by engineer. */
+"Cancel" = "Cancel";
+
+/* No comment provided by engineer. */
+"Cancelling..." = "Cancelling...";
+
+/* No comment provided by engineer. */
+"Checking for daily reports..." = "Checking for daily reports...";
+
+/* No comment provided by engineer. */
+"Checking for weekly reports..." = "Checking for weekly reports...";
+
+/* No comment provided by engineer. */
+"Checking Vendor ID..." = "Checking Vendor ID...";
+
+/* No comment provided by engineer. */
+"Countries" = "Countries";
+
+/* No comment provided by engineer. */
+"Currency" = "Currency";
+
+/* No comment provided by engineer. */
+"Daily Reports" = "Daily Reports";
+
+/* No comment provided by engineer. */
+"Delete Account?" = "Delete Account?";
+
+/* No comment provided by engineer. */
+"Delete Account..." = "Delete Account...";
+
+/* No comment provided by engineer. */
+"Delete" = "Delete";
+
+/* No comment provided by engineer. */
+"Deleting Account..." = "Deleting Account...";
+
+/* No comment provided by engineer. */
+"Do you really want to delete this account and all of its data?" = "Do you really want to delete this account and all of its data?";
+
+/* No comment provided by engineer. */
+"Do you want to start importing all report files in the Documents directory into this account?" = "Do you want to start importing all report files in the Documents directory into this account?";
+
+/* No comment provided by engineer. */
+"Done" = "Done";
+
+/* No comment provided by engineer. */
+"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@" = "Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@";
+
+/* No comment provided by engineer. */
+"Educational Sales" = "Educational Sales";
+
+/* No comment provided by engineer. */
+"Email" = "Email";
+
+/* No comment provided by engineer. */
+"Error" = "Error";
+
+/* No comment provided by engineer. */
+"example@domain.com" = "example@domain.com";
+
+/* No comment provided by engineer. */
+"Exchange rates will automatically be refreshed periodically." = "Exchange rates will automatically be refreshed periodically.";
+
+/* No comment provided by engineer. */
+"Export Completed" = "Export Completed";
+
+/* No comment provided by engineer. */
+"Export Reports..." = "Export Reports...";
+
+/* No comment provided by engineer. */
+"Exporting..." = "Exporting...";
+
+/* No comment provided by engineer. */
+"Finished (%i imported)" = "Finished (%i imported)";
+
+/* No comment provided by engineer. */
+"Finished" = "Finished";
+
+/* No comment provided by engineer. */
+"Fiscal Months" = "Fiscal Months";
+
+/* No comment provided by engineer. */
+"General" = "General";
+
+/* No comment provided by engineer. */
+"Gift Purchases" = "Gift Purchases";
+
+/* No comment provided by engineer. */
+"Hide in Dashboard" = "Hide in Dashboard";
+
+/* No comment provided by engineer. */
+"Import Reports..." = "Import Reports...";
+
+/* No comment provided by engineer. */
+"Install Boxcar..." = "Install Boxcar...";
+
+/* No comment provided by engineer. */
+"iTunes Connect Login" = "iTunes Connect Login";
+
+/* No comment provided by engineer. */
+"Loading daily report %i / %i" = "Loading daily report %1$i / %2$i";
+
+/* No comment provided by engineer. */
+"Loading weekly report %i / %i" = "Loading weekly report %1$i / %2$i";
+
+/* No comment provided by engineer. */
+"Login Missing" = "Login Missing";
+
+/* No comment provided by engineer. */
+"Manage Apps" = "Manage Apps";
+
+/* No comment provided by engineer. */
+"Missing Information" = "Missing Information";
+
+/* No comment provided by engineer. */
+"Months" = "Months";
+
+/* No comment provided by engineer. */
+"Name" = "Name";
+
+/* No comment provided by engineer. */
+"New Account" = "New Account";
+
+/* No comment provided by engineer. */
+"No Email Account" = "No Email Account";
+
+/* No comment provided by engineer. */
+"No Files Found" = "No Files Found";
+
+/* No comment provided by engineer. */
+"No new reports found" = "No new reports found";
+
+/* No comment provided by engineer. */
+"OK" = "OK";
+
+/* No comment provided by engineer. */
+"Open in..." = "Open in...";
+
+/* No comment provided by engineer. */
+"optional" = "optional";
+
+/* No comment provided by engineer. */
+"Passcode Lock" = "Passcode Lock";
+
+/* No comment provided by engineer. */
+"Password" = "Password";
+
+/* No comment provided by engineer. */
+"Please enter your username and password first." = "Please enter your username and password first.";
+
+/* No comment provided by engineer. */
+"Processing files (%i/%i)..." = "Processing files (%1$i/%2$i)...";
+
+/* No comment provided by engineer. */
+"Processing files (0/%i)..." = "Processing files (0/%i)...";
+
+/* No comment provided by engineer. */
+"Products" = "Products";
+
+/* No comment provided by engineer. */
+"Promo Codes" = "Promo Codes";
+
+/* No comment provided by engineer. */
+"Push Notifications" = "Push Notifications";
+
+/* No comment provided by engineer. */
+"Reports" = "Reports";
+
+/* No comment provided by engineer. */
+"Revenue" = "Revenue";
+
+/* No comment provided by engineer. */
+"Sales and Trends" = "Sales and Trends";
+
+/* No comment provided by engineer. */
+"Sales" = "Sales";
+
+/* No comment provided by engineer. */
+"Save" = "Save";
+
+/* No comment provided by engineer. */
+"Scale locked" = "Scale locked";
+
+/* No comment provided by engineer. */
+"Scale unlocked" = "Scale unlocked";
+
+/* No comment provided by engineer. */
+"Settings" = "Settings";
+
+/* No comment provided by engineer. */
+"Show in App Store..." = "Show in App Store...";
+
+/* No comment provided by engineer. */
+"Sort By" = "Sort By";
+
+/* No comment provided by engineer. */
+"Start Import" = "Start Import";
+
+/* No comment provided by engineer. */
+"Starting download" = "Starting download";
+
+/* No comment provided by engineer. */
+"Starting import" = "Starting import";
+
+/* No comment provided by engineer. */
+"The Boxcar app is already installed on your device. Please tap \"Add AppSales to Boxcar\" to start receiving push notifications." = "The Boxcar app is already installed on your device. Please tap \"Add AppSales to Boxcar\" to start receiving push notifications.";
+
+/* No comment provided by engineer. */
+"The Boxcar app is not installed on your device. Please download it from the App Store and try again." = "The Boxcar app is not installed on your device. Please download it from the App Store and try again.";
+
+/* No comment provided by engineer. */
+"The Documents directory does not contain any .txt files. Please use iTunes File Sharing to transfer report files to your device." = "The Documents directory does not contain any .txt files. Please use iTunes File Sharing to transfer report files to your device.";
+
+/* No comment provided by engineer. */
+"The report files of this account have been exported as a Zip archive. You can now access the archive via iTunes file sharing or open it in a suitable app." = "The report files of this account have been exported as a Zip archive. You can now access the archive via iTunes file sharing or open it in a suitable app.";
+
+/* No comment provided by engineer. */
+"The vendor ID could not be filled automatically. Please check your username and password or enter your vendor ID manually. You'll find it at the top of the Sales and Trends module on itunesconnect.apple.com." = "The vendor ID could not be filled automatically. Please check your username and password or enter your vendor ID manually. You'll find it at the top of the Sales and Trends module on itunesconnect.apple.com.";
+
+/* No comment provided by engineer. */
+"This account does not contain any apps yet. Import or download reports first." = "This account does not contain any apps yet. Import or download reports first.";
+
+/* No comment provided by engineer. */
+"To receive push notifications when new sales reports are available you have to install the free Boxcar app." = "To receive push notifications when new sales reports are available you have to install the free Boxcar app.";
+
+/* No comment provided by engineer. */
+"Update Exchange Rates Now" = "Update Exchange Rates Now";
+
+/* No comment provided by engineer. */
+"Update Notice" = "Update Notice";
+
+/* No comment provided by engineer. */
+"Updates" = "Updates";
+
+/* No comment provided by engineer. */
+"Use iTunes file sharing to import report files from your computer." = "Use iTunes file sharing to import report files from your computer.";
+
+/* No comment provided by engineer. */
+"Username" = "Username";
+
+/* No comment provided by engineer. */
+"Vendor ID Missing" = "Vendor ID Missing";
+
+/* No comment provided by engineer. */
+"Vendor ID" = "Vendor ID";
+
+/* No comment provided by engineer. */
+"Waiting..." = "Waiting...";
+
+/* No comment provided by engineer. */
+"Weekly Reports" = "Weekly Reports";
+
+/* No comment provided by engineer. */
+"www.example.com" = "www.example.com";
+
+/* No comment provided by engineer. */
+"You can import reports via iTunes File Sharing without entering your login." = "You can import reports via iTunes File Sharing without entering your login.";
+
+/* No comment provided by engineer. */
+"You don't seem to have any app installed that can open Zip files." = "You don't seem to have any app installed that can open Zip files.";
+
+/* No comment provided by engineer. */
+"You have not configured this device for sending email." = "You have not configured this device for sending email.";
+
+/* No comment provided by engineer. */
+"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information." = "You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.";
+
+/* No comment provided by engineer. */
+"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information." = "You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.";
+
+/* No comment provided by engineer. */
+"You have not entered your iTunes Connect login for this account." = "You have not entered your iTunes Connect login for this account.";
+
+/* No comment provided by engineer. */
+"You have updated from an older version of AppSales. Your sales reports are currently being imported. You can start using the app while the import is running." = "You have updated from an older version of AppSales. Your sales reports are currently being imported. You can start using the app while the import is running.";
+
+/* No comment provided by engineer. */
+"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\"." = "You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".";
+
+/* No comment provided by engineer. */
+"You need to enter at least a username or a description.\n\nIf you want to download reports from iTunes Connect, you need to enter your username and password, otherwise you can just enter a description." = "You need to enter at least a username or a description.\n\nIf you want to download reports from iTunes Connect, you need to enter your username and password, otherwise you can just enter a description.";
+
+/* No comment provided by engineer. */
+"Cancelled" = "Cancelled";
+
+/* No comment provided by engineer. */
+"Customer Reviews" = "Customer Reviews";
+
+/* No comment provided by engineer. */
+"Downloading Reviews..." = "Downloading Reviews...";
+
+/* No comment provided by engineer. */
+"Reviews" = "Reviews";
+
+/* No comment provided by engineer. */
+"Show All Reviews" = "Show All Reviews";
+
