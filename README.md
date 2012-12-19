@@ -8,6 +8,10 @@
 
 *You can of course still use (or fork) one of the older versions if you rely on these features and can live with (or fix) the bugginess.*
 
+***Announcement update: 19/12/2012***
+
+*Reviews are supported again. Now, they are downloaded from iTunes RSS feeds.
+
 ---
 
 AppSales allows iOS and Mac App Store developers to download and analyze their sales reports from iTunes Connect on the iPhone.
