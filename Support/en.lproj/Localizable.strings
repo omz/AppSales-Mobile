@@ -330,3 +330,18 @@
 /* No comment provided by engineer. */
 "You need to enter at least a username or a description.\n\nIf you want to download reports from iTunes Connect, you need to enter your username and password, otherwise you can just enter a description." = "You need to enter at least a username or a description.\n\nIf you want to download reports from iTunes Connect, you need to enter your username and password, otherwise you can just enter a description.";
 
+/* No comment provided by engineer. */
+"Cancelled" = "Cancelled";
+
+/* No comment provided by engineer. */
+"Customer Reviews" = "Customer Reviews";
+
+/* No comment provided by engineer. */
+"Downloading Reviews..." = "Downloading Reviews...";
+
+/* No comment provided by engineer. */
+"Reviews" = "Reviews";
+
+/* No comment provided by engineer. */
+"Show All Reviews" = "Show All Reviews";
+

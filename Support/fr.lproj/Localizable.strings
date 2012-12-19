@@ -55,10 +55,10 @@
 "Cancelling..." = "Annulation...";
 
 /* No comment provided by engineer. */
-"Checking for daily reports..." = "Recherche de rapports journaliers";
+"Checking for daily reports..." = "Rech. rapports journaliers";
 
 /* No comment provided by engineer. */
-"Checking for weekly reports..." = "Recherche de rapports hebdomadaires";
+"Checking for weekly reports..." = "Rech. rapports hebdo…";
 
 /* No comment provided by engineer. */
 "Checking Vendor ID..." = "Vérification du Vendor ID";
@@ -115,7 +115,7 @@
 "Export Completed" = "Export terminé";
 
 /* No comment provided by engineer. */
-"Export Reports..." = "Exportation des rapports...";
+"Export Reports..." = "Exporter des rapports...";
 
 /* No comment provided by engineer. */
 "Exporting..." = "Exportation...";
@@ -139,7 +139,7 @@
 "Hide in Dashboard" = "Masquer dans le tableau de bord";
 
 /* No comment provided by engineer. */
-"Import Reports..." = "Importation des rapports...";
+"Import Reports..." = "Importer des rapports...";
 
 /* No comment provided by engineer. */
 "Install Boxcar..." = "Installation de Boxcar";
@@ -148,10 +148,10 @@
 "iTunes Connect Login" = "Login iTunes Connect";
 
 /* No comment provided by engineer. */
-"Loading daily report %i / %i" = "Chargement du rapport journalier %1$i / %2$i";
+"Loading daily report %i / %i" = "Charg. rapport jour. %1$i / %2$i";
 
 /* No comment provided by engineer. */
-"Loading weekly report %i / %i" = "Chargement du rapport hebdomadaire %1$i / %2$i";
+"Loading weekly report %i / %i" = "Rapport hebdo. %1$i / %2$i";
 
 /* No comment provided by engineer. */
 "Login Missing" = "Login manquant";
@@ -199,10 +199,10 @@
 "Please enter your username and password first." = "Merci d'entrer vos mot nos d'utilisateur et mot de passe d'abord.";
 
 /* No comment provided by engineer. */
-"Processing files (%i/%i)..." = "Traitement des fichiers (%1$i/%2$i)...";
+"Processing files (%i/%i)..." = "Traitement fichiers (%1$i/%2$i)...";
 
 /* No comment provided by engineer. */
-"Processing files (0/%i)..." = "Traitement des fichiers (0/%i)...";
+"Processing files (0/%i)..." = "Traitement fichiers (0/%i)...";
 
 /* No comment provided by engineer. */
 "Products" = "Produits";
@@ -329,4 +329,19 @@
 
 /* No comment provided by engineer. */
 "You need to enter at least a username or a description.\n\nIf you want to download reports from iTunes Connect, you need to enter your username and password, otherwise you can just enter a description." = "Vous devez saisir à minima un nom d'utilisateur ou une description.\n\nSi vous souhaitez télécharger des rapports depuis iTunes Connect, vous devez saisir votre nom d'utilisateur et mot de passe, sinon vous pouvez juste entrer une description.";
+
+/* No comment provided by engineer. */
+"Cancelled" = "Annulé";
+
+/* No comment provided by engineer. */
+"Customer Reviews" = "Avis d'utilisateurs";
+
+/* No comment provided by engineer. */
+"Downloading Reviews..." = "Téléchargement des avis";
+
+/* No comment provided by engineer. */
+"Reviews" = "Avis";
+
+/* No comment provided by engineer. */
+"Show All Reviews" = "Afficher tous les avis";
 
