@@ -239,20 +239,17 @@
 	for (Report *dailyReport in sortedDailyReports) {
 		NSDateComponents *dateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dailyReport.startDate];
 		if (!prevDateComponents || (dateComponents.month != prevDateComponents.month || dateComponents.year != prevDateComponents.year)) {
-			if (reportsInCurrentMonth) {
-				ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
-				monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
-				[sortedCalendarMonthReports addObject:monthCollection];
-			}
+			// New month discovered. Make a new ReportCollection to gather all the daily reports in this month.
 			reportsInCurrentMonth = [NSMutableArray array];
+			[reportsInCurrentMonth addObject:dailyReport];
+			ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
+			monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
+			[sortedCalendarMonthReports addObject:monthCollection];
+		} else {
+			// This report is from the same month as the previous report. Append the daily report to the existing collection.
+			[reportsInCurrentMonth addObject:dailyReport];
 		}
-		[reportsInCurrentMonth addObject:dailyReport];
 		prevDateComponents = dateComponents;
-	}
-	if ([reportsInCurrentMonth count] > 0) {
-		ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
-		monthCollection.title = [monthFormatter stringFromDate:[monthCollection firstReport].startDate];
-		[sortedCalendarMonthReports addObject:monthCollection];
 	}
 	
 	// Group daily reports by fiscal month:
