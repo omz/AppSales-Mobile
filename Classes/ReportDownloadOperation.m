@@ -305,7 +305,7 @@
 		});
 		NSScanner *paymentsScanner = [NSScanner scannerWithString:loginPage];
 		NSString *paymentsAction = nil;
-		[paymentsScanner scanUpToString:@"alt=\"Payments and Financial Reports" intoString:NULL];
+        [paymentsScanner scanUpToString:@"<p>Manage your contracts, tax, and banking information.</p>" intoString:NULL];
 		[paymentsScanner scanUpToString:@"<a href=\"" intoString:NULL];
 		[paymentsScanner scanString:@"<a href=\"" intoString:NULL];
 		[paymentsScanner scanUpToString:@"\"" intoString:&paymentsAction];
