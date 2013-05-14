@@ -717,7 +717,7 @@
 		7F709D3D13BC98860008DBAD /* AppSalesAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppSalesAppDelegate.m; sourceTree = "<group>"; };
 		7F709D4013BC98860008DBAD /* AppSales.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = AppSales.xcdatamodel; sourceTree = "<group>"; };
 		7F709D4513BC98860008DBAD /* AccountsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AccountsViewController.h; sourceTree = "<group>"; };
-		7F709D4613BC98860008DBAD /* AccountsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AccountsViewController.m; sourceTree = "<group>"; };
+		7F709D4613BC98860008DBAD /* AccountsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AccountsViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		7F709D6113BCB64E0008DBAD /* FieldEditorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FieldEditorViewController.h; sourceTree = "<group>"; };
 		7F709D6213BCB64F0008DBAD /* FieldEditorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FieldEditorViewController.m; sourceTree = "<group>"; };
 		7F709D6A13BCC3C80008DBAD /* SSKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSKeychain.h; sourceTree = "<group>"; };

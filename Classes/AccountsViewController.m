@@ -23,6 +23,7 @@
 #import "KKPasscodeLock.h"
 #import "ZipFile.h"
 #import "ZipWriteStream.h"
+#import "IconManager.h"
 
 #define kAddNewAccountEditorIdentifier		@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier		@"EditAccountEditorIdentifier"
@@ -67,6 +68,8 @@
 	
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] addObserver:self forKeyPath:@"isBusy" options:NSKeyValueObservingOptionNew context:nil];
 	
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
+    
 	[self reloadAccounts];
 }
 
@@ -329,7 +332,8 @@
 	for (Product *product in allProducts) {
 		FieldSpecifier *productNameField = [FieldSpecifier textFieldWithKey:[NSString stringWithFormat:@"product.name.%@", product.productID] title:NSLocalizedString(@"Name", nil) defaultValue:[product displayName]];
 		FieldSpecifier *hideProductField = [FieldSpecifier switchFieldWithKey:[NSString stringWithFormat:@"product.hidden.%@", product.productID] title:NSLocalizedString(@"Hide in Dashboard", nil) defaultValue:[product.hidden boolValue]];
-		FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productNameField, hideProductField, nil] title:nil description:nil];
+		FieldSpecifier *reloadProductInfoField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.reload.%@", product.productID] title:NSLocalizedString(@"Reload App Icon...", nil)];
+		FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productNameField, hideProductField, reloadProductInfoField, nil] title:nil description:nil];
 		FieldSpecifier *showInAppStoreField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.appstore.%@", product.productID] title:NSLocalizedString(@"Show in App Store...", nil)];
 		NSString *productFooter = [NSString stringWithFormat:@"Current version: %@\nApple ID: %@", ((product.currentVersion) ? product.currentVersion : @"N/A"), product.productID];
 		FieldSectionSpecifier *showInAppStoreSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:showInAppStoreField] title:nil description:productFooter];
@@ -538,6 +542,10 @@
 		NSString *productID = [key substringFromIndex:[@"product.appstore." length]];
 		NSString *appStoreURLString = [NSString stringWithFormat:@"http://itunes.apple.com/app/id%@", productID];
 		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreURLString]];
+	} else if ([key hasPrefix:@"product.reload."]) {
+		NSString *productID = [key substringFromIndex:[@"product.reload." length]];
+        IconManager *iconManager = [IconManager sharedManager];
+        [iconManager clearIconForAppID:productID];
 	} else if ([key isEqualToString:kDeleteAccountButton]) {
 		UIAlertView *confirmDeleteAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Delete Account?", nil) 
 																	  message:NSLocalizedString(@"Do you really want to delete this account and all of its data?", nil) 
@@ -716,6 +724,15 @@
   }
   
   [settingsViewController.tableView reloadData];
+}
+
+- (void)iconCleared:(NSNotification *)notification
+{
+    NSString *productID = [[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID];
+	if (productID) {
+        // reload Icon
+		[[IconManager sharedManager] iconForAppID:productID];
+	}
 }
 
 #pragma mark -
