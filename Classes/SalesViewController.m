@@ -62,6 +62,16 @@
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
+
+		// don't extend edges in iOS 7 (setEdgesForExtendedLayout:UIRectEdgeNone)
+		// backward compatible patch: still builds with older versions of Xcode (<5) and runs on older iOS's (<7)
+#ifdef __IPHONE_7_0
+		if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
+		{
+			[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+		}
+#endif
+
     }
 	return self;
 }
