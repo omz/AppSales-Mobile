@@ -144,16 +144,12 @@
 
 - (void)start
 {
-	backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
-	
-	NSString *productID = _product.productID;
-	NSString *URLString = [NSString stringWithFormat:@"http://itunes.apple.com/WebObjects/MZStore.woa/wa/customerReviews?s=%@&id=%@&displayable-kind=11&page=%i&sort=4", storeFront, productID, page];
-	NSURL *URL = [NSURL URLWithString:URLString];
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
-	[request setValue:@"iTunes/10.1.1 (Macintosh; Intel Mac OS X 10.6.5) AppleWebKit/533.19.4" forHTTPHeaderField:@"User-Agent"];
-	[request setValue:[NSString stringWithFormat:@"%@-1,12", storeFront] forHTTPHeaderField:@"X-Apple-Store-Front"];
-	
-	self.downloadConnection = [NSURLConnection connectionWithRequest:request delegate:self];
+    backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
+    NSString *productID = _product.productID;
+    NSString *URLString = [NSString stringWithFormat:@"https://itunes.apple.com/%@/rss/customerreviews/id=%@/sortBy=mostRecent/xml", country, productID];
+    NSURL *URL = [NSURL URLWithString:URLString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+    self.downloadConnection = [NSURLConnection connectionWithRequest:request delegate:self];
 }
 
 - (void)cancel
@@ -172,115 +168,170 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-	NSString *html = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-	if (html) {
-		dispatch_async(dispatch_get_global_queue(0, 0), ^ {
-			
-			NSArray *reviewInfos = [self reviewInfosFromHTML:html];
-			
-			NSManagedObjectContext *moc = [[[NSManagedObjectContext alloc] init] autorelease];
-			[moc setPersistentStoreCoordinator:psc];
-			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
-			Product *product = (Product *)[moc objectWithID:productObjectID];
-			
-			NSDateFormatter *reviewDateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-			[reviewDateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			if ([country isEqualToString:@"fr"]) {
-				NSLocale *frLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"fr"] autorelease];
-				[reviewDateFormatter setLocale:frLocale];
-				[reviewDateFormatter setDateFormat:@"dd MMM yyyy"];
-			} else if ([country isEqualToString:@"de"]) {
-				NSLocale *deLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"de"] autorelease];
-				[reviewDateFormatter setLocale:deLocale];
-				[reviewDateFormatter setDateFormat:@"dd.MM.yyyy"];
-			} else if ([country isEqualToString:@"it"]) {
-				NSLocale *itLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"it"] autorelease];
-				[reviewDateFormatter setLocale:itLocale];
-				[reviewDateFormatter setDateFormat:@"dd-MMM-yyyy"];
-			} else if ([country isEqualToString:@"us"]) {
-				NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
-				[reviewDateFormatter setLocale:usLocale];
-				[reviewDateFormatter setDateFormat:@"MMM dd, yyyy"];
-			} else {
-				NSLocale *usLocale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"] autorelease];
-				[reviewDateFormatter setDateFormat:@"dd-MMM-yyyy"];
-				[reviewDateFormatter setLocale:usLocale];
-			}
-			
-			NSSet *downloadedUsers = [NSSet setWithArray:[reviewInfos valueForKey:kReviewInfoUser]];
-			
-			//Fetch existing reviews, based on username and country:
-			NSFetchRequest *existingReviewsFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
-			[existingReviewsFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:moc]];
-			[existingReviewsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND countryCode == %@ AND user IN %@", product, country, downloadedUsers]];
-			NSArray *existingReviews = [moc executeFetchRequest:existingReviewsFetchRequest error:NULL];
-			NSMutableDictionary *existingReviewsByUser = [NSMutableDictionary dictionary];
-			for (Review *existingReview in existingReviews) {
-				[existingReviewsByUser setObject:existingReview forKey:existingReview.user];
-			}
-			
-			BOOL changesMade = NO;
-			for (NSDictionary *reviewInfo in [reviewInfos reverseObjectEnumerator]) {
-				Review *existingReview = [existingReviewsByUser objectForKey:[reviewInfo objectForKey:kReviewInfoUser]];
-				if (!existingReview) {
-					Review *newReview = [NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
-					newReview.user = [reviewInfo objectForKey:kReviewInfoUser];
-					newReview.title = [reviewInfo objectForKey:kReviewInfoTitle];
-					newReview.text = [reviewInfo objectForKey:kReviewInfoText];
-					newReview.rating = [reviewInfo objectForKey:kReviewInfoRating];
-					newReview.downloadDate = [NSDate date];
-					newReview.productVersion = [reviewInfo objectForKey:kReviewInfoVersion];
-					newReview.product = product;
-					newReview.countryCode = country;
-					newReview.unread = [NSNumber numberWithBool:YES];
-					newReview.reviewDate = [reviewDateFormatter dateFromString:[reviewInfo objectForKey:kReviewInfoDateString]];
-					[existingReviewsByUser setObject:newReview forKey:newReview.user];
-					changesMade = YES;
-				} else {
-					NSString *existingText = existingReview.text;
-					NSString *existingTitle = existingReview.title;
-					NSNumber *existingRating = existingReview.rating;
-					NSString *newText = [reviewInfo objectForKey:kReviewInfoText];
-					NSString *newTitle = [reviewInfo objectForKey:kReviewInfoTitle];
-					NSNumber *newRating = [reviewInfo objectForKey:kReviewInfoRating];
-					if (![existingText isEqualToString:newText] || ![existingTitle isEqualToString:newTitle] || ![existingRating isEqualToNumber:newRating]) {
-						existingReview.text = newText;
-						existingReview.title = newTitle;
-						existingReview.rating = newRating;
-						changesMade = YES;
-					}
-				}
-			}
-			
-			[psc lock];
-			NSError *saveError = nil;
-			[moc save:&saveError];
-			if (saveError) {
-				NSLog(@"Could not save context: %@", saveError);
-			}
-			[psc unlock];
-			
-			if (changesMade && [reviewInfos count] >= 20) {
-				dispatch_async(dispatch_get_main_queue(), ^ {
-					page = page + 1;
-					[self start];
-				});
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^ {
-					if (!canceled) {
-						[self.delegate reviewDownloadDidFinish:self];
-					}
-				});
-			}
-		});
-	} else {
-		if (!canceled) {
-			[self.delegate reviewDownloadDidFinish:self];
-		}
-		if (backgroundTaskID != UIBackgroundTaskInvalid) {
-			[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-		}
-	}
+    NSError *error;
+    SMXMLDocument *document = [SMXMLDocument documentWithData:data error:&error];
+    // check for errors
+    if (error) {
+        NSLog(@"Error while parsing the document: %@", error);
+        return;
+    }
+    SMXMLElement *feed = document.root;
+    //NSLog(@"feed = %@", [feed name]);
+    //SMXMLElement * firstEntryChild = [feed childNamed:@"entry"];
+    //NSArray *children = [firstEntryChild children];
+    // for (SMXMLElement *child in children){
+    //     NSLog(@"child name = %@", [child name]);
+    // }
+    if (1 > 0) // always true
+    {
+        NSString * stringBlank = @"";
+        dispatch_async(dispatch_get_global_queue(0, 0), ^ {
+            
+            NSMutableArray *reviewInfos = [NSMutableArray new];
+            for (SMXMLElement *entry in [feed childrenNamed:@"entry"])
+            {
+                
+                if ([entry valueWithPath:@"artist"] == nil || [entry valueWithPath:@"artist"]  == stringBlank ){
+                    
+                    //NSArray *children2 = [entry children];
+                    //for (SMXMLElement *child2 in children2){
+                    //    NSLog(@"child name = %@", [child2 name]);
+                    //}
+                    //NSLog(@"------------");
+                    //NSLog(@"title = %@", [entry valueWithPath:@"title"]);
+                    //NSLog(@"updated = %@", [entry valueWithPath:@"updated"]);
+                    //NSString *updatedReduced = [[entry valueWithPath:@"updated"] substringToIndex:10];
+                    //NSLog(@"updated Reduced = %@", updatedReduced);
+                    //NSLog(@"author.name = %@", [entry valueWithPath:@"author.name"]);
+                    //NSLog(@"content = %@", [entry valueWithPath:@"content"]);
+                    //NSLog(@"version = %@", [entry valueWithPath:@"version"]);
+                    //NSLog(@"rating = %@", [entry valueWithPath:@"rating"]);
+                    //NSLog(@"------------");
+                    
+                    NSDictionary *reviewInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                [entry valueWithPath:@"title"],kReviewInfoTitle,
+                                                [[entry valueWithPath:@"updated"] substringToIndex:10], kReviewInfoDateString,
+                                                [entry valueWithPath:@"author.name"], kReviewInfoUser,
+                                                [entry valueWithPath:@"version"], kReviewInfoVersion,
+                                                [entry valueWithPath:@"content"], kReviewInfoText,
+                                                [NSNumber numberWithInt:[[entry valueWithPath:@"rating"] intValue]], kReviewInfoRating,
+                                                nil];
+                    [reviewInfos addObject:reviewInfo];
+                }
+            }
+            NSManagedObjectContext *moc = [[[NSManagedObjectContext alloc] init] autorelease];
+            [moc setPersistentStoreCoordinator:psc];
+            [moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
+            Product *product = (Product *)[moc objectWithID:productObjectID];
+            
+            NSSet *downloadedUsers = [NSSet setWithArray:[reviewInfos valueForKey:kReviewInfoUser]];
+            
+            //Fetch existing reviews, based on username and country:
+            NSFetchRequest *existingReviewsFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+            [existingReviewsFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:moc]];
+            [existingReviewsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND countryCode == %@ AND user IN %@", product, country, downloadedUsers]];
+            NSArray *existingReviews = [moc executeFetchRequest:existingReviewsFetchRequest error:NULL];
+            NSMutableDictionary *existingReviewsByUser = [NSMutableDictionary dictionary];
+            for (Review *existingReview in existingReviews) {
+                [existingReviewsByUser setObject:existingReview forKey:existingReview.user];
+            }
+            
+            BOOL changesMade = NO;
+            for (NSDictionary *reviewInfo in [reviewInfos reverseObjectEnumerator]) {
+                Review *existingReview = [existingReviewsByUser objectForKey:[reviewInfo objectForKey:kReviewInfoUser]];
+                
+                // CREATE REVIEW DATE BY COMPONENTS
+                NSInteger year = [[[reviewInfo objectForKey:kReviewInfoDateString] substringToIndex:4] intValue];
+                NSString * temp1 = [[reviewInfo objectForKey:kReviewInfoDateString] substringFromIndex:5];
+                NSInteger month = [[temp1 substringToIndex:2] intValue];
+                NSInteger day = [[temp1 substringFromIndex:3] intValue];
+                
+                // Combine date and time into components
+                NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+                NSDateComponents *components = [[NSDateComponents alloc] init];
+                [components setYear:year];
+                [components setMonth:month];
+                [components setDay:day];
+                [components setHour:12];
+                [components setMinute:0];
+                [components setSecond:0];
+                // Generate a new NSDate from components.
+                NSDate * combinedReviewDate = [gregorianCalendar dateFromComponents:components];
+                
+                if (!existingReview) {
+                    Review *newReview = [NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
+                    newReview.user = [reviewInfo objectForKey:kReviewInfoUser];
+                    newReview.title = [reviewInfo objectForKey:kReviewInfoTitle];
+                    newReview.text = [reviewInfo objectForKey:kReviewInfoText];
+                    newReview.rating = [reviewInfo objectForKey:kReviewInfoRating];
+                    newReview.downloadDate = [NSDate date];
+                    newReview.productVersion = [reviewInfo objectForKey:kReviewInfoVersion];
+                    newReview.product = product;
+                    newReview.countryCode = country;
+                    newReview.unread = [NSNumber numberWithBool:YES];
+                    newReview.reviewDate = combinedReviewDate;
+                    
+                    //NSLog(@"------------");
+                    //NSLog(@"newReview.title = %@", newReview.title);
+                    //NSLog(@"newReview.downloadDate = %s", [[newReview.downloadDate description] UTF8String]);
+                    //NSLog(@"newReview.reviewDate  = %s", [[newReview.reviewDate description] UTF8String]);
+                    //NSLog(@"newReview.user = %@", newReview.user);
+                    //NSLog(@"newReview.text = %@", newReview.text);
+                    //NSLog(@"newReview.productVersion = %@", newReview.productVersion);
+                    //NSLog(@"newReview.rating = %@", newReview.rating);
+                    //NSLog(@"------------");
+                    
+                    
+                    [existingReviewsByUser setObject:newReview forKey:newReview.user];
+                    changesMade = YES;
+                } else {
+                    NSString *existingText = existingReview.text;
+                    NSString *existingTitle = existingReview.title;
+                    NSNumber *existingRating = existingReview.rating;
+                    NSString *newText = [reviewInfo objectForKey:kReviewInfoText];
+                    NSString *newTitle = [reviewInfo objectForKey:kReviewInfoTitle];
+                    NSNumber *newRating = [reviewInfo objectForKey:kReviewInfoRating];
+                    
+                    if (![existingText isEqualToString:newText] || ![existingTitle isEqualToString:newTitle] || ![existingRating isEqualToNumber:newRating]) {
+                        existingReview.text = newText;
+                        existingReview.title = newTitle;
+                        existingReview.rating = newRating;
+                        existingReview.downloadDate = [NSDate date];
+                        existingReview.reviewDate = combinedReviewDate;
+                        changesMade = YES;
+                    }
+                }
+            }
+            
+            [psc lock];
+            NSError *saveError = nil;
+            [moc save:&saveError];
+            if (saveError) {
+                NSLog(@"Could not save context: %@", saveError);
+            }
+            [psc unlock];
+            
+            if (changesMade && [reviewInfos count] >= 20) {
+                dispatch_async(dispatch_get_main_queue(), ^ {
+                    page = page + 1;
+                    [self start];
+                });
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^ {
+                    if (!canceled) {
+                        [self.delegate reviewDownloadDidFinish:self];
+                    }
+                });
+            }
+        });
+    } else {
+        if (!canceled) {
+            [self.delegate reviewDownloadDidFinish:self];
+        }
+        if (backgroundTaskID != UIBackgroundTaskInvalid) {
+            [[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+        }
+    }
 }
 
 - (NSArray *)reviewInfosFromHTML:(NSString *)html

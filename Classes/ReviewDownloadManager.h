@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SMXMLDocument.h"
 
 #define ReviewDownloadManagerDidUpdateProgressNotification	@"ReviewDownloadManagerDidUpdateProgressNotification"
 
