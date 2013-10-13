@@ -42,6 +42,12 @@
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
 		self.contentSizeForViewInPopover = CGSizeMake(320, 500);
     }
+#ifdef __IPHONE_7_0
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
+    {
+        [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+    }
+#endif
     return self;
 }
 

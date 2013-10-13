@@ -198,6 +198,7 @@
 						report = nil;
 						continue;
 					}
+					
 					if (report && originalFilename) {
 						NSManagedObject *originalReport = [NSEntityDescription insertNewObjectForEntityForName:@"ReportCSV" inManagedObjectContext:moc];
 						[originalReport setValue:reportCSV forKey:@"content"];
@@ -225,6 +226,160 @@
 	if ([self isCancelled]) {
 		[pool release];
 		return;
+	}
+	
+	BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
+	if (downloadPayments && (numberOfReportsDownloaded > 0 || [account.payments count] == 0)) {
+		//==== Payments
+		NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+		NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
+		}
+
+		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];    
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
+		}
+		
+		dispatch_async(dispatch_get_main_queue(), ^ {
+			_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
+			_account.downloadProgress = 0.9;
+		});
+		
+		NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
+		NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
+		NSString *signoutSentinel = @"Sign Out";
+		
+		NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
+		NSHTTPURLResponse *loginPageResponse = nil;
+		NSError *loginPageError = nil;
+		NSData *loginPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:loginURL] returningResponse:&loginPageResponse error:&loginPageError];
+		NSString *loginPage = [[[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding] autorelease];
+			
+		if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
+			// find the login action
+			NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
+			[loginPageScanner scanUpToString:@"action=\"" intoString:nil];
+			if (![loginPageScanner scanString:@"action=\"" intoString:nil]) {
+				dispatch_async(dispatch_get_main_queue(), ^ {
+					[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
+																		object:self 
+																	  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not parse iTunes Connect login page", nil)
+																										   forKey:kASReportDownloadErrorDescription]];
+				});
+				[pool release];
+				return;
+			}
+			NSString *loginAction = nil;
+			[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
+			
+			NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
+									  username, @"theAccountName",
+									  password, @"theAccountPW", 
+									  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
+									  @"7", @"1.Continue.y",
+									  nil];
+			loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
+			
+			if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
+				dispatch_async(dispatch_get_main_queue(), ^ {
+					[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
+																		object:self 
+																	  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not login. Please check your username and password.", nil) 
+																										   forKey:kASReportDownloadErrorDescription]];
+				});
+				[pool release];
+				return;
+			}
+		}
+		
+		if ([self isCancelled]) {
+			[pool release];
+			return;
+		}
+		
+		dispatch_async(dispatch_get_main_queue(), ^ {
+			_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
+			_account.downloadProgress = 0.95;
+		});
+		NSScanner *paymentsScanner = [NSScanner scannerWithString:loginPage];
+		NSString *paymentsAction = nil;
+        [paymentsScanner scanUpToString:@"<p>Manage your contracts, tax, and banking information.</p>" intoString:NULL];
+		[paymentsScanner scanUpToString:@"<a href=\"" intoString:NULL];
+		[paymentsScanner scanString:@"<a href=\"" intoString:NULL];
+		[paymentsScanner scanUpToString:@"\"" intoString:&paymentsAction];
+		if (paymentsAction) {
+			NSString *paymentsURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", paymentsAction];
+			
+			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:paymentsURLString]] returningResponse:NULL error:NULL];
+			
+			if (paymentsPageData) {
+				NSString *paymentsPage = [[[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding] autorelease];
+				
+				NSMutableArray *vendorOptions = [NSMutableArray array];
+				NSString *vendorSelectName = nil;
+				NSString *switchVendorAction = nil;
+				NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
+				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
+				[vendorFormScanner scanUpToString:@"action=\"" intoString:NULL];
+				if ([vendorFormScanner scanString:@"action=\"" intoString:NULL]) {
+					[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
+					if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
+						NSString *vendorIDContainer = nil;
+						[vendorFormScanner scanUpToString:@"</div" intoString:&vendorIDContainer];
+						if (vendorIDContainer) {
+							vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
+							[vendorFormScanner scanUpToString:@"<select" intoString:NULL];
+							[vendorFormScanner scanUpToString:@"name=\"" intoString:NULL];
+							[vendorFormScanner scanString:@"name=\"" intoString:NULL];
+							[vendorFormScanner scanUpToString:@"\"" intoString:&vendorSelectName];
+							
+							while (![vendorFormScanner isAtEnd]) {
+								if ([vendorFormScanner scanUpToString:@"<option" intoString:NULL]) {
+									NSString *vendorOption = nil;
+									[vendorFormScanner scanUpToString:@"</option" intoString:&vendorOption];
+									if ([vendorOption rangeOfString:@"selected"].location == NSNotFound) {
+										NSString *optionValue = nil;
+										NSScanner *optionScanner = [NSScanner scannerWithString:vendorOption];
+										[optionScanner scanUpToString:@"value=\"" intoString:NULL];
+										[optionScanner scanString:@"value=\"" intoString:NULL];
+										[optionScanner scanUpToString:@"\"" intoString:&optionValue];
+										if (optionValue) {
+											[vendorOptions addObject:optionValue];
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
+				for (NSString *additionalVendorOption in vendorOptions) {
+					NSString *paymentsFormURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", switchVendorAction];
+					
+					NSData *additionalPaymentsPageData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:paymentsFormURLString] 
+																					  bodyDictionary:[NSDictionary dictionaryWithObjectsAndKeys:additionalVendorOption, vendorSelectName, nil]
+																							response:NULL];
+					NSString *additionalPaymentsPage = [[[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding] autorelease];
+					[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption];
+				}
+		
+				NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
+				NSString *signoutFormAction = nil;
+				[logoutFormScanner scanUpToString:@"<form name=\"signOutForm\"" intoString:NULL];
+				[logoutFormScanner scanUpToString:@"action=\"" intoString:NULL];
+				if ([logoutFormScanner scanString:@"action=\"" intoString:NULL]) {
+					[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
+					NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:signoutFormAction]];
+					NSError *logoutPageError = nil;
+					[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:&logoutPageError];
+				}
+			}
+		}
+		
+		//==== /Payments
 	}
 	
 	if ([moc hasChanges]) {

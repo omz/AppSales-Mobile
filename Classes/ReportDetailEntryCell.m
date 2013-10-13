@@ -53,7 +53,6 @@
 		[barBackgroundView addSubview:percentageLabel];
 		
 		subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(130, 24, 147, 12)];
-        subtitleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 		subtitleLabel.backgroundColor = [UIColor clearColor];
 		subtitleLabel.font = [UIFont systemFontOfSize:11.0];
 		subtitleLabel.textColor = [UIColor darkGrayColor];

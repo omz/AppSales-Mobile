@@ -73,7 +73,7 @@
 								@"QAR",
 								@"RUB",
 								@"SAR", @"SEK", @"SGD",
-								@"THB", @"TRY", @"TWD",
+								@"THB", @"TWD",			
 								@"ZAR", nil];
 	
 	currencySymbols = [[NSDictionary alloc] initWithObjectsAndKeys:@"€", @"EUR", @"$", @"USD", @"¥", @"JPY", @"£", @"GBP", @"₪", @"ILS", nil];

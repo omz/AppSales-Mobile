@@ -31,10 +31,23 @@
 		NSMutableArray *dates = [NSMutableArray array];
 		NSDate *currentDate = firstDate;
 		int period = 0;
+        
+        //DATE TO CHECK NOVEMBER 2011
+        NSDateComponents *dateNovember2011Components = [[[NSDateComponents alloc] init] autorelease];
+        [dateNovember2011Components setMonth:11];
+        [dateNovember2011Components setDay:26];
+        [dateNovember2011Components setYear:2011];
+        NSDate *dateNovember2011 = [calendar dateFromComponents:dateNovember2011Components];
+        
 		//Covers the fiscal calendar from 2008 to 2016:
 		while (period < 100) {
+            NSDate *nextDate;
 			//First month in a quarter covers 5 weeks, the others 4:
-			NSDate *nextDate = [calendar dateByAddingComponents:((period % 3 == 0) ? components5Weeks : components4Weeks) toDate:currentDate options:0];
+			if ([currentDate isEqualToDate:dateNovember2011]){ // December 2011 has 5 weeks
+                nextDate = [calendar dateByAddingComponents:components5Weeks toDate:currentDate options:0];
+            }else{
+                nextDate = [calendar dateByAddingComponents:((period % 3 == 0) ? components5Weeks : components4Weeks) toDate:currentDate options:0];
+            }
 			[dates addObject:nextDate];
 			currentDate = nextDate;
 			period++;
