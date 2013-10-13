@@ -62,16 +62,15 @@
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
-
-		// don't extend edges in iOS 7 (setEdgesForExtendedLayout:UIRectEdgeNone)
-		// backward compatible patch: still builds with older versions of Xcode (<5) and runs on older iOS's (<7)
+        
+        // don't extend edges in iOS 7 (setEdgesForExtendedLayout:UIRectEdgeNone)
+        // backward compatible patch: still builds with older versions of Xcode (<5) and runs on older iOS's (<7)
 #ifdef __IPHONE_7_0
-		if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
-		{
-			[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
-		}
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
+            {
+                [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+            }
 #endif
-
     }
 	return self;
 }
@@ -249,17 +248,20 @@
 	for (Report *dailyReport in sortedDailyReports) {
 		NSDateComponents *dateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dailyReport.startDate];
 		if (!prevDateComponents || (dateComponents.month != prevDateComponents.month || dateComponents.year != prevDateComponents.year)) {
-			// New month discovered. Make a new ReportCollection to gather all the daily reports in this month.
+			if (reportsInCurrentMonth) {
+				ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
+				monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
+				[sortedCalendarMonthReports addObject:monthCollection];
+			}
 			reportsInCurrentMonth = [NSMutableArray array];
-			[reportsInCurrentMonth addObject:dailyReport];
-			ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
-			monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
-			[sortedCalendarMonthReports addObject:monthCollection];
-		} else {
-			// This report is from the same month as the previous report. Append the daily report to the existing collection.
-			[reportsInCurrentMonth addObject:dailyReport];
 		}
+		[reportsInCurrentMonth addObject:dailyReport];
 		prevDateComponents = dateComponents;
+	}
+	if ([reportsInCurrentMonth count] > 0) {
+		ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
+		monthCollection.title = [monthFormatter stringFromDate:[monthCollection firstReport].startDate];
+		[sortedCalendarMonthReports addObject:monthCollection];
 	}
 	
 	// Group daily reports by fiscal month:
@@ -284,8 +286,8 @@
 		[sortedFiscalMonthReports addObject:fiscalMonthCollection];
 		fiscalMonthCollection.title = prevFiscalMonthName;
 	}
+	
 	[self.graphView reloadData];
-	[self reloadTableView];
 }
 
 

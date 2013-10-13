@@ -8,6 +8,7 @@
 
 #import "AccountsViewController.h"
 #import "SalesViewController.h"
+#import "ReviewsViewController.h"
 #import "SSKeychain.h"
 #import "ASAccount.h"
 #import "Report.h"
@@ -16,13 +17,17 @@
 #import "ReportDownloadCoordinator.h"
 #import "MBProgressHUD.h"
 #import "ReportImportOperation.h"
+#import "PaymentsViewController.h"
 #import "BadgedCell.h"
 #import "UIImage+Tinting.h"
 #import "AboutViewController.h"
 #import "AccountStatusView.h"
+#import "PromoCodesViewController.h"
+#import "PromoCodesLicenseViewController.h"
 #import "KKPasscodeLock.h"
 #import "ZipFile.h"
 #import "ZipWriteStream.h"
+#import "IconManager.h"
 
 #define kAddNewAccountEditorIdentifier		@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier		@"EditAccountEditorIdentifier"
@@ -67,6 +72,8 @@
 	
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] addObserver:self forKeyPath:@"isBusy" options:NSKeyValueObservingOptionNew context:nil];
 	
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
+    
 	[self reloadAccounts];
 }
 
@@ -173,7 +180,7 @@
 	if ([self.accounts count] == 0) {
 		return 0;
 	}
-	return 2;
+	return 5;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -196,11 +203,32 @@
 		cell.imageView.image = [UIImage imageNamed:@"Sales.png"];
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Sales.png" color:[UIColor whiteColor]];
 	} else if (indexPath.row == 1) {
+		NSInteger badge = [[[self.accounts objectAtIndex:indexPath.section] paymentsBadge] integerValue];
+		cell.textLabel.text = NSLocalizedString(@"Payments", nil);
+		cell.badgeCount = badge;
+		cell.imageView.image = [UIImage imageNamed:@"Payments.png"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Payments.png" color:[UIColor whiteColor]];
+	} else if (indexPath.row == 2) {
+		cell.textLabel.text = NSLocalizedString(@"Customer Reviews", nil);
+		cell.imageView.image = [UIImage imageNamed:@"Reviews.png"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Reviews.png" color:[UIColor whiteColor]];
+		
+		ASAccount *account = [self.accounts objectAtIndex:indexPath.section];
+		NSFetchRequest *unreadReviewsRequest = [[[NSFetchRequest alloc] init] autorelease];
+		[unreadReviewsRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:[self managedObjectContext]]];
+		[unreadReviewsRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND unread == TRUE", account]];
+		cell.badgeCount = [[self managedObjectContext] countForFetchRequest:unreadReviewsRequest error:NULL];
+	} else if (indexPath.row == 3) {
+		cell.textLabel.text = NSLocalizedString(@"Promo Codes", nil);
+		cell.imageView.image = [UIImage imageNamed:@"PromoCodes.png"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor whiteColor]];
+		cell.badgeCount = 0;
+	} else if (indexPath.row == 4) {
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
 		cell.imageView.image = [UIImage imageNamed:@"Account.png"];
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Account.png" color:[UIColor whiteColor]];
 		cell.badgeCount = 0;
-	}
+	}	
 	return cell;
 }
 
@@ -247,6 +275,15 @@
 		SalesViewController *salesViewController = [[[SalesViewController alloc] initWithAccount:account] autorelease];
 		[self.navigationController pushViewController:salesViewController animated:YES];
 	} else if (indexPath.row == 1) {
+		PaymentsViewController *paymentsViewController = [[[PaymentsViewController alloc] initWithAccount:account] autorelease];
+		[self.navigationController pushViewController:paymentsViewController animated:YES];
+	} else if (indexPath.row == 2) {
+		ReviewsViewController *reviewsViewController = [[[ReviewsViewController alloc] initWithAccount:account] autorelease];
+		[self.navigationController pushViewController:reviewsViewController animated:YES];
+	} else if (indexPath.row == 3) {
+		PromoCodesViewController *promoCodesViewController = [[[PromoCodesViewController alloc] initWithAccount:account] autorelease];
+		[self.navigationController pushViewController:promoCodesViewController animated:YES];
+	} else if (indexPath.row == 4) {
 		[self editAccount:account];
 	}
 }
@@ -329,7 +366,8 @@
 	for (Product *product in allProducts) {
 		FieldSpecifier *productNameField = [FieldSpecifier textFieldWithKey:[NSString stringWithFormat:@"product.name.%@", product.productID] title:NSLocalizedString(@"Name", nil) defaultValue:[product displayName]];
 		FieldSpecifier *hideProductField = [FieldSpecifier switchFieldWithKey:[NSString stringWithFormat:@"product.hidden.%@", product.productID] title:NSLocalizedString(@"Hide in Dashboard", nil) defaultValue:[product.hidden boolValue]];
-		FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productNameField, hideProductField, nil] title:nil description:nil];
+        FieldSpecifier *reloadProductInfoField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.reload.%@", product.productID] title:NSLocalizedString(@"Reload App Icon...", nil)];
+        FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productNameField, hideProductField, reloadProductInfoField, nil] title:nil description:nil];
 		FieldSpecifier *showInAppStoreField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.appstore.%@", product.productID] title:NSLocalizedString(@"Show in App Store...", nil)];
 		NSString *productFooter = [NSString stringWithFormat:@"Current version: %@\nApple ID: %@", ((product.currentVersion) ? product.currentVersion : @"N/A"), product.productID];
 		FieldSectionSpecifier *showInAppStoreSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:showInAppStoreField] title:nil description:productFooter];
@@ -365,12 +403,12 @@
 {
 	// main section
 	passcodeLockField = [FieldSpecifier buttonFieldWithKey:kPasscodeLockButton title:NSLocalizedString(@"Passcode Lock", nil)];
-	if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
-		passcodeLockField.defaultValue = @"On";
-	} else {
-		passcodeLockField.defaultValue = @"Off";
-	}
-	
+  if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
+    passcodeLockField.defaultValue = @"On";
+  } else {
+    passcodeLockField.defaultValue = @"Off";
+  }
+  
 	NSString *baseCurrency = [[CurrencyManager sharedManager] baseCurrency];
 	NSArray *availableCurrencies = [[CurrencyManager sharedManager] availableCurrencies];
 	NSMutableArray *currencyFields = [NSMutableArray array];
@@ -383,8 +421,9 @@
 																		  description:nil];
 	currencySection.exclusiveSelection = YES;
 	FieldSpecifier *currencySectionField = [FieldSpecifier subsectionFieldWithSection:currencySection key:@"currency"];
-	FieldSpecifier *updateExchangeRatesButtonField = [FieldSpecifier buttonFieldWithKey:kUpdateExchangeRatesButton title:NSLocalizedString(@"Update Exchange Rates Now", nil)];	
-	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:passcodeLockField, currencySectionField, updateExchangeRatesButtonField, nil] 
+	FieldSpecifier *updateExchangeRatesButtonField = [FieldSpecifier buttonFieldWithKey:kUpdateExchangeRatesButton title:NSLocalizedString(@"Update Exchange Rates Now", nil)];
+	FieldSpecifier *downloadPaymentsField = [FieldSpecifier switchFieldWithKey:kSettingDownloadPayments title:NSLocalizedString(@"Download Payments", nil) defaultValue:[[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments]];
+	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:passcodeLockField, currencySectionField, updateExchangeRatesButtonField, downloadPaymentsField, nil] 
 																			title:NSLocalizedString(@"General", nil) 
 																	  description:NSLocalizedString(@"Exchange rates will automatically be refreshed periodically.", nil)];
 
@@ -396,7 +435,7 @@
 																			defaultValue:[productSortByValue isEqualToString:@"productId"]];
 	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
 																		defaultValue:[productSortByValue isEqualToString:@"color"]];
-	NSMutableArray *productSortingFields = [NSArray arrayWithObjects:productSortingByProductIdField, productSortingByColorField, nil];
+	NSMutableArray *productSortingFields = [NSMutableArray arrayWithObjects:productSortingByProductIdField, productSortingByColorField, nil];
 
 
 	FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields
@@ -498,6 +537,7 @@
 				}
 			}
 		}
+		[[NSUserDefaults standardUserDefaults] setBool:[[returnValues objectForKey:kSettingDownloadPayments] boolValue] forKey:kSettingDownloadPayments];
 		[self dismissModalViewControllerAnimated:YES];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASViewSettingsDidChangeNotification object:nil];
@@ -538,6 +578,10 @@
 		NSString *productID = [key substringFromIndex:[@"product.appstore." length]];
 		NSString *appStoreURLString = [NSString stringWithFormat:@"http://itunes.apple.com/app/id%@", productID];
 		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreURLString]];
+    } else if ([key hasPrefix:@"product.reload."]) {
+        NSString *productID = [key substringFromIndex:[@"product.reload." length]];
+        IconManager *iconManager = [IconManager sharedManager];
+        [iconManager clearIconForAppID:productID];
 	} else if ([key isEqualToString:kDeleteAccountButton]) {
 		UIAlertView *confirmDeleteAlert = [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Delete Account?", nil) 
 																	  message:NSLocalizedString(@"Do you really want to delete this account and all of its data?", nil) 
@@ -716,6 +760,15 @@
   }
   
   [settingsViewController.tableView reloadData];
+}
+
+- (void)iconCleared:(NSNotification *)notification
+{
+    NSString *productID = [[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID];
+    if (productID) {
+        // reload Icon
+        [[IconManager sharedManager] iconForAppID:productID];
+    }
 }
 
 #pragma mark -

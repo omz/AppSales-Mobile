@@ -281,8 +281,10 @@
 		if (transactionType) {
 			NSString *promoType = transaction.promoType;
 			//Some old reports have "FREE" as the promo code identifier for updates, in newer reports, the field is empty.
-			if (promoType && ![promoType isEqualToString:@"FREE"]) { 
-				transactionType = [NSString stringWithFormat:@"%@.%@", transactionType, promoType];
+			if (promoType && ![promoType isEqualToString:@"FREE"]) {
+                if (promoType && ![promoType isEqualToString:@"FREE"] && ![promoType isEqualToString:@" "]) {
+                    transactionType = [NSString stringWithFormat:@"%@.%@", transactionType, promoType];
+                }
 			}
 			NSInteger count = [[[transactionsByType objectForKey:productIdentifier] objectForKey:transactionType] integerValue];
 			count += transactionUnits;
@@ -466,10 +468,15 @@
 	if (!combinedPaidTransactionTypes) {
 		combinedPaidTransactionTypes = [[NSSet alloc] initWithObjects:
 							@"1",		//iPhone App
+                            @"1. ",     //iPhone App
 							@"1F",		//Universal App
+                            @"1F. ",    //Universal App
 							@"1T",		//iPad App
+                            @"1T. ",    //iPad App
 							@"F1",		//Mac App
+                            @"F1. ",    //Mac App
 							@"IA1",		//In-App Purchase
+                            @"IA1. ",   //In-App Purchase
 							@"IA9",		//In-App Subscription
 							@"1.GP",	//GP = Gift Purchase
 							@"1F.GP",
