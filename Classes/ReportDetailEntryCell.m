@@ -28,11 +28,8 @@
 		revenueLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 4, 82, 30)];
 		revenueLabel.font = [UIFont systemFontOfSize:17.0];
 		revenueLabel.backgroundColor = [UIColor clearColor];
-		//revenueLabel.shadowColor = [UIColor whiteColor];
-		//revenueLabel.shadowOffset = CGSizeMake(0, 1);
-		//revenueLabel.highlightedTextColor = [UIColor whiteColor];
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
-		revenueLabel.textAlignment = UITextAlignmentRight;
+		revenueLabel.textAlignment = NSTextAlignmentRight;
 		[self.contentView addSubview:revenueLabel];
 		
 		barBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(130, 5, 180, 17)];
@@ -46,7 +43,7 @@
 		
 		percentageLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, barBackgroundView.bounds.size.width - 2, 17)];
 		percentageLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-		percentageLabel.textAlignment = UITextAlignmentRight;
+		percentageLabel.textAlignment = NSTextAlignmentRight;
 		percentageLabel.backgroundColor = [UIColor clearColor];
 		percentageLabel.font = [UIFont systemFontOfSize:11.0];
 		percentageLabel.textColor = [UIColor whiteColor];
@@ -68,9 +65,6 @@
 		percentageFormatter = [[NSNumberFormatter alloc] init];
 		[percentageFormatter setMaximumFractionDigits:1];
 		[percentageFormatter setNumberStyle:NSNumberFormatterPercentStyle];
-		
-		//self.backgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]] autorelease];
-		//self.selectedBackgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]] autorelease];
 	}
 	return self;
 }

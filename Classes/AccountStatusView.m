@@ -27,7 +27,7 @@
 		statusLabel.backgroundColor = [UIColor clearColor];
 		statusLabel.font = [UIFont systemFontOfSize:14.0];
 		statusLabel.textColor = [UIColor colorWithRed:0.322 green:0.357 blue:0.443 alpha:1.0];
-		statusLabel.textAlignment = UITextAlignmentCenter;
+		statusLabel.textAlignment = NSTextAlignmentCenter;
 		[self addSubview:statusLabel];
 		
 		[self updateStatus];

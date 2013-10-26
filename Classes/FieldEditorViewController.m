@@ -224,9 +224,9 @@
 	NSArray *fields = section.fields;
 	FieldSpecifier *field = [fields objectAtIndex:indexPath.row];
 	cell.textLabel.text = field.title;
-	cell.textLabel.textAlignment = UITextAlignmentLeft;
+	cell.textLabel.textAlignment = NSTextAlignmentLeft;
 	cell.accessoryType = UITableViewCellAccessoryNone;
-	CGSize labelSize = [field.title sizeWithFont:cell.textLabel.font];
+	CGSize labelSize = [field.title sizeWithAttributes:@{NSFontAttributeName: cell.textLabel.font}];
 	CGRect textLabelFrame = CGRectMake(10, 0, labelSize.width, 10);
 	
 	cell.detailTextLabel.text = @"";
@@ -401,7 +401,7 @@
 		}
 	}
 	FieldEditorViewController *subController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:@""] autorelease];
-	subController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
+	subController.preferredContentSize = self.preferredContentSize;
 	subController.title = subsectionField.title;
 	subController.delegate = self;
 	subController.doneButtonTitle = NSLocalizedString(@"Save",nil);

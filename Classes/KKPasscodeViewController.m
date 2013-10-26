@@ -200,7 +200,7 @@
 		[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 	}
 	
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)incrementAndShowFailedAttemptsLabel
@@ -216,7 +216,7 @@
 	} else {
 		_failedAttemptsLabel.text = [NSString stringWithFormat:@"%i Failed Passcode Attempts", _failedAttemptsCount];
 	}
-	CGSize size = [_failedAttemptsLabel.text sizeWithFont:[UIFont systemFontOfSize:14.0]];
+	CGSize size = [_failedAttemptsLabel.text sizeWithAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:14.0]}];
 	_failedAttemptsView.frame = CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0);
 	_failedAttemptsLabel.frame = CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0); 
 	
@@ -322,7 +322,7 @@
 						[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 					}
 					
-					[self dismissModalViewControllerAnimated:YES];
+					[self dismissViewControllerAnimated:YES completion:nil];
 				}
 			}						 
 		} else if (mode == KKPasscodeModeChange) {
@@ -358,7 +358,7 @@
 						[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 					}
 					
-					[self dismissModalViewControllerAnimated:YES];
+					[self dismissViewControllerAnimated:YES completion:nil];
 				}
 			}
 		}
@@ -384,7 +384,7 @@
 				[_delegate didPasscodeEnteredCorrectly:self];
 			}
 
-			[self dismissModalViewControllerAnimated:YES];
+			[self dismissViewControllerAnimated:YES completion:nil];
 		} else { 
 			[self incrementAndShowFailedAttemptsLabel];
 		}
@@ -406,7 +406,7 @@
 					[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 				}
 				
-				[self dismissModalViewControllerAnimated:YES];
+				[self dismissViewControllerAnimated:YES completion:nil];
 			}
 		}						 
 	} else if (mode == KKPasscodeModeChange) {
@@ -442,7 +442,7 @@
 					[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 				}
 				
-				[self dismissModalViewControllerAnimated:YES];
+				[self dismissViewControllerAnimated:YES completion:nil];
 			}
 		}
 	} else if (mode == KKPasscodeModeDisabled) {
@@ -456,7 +456,7 @@
 				[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 			}
 			
-			[self dismissModalViewControllerAnimated:YES];
+			[self dismissViewControllerAnimated:YES completion:nil];
 		} else { 
 			[self incrementAndShowFailedAttemptsLabel];
 		}
@@ -474,31 +474,31 @@
 	UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 27.5, self.view.bounds.size.width, 30.0)];
 	headerLabel.textColor = [UIColor colorWithRed:0.298 green:0.337 blue:0.424 alpha:1.0];
 	headerLabel.backgroundColor = [UIColor clearColor];
-	headerLabel.textAlignment = UITextAlignmentCenter;
+	headerLabel.textAlignment = NSTextAlignmentCenter;
 	headerLabel.font = [UIFont systemFontOfSize:17.0];
 	
 	if ([textField isEqual:_setPasscodeTextField]) {
 		_passcodeConfirmationWarningLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 146.5, self.view.bounds.size.width, 30.0)];
 		_passcodeConfirmationWarningLabel.textColor = [UIColor colorWithRed:0.298 green:0.337 blue:0.424 alpha:1.0];
 		_passcodeConfirmationWarningLabel.backgroundColor = [UIColor clearColor];
-		_passcodeConfirmationWarningLabel.textAlignment = UITextAlignmentCenter;
+		_passcodeConfirmationWarningLabel.textAlignment = NSTextAlignmentCenter;
 		_passcodeConfirmationWarningLabel.font = [UIFont systemFontOfSize:14.0];
 		_passcodeConfirmationWarningLabel.text = @"";
 		_passcodeConfirmationWarningLabel.numberOfLines = 0;
-		_passcodeConfirmationWarningLabel.lineBreakMode = UILineBreakModeWordWrap;
+		_passcodeConfirmationWarningLabel.lineBreakMode = NSLineBreakByWordWrapping;
 		[headerView addSubview:_passcodeConfirmationWarningLabel];
 	}
 	
 	if ([textField isEqual:_enterPasscodeTextField]) {
 		NSString *text = @"1 Failed Passcode Attempt";
-		CGSize size = [text sizeWithFont:[UIFont systemFontOfSize:14.0]];
+		CGSize size = [text sizeWithAttributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14.0]}];
 		_failedAttemptsView = [[UIView alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0)];
 		_failedAttemptsLabel = [[UILabel alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0)]; 
 		_failedAttemptsLabel.backgroundColor = [UIColor clearColor];
 		_failedAttemptsLabel.textColor = [UIColor whiteColor];
 		_failedAttemptsLabel.text = text;
 		_failedAttemptsLabel.font = [UIFont systemFontOfSize:14.0];
-		_failedAttemptsLabel.textAlignment = UITextAlignmentCenter;
+		_failedAttemptsLabel.textAlignment = NSTextAlignmentCenter;
 		_failedAttemptsView.layer.cornerRadius = 14;
 		_failedAttemptsView.layer.borderWidth = 1.0;
 		_failedAttemptsView.layer.borderColor = [[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor];
@@ -667,7 +667,7 @@
 						[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 					}
 					
-					[self dismissModalViewControllerAnimated:YES];
+					[self dismissViewControllerAnimated:YES completion:nil];
 				} else { 
 					[self incrementAndShowFailedAttemptsLabel];
 				}
@@ -685,7 +685,7 @@
 						[_delegate performSelector:@selector(didPasscodeEnteredCorrectly:) withObject:self];
 					}
 					
-					[self dismissModalViewControllerAnimated:YES];
+					[self dismissViewControllerAnimated:YES completion:nil];
 				} else { 
 					[self incrementAndShowFailedAttemptsLabel];
 				}
@@ -725,7 +725,7 @@
 							[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 						}
 						
-						[self dismissModalViewControllerAnimated:YES];
+						[self dismissViewControllerAnimated:YES completion:nil];
 					}
 				}
 			} else if ([textField isEqual:_setPasscodeTextField]) {
@@ -743,7 +743,7 @@
 					if ([_delegate respondsToSelector:@selector(didSettingsChanged:)]) {
 						[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 					}
-					[self dismissModalViewControllerAnimated:YES];
+					[self dismissViewControllerAnimated:YES completion:nil];
 				}
 			}
 		}

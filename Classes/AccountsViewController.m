@@ -130,7 +130,7 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		aboutNavController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
-	[self presentModalViewController:aboutNavController animated:YES];
+	[self presentViewController:aboutNavController animated:YES completion:nil];
 }
 
 
@@ -290,7 +290,7 @@
 		navigationController.modalPresentationStyle = UIModalPresentationFormSheet;
 		
 	}
-	[self presentModalViewController:navigationController animated:YES];
+	[self presentViewController:navigationController animated:YES completion:nil];
 }
 
 - (void)editAccount:(ASAccount *)account
@@ -355,7 +355,7 @@
 		editAccountViewController.hidesBottomBarWhenPushed = YES;
 	}
 	
-	editAccountViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
+	editAccountViewController.preferredContentSize = CGSizeMake(320, 480);
 	
 	[self.navigationController pushViewController:editAccountViewController animated:YES];
 }
@@ -395,7 +395,7 @@
 																			defaultValue:[productSortByValue isEqualToString:@"productId"]];
 	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
 																		defaultValue:[productSortByValue isEqualToString:@"color"]];
-	NSMutableArray *productSortingFields = [NSArray arrayWithObjects:productSortingByProductIdField, productSortingByColorField, nil];
+	NSMutableArray *productSortingFields = [NSMutableArray arrayWithObjects:productSortingByProductIdField, productSortingByColorField, nil];
 
 
 	FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields
@@ -426,7 +426,7 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		settingsNavController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
-	[self presentModalViewController:settingsNavController animated:YES];
+	[self presentViewController:settingsNavController animated:YES completion:nil];
 }
 
 - (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues
@@ -481,7 +481,7 @@
 		}
 		[self saveContext];
 		if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
-			[editor dismissModalViewControllerAnimated:YES];
+			[editor dismissViewControllerAnimated:YES completion:nil];
 		}
 		self.selectedAccount = nil;
 	} else if ([editor.editorIdentifier isEqualToString:kSettingsEditorIdentifier]) {
@@ -497,7 +497,7 @@
 				}
 			}
 		}
-		[self dismissModalViewControllerAnimated:YES];
+		[self dismissViewControllerAnimated:YES completion:nil];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASViewSettingsDidChangeNotification object:nil];
 	}
@@ -547,8 +547,8 @@
 		[confirmDeleteAlert show];
 	} else if ([key isEqualToString:@"SelectVendorIDButton"]) {
 		FieldEditorViewController *vc = nil;
-		if (self.modalViewController) {
-			UINavigationController *nav = (UINavigationController *)self.modalViewController;
+		if (self.presentedViewController) {
+			UINavigationController *nav = (UINavigationController *)self.presentedViewController;
 			vc = (FieldEditorViewController *)[[nav viewControllers] objectAtIndex:0];
 		} else {
 			vc = (FieldEditorViewController *)[self.navigationController.viewControllers lastObject];
@@ -702,7 +702,7 @@
 
 - (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
 {
-	[editor dismissModalViewControllerAnimated:YES];
+	[editor dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)didSettingsChanged:(KKPasscodeSettingsViewController*)viewController

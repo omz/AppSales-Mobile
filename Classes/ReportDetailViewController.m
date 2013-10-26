@@ -40,7 +40,7 @@
 		[revenueFormatter setMinimumFractionDigits:2];
 		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
-		self.contentSizeForViewInPopover = CGSizeMake(320, 500);
+		self.preferredContentSize = CGSizeMake(320, 500);
 		self.edgesForExtendedLayout = UIRectEdgeNone;
     }
     return self;
@@ -102,7 +102,6 @@
 	UISegmentedControl *modeControl = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil), nil]] autorelease];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:0];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:1];
-	modeControl.segmentedControlStyle = UISegmentedControlStyleBar;
 	modeControl.selectedSegmentIndex = (viewMode == ReportDetailViewModeProducts) ? 0 : 1;
 	[modeControl addTarget:self action:@selector(switchMode:) forControlEvents:UIControlEventValueChanged];
 	UIBarButtonItem *modeItem = [[[UIBarButtonItem alloc] initWithCustomView:modeControl] autorelease];
@@ -212,11 +211,11 @@
 	if ([allReports count] == 1) {
 		ReportCSVViewController *csvViewController = [[[ReportCSVViewController alloc] initWithReport:self.selectedReport] autorelease];
 		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:csvViewController] autorelease];
-		[self presentModalViewController:navController animated:YES];
+		[self presentViewController:navController animated:YES completion:nil];
 	} else {
 		ReportCSVSelectionViewController *csvSelectionController = [[[ReportCSVSelectionViewController alloc] initWithReports:allReports] autorelease];
 		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:csvSelectionController] autorelease];
-		[self presentModalViewController:navController animated:YES];
+		[self presentViewController:navController animated:YES completion:nil];
 	}
 }
 

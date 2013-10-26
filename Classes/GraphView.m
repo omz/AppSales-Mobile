@@ -59,7 +59,7 @@
 		
 		titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, self.bounds.size.width, 12)];
 		titleLabel.font = [UIFont systemFontOfSize:11.0];
-		titleLabel.textAlignment = UITextAlignmentCenter;
+		titleLabel.textAlignment = NSTextAlignmentCenter;
 		titleLabel.textColor = [UIColor grayColor];
 		titleLabel.backgroundColor = [UIColor clearColor];
 		[self addSubview:titleLabel];
@@ -346,7 +346,7 @@
 			dateLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 			dateLabel.backgroundColor = [UIColor clearColor];
 			dateLabel.textColor = [UIColor darkGrayColor];
-			dateLabel.textAlignment = UITextAlignmentCenter;
+			dateLabel.textAlignment = NSTextAlignmentCenter;
 			dateLabel.font = [UIFont systemFontOfSize:14.0];
 			dateLabel.adjustsFontSizeToFitWidth = YES;
 			[barView addSubview:dateLabel];
@@ -453,7 +453,7 @@
 		label.backgroundColor = [UIColor clearColor];
 		label.font = [UIFont systemFontOfSize:12.0];
 		label.adjustsFontSizeToFitWidth = YES;
-		label.textAlignment = UITextAlignmentCenter;
+		label.textAlignment = NSTextAlignmentCenter;
 		label.textColor = [UIColor darkGrayColor];
 		[self addSubview:label];
 	}
@@ -604,7 +604,7 @@
 				break;
 			}
 		}
-		NSMutableArray *steps = [NSMutableSet set];
+		NSMutableSet *steps = [NSMutableSet set];
 		int step = pickedUnit;
 		while (step <= newMax && pickedUnit != 0) {
 			[steps addObject:[NSNumber numberWithInt:step]];
@@ -680,7 +680,7 @@
 		label.backgroundColor = [UIColor clearColor];
 		label.font = [UIFont systemFontOfSize:12.0];
 		label.textColor = [UIColor darkGrayColor];
-		label.textAlignment = UITextAlignmentRight;
+		label.textAlignment = NSTextAlignmentRight;
 		label.adjustsFontSizeToFitWidth = YES;
 		[self addSubview:label];
 	}

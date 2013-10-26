@@ -24,7 +24,7 @@
 		
 		nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(44, 10, contentSize.width - 49, 20)];
 		nameLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-		nameLabel.lineBreakMode = UILineBreakModeMiddleTruncation;
+		nameLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
 		nameLabel.font = [UIFont systemFontOfSize:16.0];
 		nameLabel.backgroundColor = [UIColor clearColor];
 		//nameLabel.shadowColor = [UIColor whiteColor];

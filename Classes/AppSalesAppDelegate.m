@@ -53,7 +53,7 @@
 	} else {
 		self.accountsViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
 		self.accountsViewController.managedObjectContext = self.managedObjectContext;
-		self.accountsViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
+		self.accountsViewController.preferredContentSize = CGSizeMake(320, 480);
 		self.accountsViewController.delegate = self;
 		UINavigationController *accountsNavController = [[[UINavigationController alloc] initWithRootViewController:self.accountsViewController] autorelease];
 		accountsNavController.navigationBar.translucent = NO;
@@ -101,7 +101,7 @@
 
 - (void)selectAccount:(id)sender
 {
-	if (!self.window.rootViewController.modalViewController) {
+	if (!self.window.rootViewController.presentedViewController) {
 		[self.accountsPopover presentPopoverFromRect:CGRectMake(50, 50, 1, 1) inView:self.window.rootViewController.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
 	}
 }
@@ -236,14 +236,14 @@
 			nav.navigationBar.barStyle = accountsViewController.navigationController.navigationBar.barStyle;    
 		}
 		UIViewController *viewControllerForPresentingPasscode = nil;
-		if (self.window.rootViewController.modalViewController) {
-			if ([self.window.rootViewController.modalViewController isKindOfClass:[UINavigationController class]] 
-				&& [[[(UINavigationController *)self.window.rootViewController.modalViewController viewControllers] objectAtIndex:0] isKindOfClass:[KKPasscodeViewController class]]) {
+		if (self.window.rootViewController.presentedViewController) {
+			if ([self.window.rootViewController.presentedViewController isKindOfClass:[UINavigationController class]]
+				&& [[[(UINavigationController *)self.window.rootViewController.presentedViewController viewControllers] objectAtIndex:0] isKindOfClass:[KKPasscodeViewController class]]) {
 				//The passcode dialog is already shown...
 				return;
 			}
 			//We're in the settings or add account dialog...
-			viewControllerForPresentingPasscode = self.window.rootViewController.modalViewController;
+			viewControllerForPresentingPasscode = self.window.rootViewController.presentedViewController;
 		} else {
 			viewControllerForPresentingPasscode = self.window.rootViewController;
 		}
@@ -251,7 +251,7 @@
 			[self.accountsPopover dismissPopoverAnimated:NO];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASWillShowPasscodeLockNotification object:self];
-		[viewControllerForPresentingPasscode presentModalViewController:nav animated:NO];
+		[viewControllerForPresentingPasscode presentViewController:nav animated:NO completion:nil];
 	}
 }
 

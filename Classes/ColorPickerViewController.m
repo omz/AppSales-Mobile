@@ -24,7 +24,7 @@
 - (void)loadView
 {
 	[super loadView];
-	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+	self.view.backgroundColor = [UIColor whiteColor];
 	CGFloat height = self.view.bounds.size.height;
 	CGFloat rowHeight = 35.0;
 	int row = 0;

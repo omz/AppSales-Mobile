@@ -111,9 +111,9 @@
 
 - (void)finishedLoadingVendorID:(NSString *)vendorID
 {
-	if (self.modalViewController) {
+	if (self.presentedViewController) {
 		//Adding new account:
-		FieldEditorViewController *vc = [[(UINavigationController *)self.modalViewController viewControllers] objectAtIndex:0];
+		FieldEditorViewController *vc = [[(UINavigationController *)self.presentedViewController viewControllers] objectAtIndex:0];
 		[vc.values setObject:vendorID forKey:kAccountVendorID];
 		[vc.tableView reloadData];
 	} else {
