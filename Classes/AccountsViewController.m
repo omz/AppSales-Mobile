@@ -60,6 +60,8 @@
 	self.navigationItem.rightBarButtonItem = refreshButtonItem;
 	
 	self.title = NSLocalizedString(@"AppSales", nil);
+	self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil] autorelease];
+	
 	UIBarButtonItem *addButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNewAccount)] autorelease];
 	self.navigationItem.leftBarButtonItem = addButton;
 	
@@ -124,10 +126,9 @@
 {
 	AboutViewController *aboutViewController = [[[AboutViewController alloc] initWithNibName:nil bundle:nil] autorelease];
 	UINavigationController *aboutNavController = [[[UINavigationController alloc] initWithRootViewController:aboutViewController] autorelease];
+	
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		aboutNavController.modalPresentationStyle = UIModalPresentationFormSheet;
-	} else {
-		aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 	}
 	[self presentModalViewController:aboutNavController animated:YES];
 }
@@ -194,11 +195,9 @@
 		cell.textLabel.text = NSLocalizedString(@"Sales and Trends", nil);
 		cell.badgeCount = badge;
 		cell.imageView.image = [UIImage imageNamed:@"Sales.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Sales.png" color:[UIColor whiteColor]];
 	} else if (indexPath.row == 1) {
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
 		cell.imageView.image = [UIImage imageNamed:@"Account.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Account.png" color:[UIColor whiteColor]];
 		cell.badgeCount = 0;
 	}
 	return cell;

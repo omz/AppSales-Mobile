@@ -89,41 +89,22 @@
 	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
 	statusVisible = [self shouldShowStatusBar];
-	self.topView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]] autorelease];
+	self.topView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"TopBackground.png"] resizableImageWithCapInsets:UIEdgeInsetsMake(10, 10, 10, 10)]] autorelease];
 	topView.userInteractionEnabled = YES;
 	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5);
 	[self.view addSubview:topView];
 	
-	UIImageView *graphShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
-	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-	[topView addSubview:graphShadowView];
-	
 	self.productsTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain] autorelease];
 	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	productsTableView.dataSource = self;
 	productsTableView.delegate = self;
 	productsTableView.backgroundColor = [UIColor clearColor];
 	
-	productsTableView.tableHeaderView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]] autorelease];
-	productsTableView.tableFooterView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
-	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
-	productsTableView.contentInset = productsTableContentInset;
-	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
 	productsTableView.allowsMultipleSelection = YES;
 	
-	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+	self.view.backgroundColor = [UIColor whiteColor];
 	[self.view addSubview:self.productsTableView];
-	
-	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	shadowView.frame = graphShadowView.frame;
-	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	shadowView.alpha = 0.0;
-	
-	[self.view addSubview:shadowView];
 	
 	self.activityIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
 	if (statusVisible) [activityIndicator startAnimating];
@@ -133,8 +114,6 @@
 	statusLabel.font = [UIFont boldSystemFontOfSize:14.0];
 	statusLabel.backgroundColor = [UIColor clearColor];
 	statusLabel.textColor = [UIColor whiteColor];
-	statusLabel.shadowColor = [UIColor blackColor];
-	statusLabel.shadowOffset = CGSizeMake(0, -1);
 	statusLabel.textAlignment = UITextAlignmentCenter;
 	
 	self.progressBar = [[[UIProgressView alloc] initWithFrame:CGRectMake(0, 25, 200, 10)] autorelease];
@@ -146,6 +125,7 @@
 	UIBarButtonItem *statusItem = [[[UIBarButtonItem alloc] initWithCustomView:statusView] autorelease];
 	UIBarButtonItem *flexSpace = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
 	self.stopButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)] autorelease];
+	self.stopButtonItem.tintColor = [UIColor whiteColor];
 	
 	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - ((statusVisible) ? 44 : 0), self.view.bounds.size.width, 44);
 	self.statusToolbar = [[[UIToolbar alloc] initWithFrame:statusToolbarFrame] autorelease];
@@ -198,7 +178,7 @@
 	} else {
 		[self.activityIndicator stopAnimating];
 	}
-	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
+	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
 	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
 	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - ((statusVisible) ? 44 : 0), self.view.bounds.size.width, 44);
 	if (statusVisible) {
@@ -316,6 +296,9 @@
 	DashboardAppCell *cell = (DashboardAppCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (!cell) {
 		cell = [[[DashboardAppCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+	}
+	if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
+		[cell setSeparatorInset:UIEdgeInsetsMake(0, 44, 0, 8)];
 	}
 	
 	Product *product = nil;

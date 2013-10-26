@@ -225,7 +225,6 @@
 	FieldSpecifier *field = [fields objectAtIndex:indexPath.row];
 	cell.textLabel.text = field.title;
 	cell.textLabel.textAlignment = UITextAlignmentLeft;
-	cell.textLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	cell.accessoryType = UITableViewCellAccessoryNone;
 	CGSize labelSize = [field.title sizeWithFont:cell.textLabel.font];
 	CGRect textLabelFrame = CGRectMake(10, 0, labelSize.width, 10);

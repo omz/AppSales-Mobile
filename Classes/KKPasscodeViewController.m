@@ -45,6 +45,8 @@
 {
 	[super loadView];
 	
+	self.edgesForExtendedLayout = UIRectEdgeNone;
+	
 	self.view.backgroundColor = [UIColor whiteColor];
 	
 	self.enterPasscodeTableView = [[[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped] autorelease];
@@ -214,7 +216,7 @@
 	} else {
 		_failedAttemptsLabel.text = [NSString stringWithFormat:@"%i Failed Passcode Attempts", _failedAttemptsCount];
 	}
-	CGSize size = [_failedAttemptsLabel.text sizeWithFont:[UIFont boldSystemFontOfSize:14.0]];
+	CGSize size = [_failedAttemptsLabel.text sizeWithFont:[UIFont systemFontOfSize:14.0]];
 	_failedAttemptsView.frame = CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0);
 	_failedAttemptsLabel.frame = CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0); 
 	
@@ -473,9 +475,7 @@
 	headerLabel.textColor = [UIColor colorWithRed:0.298 green:0.337 blue:0.424 alpha:1.0];
 	headerLabel.backgroundColor = [UIColor clearColor];
 	headerLabel.textAlignment = UITextAlignmentCenter;
-	headerLabel.font = [UIFont boldSystemFontOfSize:17.0];
-	headerLabel.shadowOffset = CGSizeMake(0, 1.0);
-	headerLabel.shadowColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0];
+	headerLabel.font = [UIFont systemFontOfSize:17.0];
 	
 	if ([textField isEqual:_setPasscodeTextField]) {
 		_passcodeConfirmationWarningLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 146.5, self.view.bounds.size.width, 30.0)];
@@ -483,8 +483,6 @@
 		_passcodeConfirmationWarningLabel.backgroundColor = [UIColor clearColor];
 		_passcodeConfirmationWarningLabel.textAlignment = UITextAlignmentCenter;
 		_passcodeConfirmationWarningLabel.font = [UIFont systemFontOfSize:14.0];
-		_passcodeConfirmationWarningLabel.shadowOffset = CGSizeMake(0, 1.0);
-		_passcodeConfirmationWarningLabel.shadowColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0];
 		_passcodeConfirmationWarningLabel.text = @"";
 		_passcodeConfirmationWarningLabel.numberOfLines = 0;
 		_passcodeConfirmationWarningLabel.lineBreakMode = UILineBreakModeWordWrap;
@@ -493,16 +491,14 @@
 	
 	if ([textField isEqual:_enterPasscodeTextField]) {
 		NSString *text = @"1 Failed Passcode Attempt";
-		CGSize size = [text sizeWithFont:[UIFont boldSystemFontOfSize:14.0]];
+		CGSize size = [text sizeWithFont:[UIFont systemFontOfSize:14.0]];
 		_failedAttemptsView = [[UIView alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0)];
 		_failedAttemptsLabel = [[UILabel alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0)]; 
 		_failedAttemptsLabel.backgroundColor = [UIColor clearColor];
 		_failedAttemptsLabel.textColor = [UIColor whiteColor];
 		_failedAttemptsLabel.text = text;
-		_failedAttemptsLabel.font = [UIFont boldSystemFontOfSize:14.0];
+		_failedAttemptsLabel.font = [UIFont systemFontOfSize:14.0];
 		_failedAttemptsLabel.textAlignment = UITextAlignmentCenter;
-		_failedAttemptsLabel.shadowOffset = CGSizeMake(0, -1.0);
-		_failedAttemptsLabel.shadowColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:1.0];
 		_failedAttemptsView.layer.cornerRadius = 14;
 		_failedAttemptsView.layer.borderWidth = 1.0;
 		_failedAttemptsView.layer.borderColor = [[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor];
@@ -527,15 +523,16 @@
 	if (mode == KKPasscodeModeSet) {
 		self.navigationItem.title = @"Set Passcode";
 		UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+		cancel.tintColor = [UIColor whiteColor];
 		self.navigationItem.leftBarButtonItem = cancel;
 		[cancel release];
-		
 		
 		if ([textField isEqual:_enterPasscodeTextField]) {
 			headerLabel.text = @"Enter your passcode";
 		} else if ([textField isEqual:_setPasscodeTextField]) {
 			headerLabel.text = @"Enter a passcode";
 			UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+			cancel.tintColor = [UIColor whiteColor];
 			self.navigationItem.leftBarButtonItem = cancel;
 			[cancel release];
 			
@@ -545,6 +542,7 @@
 	} else if (mode == KKPasscodeModeDisabled) {
 		self.navigationItem.title = @"Turn off Passcode";
 		UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+		cancel.tintColor = [UIColor whiteColor];
 		self.navigationItem.leftBarButtonItem = cancel;
 		[cancel release];
 		
@@ -552,6 +550,7 @@
 	} else if (mode == KKPasscodeModeChange) {
 		self.navigationItem.title = @"Change Passcode";
 		UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+		cancel.tintColor = [UIColor whiteColor];
 		self.navigationItem.leftBarButtonItem = cancel;
 		[cancel release];
 		

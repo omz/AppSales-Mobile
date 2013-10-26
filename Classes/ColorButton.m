@@ -16,24 +16,12 @@
 - (void)drawRect:(CGRect)rect
 {
 	if (!color) return;
-	
-	UIBezierPath *roundRect = [UIBezierPath bezierPathWithRoundedRect:self.bounds cornerRadius:5.0];
-	UIBezierPath *innerRect = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(self.bounds, 3, 3) cornerRadius:3];
-	
 	if (self.highlighted) {
 		[[color colorByMultiplyingBy:0.5] set];
 	} else {
-		[(showOutline) ? [color colorByMultiplyingBy:0.75] : color set];
+		[color setFill];
 	}
-	if (displayAsEllipse) {
-		CGContextFillEllipseInRect(UIGraphicsGetCurrentContext(), self.bounds);
-		[color set];
-		CGContextFillEllipseInRect(UIGraphicsGetCurrentContext(), CGRectInset(self.bounds, 3, 3));
-	} else {
-		[roundRect fill];
-		[color set];
-		[innerRect fill];
-	}
+	UIRectFill(self.bounds);
 }
 
 - (void)setColor:(UIColor *)newColor

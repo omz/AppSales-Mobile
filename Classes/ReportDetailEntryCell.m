@@ -26,11 +26,11 @@
 		[self.contentView addSubview:iconView];
 		
 		revenueLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 4, 82, 30)];
-		revenueLabel.font = [UIFont boldSystemFontOfSize:17.0];
+		revenueLabel.font = [UIFont systemFontOfSize:17.0];
 		revenueLabel.backgroundColor = [UIColor clearColor];
-		revenueLabel.shadowColor = [UIColor whiteColor];
-		revenueLabel.shadowOffset = CGSizeMake(0, 1);
-		revenueLabel.highlightedTextColor = [UIColor whiteColor];
+		//revenueLabel.shadowColor = [UIColor whiteColor];
+		//revenueLabel.shadowOffset = CGSizeMake(0, 1);
+		//revenueLabel.highlightedTextColor = [UIColor whiteColor];
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
 		revenueLabel.textAlignment = UITextAlignmentRight;
 		[self.contentView addSubview:revenueLabel];
@@ -48,7 +48,7 @@
 		percentageLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
 		percentageLabel.textAlignment = UITextAlignmentRight;
 		percentageLabel.backgroundColor = [UIColor clearColor];
-		percentageLabel.font = [UIFont boldSystemFontOfSize:11.0];
+		percentageLabel.font = [UIFont systemFontOfSize:11.0];
 		percentageLabel.textColor = [UIColor whiteColor];
 		[barBackgroundView addSubview:percentageLabel];
 		
@@ -56,7 +56,7 @@
 		subtitleLabel.backgroundColor = [UIColor clearColor];
 		subtitleLabel.font = [UIFont systemFontOfSize:11.0];
 		subtitleLabel.textColor = [UIColor darkGrayColor];
-		subtitleLabel.highlightedTextColor = [UIColor whiteColor];
+		subtitleLabel.highlightedTextColor = [UIColor darkGrayColor];
 		[self.contentView addSubview:subtitleLabel];
 		
 		revenueFormatter = [[NSNumberFormatter alloc] init];
@@ -68,8 +68,8 @@
 		[percentageFormatter setMaximumFractionDigits:1];
 		[percentageFormatter setNumberStyle:NSNumberFormatterPercentStyle];
 		
-		self.backgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]] autorelease];
-		self.selectedBackgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]] autorelease];
+		//self.backgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]] autorelease];
+		//self.selectedBackgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]] autorelease];
 	}
 	return self;
 }
@@ -117,8 +117,8 @@
 	[super setSelected:selected animated:animated];
 	barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 	barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];
-	revenueLabel.shadowColor = [UIColor blackColor];
-	revenueLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
+	//revenueLabel.shadowColor = [UIColor blackColor];
+	//revenueLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
@@ -126,7 +126,7 @@
 	[super setHighlighted:highlighted animated:animated];
 	barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 	barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];
-	revenueLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
+	//revenueLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
 - (void)dealloc

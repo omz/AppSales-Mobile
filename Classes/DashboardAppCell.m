@@ -25,11 +25,11 @@
 		nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(44, 10, contentSize.width - 49, 20)];
 		nameLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 		nameLabel.lineBreakMode = UILineBreakModeMiddleTruncation;
-		nameLabel.font = [UIFont boldSystemFontOfSize:16.0];
+		nameLabel.font = [UIFont systemFontOfSize:16.0];
 		nameLabel.backgroundColor = [UIColor clearColor];
-		nameLabel.shadowColor = [UIColor whiteColor];
-		nameLabel.highlightedTextColor = [UIColor whiteColor];
-		nameLabel.shadowOffset = CGSizeMake(0, 1);
+		//nameLabel.shadowColor = [UIColor whiteColor];
+		//nameLabel.highlightedTextColor = [UIColor whiteColor];
+		//nameLabel.shadowOffset = CGSizeMake(0, 1);
 		
 		colorButton = [[ColorButton alloc] initWithFrame:CGRectMake(5, 5, 30, 30)];
 		colorButton.showOutline = NO;
@@ -40,8 +40,8 @@
 		[self.contentView addSubview:iconView];
 		[self.contentView addSubview:nameLabel];
 		
-		self.backgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]] autorelease];
-		self.selectedBackgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]] autorelease];
+		//self.backgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]] autorelease];
+		//self.selectedBackgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]] autorelease];
     }
     return self;
 }
@@ -74,7 +74,7 @@
 	[super setHighlighted:highlighted animated:animated];
 	colorButton.selected = NO;
 	colorButton.highlighted = NO;
-	nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
+	//nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated 
@@ -82,7 +82,7 @@
 	[super setSelected:selected animated:animated];
 	colorButton.selected = NO;
 	colorButton.highlighted = NO;
-	nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
+	//nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
 - (void)dealloc

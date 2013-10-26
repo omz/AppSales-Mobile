@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>08ED4EBE-FDAD-46CC-AF72-7E8915FE9D00</string>
+	<key>IDESourceControlProjectName</key>
+	<string>AppSales</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>CD0CEDBD-6CB0-407F-AF25-62D3A517214E</key>
+		<string>ssh://github.com/omz/AppSales-Mobile.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>AppSales.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>CD0CEDBD-6CB0-407F-AF25-62D3A517214E</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/omz/AppSales-Mobile.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>CD0CEDBD-6CB0-407F-AF25-62D3A517214E</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>CD0CEDBD-6CB0-407F-AF25-62D3A517214E</string>
+			<key>IDESourceControlWCCName</key>
+			<string>AppSales</string>
+		</dict>
+	</array>
+</dict>
+</plist>

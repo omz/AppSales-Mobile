@@ -10,12 +10,6 @@
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
 	<string>Icon57.png</string>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>Icon57.png</string>
-		<string>Icon72.png</string>
-		<string>Icon114.png</string>
-	</array>
 	<key>CFBundleIdentifier</key>
 	<string>de.omzsoftware.${PRODUCT_NAME:identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>

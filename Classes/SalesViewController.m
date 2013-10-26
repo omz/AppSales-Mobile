@@ -44,6 +44,8 @@
 		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
 		self.tabBarItem.image = [UIImage imageNamed:@"Sales.png"];
 		
+		self.edgesForExtendedLayout = UIRectEdgeNone;
+		
 		sortedDailyReports = [NSMutableArray new];
 		sortedWeeklyReports = [NSMutableArray new];
 		sortedCalendarMonthReports = [NSMutableArray new];
@@ -239,20 +241,17 @@
 	for (Report *dailyReport in sortedDailyReports) {
 		NSDateComponents *dateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dailyReport.startDate];
 		if (!prevDateComponents || (dateComponents.month != prevDateComponents.month || dateComponents.year != prevDateComponents.year)) {
-			if (reportsInCurrentMonth) {
-				ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
-				monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
-				[sortedCalendarMonthReports addObject:monthCollection];
-			}
+			// New month discovered. Make a new ReportCollection to gather all the daily reports in this month.
 			reportsInCurrentMonth = [NSMutableArray array];
+			[reportsInCurrentMonth addObject:dailyReport];
+			ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
+			monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
+			[sortedCalendarMonthReports addObject:monthCollection];
+		} else {
+			// This report is from the same month as the previous report. Append the daily report to the existing collection.
+			[reportsInCurrentMonth addObject:dailyReport];
 		}
-		[reportsInCurrentMonth addObject:dailyReport];
 		prevDateComponents = dateComponents;
-	}
-	if ([reportsInCurrentMonth count] > 0) {
-		ReportCollection *monthCollection = [[[ReportCollection alloc] initWithReports:reportsInCurrentMonth] autorelease];
-		monthCollection.title = [monthFormatter stringFromDate:[monthCollection firstReport].startDate];
-		[sortedCalendarMonthReports addObject:monthCollection];
 	}
 	
 	// Group daily reports by fiscal month:
@@ -705,7 +704,7 @@
 	if (selectedTab == 0 || selectedTab == 1) {
 		UIButton *latestValueButton = [UIButton buttonWithType:UIButtonTypeCustom];
 		latestValueButton.frame = CGRectMake(0, 0, 64, 28);
-		latestValueButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
+		latestValueButton.titleLabel.font = [UIFont systemFontOfSize:16.0];
 		latestValueButton.titleLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
 		latestValueButton.titleLabel.shadowOffset = CGSizeMake(0, -1);
 		[latestValueButton setBackgroundImage:[UIImage imageNamed:@"LatestValueButton.png"] forState:UIControlStateNormal];

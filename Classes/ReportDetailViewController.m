@@ -41,6 +41,7 @@
 		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
 		self.contentSizeForViewInPopover = CGSizeMake(320, 500);
+		self.edgesForExtendedLayout = UIRectEdgeNone;
     }
     return self;
 }
@@ -48,7 +49,7 @@
 - (void)loadView
 {
 	[super loadView];
-	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+	self.view.backgroundColor = [UIColor whiteColor];
 	
 	viewMode = (self.selectedProduct) ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
 	
@@ -61,22 +62,14 @@
 	}
 	[self.view addSubview:mapView];
 	
-	self.mapShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	mapShadowView.frame = CGRectMake(0, CGRectGetMaxY(mapView.frame), self.view.bounds.size.width, 20);
-	mapShadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	mapShadowView.alpha = (mapHidden) ? 0.0 : 1.0;
-	[self.view addSubview:mapShadowView];
-	
 	CGRect headerFrame = (mapHidden) ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 208-20, self.view.bounds.size.width, 20);
 	self.headerView = [[[UIImageView alloc] initWithFrame:headerFrame] autorelease];
 	headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	headerView.image = [UIImage imageNamed:@"DetailHeader.png"];
 	self.headerLabel = [[[UILabel alloc] initWithFrame:CGRectMake(30, 0, headerView.bounds.size.width - 40, 20)] autorelease];
 	headerLabel.textColor = [UIColor darkGrayColor];
-	headerLabel.shadowColor = [UIColor whiteColor];
-	headerLabel.shadowOffset = CGSizeMake(0, 1);
 	headerLabel.backgroundColor = [UIColor clearColor];
-	headerLabel.font = [UIFont boldSystemFontOfSize:13.0];
+	headerLabel.font = [UIFont systemFontOfSize:13.0];
 	[headerView addSubview:headerLabel];
 	self.headerIconView = [[[AppIconView alloc] initWithFrame:CGRectMake(7, 2, 16, 16)] autorelease];
 	headerIconView.image = [UIImage imageNamed:@"AllApps.png"];
@@ -88,23 +81,14 @@
 	CGRect tableViewFrame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
 	self.tableView = [[[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain] autorelease];
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+	tableView.separatorInset = UIEdgeInsetsMake(0, 40, 0, 0);
 	tableView.backgroundColor = [UIColor clearColor];
 	tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
+	tableView.contentInset = tableView.scrollIndicatorInsets;
 	tableView.dataSource = self;
 	tableView.delegate = self;
 	
-	self.tableView.tableHeaderView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]] autorelease];
-	self.tableView.tableFooterView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
-	
 	[self.view addSubview:tableView];
-	
-	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	shadowView.frame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, 20) : CGRectMake(0, 208, self.view.bounds.size.width, 20);
-	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	shadowView.alpha = 0.0;
-	[self.view addSubview:shadowView];
 	
 	if (!UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
 		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)] autorelease];
@@ -152,7 +136,7 @@
 	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(toInterfaceOrientation) ? 32.0 : 44.0;
 	self.toolbar.frame = CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight);
 	self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
-	self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
+	self.tableView.contentInset = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
@@ -368,21 +352,21 @@
 	if (viewMode == ReportDetailViewModeCountries) {
 		if (self.selectedProduct) {
 			self.headerIconView.productID = self.selectedProduct.productID;
-			self.headerLabel.text = [self.selectedProduct displayName];
+			self.headerLabel.text = [[self.selectedProduct displayName] uppercaseString];
 		} else {
 			self.headerIconView.productID = nil;
 			self.headerIconView.image = [UIImage imageNamed:@"AllApps.png"];
-			self.headerLabel.text = NSLocalizedString(@"All Apps", nil);
+			self.headerLabel.text = [NSLocalizedString(@"All Apps", nil) uppercaseString];
 		}
 	} else {
 		self.headerIconView.productID = nil;
 		if (self.selectedCountry) {
 			self.headerIconView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", [self.selectedCountry lowercaseString]]];
 			NSString *countryName = [[CountryDictionary sharedDictionary] nameForCountryCode:self.selectedCountry];
-			self.headerLabel.text = countryName;
+			self.headerLabel.text = [countryName uppercaseString];
 		} else {
 			self.headerIconView.image = [UIImage imageNamed:@"world.png"];
-			self.headerLabel.text = NSLocalizedString(@"All Countries", nil);
+			self.headerLabel.text = [NSLocalizedString(@"All Countries", nil) uppercaseString];
 		}
 	}
 }

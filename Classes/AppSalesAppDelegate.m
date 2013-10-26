@@ -26,6 +26,7 @@
 	
 	srandom(time(NULL));
 	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+	self.window.tintColor = [UIColor colorWithRed:0.28 green:0.51 blue:0.69 alpha:1.0];
 	
 	NSString *currencyCode = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
 	if (![[CurrencyManager sharedManager].availableCurrencies containsObject:currencyCode]) {
@@ -44,6 +45,7 @@
 		rootViewController.managedObjectContext = self.managedObjectContext;
 		UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:rootViewController] autorelease];
 		navigationController.toolbarHidden = NO;
+		navigationController.navigationBar.translucent = NO;
 		self.accountsViewController = rootViewController;
 		
 		self.window.rootViewController = navigationController;
@@ -54,6 +56,7 @@
 		self.accountsViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
 		self.accountsViewController.delegate = self;
 		UINavigationController *accountsNavController = [[[UINavigationController alloc] initWithRootViewController:self.accountsViewController] autorelease];
+		accountsNavController.navigationBar.translucent = NO;
 		accountsNavController.toolbarHidden = NO;
 		self.accountsPopover = [[[UIPopoverController alloc] initWithContentViewController:accountsNavController] autorelease];	
 		[self loadAccount:nil];
@@ -131,6 +134,7 @@
 	SalesViewController *salesVC = [[[SalesViewController alloc] initWithAccount:account] autorelease];
 	salesVC.navigationItem.leftBarButtonItem = selectAccountButtonItem;
 	UINavigationController *salesNavController = [[[UINavigationController alloc] initWithRootViewController:salesVC] autorelease];
+	salesNavController.navigationBar.translucent = NO;
 	
 	self.window.rootViewController = salesNavController;
 }
