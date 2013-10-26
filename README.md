@@ -21,8 +21,6 @@ AppSales allows iOS and Mac App Store developers to download and analyze their s
 * Import reports that you downloaded elsewhere (for example with [AppViz](http://www.ideaswarm.com) on your Mac) via iTunes File Sharing
 * Optional push notifications when new reports are available via Boxcar
 
-Please see the screenshot below for a visual guide to AppSales' main interface and some tips and tricks.
-
 ##Requirements
 AppSales requires the iOS 5.0 SDK or later.
 
@@ -42,8 +40,6 @@ If you'd like to support this effort, please consider a donation via PayPal or F
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YDQN4S3WVRCBU&lc=US&item_name=AppSales&no_note=1&currency_code=USD"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a> <a href="http://flattr.com/thing/366574/AppSales" target="_blank">
 <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
-
-![AppSales Screenshot](http://github.com/omz/AppSales-Mobile/raw/master/Screenshot.png)
 
 ##License
 In addition to the BSD-2 license below, I ask that you do not publicly distribute the app as a whole in binary form (e.g. on the App Store).
