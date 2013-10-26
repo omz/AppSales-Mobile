@@ -80,7 +80,6 @@
 		7FAEB66613E6D0EE00750788 /* BadgedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FAEB66513E6D0EE00750788 /* BadgedCell.m */; };
 		7FAEB66A13E6D1AF00750788 /* Badge.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAEB66813E6D1AF00750788 /* Badge.png */; };
 		7FAEB66B13E6D1AF00750788 /* Badge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAEB66913E6D1AF00750788 /* Badge@2x.png */; };
-		7FAEB67113E6D3AC00750788 /* UIImage+Tinting.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FAEB67013E6D3AB00750788 /* UIImage+Tinting.m */; };
 		7FAEB67813E6DD4C00750788 /* Account.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAEB67613E6DD4C00750788 /* Account.png */; };
 		7FAEB67913E6DD4C00750788 /* Account@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAEB67713E6DD4C00750788 /* Account@2x.png */; };
 		7FAEB68F13E75B0000750788 /* About.html in Resources */ = {isa = PBXBuildFile; fileRef = 7FAEB68E13E75AFF00750788 /* About.html */; };
@@ -738,8 +737,6 @@
 		7FAEB66513E6D0EE00750788 /* BadgedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BadgedCell.m; sourceTree = "<group>"; };
 		7FAEB66813E6D1AF00750788 /* Badge.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Badge.png; sourceTree = "<group>"; };
 		7FAEB66913E6D1AF00750788 /* Badge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Badge@2x.png"; sourceTree = "<group>"; };
-		7FAEB66F13E6D3AB00750788 /* UIImage+Tinting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Tinting.h"; sourceTree = "<group>"; };
-		7FAEB67013E6D3AB00750788 /* UIImage+Tinting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Tinting.m"; sourceTree = "<group>"; };
 		7FAEB67613E6DD4C00750788 /* Account.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Account.png; sourceTree = "<group>"; };
 		7FAEB67713E6DD4C00750788 /* Account@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Account@2x.png"; sourceTree = "<group>"; };
 		7FAEB68E13E75AFF00750788 /* About.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = About.html; sourceTree = "<group>"; };
@@ -1656,8 +1653,6 @@
 				7F709D6213BCB64F0008DBAD /* FieldEditorViewController.m */,
 				7FAEB66413E6D0EE00750788 /* BadgedCell.h */,
 				7FAEB66513E6D0EE00750788 /* BadgedCell.m */,
-				7FAEB66F13E6D3AB00750788 /* UIImage+Tinting.h */,
-				7FAEB67013E6D3AB00750788 /* UIImage+Tinting.m */,
 				7FAEB69013E75B7400750788 /* AboutViewController.h */,
 				7FAEB69113E75B7400750788 /* AboutViewController.m */,
 				7F963B4013E98B8600CA62FD /* AccountStatusView.h */,
@@ -2815,7 +2810,6 @@
 				7F398ED513DF570E004BEC44 /* ReportDetailEntry.m in Sources */,
 				7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */,
 				7FAEB66613E6D0EE00750788 /* BadgedCell.m in Sources */,
-				7FAEB67113E6D3AC00750788 /* UIImage+Tinting.m in Sources */,
 				7FAEB69213E75B7400750788 /* AboutViewController.m in Sources */,
 				7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */,
 				7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */,

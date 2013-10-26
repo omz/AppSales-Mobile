@@ -17,7 +17,6 @@
 #import "MBProgressHUD.h"
 #import "ReportImportOperation.h"
 #import "BadgedCell.h"
-#import "UIImage+Tinting.h"
 #import "AboutViewController.h"
 #import "AccountStatusView.h"
 #import "KKPasscodeLock.h"

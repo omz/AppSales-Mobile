@@ -7,7 +7,6 @@
 //
 
 #import "BadgedCell.h"
-#import "UIImage+Tinting.h"
 
 @implementation BadgedCell
 
