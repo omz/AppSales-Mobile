@@ -22,7 +22,7 @@ AppSales allows iOS and Mac App Store developers to download and analyze their s
 * Optional push notifications when new reports are available via Boxcar
 
 ##Requirements
-AppSales requires the iOS 5.0 SDK or later.
+AppSales requires the iOS 7.0 SDK or later.
 
 ##Push Notifications
 Because sales reports are not always available at the same time, I run a web service to send out push notifications when the daily reports have been generated.
