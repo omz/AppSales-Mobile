@@ -68,6 +68,7 @@
 		7F86C0F4181C648400F7BE09 /* HideMap@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F86C0F2181C648400F7BE09 /* HideMap@2x.png */; };
 		7F86C0F5181C648400F7BE09 /* ShowMap@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F86C0F3181C648400F7BE09 /* ShowMap@2x.png */; };
 		7F86C0F7181C781A00F7BE09 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F86C0F6181C781A00F7BE09 /* Media.xcassets */; };
+		7F86C0FA181D27DA00F7BE09 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F86C0F9181D27DA00F7BE09 /* Icon.png */; };
 		7F958AC713D46DD000FDFF75 /* DateButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F958AC613D46DD000FDFF75 /* DateButton@2x.png */; };
 		7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F963B4113E98B8600CA62FD /* AccountStatusView.m */; };
 		7FAB532613DCC1270027274F /* Back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FAB532413DCC1260027274F /* Back@2x.png */; };
@@ -722,6 +723,7 @@
 		7F86C0F2181C648400F7BE09 /* HideMap@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "HideMap@2x.png"; sourceTree = "<group>"; };
 		7F86C0F3181C648400F7BE09 /* ShowMap@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ShowMap@2x.png"; sourceTree = "<group>"; };
 		7F86C0F6181C781A00F7BE09 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		7F86C0F9181D27DA00F7BE09 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		7F958AC613D46DD000FDFF75 /* DateButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DateButton@2x.png"; sourceTree = "<group>"; };
 		7F963B4013E98B8600CA62FD /* AccountStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountStatusView.h; sourceTree = "<group>"; };
 		7F963B4113E98B8600CA62FD /* AccountStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountStatusView.m; sourceTree = "<group>"; };
@@ -1439,6 +1441,7 @@
 				7FDF6E8013D8962500B8CC4E /* countries.plist */,
 				7FDF6E8213D89B1000B8CC4E /* countries_simple.plist */,
 				7FAEB68E13E75AFF00750788 /* About.html */,
+				7F86C0F9181D27DA00F7BE09 /* Icon.png */,
 			);
 			name = "Supporting Files";
 			path = Support;
@@ -2335,6 +2338,7 @@
 				7FDF70E013D8D4AE00B8CC4E /* cl.png in Resources */,
 				7FDF70E113D8D4AE00B8CC4E /* cl@2x.png in Resources */,
 				7FDF70E213D8D4AE00B8CC4E /* cm.png in Resources */,
+				7F86C0FA181D27DA00F7BE09 /* Icon.png in Resources */,
 				7FDF70E313D8D4AE00B8CC4E /* cm@2x.png in Resources */,
 				7FDF70E413D8D4AE00B8CC4E /* cn.png in Resources */,
 				7FDF70E513D8D4AE00B8CC4E /* cn@2x.png in Resources */,
