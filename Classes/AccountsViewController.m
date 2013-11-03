@@ -670,12 +670,8 @@
 		}
 	} else if (alertView.tag == kAlertTagConfirmDelete) {
 		if (buttonIndex != [alertView cancelButtonIndex]) {
-			MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-			[hud setLabelText:NSLocalizedString(@"Deleting Account...", nil)];
-			
-			ASAccount *account = [[self.selectedAccount retain] autorelease];
+			[self deleteAccount:self.selectedAccount];
 			[self.navigationController popViewControllerAnimated:YES];
-			[self performSelector:@selector(deleteAccount:) withObject:account afterDelay:0.1];
 		}
 	}
 }
