@@ -44,7 +44,11 @@
 		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
 		self.tabBarItem.image = [UIImage imageNamed:@"Sales.png"];
 		
-		self.edgesForExtendedLayout = UIRectEdgeNone;
+#if defined(__IPHONE_7_0)
+		if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+			self.edgesForExtendedLayout = UIRectEdgeNone;
+		}
+#endif
 		
 		sortedDailyReports = [NSMutableArray new];
 		sortedWeeklyReports = [NSMutableArray new];
