@@ -317,7 +317,17 @@
     // Add label if label text was set
     if (nil != self.labelText) {
         // Get size of label text
-		CGSize dims = [self.labelText sizeWithAttributes:@{NSFontAttributeName: self.labelFont}];
+		CGSize dims;
+#if defined(__IPHONE_7_0)
+		if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+			dims = [self.labelText sizeWithAttributes:@{NSFontAttributeName: self.labelFont}];
+		}
+		else {
+#endif
+			dims = [self.labelText sizeWithFont:self.labelFont];
+#if defined(__IPHONE_7_0)
+		}
+#endif
         // Compute label dimensions based on font metrics if size is larger than max then clip the label width
         float lHeight = dims.height;
         float lWidth;
@@ -358,7 +368,16 @@
         // Add details label delatils text was set
         if (nil != self.detailsLabelText) {
             // Get size of label text
-			dims = [self.detailsLabelText sizeWithAttributes:@{NSFontAttributeName: self.detailsLabelFont}];
+#if defined(__IPHONE_7_0)
+			if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+				dims = [self.detailsLabelText sizeWithAttributes:@{NSFontAttributeName: self.detailsLabelFont}];
+			}
+			else {
+#endif
+				dims = [self.detailsLabelText sizeWithFont:self.detailsLabelFont];
+#if defined(__IPHONE_7_0)
+			}
+#endif
             // Compute label dimensions based on font metrics if size is larger than max then clip the label width
             lHeight = dims.height;
             if (dims.width <= (frame.size.width - 2 * margin)) {

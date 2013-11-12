@@ -57,7 +57,11 @@
 	} else {
 		self.accountsViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
 		self.accountsViewController.managedObjectContext = self.managedObjectContext;
-		self.accountsViewController.preferredContentSize = CGSizeMake(320, 480);
+#if defined(__IPHONE_7_0)
+		if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+			self.accountsViewController.preferredContentSize = CGSizeMake(320, 480);
+		}
+#endif
 		self.accountsViewController.delegate = self;
 		UINavigationController *accountsNavController = [[[UINavigationController alloc] initWithRootViewController:self.accountsViewController] autorelease];
 		accountsNavController.navigationBar.translucent = NO;

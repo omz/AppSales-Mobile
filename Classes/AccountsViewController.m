@@ -59,7 +59,9 @@
 	self.navigationItem.rightBarButtonItem = refreshButtonItem;
 	
 	self.title = NSLocalizedString(@"AppSales", nil);
-	self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil] autorelease];
+	if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+		self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil] autorelease];
+	}
 	
 	UIBarButtonItem *addButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNewAccount)] autorelease];
 	self.navigationItem.leftBarButtonItem = addButton;
@@ -354,7 +356,11 @@
 		editAccountViewController.hidesBottomBarWhenPushed = YES;
 	}
 	
-	editAccountViewController.preferredContentSize = CGSizeMake(320, 480);
+#if defined(__IPHONE_7_0)
+	if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+		editAccountViewController.preferredContentSize = CGSizeMake(320, 480);
+	}
+#endif
 	
 	[self.navigationController pushViewController:editAccountViewController animated:YES];
 }

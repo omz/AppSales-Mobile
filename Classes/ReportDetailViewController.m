@@ -40,9 +40,9 @@
 		[revenueFormatter setMinimumFractionDigits:2];
 		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
-		self.preferredContentSize = CGSizeMake(320, 500);
 #if defined(__IPHONE_7_0)
 		if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+			self.preferredContentSize = CGSizeMake(320, 500);
 			self.edgesForExtendedLayout = UIRectEdgeNone;
 		}
 #endif
@@ -85,7 +85,11 @@
 	CGRect tableViewFrame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
 	self.tableView = [[[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain] autorelease];
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	tableView.separatorInset = UIEdgeInsetsMake(0, 40, 0, 0);
+#if defined(__IPHONE_7_0)
+	if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+		tableView.separatorInset = UIEdgeInsetsMake(0, 40, 0, 0);
+	}
+#endif
 	tableView.backgroundColor = [UIColor clearColor];
 	tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
 	tableView.contentInset = tableView.scrollIndicatorInsets;

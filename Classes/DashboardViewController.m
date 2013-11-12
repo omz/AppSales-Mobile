@@ -254,7 +254,11 @@
 		vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
 		[self presentViewController:vc animated:YES completion:nil];
 	} else {
-		vc.preferredContentSize = CGSizeMake(320, 210);
+#if defined(__IPHONE_7_0)
+		if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+			vc.preferredContentSize = CGSizeMake(320, 210);
+		}
+#endif
 		self.colorPopover = [[[UIPopoverController alloc] initWithContentViewController:vc] autorelease];
 		[self.colorPopover presentPopoverFromRect:sender.bounds inView:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 	}
@@ -297,9 +301,11 @@
 	if (!cell) {
 		cell = [[[DashboardAppCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
 	}
-	if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
+#if defined(__IPHONE_7_0)
+	if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
 		[cell setSeparatorInset:UIEdgeInsetsMake(0, 44, 0, 8)];
 	}
+#endif
 	
 	Product *product = nil;
 	if (indexPath.row != 0) {

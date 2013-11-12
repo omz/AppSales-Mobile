@@ -226,7 +226,17 @@
 	cell.textLabel.text = field.title;
 	cell.textLabel.textAlignment = NSTextAlignmentLeft;
 	cell.accessoryType = UITableViewCellAccessoryNone;
-	CGSize labelSize = [field.title sizeWithAttributes:@{NSFontAttributeName: cell.textLabel.font}];
+	CGSize labelSize;
+#if defined(__IPHONE_7_0)
+	if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+		labelSize = [field.title sizeWithAttributes:@{NSFontAttributeName: cell.textLabel.font}];
+	}
+	else {
+#endif
+		labelSize = [field.title sizeWithFont:cell.textLabel.font];
+#if defined(__IPHONE_7_0)
+	}
+#endif
 	CGRect textLabelFrame = CGRectMake(10, 0, labelSize.width, 10);
 	
 	cell.detailTextLabel.text = @"";
@@ -401,7 +411,11 @@
 		}
 	}
 	FieldEditorViewController *subController = [[[FieldEditorViewController alloc] initWithFieldSections:sections title:@""] autorelease];
-	subController.preferredContentSize = self.preferredContentSize;
+#if defined(__IPHONE_7_0)
+	if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+		subController.preferredContentSize = self.preferredContentSize;
+	}
+#endif
 	subController.title = subsectionField.title;
 	subController.delegate = self;
 	subController.doneButtonTitle = NSLocalizedString(@"Save",nil);
