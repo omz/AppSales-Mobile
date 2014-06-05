@@ -60,7 +60,7 @@
 		nameLabel.text = [product displayName];
 		colorButton.hidden = NO;
 		colorButton.color = product.color;
-		if (self.product.parentSKU) {
+		if (self.product.parentSKU && self.product.parentSKU.length > 1) {
 			iconView.productID = nil;
 			iconView.image = [UIImage imageNamed:@"InApp.png"];
 		} else {
