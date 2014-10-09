@@ -122,7 +122,7 @@
 			cell.textLabel.text = @"Turn Passcode On";
 		}
 		cell.textLabel.textColor = [UIColor blackColor];
-		cell.textLabel.textAlignment = UITextAlignmentCenter;
+		cell.textLabel.textAlignment = NSTextAlignmentCenter;
 		cell.accessoryView = nil;
 		cell.selectionStyle = UITableViewCellSelectionStyleBlue;
 	} else if (indexPath.section == 1) {
@@ -134,11 +134,11 @@
 			cell.textLabel.textColor = [UIColor grayColor];
 			cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		}
-		cell.textLabel.textAlignment = UITextAlignmentCenter;
+		cell.textLabel.textAlignment = NSTextAlignmentCenter;
 		cell.accessoryView = nil;
 	} else if (indexPath.section == 2) {
 		cell.textLabel.text = @"Erase Data";
-		cell.textLabel.textAlignment = UITextAlignmentLeft;
+		cell.textLabel.textAlignment = NSTextAlignmentLeft;
 		cell.accessoryView = _eraseDataSwitch;
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		if (_passcodeLockOn) {
@@ -182,7 +182,7 @@
 			nav.navigationBar.barStyle = self.navigationController.navigationBar.barStyle;		
 		}
 		
-		[self.navigationController presentModalViewController:nav animated:YES];
+		[self.navigationController presentViewController:nav animated:YES completion:nil];
 		
 		
 	} else if (indexPath.section == 1 && _passcodeLockOn) {
@@ -205,7 +205,7 @@
 			nav.navigationBar.barStyle = self.navigationController.navigationBar.barStyle;		
 		}
 		
-		[self.navigationController presentModalViewController:nav animated:YES];		
+		[self.navigationController presentViewController:nav animated:YES completion:nil];
 	}
 }
 

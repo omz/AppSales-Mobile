@@ -234,11 +234,11 @@
 	if ([allReports count] == 1) {
 		ReportCSVViewController *csvViewController = [[[ReportCSVViewController alloc] initWithReport:self.selectedReport] autorelease];
 		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:csvViewController] autorelease];
-		[self presentModalViewController:navController animated:YES];
+		[self presentViewController:navController animated:YES completion:nil];
 	} else {
 		ReportCSVSelectionViewController *csvSelectionController = [[[ReportCSVSelectionViewController alloc] initWithReports:allReports] autorelease];
 		UINavigationController *navController = [[[UINavigationController alloc] initWithRootViewController:csvSelectionController] autorelease];
-		[self presentModalViewController:navController animated:YES];
+		[self presentViewController:navController animated:YES completion:nil];
 	}
 }
 

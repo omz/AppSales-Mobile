@@ -135,7 +135,7 @@
 	statusLabel.textColor = [UIColor whiteColor];
 	statusLabel.shadowColor = [UIColor blackColor];
 	statusLabel.shadowOffset = CGSizeMake(0, -1);
-	statusLabel.textAlignment = UITextAlignmentCenter;
+	statusLabel.textAlignment = NSTextAlignmentCenter;
 	
 	self.progressBar = [[[UIProgressView alloc] initWithFrame:CGRectMake(0, 25, 200, 10)] autorelease];
 	
@@ -276,7 +276,7 @@
 	vc.context = product;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
 		vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
-		[self presentModalViewController:vc animated:YES];
+		[self presentViewController:vc animated:YES completion:nil];
 	} else {
 		vc.contentSizeForViewInPopover = CGSizeMake(320, 210);
 		self.colorPopover = [[[UIPopoverController alloc] initWithContentViewController:vc] autorelease];
@@ -291,7 +291,7 @@
 	[product.managedObjectContext save:NULL];
 	[self reloadTableView];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-		[picker dismissModalViewControllerAnimated:YES];
+		[picker dismissViewControllerAnimated:YES completion:nil];
 	} else {
 		[self.colorPopover dismissPopoverAnimated:YES];
 	}

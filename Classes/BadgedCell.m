@@ -25,7 +25,7 @@
 		badgeLabel.adjustsFontSizeToFitWidth = YES;
 		badgeLabel.backgroundColor = [UIColor clearColor];
 		badgeLabel.textColor = [UIColor whiteColor];
-		badgeLabel.textAlignment = UITextAlignmentCenter;
+		badgeLabel.textAlignment = NSTextAlignmentCenter;
 		badgeLabel.font = [UIFont boldSystemFontOfSize:14.0];
 		badgeLabel.highlightedTextColor = [UIColor colorWithRed:0.008 green:0.435 blue:0.929 alpha:1.0];
 		[badgeView addSubview:badgeLabel];

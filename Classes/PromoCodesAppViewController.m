@@ -52,7 +52,7 @@
 		statusLabel.textColor = [UIColor whiteColor];
 		statusLabel.shadowColor = [UIColor blackColor];
 		statusLabel.shadowOffset = CGSizeMake(0, -1);
-		statusLabel.textAlignment = UITextAlignmentCenter;
+		statusLabel.textAlignment = NSTextAlignmentCenter;
 		statusLabel.text = NSLocalizedString(@"Loading Promo Codes...", nil);
 		
 		UIView *statusView = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 200, 40)] autorelease];
@@ -107,7 +107,7 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		navController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
-	[self presentModalViewController:navController animated:YES];
+	[self presentViewController:navController animated:YES completion:nil];
 }
 
 - (void)stopDownload:(id)sender
@@ -161,14 +161,14 @@
 		[[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter a smaller number. You have a maximum of 50 promo codes per version of your app.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] autorelease] show];
 		return;
 	}
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 	
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadPromoCodesForProduct:product numberOfCodes:numberOfCodes];
 }
 
 - (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
 {
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)refreshHistory:(id)sender
@@ -289,7 +289,7 @@
 				NSString *subject = [NSString stringWithFormat:@"Promo Code for %@", [product displayName]];
 				[mailComposeViewController setMessageBody:body isHTML:YES];
 				[mailComposeViewController setSubject:subject];
-				[self presentModalViewController:mailComposeViewController animated:YES];
+				[self presentViewController:mailComposeViewController animated:YES completion:nil];
 			} else if (buttonIndex == 1) {
 				//copy
 				[[UIPasteboard generalPasteboard] setString:self.selectedPromoCode.code];
@@ -315,7 +315,7 @@
 				NSString *subject = [NSString stringWithFormat:@"Promo Codes for %@", [product displayName]];
 				[mailComposeViewController setMessageBody:body isHTML:NO];
 				[mailComposeViewController setSubject:subject];
-				[self presentModalViewController:mailComposeViewController animated:YES];
+				[self presentViewController:mailComposeViewController animated:YES completion:nil];
 			} else if (buttonIndex == 1) {
 				NSMutableString *allCodes = [NSMutableString string];
 				for (PromoCode *promoCode in self.promoCodes) {
@@ -338,7 +338,7 @@
 		self.selectedPromoCode.used = [NSNumber numberWithBool:YES];
 		[self.tableView reloadData];
 	}
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 

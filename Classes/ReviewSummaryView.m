@@ -25,7 +25,7 @@
 			
 			UILabel *starLabel = [[[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, CGRectGetMidY(barFrame) - 15, 90, 29))] autorelease];
 			starLabel.backgroundColor = [UIColor clearColor];
-			starLabel.textAlignment = UITextAlignmentRight;
+			starLabel.textAlignment = NSTextAlignmentRight;
 			starLabel.textColor = [UIColor darkGrayColor];
 			starLabel.shadowColor = [UIColor whiteColor];
 			starLabel.shadowOffset = CGSizeMake(0, 1);
@@ -97,7 +97,7 @@
 		averageLabel.font = [UIFont boldSystemFontOfSize:15.0];
 		averageLabel.backgroundColor = [UIColor clearColor];
 		averageLabel.textColor = [UIColor darkGrayColor];
-		averageLabel.textAlignment = UITextAlignmentRight;
+		averageLabel.textAlignment = NSTextAlignmentRight;
 		[self addSubview:averageLabel];
 		
 		if (iPad) {

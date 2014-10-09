@@ -54,7 +54,7 @@
 	yearRect.origin.y += 10;
 	[[UIColor darkGrayColor] set];
 	UIFont *yearFont = [UIFont boldSystemFontOfSize:27];
-	[[NSString stringWithFormat:@"%i", year] drawInRect:yearRect withFont:yearFont lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
+	[[NSString stringWithFormat:@"%i", year] drawInRect:yearRect withFont:yearFont lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
 	
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM"];
@@ -83,7 +83,7 @@
 		NSDate *monthDate = [calendar dateFromComponents:monthComponents];
 		NSString *month = [monthFormatter stringFromDate:monthDate];
 		
-		[month drawInRect:monthRect withFont:monthFont lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentLeft];
+		[month drawInRect:monthRect withFont:monthFont lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentLeft];
 		
 		NSString *label = [labelsByMonth objectForKey:[NSNumber numberWithInt:i+1]];
 		if (label) {
@@ -99,7 +99,7 @@
 	}
 	
 	CGRect footerRect = CGRectMake(margin, self.bounds.size.height - footerHeight + 3, self.bounds.size.width - 2 * margin, 20);
-	[self.footerText drawInRect:footerRect withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:UILineBreakModeClip alignment:UITextAlignmentCenter];
+	[self.footerText drawInRect:footerRect withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
 	
 }
 

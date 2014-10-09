@@ -40,13 +40,13 @@
 {
 	downloadOperation.paused = NO;
 	[downloadOperation start];
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)cancel:(id)sender
 {
 	[downloadOperation cancel];
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -80,7 +80,7 @@
 
 - (void)done:(id)sender
 {
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)dealloc

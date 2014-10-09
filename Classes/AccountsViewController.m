@@ -136,7 +136,7 @@
 	} else {
 		aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 	}
-	[self presentModalViewController:aboutNavController animated:YES];
+    [self presentViewController:aboutNavController animated:YES completion:nil];
 }
 
 
@@ -328,7 +328,7 @@
 		navigationController.modalPresentationStyle = UIModalPresentationFormSheet;
 		
 	}
-	[self presentModalViewController:navigationController animated:YES];
+	[self presentViewController:navigationController animated:YES completion:nil];
 }
 
 - (void)editAccount:(ASAccount *)account
@@ -466,7 +466,7 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		settingsNavController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
-	[self presentModalViewController:settingsNavController animated:YES];
+	[self presentViewController:settingsNavController animated:YES completion:nil];
 }
 
 - (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues
@@ -521,7 +521,7 @@
 		}
 		[self saveContext];
 		if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
-			[editor dismissModalViewControllerAnimated:YES];
+			[editor dismissViewControllerAnimated:YES completion:nil];
 		}
 		self.selectedAccount = nil;
 	} else if ([editor.editorIdentifier isEqualToString:kSettingsEditorIdentifier]) {
@@ -538,7 +538,7 @@
 			}
 		}
 		[[NSUserDefaults standardUserDefaults] setBool:[[returnValues objectForKey:kSettingDownloadPayments] boolValue] forKey:kSettingDownloadPayments];
-		[self dismissModalViewControllerAnimated:YES];
+		[self dismissViewControllerAnimated:YES completion:nil];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASViewSettingsDidChangeNotification object:nil];
 	}
@@ -592,8 +592,8 @@
 		[confirmDeleteAlert show];
 	} else if ([key isEqualToString:@"SelectVendorIDButton"]) {
 		FieldEditorViewController *vc = nil;
-		if (self.modalViewController) {
-			UINavigationController *nav = (UINavigationController *)self.modalViewController;
+		if (self.presentedViewController) {
+			UINavigationController *nav = (UINavigationController *)self.presentedViewController;
 			vc = (FieldEditorViewController *)[[nav viewControllers] objectAtIndex:0];
 		} else {
 			vc = (FieldEditorViewController *)[self.navigationController.viewControllers lastObject];
@@ -747,7 +747,7 @@
 
 - (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
 {
-	[editor dismissModalViewControllerAnimated:YES];
+	[editor dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)didSettingsChanged:(KKPasscodeSettingsViewController*)viewController

@@ -90,12 +90,12 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		mailComposeViewController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
-	[self presentModalViewController:mailComposeViewController animated:YES];
+    [self presentViewController:mailComposeViewController animated:YES completion:nil];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
 {
-	[self dismissModalViewControllerAnimated:YES];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 

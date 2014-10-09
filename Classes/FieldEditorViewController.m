@@ -224,7 +224,7 @@
 	NSArray *fields = section.fields;
 	FieldSpecifier *field = [fields objectAtIndex:indexPath.row];
 	cell.textLabel.text = field.title;
-	cell.textLabel.textAlignment = UITextAlignmentLeft;
+	cell.textLabel.textAlignment = NSTextAlignmentLeft;
 	cell.textLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	cell.accessoryType = UITableViewCellAccessoryNone;
 	CGSize labelSize = [field.title sizeWithFont:cell.textLabel.font];

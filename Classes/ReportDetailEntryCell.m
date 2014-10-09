@@ -32,7 +32,7 @@
 		revenueLabel.shadowOffset = CGSizeMake(0, 1);
 		revenueLabel.highlightedTextColor = [UIColor whiteColor];
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
-		revenueLabel.textAlignment = UITextAlignmentRight;
+		revenueLabel.textAlignment = NSTextAlignmentRight;
 		[self.contentView addSubview:revenueLabel];
 		
 		barBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(130, 5, 180, 17)];
@@ -46,7 +46,7 @@
 		
 		percentageLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, barBackgroundView.bounds.size.width - 2, 17)];
 		percentageLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-		percentageLabel.textAlignment = UITextAlignmentRight;
+		percentageLabel.textAlignment = NSTextAlignmentRight;
 		percentageLabel.backgroundColor = [UIColor clearColor];
 		percentageLabel.font = [UIFont boldSystemFontOfSize:11.0];
 		percentageLabel.textColor = [UIColor whiteColor];
