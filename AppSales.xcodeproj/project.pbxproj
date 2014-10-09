@@ -622,6 +622,7 @@
 		7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
+		AADD25CF19E6DEB900F993FD /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AADD25CE19E6DEB900F993FD /* Launch.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1309,6 +1310,7 @@
 		7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+HTTP.m"; sourceTree = "<group>"; };
 		7FFFB39713D4573700AD18E3 /* Sales.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Sales.png; sourceTree = "<group>"; };
 		7FFFB39C13D4599300AD18E3 /* DateButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButton.png; sourceTree = "<group>"; };
+		AADD25CE19E6DEB900F993FD /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1433,6 +1435,7 @@
 		7F709D3413BC98860008DBAD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AADD25CE19E6DEB900F993FD /* Launch.storyboard */,
 				7FDF6E9813D8D4AD00B8CC4E /* Flag Images */,
 				7F709D6F13BCCB8B0008DBAD /* Images */,
 				7F709D3513BC98860008DBAD /* AppSales-Info.plist */,
@@ -2484,6 +2487,7 @@
 				7FDF717013D8D4AE00B8CC4E /* km.png in Resources */,
 				7FDF717113D8D4AE00B8CC4E /* km@2x.png in Resources */,
 				7FDF717213D8D4AE00B8CC4E /* kn.png in Resources */,
+				AADD25CF19E6DEB900F993FD /* Launch.storyboard in Resources */,
 				7FDF717313D8D4AE00B8CC4E /* kn@2x.png in Resources */,
 				7FDF717413D8D4AE00B8CC4E /* kp.png in Resources */,
 				7FDF717513D8D4AE00B8CC4E /* kp@2x.png in Resources */,
