@@ -136,7 +136,7 @@
         [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
         [pred appendString:@" AND (product == nil"];
-        for (Product* p in self.selectedProducts) {
+        for (Product* p __attribute__((unused)) in self.selectedProducts) {
             [pred appendString:@" OR product == %@"];
         }
         [pred appendString:@")"];
@@ -163,7 +163,7 @@
         [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
         [pred appendString:@" AND (product == nil"];
-        for (Product* p in self.selectedProducts) {
+        for (Product* p __attribute__((unused)) in self.selectedProducts) {
             [pred appendString:@" OR product == %@"];
         }
         [pred appendString:@")"];

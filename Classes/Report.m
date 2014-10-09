@@ -189,6 +189,7 @@
 										  kProductPlatformMac, @"F7",
 										  kProductPlatformInApp, @"IA1",
 										  kProductPlatformInApp, @"IA9",
+                                          kProductPlatformAppBundle, @"1-B",
 										  nil];
 		}
 		NSString *platform = [platformsByTransactionType objectForKey:[rowDictionary objectForKey:kReportColumnProductTypeIdentifier]];
@@ -469,15 +470,24 @@
 		combinedPaidTransactionTypes = [[NSSet alloc] initWithObjects:
 							@"1",		//iPhone App
                             @"1. ",     //iPhone App
+                            @"1-B",     //App Bundle
+                            @"1-B. ",   //App Bundle
 							@"1F",		//Universal App
                             @"1F. ",    //Universal App
 							@"1T",		//iPad App
                             @"1T. ",    //iPad App
 							@"F1",		//Mac App
                             @"F1. ",    //Mac App
+                            @"FI1",     //Mac In-App Purchase
+                            @"FI1. ",   //Mac In-App Purchase
 							@"IA1",		//In-App Purchase
                             @"IA1. ",   //In-App Purchase
-							@"IA9",		//In-App Subscription
+                            @"IA9",		//In-App Subscription
+                            @"IA9. ",	//In-App Subscription
+                            @"IAY",		//In-App Renewable Subscription
+                            @"IAY. ",	//In-App Renewable Subscription
+                            @"IAC",     //In-App Free Subscription
+                            @"IAC. "    //In-App Free Subscription
 							@"1.GP",	//GP = Gift Purchase
 							@"1F.GP",
 							@"1T.GP",
@@ -527,7 +537,13 @@
 										@"1T.EDU",
 										@"F1.EDU",
 										@"IA1.EDU",
-										@"IA9.EDU",
+                                        @"IA9.EDU",
+                                        @"IAY.EDU",
+                                        @"FI1.EDU",
+                                        @"1E.EDU",
+                                        @"1EP.EDU",
+                                        @"1EU.EDU",
+                                        @"1-B.EDU",
 										nil];
 	}
 	return combinedEducationalTransactionTypes;
@@ -544,6 +560,12 @@
 										@"F1.GP",
 										@"IA1.GP",
 										@"IA9.GP",
+                                        @"IAY.GP",
+                                        @"FI1.GP",
+                                        @"1E.GP",
+                                        @"1EP.GP",
+                                        @"1EU.GP",
+                                        @"1-B.GP",
 										nil];
 	}
 	return combinedGiftPurchaseTransactionTypes;
@@ -559,7 +581,13 @@
 												@"1T.CR-RW",
 												@"F1.CR-RW",
 												@"IA1.CR-RW",
-												@"IA9.CR-RW",
+                                                @"IA9.CR-RW",
+                                                @"IAY.CR-RW",
+                                                @"FI1.CR-RW",
+                                                @"1E.CR-RW",
+                                                @"1EP.CR-RW",
+                                                @"1EU.CR-RW",
+                                                @"1-B.CR-RW",
 												nil];
 	}
 	return combinedPromoCodeTransactionTypes;
@@ -576,6 +604,12 @@
 								@"F1",		//Mac App
 								@"IA1",		//In-App Purchase
 								@"IA9",		//In-App Subscription
+                                @"IAY",     //In-App Auto-Renewable Subscription
+                                @"FI1",     //Mac In-App Purchase
+                                @"1E",      //Paid App (Custom iPhone)
+                                @"1EP",     //Paid App (Custom iPad)
+                                @"1EU",     //Paid App (Custom Universal)
+                                @"1-B",     //App Bundle
 								nil];
 	}
 	return paidTransactionTypes;

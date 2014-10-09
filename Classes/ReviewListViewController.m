@@ -120,7 +120,7 @@
 
     if (products) {
         [pred appendString:@"(product == nil"];
-        for (Product* p in products) {
+        for (Product* p __attribute__((unused)) in products) {
             [pred appendString:@" OR product == %@"];
         }
         [pred appendString:@")"];
