@@ -14,6 +14,7 @@
 #define kProductPlatformUniversal	@"Universal"
 #define kProductPlatformMac			@"Mac"
 #define kProductPlatformInApp		@"In-App"
+#define kProductPlatformAppBundle   @"App Bundle"
 
 @class ASAccount;
 
