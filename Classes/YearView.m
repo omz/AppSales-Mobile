@@ -35,7 +35,7 @@
 	CGContextRestoreGState(c);
 	
 	CGFloat headerHeight = 52.0;
-	CGFloat footerHeight = 42.0;
+	CGFloat footerHeight = 92.0;
 	CGFloat monthsHeight = self.bounds.size.height - 2 * margin - headerHeight - footerHeight;
 	CGFloat singleMonthHeight = monthsHeight / 4;
 	CGFloat singleMonthWidth = (self.bounds.size.width - 2 * margin) / 3.0;
