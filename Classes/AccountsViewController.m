@@ -297,6 +297,7 @@
 		[context deleteObject:account];
 		[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
 		[self reloadAccounts];
+        [self.navigationController popViewControllerAnimated:YES];
 	}
 }
 
@@ -720,7 +721,6 @@
 			[hud setLabelText:NSLocalizedString(@"Deleting Account...", nil)];
 			
 			ASAccount *account = [[self.selectedAccount retain] autorelease];
-			[self.navigationController popViewControllerAnimated:YES];
 			[self performSelector:@selector(deleteAccount:) withObject:account afterDelay:0.1];
 		}
 	}
