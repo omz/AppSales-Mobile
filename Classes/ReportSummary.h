@@ -21,6 +21,8 @@
 
 - (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID;
 - (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country;
+- (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct;
+- (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct;
 
 - (int)totalNumberOfUpdatesForProductWithID:(NSString *)productID;
 - (int)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID;

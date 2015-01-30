@@ -387,6 +387,70 @@
 	return result;
 }
 
+- (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct
+{
+    NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    for (Transaction *transaction in self.transactions) {
+        if (transaction.units.integerValue < 0) {
+            continue;
+        }
+        NSString *type = transaction.type;
+        NSString *promoType = transaction.promoType;
+        if(promoType != nil) {
+            promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            if([promoType isEqualToString:@""])promoType = nil;
+        }
+        NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
+        if (![paidTransactionTypes containsObject:combinedType]) {
+            continue;
+        }
+        NSString *transactionCountry = transaction.countryCode;
+        NSString *transactionProductID = transaction.product.productID;
+        NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+        if (!paidDownloadsByProduct) {
+            paidDownloadsByProduct = [NSMutableDictionary dictionary];
+            [result setObject:paidDownloadsByProduct forKey:transactionCountry];
+        }
+        NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+        NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
+        [paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+    }
+    return result;
+}
+
+- (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct
+{
+    NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    for (Transaction *transaction in self.transactions) {
+        if (transaction.units.integerValue > 0) {
+            continue;
+        }
+        NSString *type = transaction.type;
+        NSString *promoType = transaction.promoType;
+        if(promoType != nil) {
+            promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            if([promoType isEqualToString:@""])promoType = nil;
+        }
+        NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
+        if (![paidTransactionTypes containsObject:combinedType]) {
+            continue;
+        }
+        NSString *transactionCountry = transaction.countryCode;
+        NSString *transactionProductID = transaction.product.productID;
+        NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+        if (!paidDownloadsByProduct) {
+            paidDownloadsByProduct = [NSMutableDictionary dictionary];
+            [result setObject:paidDownloadsByProduct forKey:transactionCountry];
+        }
+        NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+        NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
+        [paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+    }
+    return result;
+}
+
 - (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
 {
 	NSSet *paidTransactionTypes = [[self class] paidTransactionTypes];

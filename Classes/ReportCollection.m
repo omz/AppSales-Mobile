@@ -118,6 +118,48 @@
 	return result;
 }
 
+- (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct {
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    for (Report *report in reports) {
+        NSDictionary *paidDownloadsForReport = [report totalNumberOfPaidNonRefundDownloadsByCountryAndProduct];
+        for (NSString *country in paidDownloadsForReport) {
+            NSMutableDictionary *paidDownloadsByProductResult = [result objectForKey:country];
+            if (!paidDownloadsByProductResult) {
+                paidDownloadsByProductResult = [NSMutableDictionary dictionary];
+                [result setObject:paidDownloadsByProductResult forKey:country];
+            }
+            NSDictionary *paidDownloadsByProduct = [paidDownloadsForReport objectForKey:country];
+            for (NSString *productID in paidDownloadsByProduct) {
+                NSInteger oldValue = [[paidDownloadsByProductResult objectForKey:productID] integerValue];
+                NSInteger newValue = oldValue + [[paidDownloadsByProduct objectForKey:productID] integerValue];
+                [paidDownloadsByProductResult setObject:[NSNumber numberWithInteger:newValue] forKey:productID];
+            }
+        }
+    }
+    return result;
+}
+
+- (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct {
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    for (Report *report in reports) {
+        NSDictionary *paidDownloadsForReport = [report totalNumberOfRefundedDownloadsByCountryAndProduct];
+        for (NSString *country in paidDownloadsForReport) {
+            NSMutableDictionary *paidDownloadsByProductResult = [result objectForKey:country];
+            if (!paidDownloadsByProductResult) {
+                paidDownloadsByProductResult = [NSMutableDictionary dictionary];
+                [result setObject:paidDownloadsByProductResult forKey:country];
+            }
+            NSDictionary *paidDownloadsByProduct = [paidDownloadsForReport objectForKey:country];
+            for (NSString *productID in paidDownloadsByProduct) {
+                NSInteger oldValue = [[paidDownloadsByProductResult objectForKey:productID] integerValue];
+                NSInteger newValue = oldValue + [[paidDownloadsByProduct objectForKey:productID] integerValue];
+                [paidDownloadsByProductResult setObject:[NSNumber numberWithInteger:newValue] forKey:productID];
+            }
+        }
+    }
+    return result;
+}
+
 - (NSDictionary *)revenueInBaseCurrencyByCountry
 {
 	NSMutableDictionary *revenueByCountry = [NSMutableDictionary dictionary];
