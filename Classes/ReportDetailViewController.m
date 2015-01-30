@@ -240,6 +240,8 @@
 	NSMutableArray *sortedEntries = [NSMutableArray array];
 	
 	NSDictionary *paidDownloadsByCountryAndProduct = [self.selectedReport totalNumberOfPaidDownloadsByCountryAndProduct];
+	NSDictionary *paidNonRefundDownloadsByCountryAndProduct = [self.selectedReport totalNumberOfPaidNonRefundDownloadsByCountryAndProduct];
+	NSDictionary *refundedDownloadsByCountryAndProduct = [self.selectedReport totalNumberOfRefundedDownloadsByCountryAndProduct];
 	
 	float totalRevenue;
 	if (viewMode == ReportDetailViewModeCountries) {
@@ -275,16 +277,27 @@
 	for (Product *product in allProducts) {
 		NSString *productID = product.productID;
 		float revenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:productID inCountry:self.selectedCountry];
-		NSInteger sales = 0;
+		NSInteger sales = 0, nonRefunds = 0, refunds = 0;
 		if (self.selectedCountry) {
 			sales = [[[paidDownloadsByCountryAndProduct objectForKey:[self.selectedCountry uppercaseString]] objectForKey:productID] integerValue];
+			nonRefunds = [[[paidNonRefundDownloadsByCountryAndProduct objectForKey:[self.selectedCountry uppercaseString]] objectForKey:productID] integerValue];
+			refunds = -[[[refundedDownloadsByCountryAndProduct objectForKey:[self.selectedCountry uppercaseString]] objectForKey:productID] integerValue];
 		} else {
 			for (NSDictionary *salesByProduct in [paidDownloadsByCountryAndProduct allValues]) {
 				sales += [[salesByProduct objectForKey:productID] integerValue];
 			}
-		}		
+			for (NSDictionary *nonRefundsByProduct in [paidNonRefundDownloadsByCountryAndProduct allValues]) {
+				nonRefunds += [[nonRefundsByProduct objectForKey:productID] integerValue];
+			}
+			for (NSDictionary *refundsByProduct in [refundedDownloadsByCountryAndProduct allValues]) {
+				refunds -= [[refundsByProduct objectForKey:productID] integerValue];
+			}
+		}
 		float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
 		NSString *subtitle = [NSString stringWithFormat:@"%i × %@", sales, [product displayName]];
+		if (sales != nonRefunds) {
+			subtitle = [NSString stringWithFormat:@"%i (%i - %i) × %@", sales, nonRefunds, refunds, [product displayName]];
+		}
 		ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:nil product:product];
 		[entries addObject:entry];
 	}

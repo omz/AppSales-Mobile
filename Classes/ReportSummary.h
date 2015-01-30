@@ -28,6 +28,8 @@
 - (int)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID;
 
 - (NSDictionary *)totalNumberOfPaidDownloadsByCountryAndProduct;
+- (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct;
+- (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct;
 
 - (NSDictionary *)revenueInBaseCurrencyByCountry;
 - (NSDictionary *)revenueInBaseCurrencyByCountryForProductWithID:(NSString *)productID;
