@@ -246,6 +246,7 @@
 		[pool release];
 		return;
 	}
+	csv = [csv stringByReplacingOccurrencesOfString:@" to " withString:@"/"];
 	NSArray *lines = [csv componentsSeparatedByString:@"\n"];
 	for (NSString *line in lines) {
 		NSArray *comps = [line componentsSeparatedByString:@","];
