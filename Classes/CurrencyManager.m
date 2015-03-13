@@ -88,50 +88,50 @@
 	exchangeRates = [[[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerExchangeRates"] retain];
 	if (!exchangeRates) {
 		exchangeRates = [NSMutableDictionary new];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.2178] forKey:@"\"AED to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.5096] forKey:@"\"AUD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:2.1227] forKey:@"\"BHD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.5519] forKey:@"\"BND to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.3351] forKey:@"\"BRL to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.6378] forKey:@"\"CAD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.6605] forKey:@"\"CHF to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0012] forKey:@"\"CLP to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.1171] forKey:@"\"CNY to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:2.0112] forKey:@"\"CYP to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0389] forKey:@"\"CZK to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.1343] forKey:@"\"DKK to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:1.0000] forKey:@"\"EUR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:1.1968] forKey:@"\"GBP to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.1033] forKey:@"\"HKD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0037] forKey:@"\"HUF to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0001] forKey:@"\"IDR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.2003] forKey:@"\"ILS to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0159] forKey:@"\"INR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0036] forKey:@"\"ISK to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0084] forKey:@"\"JPY to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0006] forKey:@"\"KRW to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:2.9416] forKey:@"\"KWD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0067] forKey:@"\"KZT to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0073] forKey:@"\"LKR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:2.7266] forKey:@"\"MTL to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0246] forKey:@"\"MUR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0592] forKey:@"\"MXN to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.221] forKey:@"\"MYR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.11335] forKey:@"\"NOK to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0101] forKey:@"\"NPR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.4338] forKey:@"\"NZD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:2.0786] forKey:@"\"OMR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0101] forKey:@"\"PKR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.2198] forKey:@"\"QAR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.029] forKey:@"\"RUB to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.2134] forKey:@"\"SAR to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0978] forKey:@"\"SEK to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.5226] forKey:@"\"SGD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0329] forKey:@"\"SKK to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0228] forKey:@"\"THB to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.024] forKey:@"\"TWD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.8003] forKey:@"\"USD to EUR\""];
-		[exchangeRates setObject:[NSNumber numberWithFloat:0.0764] forKey:@"\"ZAR to EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.2178] forKey:@"\"AED/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.5096] forKey:@"\"AUD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:2.1227] forKey:@"\"BHD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.5519] forKey:@"\"BND/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.3351] forKey:@"\"BRL/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.6378] forKey:@"\"CAD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.6605] forKey:@"\"CHF/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0012] forKey:@"\"CLP/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.1171] forKey:@"\"CNY/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:2.0112] forKey:@"\"CYP/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0389] forKey:@"\"CZK/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.1343] forKey:@"\"DKK/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:1.0000] forKey:@"\"EUR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:1.1968] forKey:@"\"GBP/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.1033] forKey:@"\"HKD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0037] forKey:@"\"HUF/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0001] forKey:@"\"IDR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.2003] forKey:@"\"ILS/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0159] forKey:@"\"INR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0036] forKey:@"\"ISK/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0084] forKey:@"\"JPY/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0006] forKey:@"\"KRW/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:2.9416] forKey:@"\"KWD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0067] forKey:@"\"KZT/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0073] forKey:@"\"LKR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:2.7266] forKey:@"\"MTL/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0246] forKey:@"\"MUR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0592] forKey:@"\"MXN/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.221] forKey:@"\"MYR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.11335] forKey:@"\"NOK/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0101] forKey:@"\"NPR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.4338] forKey:@"\"NZD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:2.0786] forKey:@"\"OMR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0101] forKey:@"\"PKR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.2198] forKey:@"\"QAR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.029] forKey:@"\"RUB/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.2134] forKey:@"\"SAR/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0978] forKey:@"\"SEK/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.5226] forKey:@"\"SGD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0329] forKey:@"\"SKK/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0228] forKey:@"\"THB/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.024] forKey:@"\"TWD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.8003] forKey:@"\"USD/EUR\""];
+		[exchangeRates setObject:[NSNumber numberWithFloat:0.0764] forKey:@"\"ZAR/EUR\""];
 		[self forceRefresh];
 	}
 
@@ -224,9 +224,9 @@
 {
 	NSAutoreleasePool *pool = [NSAutoreleasePool new];
 	NSMutableDictionary *newExchangeRates = [NSMutableDictionary dictionary];
-	
-	[newExchangeRates setObject:[NSNumber numberWithFloat:1.0] forKey:@"\"EUR to EUR\""];
-	
+
+	[newExchangeRates setObject:[NSNumber numberWithFloat:1.0] forKey:@"\"EUR/EUR\""];
+
 	NSMutableString *urlString = [NSMutableString stringWithString:@"http://quote.yahoo.com/d/quotes.csv?s="];
 	int i = 0;
 	for (NSString *currency in self.availableCurrencies) {
@@ -246,17 +246,18 @@
 		[pool release];
 		return;
 	}
+	csv = [csv stringByReplacingOccurrencesOfString:@" to " withString:@"/"];
 	NSArray *lines = [csv componentsSeparatedByString:@"\n"];
 	for (NSString *line in lines) {
 		NSArray *comps = [line componentsSeparatedByString:@","];
 		if ([comps count] == 2) {
-			NSString *currenciesString = [comps objectAtIndex:0]; //ex: "USD to EUR"
+			NSString *currenciesString = [comps objectAtIndex:0]; //ex: "USD/EUR"
 			float exchangeRate = [[comps objectAtIndex:1] floatValue];
 			
 			[newExchangeRates setObject:[NSNumber numberWithFloat:exchangeRate] forKey:currenciesString];
 		}
 	}
-	if (fabsf([[newExchangeRates objectForKey:@"\"USD to EUR\""] floatValue]) > 9999) {
+	if (fabsf([[newExchangeRates objectForKey:@"\"USD/EUR\""] floatValue]) > 9999) {
 		//Yes, this could theoretically happen, but more likely, 
 		//Yahoo returned bogus values, which apparently does happen every now and then...
 		NSLog(@"Exchange rates returned by Yahoo are likely incorrect, ignoring...");
@@ -282,7 +283,7 @@
 
 	} else {
 		/* Convert to euros, our universal common factor */
-		NSNumber *conversionRateEuroNumber = [exchangeRates objectForKey:[NSString stringWithFormat:@"\"%@ to EUR\"", sourceCurrency]];
+		NSNumber *conversionRateEuroNumber = [exchangeRates objectForKey:[NSString stringWithFormat:@"\"%@/EUR\"", sourceCurrency]];
 		if (!conversionRateEuroNumber) {
 			//NSLog(@"Error: Currency code not found or exchange rates not downloaded yet");
 			return 0.0;
@@ -293,7 +294,7 @@
 			/* If the destination currency isn't euros, convert euros to our destination currency.
 			 * The exchangeRates stores X to EUR, so we divide by the conversion rate to go EUR to X.
 			 */
-			NSNumber *conversionRateBaseCurrencyNumber = [exchangeRates objectForKey:[NSString stringWithFormat:@"\"%@ to EUR\"", self.baseCurrency]];
+			NSNumber *conversionRateBaseCurrencyNumber = [exchangeRates objectForKey:[NSString stringWithFormat:@"\"%@/EUR\"", self.baseCurrency]];
 			conversionFactor /= [conversionRateBaseCurrencyNumber floatValue];
 		}
 		
