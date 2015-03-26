@@ -24,9 +24,9 @@
 		NSDate *firstDate = [calendar dateFromComponents:firstDateComponents];
 		
 		NSDateComponents *components5Weeks = [[[NSDateComponents alloc] init] autorelease];
-		[components5Weeks setWeek:5];
+        [components5Weeks setWeekOfMonth:5];
 		NSDateComponents *components4Weeks = [[[NSDateComponents alloc] init] autorelease];
-		[components4Weeks setWeek:4];
+        [components4Weeks setWeekOfMonth:4];
 		
 		NSMutableArray *dates = [NSMutableArray array];
 		NSDate *currentDate = firstDate;

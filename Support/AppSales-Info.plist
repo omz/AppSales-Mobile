@@ -8,8 +8,6 @@
 	<string>AppSales</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIconFile</key>
-	<string>Icon57.png</string>
 	<key>CFBundleIdentifier</key>
 	<string>de.omzsoftware.${PRODUCT_NAME:identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>

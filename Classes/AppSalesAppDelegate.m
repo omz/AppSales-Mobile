@@ -58,7 +58,7 @@
 	} else {
 		self.accountsViewController = [[[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped] autorelease];
 		self.accountsViewController.managedObjectContext = self.managedObjectContext;
-		self.accountsViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
+		self.accountsViewController.preferredContentSize = CGSizeMake(320, 480);
 		self.accountsViewController.delegate = self;
 		UINavigationController *accountsNavController = [[[UINavigationController alloc] initWithRootViewController:self.accountsViewController] autorelease];
 		accountsNavController.toolbarHidden = NO;

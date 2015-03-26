@@ -395,7 +395,7 @@
 		editAccountViewController.hidesBottomBarWhenPushed = YES;
 	}
 	
-	editAccountViewController.contentSizeForViewInPopover = CGSizeMake(320, 480);
+	editAccountViewController.preferredContentSize = CGSizeMake(320, 480);
 	
 	[self.navigationController pushViewController:editAccountViewController animated:YES];
 }

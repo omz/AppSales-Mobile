@@ -54,7 +54,10 @@
 	yearRect.origin.y += 10;
 	[[UIColor darkGrayColor] set];
 	UIFont *yearFont = [UIFont boldSystemFontOfSize:27];
-	[[NSString stringWithFormat:@"%i", year] drawInRect:yearRect withFont:yearFont lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
+    NSMutableParagraphStyle* style = [NSMutableParagraphStyle new];
+    [style setAlignment:NSTextAlignmentCenter];
+    [[NSString stringWithFormat:@"%i", year] drawInRect:yearRect withAttributes:@{NSFontAttributeName : yearFont,
+                                                                                  NSParagraphStyleAttributeName : style}];
 	
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM"];
@@ -82,24 +85,29 @@
 		[monthComponents setMonth:i + 1];
 		NSDate *monthDate = [calendar dateFromComponents:monthComponents];
 		NSString *month = [monthFormatter stringFromDate:monthDate];
-		
-		[month drawInRect:monthRect withFont:monthFont lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentLeft];
-		
-		NSString *label = [labelsByMonth objectForKey:[NSNumber numberWithInt:i+1]];
+        NSMutableParagraphStyle* style = [NSMutableParagraphStyle new];
+        [style setAlignment:NSTextAlignmentLeft];
+        [month drawInRect:monthRect withAttributes:@{NSFontAttributeName : monthFont,
+                                                     NSParagraphStyleAttributeName : style}];
+        
+        NSString *label = [labelsByMonth objectForKey:[NSNumber numberWithInt:i+1]];
 		if (label) {
 			CGSize size = CGSizeMake(FLT_MAX, FLT_MAX);
 			float fontSize = maxPaymentFontSize;
 			while (size.width > monthRect.size.width) {
 				fontSize -= 1.0;
-				size = [label sizeWithFont:[UIFont boldSystemFontOfSize:fontSize]];
+                size = [label sizeWithAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:fontSize]}];
 			}
 			CGRect labelRect = CGRectMake(monthRect.origin.x, monthRect.origin.y + monthRect.size.height/2 - size.height/2, monthRect.size.width, size.height);
-			[label drawInRect:labelRect withFont:[UIFont boldSystemFontOfSize:fontSize]];
+            [label drawInRect:labelRect withAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:fontSize]}];
 		}
 	}
 	
 	CGRect footerRect = CGRectMake(margin, self.bounds.size.height - footerHeight + 3, self.bounds.size.width - 2 * margin, 20);
-	[self.footerText drawInRect:footerRect withFont:[UIFont boldSystemFontOfSize:14.0] lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
+    NSMutableParagraphStyle* style2 = [NSMutableParagraphStyle new];
+    [style2 setAlignment:NSTextAlignmentCenter];
+    [self.footerText drawInRect:footerRect withAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:14.0],
+                                                 NSParagraphStyleAttributeName : style2}];
 	
 }
 

@@ -34,7 +34,7 @@
 - (void)loadView
 {
 	[super loadView];
-	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	
 	self.scrollView = [[[UIScrollView alloc] initWithFrame:self.view.bounds] autorelease];
 	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

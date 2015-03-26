@@ -214,7 +214,7 @@
 	} else {
 		_failedAttemptsLabel.text = [NSString stringWithFormat:@"%i Failed Passcode Attempts", _failedAttemptsCount];
 	}
-	CGSize size = [_failedAttemptsLabel.text sizeWithFont:[UIFont boldSystemFontOfSize:14.0]];
+    CGSize size = [_failedAttemptsLabel.text sizeWithAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:14.0]}];
 	_failedAttemptsView.frame = CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0);
 	_failedAttemptsLabel.frame = CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0); 
 	
@@ -493,7 +493,7 @@
 	
 	if ([textField isEqual:_enterPasscodeTextField]) {
 		NSString *text = @"1 Failed Passcode Attempt";
-		CGSize size = [text sizeWithFont:[UIFont boldSystemFontOfSize:14.0]];
+        CGSize size = [text sizeWithAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:14.0]}];
 		_failedAttemptsView = [[UIView alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0)];
 		_failedAttemptsLabel = [[UILabel alloc] initWithFrame:CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0)]; 
 		_failedAttemptsLabel.backgroundColor = [UIColor clearColor];

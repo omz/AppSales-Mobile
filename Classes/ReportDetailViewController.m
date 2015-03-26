@@ -40,7 +40,7 @@
 		[revenueFormatter setMinimumFractionDigits:2];
 		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
-		self.contentSizeForViewInPopover = CGSizeMake(320, 500);
+		self.preferredContentSize = CGSizeMake(320, 500);
     }
 #ifdef __IPHONE_7_0
     if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
@@ -54,7 +54,7 @@
 - (void)loadView
 {
 	[super loadView];
-	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	
 	viewMode = (self.selectedProduct) ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
 	
@@ -124,7 +124,6 @@
 	UISegmentedControl *modeControl = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil), nil]] autorelease];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:0];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:1];
-	modeControl.segmentedControlStyle = UISegmentedControlStyleBar;
 	modeControl.selectedSegmentIndex = (viewMode == ReportDetailViewModeProducts) ? 0 : 1;
 	[modeControl addTarget:self action:@selector(switchMode:) forControlEvents:UIControlEventValueChanged];
 	UIBarButtonItem *modeItem = [[[UIBarButtonItem alloc] initWithCustomView:modeControl] autorelease];

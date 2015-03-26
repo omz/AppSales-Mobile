@@ -115,7 +115,7 @@
 	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
 	productsTableView.allowsMultipleSelection = YES;
 	
-	self.view.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	[self.view addSubview:self.productsTableView];
 	
 	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
@@ -278,7 +278,7 @@
 		vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
 		[self presentViewController:vc animated:YES completion:nil];
 	} else {
-		vc.contentSizeForViewInPopover = CGSizeMake(320, 210);
+		vc.preferredContentSize = CGSizeMake(320, 210);
 		self.colorPopover = [[[UIPopoverController alloc] initWithContentViewController:vc] autorelease];
 		[self.colorPopover presentPopoverFromRect:sender.bounds inView:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 	}
