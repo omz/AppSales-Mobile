@@ -92,15 +92,15 @@
 	self.topView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]] autorelease];
 	topView.userInteractionEnabled = YES;
 	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5);
+	topView.frame = CGRectMake(0, 64.0, self.view.bounds.size.width, iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5);
 	[self.view addSubview:topView];
 	
 	UIImageView *graphShadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
+	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds) + 64.0, topView.bounds.size.width, 20);
 	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	[topView addSubview:graphShadowView];
 	
-	self.productsTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain] autorelease];
+	self.productsTableView = [[[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - 64.0 - topView.bounds.size.height) style:UITableViewStylePlain] autorelease];
 	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	productsTableView.dataSource = self;
@@ -267,7 +267,7 @@
 
 - (void)changeColor:(UIButton *)sender
 {
-	int row = sender.tag;
+	NSInteger row = sender.tag;
 	Product *product = [self.visibleProducts objectAtIndex:row - 1];
 	
 	NSArray *palette = [UIColor crayonColorPalette];
@@ -284,7 +284,7 @@
 	}
 }
 
-- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(int)colorIndex
+- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(NSInteger)colorIndex
 {
 	Product *product = (Product *)picker.context;
 	product.color = color;

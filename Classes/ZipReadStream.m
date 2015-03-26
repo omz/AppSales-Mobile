@@ -50,7 +50,7 @@
 }
 
 - (NSUInteger) readDataWithBuffer:(NSMutableData *)buffer {
-	int err= unzReadCurrentFile(_unzFile, [buffer mutableBytes], [buffer length]);
+	NSInteger err= unzReadCurrentFile(_unzFile, [buffer mutableBytes], (int)[buffer length]);
 	if (err < 0) {
 		NSString *reason= [NSString stringWithFormat:@"Error in reading '%@' in the zipfile", _fileNameInZip];
 		@throw [[[ZipException alloc] initWithError:err reason:reason] autorelease];

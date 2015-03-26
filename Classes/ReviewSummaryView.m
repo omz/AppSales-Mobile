@@ -144,7 +144,7 @@
 		[[barViews objectAtIndex:5-rating] setFrame:barFrame];
 		
 		UILabel *barLabel = [barLabels objectAtIndex:5-rating];
-		barLabel.text = [NSString stringWithFormat:@"%i", numberOfReviews];
+		barLabel.text = [NSString stringWithFormat:@"%li", (long)numberOfReviews];
 		if ([[unreadRatings objectForKey:[NSNumber numberWithInteger:rating]] integerValue] > 0) {
 			barLabel.font = [UIFont boldSystemFontOfSize:13.0];
 			barLabel.textColor = [UIColor colorWithRed:0.141 green:0.439 blue:0.847 alpha:1.0];
@@ -153,7 +153,7 @@
 			barLabel.textColor = [UIColor darkGrayColor];
 		}
 	}
-	sumLabel.text = [NSString stringWithFormat:@"%i", total];
+	sumLabel.text = [NSString stringWithFormat:@"%li", (long)total];
 	
 	float average = (float)starSum / (float)total;
 	NSNumberFormatter *averageFormatter = [[[NSNumberFormatter alloc] init] autorelease];

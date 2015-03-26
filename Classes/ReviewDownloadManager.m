@@ -387,7 +387,7 @@
 										reviewVersion, kReviewInfoVersion, 
 										reviewDateString, kReviewInfoDateString, 
 										reviewText, kReviewInfoText, 
-										[NSNumber numberWithInt:rating], kReviewInfoRating,
+										[NSNumber numberWithInteger:rating], kReviewInfoRating,
 										nil];
 			[reviews addObject:reviewInfo];
 		}

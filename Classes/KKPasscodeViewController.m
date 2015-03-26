@@ -212,7 +212,7 @@
 	if (_failedAttemptsCount == 1) {
 		_failedAttemptsLabel.text = @"1 Failed Passcode Attempt";
 	} else {
-		_failedAttemptsLabel.text = [NSString stringWithFormat:@"%i Failed Passcode Attempts", _failedAttemptsCount];
+		_failedAttemptsLabel.text = [NSString stringWithFormat:@"%li Failed Passcode Attempts", (long)_failedAttemptsCount];
 	}
     CGSize size = [_failedAttemptsLabel.text sizeWithAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:14.0]}];
 	_failedAttemptsView.frame = CGRectMake((self.view.bounds.size.width - (size.width + 36.0)) / 2, 147.5, size.width + 36.0, size.height + 10.0);

@@ -29,7 +29,7 @@
 	[[KKPasscodeLock sharedLock] setDefaultSettings];
 	[[KKPasscodeLock sharedLock] setEraseOption:NO];
 	
-	srandom(time(NULL));
+	srandom((unsigned)time(NULL));
 	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
 	
 	NSString *currencyCode = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];

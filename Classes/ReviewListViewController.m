@@ -90,7 +90,7 @@
     return cell;
 }
 
-- (float)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	return 50.0;
 }
@@ -131,7 +131,7 @@
     
     if (rating != 0) {
         [pred appendString:@" AND rating = %@"];
-        [args addObject:[NSNumber numberWithInt:rating]];
+        [args addObject:[NSNumber numberWithInteger:rating]];
     }
 
     [fetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];

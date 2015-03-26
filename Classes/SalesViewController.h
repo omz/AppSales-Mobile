@@ -14,14 +14,14 @@
 @class ASAccount, Report, Product;
 @protocol ReportSummary;
 
-typedef enum DashboardViewMode { 
+typedef NS_ENUM(NSInteger, DashboardViewMode) {
 	DashboardViewModeRevenue = 0,
 	DashboardViewModeSales,
 	DashboardViewModeUpdates,
 	DashboardViewModeEducationalSales,
 	DashboardViewModeGiftPurchases,
 	DashboardViewModePromoCodes
-} DashboardViewMode;
+};
 
 @interface SalesViewController : DashboardViewController <UIActionSheetDelegate, GraphViewDelegate, GraphViewDataSource> {
 	
@@ -32,7 +32,7 @@ typedef enum DashboardViewMode {
 	BOOL showNumberOfSales;
 	BOOL showFiscalMonths;
 	BOOL showWeeks;
-	int selectedTab;
+	NSInteger selectedTab;
 	
 	GraphView *graphView;
 	

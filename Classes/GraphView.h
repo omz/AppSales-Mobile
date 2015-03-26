@@ -63,7 +63,7 @@
 @property (nonatomic, retain) NSString *title;
 
 - (NSRange)visibleBarRange;
-- (CGRect)frameForBarAtIndex:(int)index;
+- (CGRect)frameForBarAtIndex:(NSInteger)index;
 - (NSString *)labelTextForIndex:(NSUInteger)index;
 - (NSArray *)stackedValuesForBarAtIndex:(NSUInteger)index;
 - (void)setNumberOfBarsPerPage:(int)newBarsPerPage;

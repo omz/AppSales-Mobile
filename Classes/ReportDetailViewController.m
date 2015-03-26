@@ -42,12 +42,9 @@
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
 		self.preferredContentSize = CGSizeMake(320, 500);
     }
-#ifdef __IPHONE_7_0
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
-    {
-        [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
-    }
-#endif
+    
+    [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+    
     return self;
 }
 
@@ -59,7 +56,7 @@
 	viewMode = (self.selectedProduct) ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
 	
 	mapHidden = mapHidden || UIInterfaceOrientationIsLandscape(self.interfaceOrientation);
-	self.mapView = [[[MapView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 208)] autorelease];
+	self.mapView = [[[MapView alloc] initWithFrame:CGRectMake(0, 64.0, self.view.bounds.size.width, 208)] autorelease];
 	mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	mapView.alpha = (mapHidden) ? 0.0 : 1.0;
 	if (!mapHidden) {
@@ -73,7 +70,7 @@
 	mapShadowView.alpha = (mapHidden) ? 0.0 : 1.0;
 	[self.view addSubview:mapShadowView];
 	
-	CGRect headerFrame = (mapHidden) ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 208-20, self.view.bounds.size.width, 20);
+	CGRect headerFrame = (mapHidden) ? CGRectMake(0, 64, self.view.bounds.size.width, 20) : CGRectMake(0, 272-20, self.view.bounds.size.width, 20);
 	self.headerView = [[[UIImageView alloc] initWithFrame:headerFrame] autorelease];
 	headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	headerView.image = [UIImage imageNamed:@"DetailHeader.png"];
@@ -91,7 +88,7 @@
 	
 	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(self.interfaceOrientation) ? 32.0 : 44.0;
 	
-	CGRect tableViewFrame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
+	CGRect tableViewFrame = (mapHidden) ? CGRectMake(0, 84, self.view.bounds.size.width, self.view.bounds.size.height - 84) : CGRectMake(0, 272, self.view.bounds.size.width, self.view.bounds.size.height - 272);
 	self.tableView = [[[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain] autorelease];
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -107,7 +104,7 @@
 	[self.view addSubview:tableView];
 	
 	self.shadowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]] autorelease];
-	shadowView.frame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, 20) : CGRectMake(0, 208, self.view.bounds.size.width, 20);
+	shadowView.frame = (mapHidden) ? CGRectMake(0, 64, self.view.bounds.size.width, 20) : CGRectMake(0, 272, self.view.bounds.size.width, 20);
 	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	shadowView.alpha = 0.0;
 	[self.view addSubview:shadowView];
@@ -286,7 +283,7 @@
 			NSDictionary *salesByProduct = [paidDownloadsByCountryAndProduct objectForKey:[country uppercaseString]];
 			sales = [[[salesByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
 		}
-		NSString *subtitle = [NSString stringWithFormat:@"%@: %i %@", [[CountryDictionary sharedDictionary] nameForCountryCode:country], sales, sales == 1 ? @"sale" : @"sales"];
+		NSString *subtitle = [NSString stringWithFormat:@"%@: %li %@", [[CountryDictionary sharedDictionary] nameForCountryCode:country], (long)sales, sales == 1 ? @"sale" : @"sales"];
 		ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:country product:nil];
 		[sortedEntries addObject:entry];
 	}
@@ -317,9 +314,9 @@
             }
         }
         float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
-        NSString *subtitle = [NSString stringWithFormat:@"%i × %@", sales, [product displayName]];
+        NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, [product displayName]];
         if (sales != nonRefunds) {
-            subtitle = [NSString stringWithFormat:@"%i (%i - %i) × %@", sales, nonRefunds, refunds, [product displayName]];
+            subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, [product displayName]];
         }
         ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:nil product:product];
         [entries addObject:entry];

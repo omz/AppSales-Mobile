@@ -25,12 +25,7 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}
     
-#ifdef __IPHONE_7_0
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
-    {
-        [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
-    }
-#endif
+    [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
     
 	return self;
 }
@@ -128,7 +123,7 @@
 
     NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@"];
     NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
-    [args insertObject:[NSNumber numberWithInt:rating] atIndex:0];
+    [args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
     
 	if (![self.selectedProducts count]) {
         [pred appendString:@" AND product.account = %@"];
@@ -155,7 +150,7 @@
     
     NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
     NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
-    [args insertObject:[NSNumber numberWithInt:rating] atIndex:0];
+    [args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
     
 	if (![self.selectedProducts count]) {
         [pred appendString:@" AND product.account = %@"];

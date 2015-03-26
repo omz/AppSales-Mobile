@@ -123,7 +123,6 @@
 		7FDCCE8F1594317300124140 /* ZipWriteStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDCCE8A1594317300124140 /* ZipWriteStream.m */; };
 		7FDCCEA61594318400124140 /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = 7FDCCE901594318400124140 /* adler32.c */; };
 		7FDCCEA71594318400124140 /* compress.c in Sources */ = {isa = PBXBuildFile; fileRef = 7FDCCE911594318400124140 /* compress.c */; };
-		7FDCCEA81594318400124140 /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = 7FDCCE921594318400124140 /* crc32.c */; };
 		7FDCCEA91594318400124140 /* deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = 7FDCCE941594318400124140 /* deflate.c */; };
 		7FDCCEAA1594318400124140 /* gzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 7FDCCE961594318400124140 /* gzio.c */; };
 		7FDCCEAB1594318400124140 /* infback.c in Sources */ = {isa = PBXBuildFile; fileRef = 7FDCCE971594318400124140 /* infback.c */; };
@@ -846,8 +845,6 @@
 		7FDCCE8A1594317300124140 /* ZipWriteStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipWriteStream.m; sourceTree = "<group>"; };
 		7FDCCE901594318400124140 /* adler32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = adler32.c; sourceTree = "<group>"; };
 		7FDCCE911594318400124140 /* compress.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = compress.c; sourceTree = "<group>"; };
-		7FDCCE921594318400124140 /* crc32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc32.c; sourceTree = "<group>"; };
-		7FDCCE931594318400124140 /* crc32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc32.h; sourceTree = "<group>"; };
 		7FDCCE941594318400124140 /* deflate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = deflate.c; sourceTree = "<group>"; };
 		7FDCCE951594318400124140 /* deflate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deflate.h; sourceTree = "<group>"; };
 		7FDCCE961594318400124140 /* gzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gzio.c; sourceTree = "<group>"; };
@@ -1757,8 +1754,6 @@
 				7FDCCE7C1594316600124140 /* zip.h */,
 				7FDCCE901594318400124140 /* adler32.c */,
 				7FDCCE911594318400124140 /* compress.c */,
-				7FDCCE921594318400124140 /* crc32.c */,
-				7FDCCE931594318400124140 /* crc32.h */,
 				7FDCCE941594318400124140 /* deflate.c */,
 				7FDCCE951594318400124140 /* deflate.h */,
 				7FDCCE961594318400124140 /* gzio.c */,
@@ -3054,7 +3049,6 @@
 				7FDCCE8F1594317300124140 /* ZipWriteStream.m in Sources */,
 				7FDCCEA61594318400124140 /* adler32.c in Sources */,
 				7FDCCEA71594318400124140 /* compress.c in Sources */,
-				7FDCCEA81594318400124140 /* crc32.c in Sources */,
 				7FDCCEA91594318400124140 /* deflate.c in Sources */,
 				7FDCCEAA1594318400124140 /* gzio.c in Sources */,
 				7FDCCEAB1594318400124140 /* infback.c in Sources */,
@@ -3128,7 +3122,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = AppSalesMobile;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "armv7 arm64 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -3144,7 +3140,9 @@
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = AppSalesMobile;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "armv7 arm64 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

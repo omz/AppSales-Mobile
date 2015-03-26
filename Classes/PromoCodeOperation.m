@@ -279,7 +279,7 @@
 		} else {
 			NSString *requestCodesURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", viewHistoryFormAction];
 			NSDictionary *bodyDict = [NSDictionary dictionaryWithObjectsAndKeys:
-									  [NSString stringWithFormat:@"%i", numberOfCodesToRequest], numberOfCodesFieldName,
+									  [NSString stringWithFormat:@"%li", (long)numberOfCodesToRequest], numberOfCodesFieldName,
 									  @"58", [NSString stringWithFormat:@"%@.x", continueButtonName],
 									  @"14", [NSString stringWithFormat:@"%@.y", continueButtonName],
 									  nil];

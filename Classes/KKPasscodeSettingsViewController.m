@@ -69,7 +69,7 @@
 - (void)eraseDataSwitchChanged:(id)sender 
 {
 	if (_eraseDataSwitch.on) {
-		NSString* title = [NSString stringWithFormat:@"All data in this app will be erased after %d failed passcode attempts.", [[KKPasscodeLock sharedLock] attemptsAllowed]];
+		NSString* title = [NSString stringWithFormat:@"All data in this app will be erased after %lu failed passcode attempts.", (unsigned long)[[KKPasscodeLock sharedLock] attemptsAllowed]];
 		
 		UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Enable" otherButtonTitles:nil];
 		[sheet showInView:self.view];
@@ -100,7 +100,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
 	if (section == 2) {
-		return [NSString stringWithFormat:@"Erase all data in this app after %d failed passcode attempts.", [[KKPasscodeLock sharedLock] attemptsAllowed]];;
+		return [NSString stringWithFormat:@"Erase all data in this app after %lu failed passcode attempts.", (unsigned long)[[KKPasscodeLock sharedLock] attemptsAllowed]];;
 	} else {
 		return @"";
 	}

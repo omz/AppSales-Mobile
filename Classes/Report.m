@@ -353,7 +353,7 @@
 	}
 }
 
-- (int)totalNumberOfPaidDownloads
+- (NSInteger)totalNumberOfPaidDownloads
 {
 	return [self totalNumberOfPaidDownloadsForProductWithID:nil];
 }
@@ -451,7 +451,7 @@
     return result;
 }
 
-- (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
 {
 	NSSet *paidTransactionTypes = [[self class] paidTransactionTypes];
 	NSInteger total = 0;
@@ -478,27 +478,27 @@
 	return total;
 }
 
-- (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID
 {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedPaidTransactionTypes] forProductWithID:productID];
 }
 
-- (int)totalNumberOfUpdatesForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfUpdatesForProductWithID:(NSString *)productID
 {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedUpdateTransactionTypes] forProductWithID:productID];
 }
 
-- (int)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
 {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedEducationalTransactionTypes] forProductWithID:productID];
 }
 
-- (int)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID
 {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedGiftPurchaseTransactionTypes] forProductWithID:productID];
 }
 
-- (int)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID
 {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedPromoCodeTransactionTypes] forProductWithID:productID];
 }

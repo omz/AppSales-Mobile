@@ -62,15 +62,8 @@
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
-        
-        // don't extend edges in iOS 7 (setEdgesForExtendedLayout:UIRectEdgeNone)
-        // backward compatible patch: still builds with older versions of Xcode (<5) and runs on older iOS's (<7)
-#ifdef __IPHONE_7_0
-        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= (float)__IPHONE_7_0/10000)
-            {
-                [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
-            }
-#endif
+
+        [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
     }
 	return self;
 }
@@ -190,15 +183,15 @@
 		[self.selectedReportPopover dismissPopoverAnimated:YES];
 	}
 	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-		self.graphView.frame = self.view.bounds;
+		self.graphView.frame = CGRectMake(0, 32.0, self.view.bounds.size.width, self.view.bounds.size.height - 32.0);
 		self.topView.frame = self.view.bounds;
 		self.productsTableView.alpha = 0.0;
 		self.shadowView.hidden = YES;
 		[self.graphView reloadValuesAnimated:NO];
 	} else {
-		CGFloat graphHeight = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 450.0 : self.view.bounds.size.height * 0.5;
+		CGFloat graphHeight = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5;
 		self.graphView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
-		self.topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
+		self.topView.frame = CGRectMake(0, 64.0, self.view.bounds.size.width, graphHeight);
 		self.shadowView.hidden = NO;
 		self.productsTableView.alpha = 1.0;
 		[self.graphView reloadValuesAnimated:NO];
@@ -498,11 +491,11 @@
 		if (showWeeks) {
 			NSDateComponents *dateComponents = [calendar components:NSWeekdayOrdinalCalendarUnit fromDate:report.startDate];
 			NSInteger weekdayOrdinal = [dateComponents weekdayOrdinal];
-			return [NSString stringWithFormat:@"W%i", weekdayOrdinal];
+			return [NSString stringWithFormat:@"W%li", (long)weekdayOrdinal];
 		} else {
 			NSDateComponents *dateComponents = [calendar components:NSDayCalendarUnit fromDate:report.startDate];
 			NSInteger day = [dateComponents day];
-			return [NSString stringWithFormat:@"%i", day];
+			return [NSString stringWithFormat:@"%li", (long)day];
 		}
 	} else {
 		NSDateFormatter *monthFormatter = [[[NSDateFormatter alloc] init] autorelease];
@@ -739,7 +732,7 @@
 							   (int)roundf([latestReport totalRevenueInBaseCurrencyForProductWithID:product.productID])];
 			[latestValueButton setTitle:label forState:UIControlStateNormal];
 		} else {
-			int latestNumber = 0;
+			NSInteger latestNumber = 0;
 			if (viewMode == DashboardViewModeSales) {
 				latestNumber = [latestReport totalNumberOfPaidDownloadsForProductWithID:product.productID];
 			} else if (viewMode == DashboardViewModeUpdates) {
@@ -751,7 +744,7 @@
 			} else if (viewMode == DashboardViewModePromoCodes) {
 				latestNumber = [latestReport totalNumberOfPromoCodeTransactionsForProductWithID:product.productID];
 			}
-			NSString *label = [NSString stringWithFormat:@"%i", latestNumber];
+			NSString *label = [NSString stringWithFormat:@"%li", (long)latestNumber];
 			[latestValueButton setTitle:label forState:UIControlStateNormal];
 		}
 		[latestValueButton addTarget:self action:@selector(switchGraphMode:) forControlEvents:UIControlEventTouchUpInside];

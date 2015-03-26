@@ -12,7 +12,7 @@
 
 @protocol ColorPickerViewControllerDelegate <NSObject>
 
-- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(int)colorIndex;
+- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(NSInteger)colorIndex;
 
 @end
 

@@ -42,7 +42,7 @@
 	return sum;
 }
 
-- (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID
 {
 	NSInteger total = 0;
 	for (Report *report in reports) {
@@ -51,7 +51,7 @@
 	return total;
 }
 
-- (int)totalNumberOfUpdatesForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfUpdatesForProductWithID:(NSString *)productID
 {
 	NSInteger total = 0;
 	for (Report *report in reports) {
@@ -60,7 +60,7 @@
 	return total;
 }
 
-- (int)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
 {
 	NSInteger total = 0;
 	for (Report *report in reports) {
@@ -69,7 +69,7 @@
 	return total;
 }
 
-- (int)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID
 {
 	NSInteger total = 0;
 	for (Report *report in reports) {
@@ -78,7 +78,7 @@
 	return total;
 }
 
-- (int)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID
+- (NSInteger)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID
 {
 	NSInteger total = 0;
 	for (Report *report in reports) {
@@ -87,7 +87,7 @@
 	return total;
 }
 
-- (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
 {
 	NSInteger total = 0;
 	for (Report *report in reports) {

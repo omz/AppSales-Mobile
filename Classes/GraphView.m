@@ -273,7 +273,7 @@
 - (float)maxVisibleValue
 {
 	float maxValue = 0.0;
-	for (int i = visibleRange.location; i < visibleRange.location + visibleRange.length; i++) {
+	for (NSInteger i = visibleRange.location; i < visibleRange.location + visibleRange.length; i++) {
 		NSArray *stackedValues = [self.dataSource graphView:self valuesForBarAtIndex:i];
 		float sum = [[stackedValues valueForKeyPath:@"@sum.self"] floatValue];
 		if (sum > maxValue) maxValue = sum;
@@ -281,7 +281,7 @@
 	return maxValue;
 }
 
-- (CGRect)frameForBarAtIndex:(int)index
+- (CGRect)frameForBarAtIndex:(NSInteger)index
 {
 	float marginBottom = 30.0;
 	CGRect barFrame =  CGRectMake(barWidth * index, 0, barWidth, self.bounds.size.height - marginBottom);
@@ -333,8 +333,8 @@
 	}
 	
 	//Add views that are visible now:
-	for (int i=visibleRange.location; i<visibleRange.location+visibleRange.length; i++) {
-		StackedBarView *barView = [visibleBarViews objectForKey:[NSNumber numberWithInt:i]];
+	for (NSInteger i=visibleRange.location; i<visibleRange.location+visibleRange.length; i++) {
+		StackedBarView *barView = [visibleBarViews objectForKey:[NSNumber numberWithInteger:i]];
 		CGRect frameForBar = [self frameForBarAtIndex:i];
 		if (!barView) {
 			NSArray *colors = [self.dataSource colorsForGraphView:self];
@@ -371,7 +371,7 @@
 			[barView setSegmentValues:stackedValues label:[self labelTextForIndex:i]];
 			
 			[scrollView addSubview:barView];
-			[visibleBarViews setObject:barView forKey:[NSNumber numberWithInt:i]];
+			[visibleBarViews setObject:barView forKey:[NSNumber numberWithInteger:i]];
 		}
 	}
 }

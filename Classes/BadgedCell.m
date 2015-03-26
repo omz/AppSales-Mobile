@@ -46,7 +46,7 @@
 	if (badgeCount == 0) {
 		badgeView.hidden = YES;
 	} else {
-		badgeLabel.text = [NSString stringWithFormat:@"%i", badgeCount];
+		badgeLabel.text = [NSString stringWithFormat:@"%li", (long)badgeCount];
 		badgeView.hidden = NO;
 	}
 }

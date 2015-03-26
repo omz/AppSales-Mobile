@@ -56,7 +56,7 @@
 	UIFont *yearFont = [UIFont boldSystemFontOfSize:27];
     NSMutableParagraphStyle* style = [NSMutableParagraphStyle new];
     [style setAlignment:NSTextAlignmentCenter];
-    [[NSString stringWithFormat:@"%i", year] drawInRect:yearRect withAttributes:@{NSFontAttributeName : yearFont,
+    [[NSString stringWithFormat:@"%li", (long)year] drawInRect:yearRect withAttributes:@{NSFontAttributeName : yearFont,
                                                                                   NSParagraphStyleAttributeName : style}];
 	
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];

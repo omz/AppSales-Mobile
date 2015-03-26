@@ -123,7 +123,7 @@
 		}
 		
 		int i = 0;
-		int numberOfReportsAvailable = [availableReportDateStrings count];
+		NSUInteger numberOfReportsAvailable = [availableReportDateStrings count];
 		for (NSString *reportDateString in availableReportDateStrings) {
 			if ([self isCancelled]) {
 				[pool release];
@@ -447,7 +447,7 @@
 							NSDateComponents *dateComponents = [calendar components:NSMonthCalendarUnit | NSYearCalendarUnit fromDate:labelDate];
 							NSInteger month = [dateComponents month];
 							NSInteger year = [dateComponents year];
-							NSString *paymentIdentifier = [NSString stringWithFormat:@"%@-%i-%i", vendorID, month, year];
+							NSString *paymentIdentifier = [NSString stringWithFormat:@"%@-%li-%li", vendorID, (long)month, (long)year];
 							if (![existingPaymentIdentifiers containsObject:paymentIdentifier]) {
 								NSManagedObject *payment = [NSEntityDescription insertNewObjectForEntityForName:@"Payment" inManagedObjectContext:moc];
 								[payment setValue:account forKey:@"account"];

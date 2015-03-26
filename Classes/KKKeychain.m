@@ -57,16 +57,16 @@
 			[addDict setObject:data forKey:(id)kSecValueData];
       
 			res = SecItemAdd((CFDictionaryRef)addDict, NULL);
-			NSAssert1(res == errSecSuccess, @"Recieved %ld from SecItemAdd!", res);
+			NSAssert1(res == errSecSuccess, @"Recieved %ld from SecItemAdd!", (long)res);
 		}
 	} else if (res == errSecSuccess) {
 		// Modify an existing one
 		// Actually pull it now of the keychain at this point.
 		NSDictionary *attributeDict = [NSDictionary dictionaryWithObject:data forKey:(id)kSecValueData];
 		res = SecItemUpdate((CFDictionaryRef)existsQueryDictionary, (CFDictionaryRef)attributeDict);
-		NSAssert1(res == errSecSuccess, @"SecItemUpdated returned %ld!", res);
+		NSAssert1(res == errSecSuccess, @"SecItemUpdated returned %ld!", (long)res);
 	} else {
-		NSAssert1(NO, @"Received %ld from SecItemCopyMatching!", res);
+		NSAssert1(NO, @"Received %ld from SecItemCopyMatching!", (long)res);
 	}
 	return YES;
 }
@@ -92,7 +92,7 @@
 		NSString *string = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
 		return string;
 	} else {
-		NSAssert1(res == errSecItemNotFound, @"SecItemCopyMatching returned %ld!", res);
+		NSAssert1(res == errSecItemNotFound, @"SecItemCopyMatching returned %ld!", (long)res);
 	}		
 	
 	return nil;
