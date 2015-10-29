@@ -200,6 +200,7 @@
 										  kProductPlatformMac, @"F7",
 										  kProductPlatformInApp, @"IA1",
 										  kProductPlatformInApp, @"IA9",
+										  kProductPlatformAppBundle, @"1-B",
 										  nil];
 		}
 		NSString *platform = [platformsByTransactionType objectForKey:[rowDictionary objectForKey:kReportColumnProductTypeIdentifier]];
@@ -395,6 +396,70 @@
 	return result;
 }
 
+- (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct
+{
+	NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
+	NSMutableDictionary *result = [NSMutableDictionary dictionary];
+	for (Transaction *transaction in self.transactions) {
+		if (transaction.units.integerValue < 0) {
+			continue;
+		}
+		NSString *type = transaction.type;
+		NSString *promoType = transaction.promoType;
+		if(promoType != nil) {
+			promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			if([promoType isEqualToString:@""])promoType = nil;
+		}
+		NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
+		if (![paidTransactionTypes containsObject:combinedType]) {
+			continue;
+		}
+		NSString *transactionCountry = transaction.countryCode;
+		NSString *transactionProductID = transaction.product.productID;
+		NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+		if (!paidDownloadsByProduct) {
+			paidDownloadsByProduct = [NSMutableDictionary dictionary];
+			[result setObject:paidDownloadsByProduct forKey:transactionCountry];
+		}
+		NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+		NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
+		[paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+	}
+	return result;
+}
+
+- (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct
+{
+	NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
+	NSMutableDictionary *result = [NSMutableDictionary dictionary];
+	for (Transaction *transaction in self.transactions) {
+		if (transaction.units.integerValue > 0) {
+			continue;
+		}
+		NSString *type = transaction.type;
+		NSString *promoType = transaction.promoType;
+		if(promoType != nil) {
+			promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			if([promoType isEqualToString:@""])promoType = nil;
+		}
+		NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
+		if (![paidTransactionTypes containsObject:combinedType]) {
+			continue;
+		}
+		NSString *transactionCountry = transaction.countryCode;
+		NSString *transactionProductID = transaction.product.productID;
+		NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+		if (!paidDownloadsByProduct) {
+			paidDownloadsByProduct = [NSMutableDictionary dictionary];
+			[result setObject:paidDownloadsByProduct forKey:transactionCountry];
+		}
+		NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+		NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
+		[paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+	}
+	return result;
+}
+
 - (int)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
 {
 	NSSet *paidTransactionTypes = [[self class] paidTransactionTypes];
@@ -477,29 +542,47 @@
 	if (!combinedPaidTransactionTypes) {
 		combinedPaidTransactionTypes = [[NSSet alloc] initWithObjects:
 							@"1",		//iPhone App
+							@"1-B",     //App Bundle
+							@"1-B. ",   //App Bundle
+							@"1-B.EDU",
+							@"1-B.GP",
 							@"1. ",		//iPhone App
+							@"1.EDU",	//EDU = Education Store transaction
+							@"1.GP",	//GP = Gift Purchase
+							@"1E.EDU",
+							@"1E.GP",
+							@"1EP.EDU",
+							@"1EP.GP",
+							@"1EU.EDU",
+							@"1EU.GP",
 							@"1F",		//Universal App
 							@"1F. ",	//Universal App
+							@"1F.EDU",
+							@"1F.GP",
 							@"1T",		//iPad App
 							@"1T. ",	//iPad App
+							@"1T.EDU",
+							@"1T.GP",
 							@"F1",		//Mac App
 							@"F1. ",	//Mac App
+							@"F1.EDU",
+							@"F1.GP",
+							@"FI1.EDU",
+							@"FI1.GP",
 							@"IA1",		//In-App Purchase
 							@"IA1. ",	//In-App Purchase
+							@"IA1.EDU",
+							@"IA1.GP",
 							@"IA9",		//In-App Subscription
 							@"IA9. ",	//In-App Subscription
-							@"1.GP",	//GP = Gift Purchase
-							@"1F.GP",
-							@"1T.GP",
-							@"F1.GP",
-							@"IA1.GP",
-							@"IA9.GP",
-							@"1.EDU",	//EDU = Education Store transaction
-							@"1F.EDU",
-							@"1T.EDU",
-							@"F1.EDU",
-							@"IA1.EDU",
 							@"IA9.EDU",
+							@"IA9.GP",
+							@"IAC",     //In-App Free Subscription
+							@"IAC. "    //In-App Free Subscription
+							@"IAY",		//In-App Renewable Subscription
+							@"IAY. ",	//In-App Renewable Subscription
+							@"IAY.EDU",
+							@"IAY.GP",
 							nil];
 	}
 	return combinedPaidTransactionTypes;
@@ -532,12 +615,18 @@
 	static NSSet *combinedEducationalTransactionTypes = nil;
 	if (!combinedEducationalTransactionTypes) {
 		combinedEducationalTransactionTypes = [[NSSet alloc] initWithObjects:
+										@"1-B.EDU",
 										@"1.EDU",
+										@"1E.EDU",
+										@"1EP.EDU",
+										@"1EU.EDU",
 										@"1F.EDU",
 										@"1T.EDU",
 										@"F1.EDU",
+										@"FI1.EDU",
 										@"IA1.EDU",
 										@"IA9.EDU",
+										@"IAY.EDU",
 										nil];
 	}
 	return combinedEducationalTransactionTypes;
@@ -548,12 +637,18 @@
 	static NSSet *combinedGiftPurchaseTransactionTypes = nil;
 	if (!combinedGiftPurchaseTransactionTypes) {
 		combinedGiftPurchaseTransactionTypes = [[NSSet alloc] initWithObjects:
+										@"1-B.GP",
 										@"1.GP",	//GP = Gift Purchase
+										@"1E.GP",
+										@"1EP.GP",
+										@"1EU.GP",
 										@"1F.GP",
 										@"1T.GP",
 										@"F1.GP",
+										@"FI1.GP",
 										@"IA1.GP",
 										@"IA9.GP",
+										@"IAY.GP",
 										nil];
 	}
 	return combinedGiftPurchaseTransactionTypes;
@@ -570,6 +665,13 @@
 												@"F1.CR-RW",
 												@"IA1.CR-RW",
 												@"IA9.CR-RW",
+											    @"1-B.CR-RW",
+											    @"1E.CR-RW",
+											    @"1EP.CR-RW",
+											    @"1EU.CR-RW",
+											    @"FI1.CR-RW",
+											    @"IA9.CR-RW",
+											    @"IAY.CR-RW",
 												nil];
 	}
 	return combinedPromoCodeTransactionTypes;
@@ -581,11 +683,17 @@
 	if (!paidTransactionTypes) {
 		paidTransactionTypes = [[NSSet alloc] initWithObjects:
 								@"1",		//iPhone App
+								@"1-B",     //App Bundle
+								@"1E",      //Paid App (Custom iPhone)
+								@"1EP",     //Paid App (Custom iPad)
+								@"1EU",     //Paid App (Custom Universal)
 								@"1F",		//Universal App
 								@"1T",		//iPad App
 								@"F1",		//Mac App
+								@"FI1",     //Mac In-App Purchase
 								@"IA1",		//In-App Purchase
 								@"IA9",		//In-App Subscription
+								@"IAY",     //In-App Auto-Renewable Subscription
 								nil];
 	}
 	return paidTransactionTypes;
