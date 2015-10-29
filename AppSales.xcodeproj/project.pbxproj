@@ -2383,7 +2383,7 @@
 		7F709D1E13BC98860008DBAD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0700;
 			};
 			buildConfigurationList = 7F709D2113BC98860008DBAD /* Build configuration list for PBXProject "AppSales" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3070,6 +3070,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3121,6 +3122,7 @@
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.omzsoftware.${PRODUCT_NAME:identifier}";
 				PRODUCT_NAME = AppSalesMobile;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3139,6 +3141,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Support/AppSales-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.omzsoftware.${PRODUCT_NAME:identifier}";
 				PRODUCT_NAME = AppSalesMobile;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
