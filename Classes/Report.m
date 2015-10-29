@@ -154,6 +154,17 @@
 		NSString *productSKU = [rowDictionary objectForKey:kReportColumnSKU];
 		if (!productSKU) productSKU = [rowDictionary objectForKey:kReportColumnSKU2];
 		
+        if ([productSKU hasSuffix:@" "])
+        { // bug in 26th October reports, sku has trailing space
+            // first delete 'productSKU plus space' duplicate and clean up the mess
+            Product *product = [productsBySKU objectForKey:productSKU];
+            if (product)
+                [moc deleteObject:product];
+            // now fix the SKU so it does not happen again
+            int len = (int)productSKU.length;
+            productSKU = [productSKU substringToIndex:len-1];
+        }
+        
 		NSString *productVersion = [rowDictionary objectForKey:kReportColumnVersion];
 		Product *product = [productsBySKU objectForKey:productSKU];
 		if (!product) {
