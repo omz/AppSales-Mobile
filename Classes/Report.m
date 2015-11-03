@@ -135,6 +135,7 @@
 		BOOL isWeeklyReport = ![beginDate isEqual:endDate];
 		NSString *productName = [rowDictionary objectForKey:kReportColumnTitle];
 		if (!productName) productName = [rowDictionary objectForKey:kReportColumnTitle2];
+        productName = [productName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		
 		Transaction *transaction = [NSEntityDescription insertNewObjectForEntityForName:@"Transaction" inManagedObjectContext:moc];
 		transaction.units = [NSNumber numberWithInteger:[[rowDictionary objectForKey:kReportColumnUnits] integerValue]];
@@ -164,6 +165,7 @@
             int len = (int)productSKU.length;
             productSKU = [productSKU substringToIndex:len-1];
         }
+        productSKU = [productSKU stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         
 		NSString *productVersion = [rowDictionary objectForKey:kReportColumnVersion];
 		Product *product = [productsBySKU objectForKey:productSKU];
@@ -191,12 +193,16 @@
 		if (!platformsByTransactionType) {
 			platformsByTransactionType = [[NSDictionary alloc] initWithObjectsAndKeys:
 										  kProductPlatformiPhone, @"1",
+                                          kProductPlatformiPhone, @"3",
 										  kProductPlatformiPhone, @"7",
 										  kProductPlatformUniversal, @"1F",
+                                          kProductPlatformUniversal, @"3F",
 										  kProductPlatformUniversal, @"7F",
 										  kProductPlatformiPad, @"1T",
+                                          kProductPlatformiPad, @"3T",
 										  kProductPlatformiPad, @"7T",
 										  kProductPlatformMac, @"F1",
+                                          kProductPlatformMac, @"F3",
 										  kProductPlatformMac, @"F7",
 										  kProductPlatformInApp, @"IA1",
 										  kProductPlatformInApp, @"IA9",
@@ -499,6 +505,11 @@
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedUpdateTransactionTypes] forProductWithID:productID];
 }
 
+- (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID
+{
+    return [self totalNumberOfTransactionsInSet:[[self class] combinedRedownloadedTransactionTypes] forProductWithID:productID];
+}
+
 - (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
 {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedEducationalTransactionTypes] forProductWithID:productID];
@@ -600,6 +611,20 @@
 										nil];
 	}
 	return combinedUpdateTransactionTypes;
+}
+
++ (NSSet *)combinedRedownloadedTransactionTypes
+{
+    static NSSet *combinedRedownloadedTransactionTypes = nil;
+    if (!combinedRedownloadedTransactionTypes) {
+        combinedRedownloadedTransactionTypes = [[NSSet alloc] initWithObjects:
+                                                @"3",
+                                                @"3F",
+                                                @"3T",
+                                                @"F3",
+                                                nil];
+    }
+    return combinedRedownloadedTransactionTypes;
 }
 
 + (NSSet *)combinedEducationalTransactionTypes

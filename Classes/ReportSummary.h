@@ -25,6 +25,7 @@
 - (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct;
 
 - (NSInteger)totalNumberOfUpdatesForProductWithID:(NSString *)productID;
+- (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID;
 - (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID;
 - (NSInteger)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID;
 - (NSInteger)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID;

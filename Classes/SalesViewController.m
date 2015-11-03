@@ -288,6 +288,8 @@
 	viewMode = newViewMode;
 	if (viewMode == DashboardViewModeSales || viewMode == DashboardViewModeRevenue) {
 		self.graphView.title = nil;
+    } else if (viewMode == DashboardViewModeRedownloads) {
+        self.graphView.title = NSLocalizedString(@"Redownloads", nil);
 	} else if (viewMode == DashboardViewModeEducationalSales) {
 		self.graphView.title = NSLocalizedString(@"Educational Sales", nil);
 	} else if (viewMode == DashboardViewModeGiftPurchases) {
@@ -404,11 +406,13 @@
 			} else if (buttonIndex == 2) {
 				self.viewMode = DashboardViewModeUpdates;
 			} else if (buttonIndex == 3) {
-				self.viewMode = DashboardViewModeEducationalSales;
+				self.viewMode = DashboardViewModeRedownloads;
 			} else if (buttonIndex == 4) {
-				self.viewMode = DashboardViewModeGiftPurchases;
+				self.viewMode = DashboardViewModeEducationalSales;
 			} else if (buttonIndex == 5) {
-				self.viewMode = DashboardViewModePromoCodes;
+				self.viewMode = DashboardViewModeGiftPurchases;
+            } else if (buttonIndex == 6) {
+                self.viewMode = DashboardViewModePromoCodes;
 			}
 			[[NSUserDefaults standardUserDefaults] setInteger:viewMode forKey:kSettingDashboardViewMode];
 			if (viewMode != DashboardViewModeRevenue) {
@@ -550,6 +554,8 @@
                 value += [report totalNumberOfPaidDownloadsForProductWithID:selectedProduct.productID];
             } else if (viewMode == DashboardViewModeUpdates) {
                 value += [report totalNumberOfUpdatesForProductWithID:selectedProduct.productID];
+            } else if (viewMode == DashboardViewModeRedownloads) {
+                value += [report totalNumberOfRedownloadsForProductWithID:selectedProduct.productID];
             } else if (viewMode == DashboardViewModeEducationalSales) {
                 value += [report totalNumberOfEducationalSalesForProductWithID:selectedProduct.productID];
             } else if (viewMode == DashboardViewModeGiftPurchases) {
@@ -614,6 +620,8 @@
 					valueForProduct = (float)[report totalNumberOfPaidDownloadsForProductWithID:productID];
 				} else if (viewMode == DashboardViewModeUpdates) {
 					valueForProduct = (float)[report totalNumberOfUpdatesForProductWithID:productID];
+                } else if (viewMode == DashboardViewModeRedownloads) {
+                    valueForProduct = (float)[report totalNumberOfRedownloadsForProductWithID:productID];
 				} else if (viewMode == DashboardViewModeEducationalSales) {
 					valueForProduct = (float)[report totalNumberOfEducationalSalesForProductWithID:productID];
 				} else if (viewMode == DashboardViewModeGiftPurchases) {
@@ -737,6 +745,8 @@
 				latestNumber = [latestReport totalNumberOfPaidDownloadsForProductWithID:product.productID];
 			} else if (viewMode == DashboardViewModeUpdates) {
 				latestNumber = [latestReport totalNumberOfUpdatesForProductWithID:product.productID];
+            } else if (viewMode == DashboardViewModeRedownloads) {
+                latestNumber = [latestReport totalNumberOfRedownloadsForProductWithID:product.productID];
 			} else if (viewMode == DashboardViewModeEducationalSales) {
 				latestNumber = [latestReport totalNumberOfEducationalSalesForProductWithID:product.productID];
 			} else if (viewMode == DashboardViewModeGiftPurchases) {
@@ -763,8 +773,9 @@
 												   otherButtonTitles:
 								 NSLocalizedString(@"Revenue", nil), 
 								 NSLocalizedString(@"Sales", nil), 
-								 NSLocalizedString(@"Updates", nil), 
-								 NSLocalizedString(@"Educational Sales", nil), 
+								 NSLocalizedString(@"Updates", nil),
+                                 NSLocalizedString(@"Redownloads", nil),
+								 NSLocalizedString(@"Educational Sales", nil),
 								 NSLocalizedString(@"Gift Purchases", nil), 
 								 NSLocalizedString(@"Promo Codes", nil), nil] autorelease];
 		self.activeSheet.tag = kSheetTagAdvancedViewMode;

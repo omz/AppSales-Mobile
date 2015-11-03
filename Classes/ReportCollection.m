@@ -60,6 +60,15 @@
 	return total;
 }
 
+- (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID
+{
+    NSInteger total = 0;
+    for (Report *report in reports) {
+        total += [report totalNumberOfRedownloadsForProductWithID:productID];
+    }
+    return total;
+}
+
 - (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
 {
 	NSInteger total = 0;

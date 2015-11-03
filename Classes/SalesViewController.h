@@ -18,6 +18,7 @@ typedef NS_ENUM(NSInteger, DashboardViewMode) {
 	DashboardViewModeRevenue = 0,
 	DashboardViewModeSales,
 	DashboardViewModeUpdates,
+    DashboardViewModeRedownloads,
 	DashboardViewModeEducationalSales,
 	DashboardViewModeGiftPurchases,
 	DashboardViewModePromoCodes

@@ -36,6 +36,7 @@
 
 + (NSSet *)combinedPaidTransactionTypes;
 + (NSSet *)combinedUpdateTransactionTypes;
++ (NSSet *)combinedRedownloadedTransactionTypes;
 + (NSSet *)combinedEducationalTransactionTypes;
 + (NSSet *)combinedGiftPurchaseTransactionTypes;
 + (NSSet *)combinedPromoCodeTransactionTypes;
