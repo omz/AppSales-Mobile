@@ -283,9 +283,13 @@
 			NSDictionary *salesByProduct = [paidDownloadsByCountryAndProduct objectForKey:[country uppercaseString]];
 			sales = [[[salesByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
 		}
-		NSString *subtitle = [NSString stringWithFormat:@"%@: %li %@", [[CountryDictionary sharedDictionary] nameForCountryCode:country], (long)sales, sales == 1 ? @"sale" : @"sales"];
-		ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:country product:nil];
-		[sortedEntries addObject:entry];
+        
+        // Only display if we have something to show
+        if (sales != 0) {
+            NSString *subtitle = [NSString stringWithFormat:@"%@: %li %@", [[CountryDictionary sharedDictionary] nameForCountryCode:country], (long)sales, sales == 1 ? @"sale" : @"sales"];
+            ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:country product:nil];
+            [sortedEntries addObject:entry];
+        }
 	}
 	self.countryEntries = [NSArray arrayWithArray:sortedEntries];
 	
@@ -313,13 +317,17 @@
                 refunds -= [[refundsByProduct objectForKey:productID] integerValue];
             }
         }
-        float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
-        NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, [product displayName]];
-        if (sales != nonRefunds) {
-            subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, [product displayName]];
+        
+        // Only display if we have something to show
+        if (sales != 0) {
+            float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
+            NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, [product displayName]];
+            if (sales != nonRefunds) {
+                subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, [product displayName]];
+            }
+            ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:nil product:product];
+            [entries addObject:entry];
         }
-        ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:nil product:product];
-        [entries addObject:entry];
     }
 	[entries sortUsingDescriptors:[NSArray arrayWithObject:[[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO] autorelease]]];
 	
