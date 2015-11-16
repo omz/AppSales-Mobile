@@ -58,6 +58,7 @@
 	NSInteger previousBadge = [account.reportsBadge integerValue];
 	NSString *vendorID = account.vendorID;
 	
+    NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
 	for (NSString *dateType in [NSArray arrayWithObjects:@"Daily", @"Weekly", nil]) {
 		//Determine which reports should be available for download:
 		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
@@ -173,8 +174,30 @@
 			NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:NULL];
 			
 			NSString *errorMessage = [[response allHeaderFields] objectForKey:@"Errormsg"];
-			if (errorMessage) {
-				NSLog(@"  %@", errorMessage);
+            // The message "Daily Reports are only available for past 365 days. Please enter a new date."
+            // just means that the report in question has not yet been released.
+            // We can safely ignore this error and move on.
+            if ([errorMessage rangeOfString:@"past 365 days"].location == NSNotFound) {
+                NSLog(@"%@ -> %@", reportDateString, errorMessage);
+                
+                NSInteger year = [[reportDateString substringWithRange:NSMakeRange(0, 4)] intValue];
+                NSInteger month = [[reportDateString substringWithRange:NSMakeRange(4, 2)] intValue];
+                NSInteger day = [[reportDateString substringWithRange:NSMakeRange(6, 2)] intValue];
+                
+                NSDateComponents *components = [[NSDateComponents alloc] init];
+                [components setYear:year];
+                [components setMonth:month];
+                [components setDay:day];
+                
+                NSDate *reportDate = [[NSCalendar currentCalendar] dateFromComponents:components];
+                
+                NSMutableDictionary *reportTypes = [[NSMutableDictionary alloc] initWithDictionary:errors[errorMessage]];
+                
+                NSMutableArray *reports = [[NSMutableArray alloc] initWithArray:reportTypes[dateType]];
+                [reports addObject:reportDate];
+                reportTypes[dateType] = reports;
+                
+                errors[errorMessage] = reportTypes;
 			} else if (reportData) {
 				NSString *originalFilename = [[response allHeaderFields] objectForKey:@"Filename"];
 				NSData *inflatedReportData = [reportData gzipInflate];
@@ -227,6 +250,30 @@
 		[pool release];
 		return;
 	}
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.timeStyle = NSDateFormatterNoStyle;
+        dateFormatter.dateStyle = NSDateFormatterShortStyle;
+        for (NSString *error in errors.allKeys) {
+            NSString *message = error;
+            
+            NSDictionary *reportTypes = errors[error];
+            for (NSString *reportType in reportTypes.allKeys) {
+                message = [message stringByAppendingFormat:@"\n\n%@ Reports:", reportType];
+                for (NSDate *reportDate in reportTypes[reportType]) {
+                    message = [message stringByAppendingFormat:@"\n%@", [dateFormatter stringFromDate:reportDate]];
+                }
+            }
+            
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil)
+                                                                message:message
+                                                               delegate:nil
+                                                      cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                                                      otherButtonTitles:nil];
+            [alertView show];
+        }
+    });
 	
 	BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
 	if (downloadPayments && (numberOfReportsDownloaded > 0 || [account.payments count] == 0)) {
