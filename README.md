@@ -1,6 +1,7 @@
 #AppSales
 
 ---
+[![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=565753b228898101003ae89e&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/565753b228898101003ae89e/build/latest)
 
 ***Announcement***
 
