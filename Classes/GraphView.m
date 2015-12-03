@@ -311,7 +311,7 @@
 	}
 	
 	//Add views that are visible now:
-	for (NSInteger i=visibleRange.location; i<visibleRange.location+visibleRange.length; i++) {
+	for (NSInteger i = visibleRange.location; i < (visibleRange.location + visibleRange.length); i++) {
 		StackedBarView *barView = [visibleBarViews objectForKey:[NSNumber numberWithInteger:i]];
 		CGRect frameForBar = [self frameForBarAtIndex:i];
 		if (!barView) {
@@ -322,15 +322,16 @@
 			barView.frame = frameForBar;
 			barView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 			
-			UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, frameForBar.size.height, frameForBar.size.width, 20)];
+			UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, frameForBar.size.height, frameForBar.size.width, 30)];
 			dateLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 			dateLabel.backgroundColor = [UIColor clearColor];
 			dateLabel.textColor = [UIColor darkGrayColor];
 			dateLabel.shadowColor = [UIColor whiteColor];
 			dateLabel.shadowOffset = CGSizeMake(0, 1);
 			dateLabel.textAlignment = NSTextAlignmentCenter;
-			dateLabel.font = [UIFont boldSystemFontOfSize:14.0];
+			dateLabel.font = [UIFont boldSystemFontOfSize:12.0];
 			dateLabel.adjustsFontSizeToFitWidth = YES;
+			dateLabel.numberOfLines = 0;
 			[barView addSubview:dateLabel];
 			
 			NSString *xAxisLabelText = [self.dataSource graphView:self labelForXAxisAtIndex:i];

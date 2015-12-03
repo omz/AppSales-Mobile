@@ -51,6 +51,9 @@
 		calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 		[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		
+		dateFormatter = [[NSDateFormatter alloc] init];
+		[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+		
 		[account addObserver:self forKeyPath:@"isDownloadingReports" options:NSKeyValueObservingOptionNew context:nil];
 		[account addObserver:self forKeyPath:@"downloadStatus" options:NSKeyValueObservingOptionNew context:nil];
 		[account addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:nil];
@@ -221,9 +224,6 @@
 	[sortedWeeklyReports sortUsingDescriptors:sortDescriptors];
 	
 	// Group daily reports by calendar month:
-	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
-	[monthFormatter setDateFormat:@"MMMM yyyy"];
-	[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	[sortedCalendarMonthReports removeAllObjects];
 	NSDateComponents *prevDateComponents = nil;
 	NSMutableArray *reportsInCurrentMonth = nil;
@@ -234,7 +234,8 @@
 			reportsInCurrentMonth = [NSMutableArray array];
 			[reportsInCurrentMonth addObject:dailyReport];
 			ReportCollection *monthCollection = [[ReportCollection alloc] initWithReports:reportsInCurrentMonth];
-			monthCollection.title = [monthFormatter stringFromDate:dailyReport.startDate];
+			[dateFormatter setDateFormat:@"MMMM yyyy"];
+			monthCollection.title = [dateFormatter stringFromDate:dailyReport.startDate];
 			[sortedCalendarMonthReports addObject:monthCollection];
 		} else {
 			// This report is from the same month as the previous report. Append the daily report to the existing collection.
@@ -470,22 +471,21 @@
 			NSInteger weekdayOrdinal = [dateComponents weekdayOrdinal];
 			return [NSString stringWithFormat:@"W%li", (long)weekdayOrdinal];
 		} else {
-			NSDateComponents *dateComponents = [calendar components:NSDayCalendarUnit fromDate:report.startDate];
-			NSInteger day = [dateComponents day];
-			return [NSString stringWithFormat:@"%li", (long)day];
+			[dateFormatter setDateFormat:@"d\nEEE"];
+			return [dateFormatter stringFromDate:report.startDate];
 		}
 	} else {
-		NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
-		[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-		[monthFormatter setDateFormat:@"MMM"];
+		NSDate *monthDate = nil;
 		if (showFiscalMonths) {
 			NSDate *date = [[self.sortedFiscalMonthReports objectAtIndex:index] startDate];
 			NSDate *representativeDateForFiscalMonth = [[AppleFiscalCalendar sharedFiscalCalendar] representativeDateForFiscalMonthOfDate:date];
-			return [monthFormatter stringFromDate:representativeDateForFiscalMonth];
+			monthDate = representativeDateForFiscalMonth;
 		} else {
 			id<ReportSummary> report = [self.sortedCalendarMonthReports objectAtIndex:index];
-			return [monthFormatter stringFromDate:report.startDate];
+			monthDate = report.startDate;
 		}
+		[dateFormatter setDateFormat:@"MMM"];
+		return [dateFormatter stringFromDate:monthDate];
 	}
 }
 
@@ -551,20 +551,16 @@
 	if (selectedTab == 0) {
 		if ([((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count] > index) {
 			Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
-			NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
-			[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			[monthFormatter setDateFormat:@"MMM '’'yy"];
-			return [monthFormatter stringFromDate:report.startDate];
+			[dateFormatter setDateFormat:@"MMM '’'yy"];
+			return [dateFormatter stringFromDate:report.startDate];
 		} else {
 			return @"N/A";
 		}
 	} else {
 		if ([self.sortedCalendarMonthReports count] > index) {
 			id<ReportSummary> report = [self.sortedCalendarMonthReports objectAtIndex:index];
-			NSDateFormatter *yearFormatter = [[NSDateFormatter alloc] init];
-			[yearFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			[yearFormatter setDateFormat:@"yyyy"];
-			NSString *yearString = [yearFormatter stringFromDate:report.startDate];
+			[dateFormatter setDateFormat:@"yyyy"];
+			NSString *yearString = [dateFormatter stringFromDate:report.startDate];
 			if (showFiscalMonths) {
 				return [NSString stringWithFormat:@" %@", yearString];
 			} else {
