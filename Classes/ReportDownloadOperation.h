@@ -7,17 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "LoginManager.h"
 
 #define kASReportDownloadErrorDescription	@"error"
 #define ASReportDownloadFailedNotification	@"ASReportDownloadFailedNotification"
 
 @class ASAccount;
 
-@interface ReportDownloadOperation : NSOperation {
+@interface ReportDownloadOperation : NSOperation <LoginManagerDelegate> {
 	
 	ASAccount *_account;
 	NSString *username;
 	NSString *password;
+	NSString *appPassword;
 	NSPersistentStoreCoordinator *psc;
 	NSManagedObjectID *accountObjectID;
 	NSInteger downloadCount;

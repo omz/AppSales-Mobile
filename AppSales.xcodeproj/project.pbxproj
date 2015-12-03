@@ -655,6 +655,8 @@
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
+		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
+		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1390,6 +1392,10 @@
 		7FFFB39513D4573700AD18E3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
 		7FFFB39713D4573700AD18E3 /* Sales.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Sales.png; sourceTree = "<group>"; };
 		7FFFB39C13D4599300AD18E3 /* DateButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButton.png; sourceTree = "<group>"; };
+		DA9DB1B11C0FEC48007B0178 /* LoginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginManager.h; sourceTree = "<group>"; };
+		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
+		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
+		DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurityCodeInputController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1456,6 +1462,7 @@
 				7FDF602013DD21D5005F1E2D /* Common UI */,
 				7F7F1D0413F63F7F00F18143 /* Promo Code Download */,
 				7F88897A14CD4C9A007604D7 /* Passcode Lock */,
+				DA9DB1B71C0FEC4C007B0178 /* Login Manager */,
 				7F1499D113BE312100D89064 /* Report Download */,
 				7F89BCDA13DFA43E001C607F /* Review Download */,
 				7F709D9013BD06570008DBAD /* Model */,
@@ -2352,6 +2359,17 @@
 			path = ../Images/Flags;
 			sourceTree = "<group>";
 		};
+		DA9DB1B71C0FEC4C007B0178 /* Login Manager */ = {
+			isa = PBXGroup;
+			children = (
+				DA9DB1B11C0FEC48007B0178 /* LoginManager.h */,
+				DA9DB1B21C0FEC48007B0178 /* LoginManager.m */,
+				DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */,
+				DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */,
+			);
+			name = "Login Manager";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2983,6 +3001,7 @@
 				7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */,
 				7F1499CA13BE15F500D89064 /* NSData+Compression.m in Sources */,
 				7F1499D013BE311600D89064 /* ReportDownloadOperation.m in Sources */,
+				DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */,
 				7F1499E113BE544F00D89064 /* ReportDownloadCoordinator.m in Sources */,
 				7F06B6BF13BF73C8004DB170 /* Report.m in Sources */,
 				7F1B14F313C51ACA00243AA3 /* CurrencyManager.m in Sources */,
@@ -3029,6 +3048,7 @@
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
 				7F0B8A7313F7E647006E9151 /* PromoCodesLicenseViewController.m in Sources */,
 				7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */,
+				DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */,
 				6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */,
 				6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */,
 				6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */,
@@ -3077,7 +3097,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-licucore";
 				SDKROOT = iphoneos;
@@ -3096,7 +3116,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = "-licucore";
 				SDKROOT = iphoneos;

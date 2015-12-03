@@ -12,6 +12,7 @@
 
 #define kAccountUsername                    @"username"
 #define kAccountPassword                    @"password"
+#define kAccountAppPassword                 @"appPassword"
 #define kAccountVendorID                    @"vendorID"
 #define ASViewSettingsDidChangeNotification @"ASViewSettingsDidChangeNotification"
 
@@ -29,6 +30,7 @@
 	UINavigationController *settingsNavController;
 	NSString *exportedReportsZipPath;
 	UIDocumentInteractionController *documentInteractionController;
+	NSMutableDictionary *vendors;
 }
 
 @property (nonatomic, weak) id<AccountsViewControllerDelegate> delegate;

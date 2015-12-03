@@ -12,6 +12,7 @@
 #define kSettingShow14Days				@"DashboardShow14Days"
 #define kSettingDashboardShowWeeks		@"DashboardShowWeeks"
 #define kSettingDownloadPayments		@"DownloadPayments"
+#define kSettingDeleteCookies			@"DeleteCookies"
 
 #define kSettingSelectedAccountID		@"SelectedAccountID"
 

@@ -283,22 +283,37 @@
 	}
 }
 
+- (NSArray *)accountSectionsFor:(ASAccount *)account {
+	FieldSpecifier *usernameField = [FieldSpecifier emailFieldWithKey:kAccountUsername title:NSLocalizedString(@"Email", nil) defaultValue:account.username ?: @""];
+	FieldSpecifier *passwordField = [FieldSpecifier passwordFieldWithKey:kAccountPassword title:NSLocalizedString(@"Password", nil) defaultValue:account.password ?: @""];
+	FieldSectionSpecifier *loginSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:usernameField, passwordField, nil]
+																			 title:NSLocalizedString(@"iTunes Connect Login", nil)
+																	   description:nil];
+	
+	FieldSpecifier *appPasswordField = [FieldSpecifier passwordFieldWithKey:kAccountAppPassword title:NSLocalizedString(@"Password", nil) defaultValue:account.appPassword ?: @""];
+	FieldSpecifier *generateAppPasswordButtonField = [FieldSpecifier buttonFieldWithKey:@"GenerateAppPasswordButton" title:NSLocalizedString(@"Generate App-Specific Password...", nil)];
+	FieldSectionSpecifier *appPasswordSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:appPasswordField, generateAppPasswordButtonField, nil]
+																				   title:NSLocalizedString(@"App-Specific Password", nil)
+																	   description:NSLocalizedString(@"An app-specific password is required in order to fetch reports. Tap the button above to open the “Manage your Apple ID” web page.", nil)];
+	
+	FieldSpecifier *vendorIDField = [FieldSpecifier numericFieldWithKey:kAccountVendorID title:NSLocalizedString(@"Vendor ID", nil) defaultValue:account.vendorID ?: @""];
+	vendorIDField.placeholder = @"8XXXXXXX";
+	FieldSpecifier *selectVendorIDButtonField = [FieldSpecifier buttonFieldWithKey:@"SelectVendorIDButton" title:NSLocalizedString(@"Auto-Fill Vendor ID...", nil)];
+	FieldSectionSpecifier *vendorIDSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:vendorIDField, selectVendorIDButtonField, nil]
+																			 title:NSLocalizedString(@"Vendor ID", nil)
+																	   description:NSLocalizedString(@"You can find your Vendor ID at the top of the “Payments and Financial Reports” module in iTunes Connect.", nil)];
+	
+	return @[loginSection, appPasswordSection, vendorIDSection];
+}
+
 - (void)addNewAccount {
 	FieldSpecifier *titleField = [FieldSpecifier textFieldWithKey:kAccountTitle title:@"Description" defaultValue:@""];
 	titleField.placeholder = NSLocalizedString(@"optional", nil);
 	FieldSectionSpecifier *titleSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:titleField] title:nil description:nil];
 	
-	FieldSpecifier *usernameField = [FieldSpecifier emailFieldWithKey:kAccountUsername title:NSLocalizedString(@"Email", nil) defaultValue:@""];
-	FieldSpecifier *passwordField = [FieldSpecifier passwordFieldWithKey:kAccountPassword title:NSLocalizedString(@"Password", nil) defaultValue:@""];
-	FieldSpecifier *vendorIDField = [FieldSpecifier numericFieldWithKey:kAccountVendorID title:NSLocalizedString(@"Vendor ID", nil) defaultValue:@""];
-	vendorIDField.placeholder = @"8XXXXXXX";
-	FieldSpecifier *selectVendorIDButtonField = [FieldSpecifier buttonFieldWithKey:@"SelectVendorIDButton" title:NSLocalizedString(@"Auto-Fill Vendor ID...", nil)];
+	NSMutableArray *sections = [[NSMutableArray alloc] initWithArray:[self accountSectionsFor:nil]];
+	[sections insertObject:titleSection atIndex:0];
 	
-	FieldSectionSpecifier *loginSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:usernameField, passwordField, vendorIDField, selectVendorIDButtonField, nil] 
-																			 title:NSLocalizedString(@"iTunes Connect Login", nil) 
-																	   description:NSLocalizedString(@"You can import reports via iTunes File Sharing without entering your login.", nil)];
-	
-	NSArray *sections = [NSArray arrayWithObjects:titleSection, loginSection, nil];
 	FieldEditorViewController *addAccountViewController = [[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"New Account",nil)];
 	addAccountViewController.cancelButtonTitle = NSLocalizedString(@"Cancel", nil);
 	addAccountViewController.doneButtonTitle = NSLocalizedString(@"Done", nil);
@@ -315,24 +330,11 @@
 
 - (void)editAccount:(ASAccount *)account {
 	self.selectedAccount = account;
-	NSString *username = account.username;
-	NSString *password = account.password;
-	NSString *title = account.title;
-	NSString *vendorID = account.vendorID;
 	
-	FieldSpecifier *titleField = [FieldSpecifier textFieldWithKey:kAccountTitle title:@"Description" defaultValue:title];
+	FieldSpecifier *titleField = [FieldSpecifier textFieldWithKey:kAccountTitle title:@"Description" defaultValue:account.title ?: @""];
 	titleField.placeholder = NSLocalizedString(@"optional", nil);
 	
-	FieldSpecifier *usernameField = [FieldSpecifier emailFieldWithKey:kAccountUsername title:NSLocalizedString(@"Username", nil) defaultValue:username];
-	FieldSpecifier *passwordField = [FieldSpecifier passwordFieldWithKey:kAccountPassword title:NSLocalizedString(@"Password", nil) defaultValue:password];
-	FieldSpecifier *vendorIDField = [FieldSpecifier numericFieldWithKey:kAccountVendorID title:NSLocalizedString(@"Vendor ID", nil) defaultValue:vendorID];
-	FieldSpecifier *selectVendorIDButtonField = [FieldSpecifier buttonFieldWithKey:@"SelectVendorIDButton" title:NSLocalizedString(@"Auto-Fill Vendor ID...", nil)];
-	
-	vendorIDField.placeholder = @"8XXXXXXX";
-	FieldSectionSpecifier *loginSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:usernameField, passwordField, vendorIDField, selectVendorIDButtonField, nil] 
-																			 title:NSLocalizedString(@"iTunes Connect Login", nil) 
-																	   description:nil];
-	FieldSpecifier *loginSubsectionField = [FieldSpecifier subsectionFieldWithSection:loginSection key:@"iTunesConnect"];
+	FieldSpecifier *loginSubsectionField = [FieldSpecifier subsectionFieldWithSections:[self accountSectionsFor:account] key:@"iTunesConnect" title:NSLocalizedString(@"iTunes Connect Login", nil)];
 	FieldSectionSpecifier *titleSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:titleField, loginSubsectionField, nil] title:nil description:nil];
 	
 	FieldSpecifier *importButtonField = [FieldSpecifier buttonFieldWithKey:kImportReportsButton title:NSLocalizedString(@"Import Reports...", nil)];
@@ -402,13 +404,17 @@
 	currencySection.exclusiveSelection = YES;
 	FieldSpecifier *currencySectionField = [FieldSpecifier subsectionFieldWithSection:currencySection key:@"currency"];
 	FieldSpecifier *updateExchangeRatesButtonField = [FieldSpecifier buttonFieldWithKey:kUpdateExchangeRatesButton title:NSLocalizedString(@"Update Exchange Rates Now", nil)];
-	FieldSpecifier *downloadPaymentsField = [FieldSpecifier switchFieldWithKey:kSettingDownloadPayments title:NSLocalizedString(@"Download Payments", nil) defaultValue:[[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments]];
-	FieldSectionSpecifier *mainSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:passcodeLockField, currencySectionField, updateExchangeRatesButtonField, downloadPaymentsField, nil] 
-																			title:NSLocalizedString(@"General", nil) 
+	FieldSectionSpecifier *generalSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:passcodeLockField, currencySectionField, updateExchangeRatesButtonField, nil]
+																			   title:NSLocalizedString(@"General", nil)
 																	  description:NSLocalizedString(@"Exchange rates will automatically be refreshed periodically.", nil)];
-
-
-  
+	
+	
+	FieldSpecifier *downloadPaymentsField = [FieldSpecifier switchFieldWithKey:kSettingDownloadPayments title:NSLocalizedString(@"Download Payments", nil) defaultValue:[[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments]];
+	FieldSpecifier *deleteCookiesField = [FieldSpecifier switchFieldWithKey:kSettingDeleteCookies title:NSLocalizedString(@"Delete Cookies", nil) defaultValue:[[NSUserDefaults standardUserDefaults] boolForKey:kSettingDeleteCookies]];
+	FieldSectionSpecifier *paymentsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:downloadPaymentsField, deleteCookiesField, nil]
+																				title:NSLocalizedString(@"Payments", nil)
+																		  description:NSLocalizedString(@"Delete Cookies forces accounts with Two-Step Verification to re-verify their identity each time that payments are downloaded.", nil)];
+	
 	// products section
 	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 	FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
@@ -436,7 +442,7 @@
 	FieldSpecifier *pushSectionField = [FieldSpecifier subsectionFieldWithSection:pushSection key:@"PushSection"];
 	FieldSectionSpecifier *pushSectionFieldSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:pushSectionField] title:NSLocalizedString(@"Push Notifications", nil) description:nil];
 		  
-	NSArray *sections = [NSArray arrayWithObjects:mainSection, productsSection, pushSectionFieldSection, nil];
+	NSArray *sections = [NSArray arrayWithObjects:generalSection, paymentsSection, productsSection, pushSectionFieldSection, nil];
 	settingsViewController = [[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)];
 	settingsViewController.doneButtonTitle = NSLocalizedString(@"Done", nil);
 	settingsViewController.delegate = self;
@@ -453,23 +459,29 @@
 	if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier] || [editor.editorIdentifier isEqualToString:kEditAccountEditorIdentifier]) {
 		NSString *username = [returnValues objectForKey:kAccountUsername];
 		NSString *password = [returnValues objectForKey:kAccountPassword];
+		NSString *appPassword = [returnValues objectForKey:kAccountAppPassword];
 		NSString *vendorID = [returnValues objectForKey:kAccountVendorID];
 		NSString *title = [returnValues objectForKey:kAccountTitle];
-		if ((!username || [username isEqualToString:@""]) && (!title || [title isEqualToString:@""])) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nIf you want to download reports from iTunes Connect, you need to enter your username and password, otherwise you can just enter a description.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+		if ((username.length == 0) && (title.length == 0)) {
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nAll fields are required if you want to download reports from iTunes Connect, otherwise you can just enter a description.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+			return;
+		}
+		if (((password.length > 0) && (appPassword.length == 0)) || ((password.length == 0) && (appPassword.length > 0))) {
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter both your account password and an app-specific password in order to download reports from iTunes Connect.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+			return;
+		}
+		if ((password.length > 0) && (vendorID.length == 0)) {
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 			return;
 		}
 		if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
-			if (password && password.length > 0 && (!vendorID || vendorID.length == 0)) {
-				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-				return;
-			}
 			ASAccount *account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:self.managedObjectContext];
 			account.title = title;
 			account.username = username;
 			account.vendorID = vendorID;
 			account.sortIndex = [NSNumber numberWithLong:time(NULL)];
-			[account setPassword:password];
+			account.password = password;
+			account.appPassword = appPassword;
 		}
 		else if ([editor.editorIdentifier isEqualToString:kEditAccountEditorIdentifier]) {
 			ASAccount *account = (ASAccount *)editor.context;
@@ -477,7 +489,8 @@
 			account.username = username;
 			account.title = title;
 			account.vendorID = vendorID;
-			[account setPassword:password];
+			account.password = password;
+			account.appPassword = appPassword;
 			
 			NSMutableDictionary *productsByID = [NSMutableDictionary dictionary];
 			for (Product *product in self.selectedAccount.products) {
@@ -517,6 +530,7 @@
 			}
 		}
 		[[NSUserDefaults standardUserDefaults] setBool:[[returnValues objectForKey:kSettingDownloadPayments] boolValue] forKey:kSettingDownloadPayments];
+		[[NSUserDefaults standardUserDefaults] setBool:[[returnValues objectForKey:kSettingDeleteCookies] boolValue] forKey:kSettingDeleteCookies];
 		[self dismissViewControllerAnimated:YES completion:nil];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASViewSettingsDidChangeNotification object:nil];
@@ -568,6 +582,12 @@
 															otherButtonTitles:NSLocalizedString(@"Delete", nil), nil];
 		confirmDeleteAlert.tag = kAlertTagConfirmDelete;
 		[confirmDeleteAlert show];
+	} else if ([key isEqualToString:@"GenerateAppPasswordButton"]) {
+		NSURL *manageAppleIDURL = [NSURL URLWithString:@"https://appleid.apple.com/account/manage/security"];
+		UIApplication *application = [UIApplication sharedApplication];
+		if ([application canOpenURL:manageAppleIDURL]) {
+			[application openURL:manageAppleIDURL];
+		}
 	} else if ([key isEqualToString:@"SelectVendorIDButton"]) {
 		FieldEditorViewController *vc = nil;
 		if (self.presentedViewController) {
@@ -578,17 +598,17 @@
 		}
 		NSString *username = [vc.values objectForKey:kAccountUsername];
 		NSString *password = [vc.values objectForKey:kAccountPassword];
-		[vc dismissKeyboard];
 		
-		if (!username || username.length == 0 || !password || password.length == 0) {
+		if ((username.length == 0) || (password.length == 0)) {
 			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter your username and password first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 			return;
 		}
+		[vc dismissKeyboard];
 		
-		NSDictionary *loginInfo = [NSDictionary dictionaryWithObjectsAndKeys:password, kAccountPassword, username, kAccountUsername, nil];
+		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
 		
 		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
-		hud.labelText = NSLocalizedString(@"Checking Vendor ID...", nil);
+		hud.labelText = NSLocalizedString(@"Fetching Vendor ID...", nil);
 		[hud showWhileExecuting:@selector(findVendorIDsWithLogin:) onTarget:self withObject:loginInfo animated:YES];
 	} else if ([key isEqualToString:kDownloadBoxcarButton]) {
 		if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"boxcar://provider/965"]]) {

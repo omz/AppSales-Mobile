@@ -9,7 +9,8 @@
 #import "ASAccount.h"
 #import "SSKeychain.h"
 
-#define kAccountKeychainServiceIdentifier	@"iTunesConnect"
+#define kAccountKeychainiTunesConnect  @"iTunesConnect"
+#define kAccountKeychainAppSalesMobile @"AppSalesMobile"
 
 @implementation ASAccount
 
@@ -17,15 +18,27 @@
 @synthesize isDownloadingReports, downloadStatus, downloadProgress;
 
 - (NSString *)password {
-	return [SSKeychain passwordForService:kAccountKeychainServiceIdentifier account:self.username];
+	return [SSKeychain passwordForService:kAccountKeychainiTunesConnect account:self.username];
 }
 
-- (void)setPassword:(NSString *)newPassword {
-	[SSKeychain setPassword:newPassword forService:kAccountKeychainServiceIdentifier account:self.username];
+- (void)setPassword:(NSString *)password {
+	[SSKeychain setPassword:password forService:kAccountKeychainiTunesConnect account:self.username];
 }
 
 - (void)deletePassword {
-	[SSKeychain deletePasswordForService:kAccountKeychainServiceIdentifier account:self.username];
+	[SSKeychain deletePasswordForService:kAccountKeychainiTunesConnect account:self.username];
+}
+
+- (NSString *)appPassword {
+	return [SSKeychain passwordForService:kAccountKeychainAppSalesMobile account:self.username];
+}
+
+- (void)setAppPassword:(NSString *)appPassword {
+	[SSKeychain setPassword:appPassword forService:kAccountKeychainAppSalesMobile account:self.username];
+}
+
+- (void)deleteAppPassword {
+	[SSKeychain deletePasswordForService:kAccountKeychainAppSalesMobile account:self.username];
 }
 
 - (NSString *)displayName {

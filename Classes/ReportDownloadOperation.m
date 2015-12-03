@@ -29,11 +29,12 @@
 - (id)initWithAccount:(ASAccount *)account {
 	self = [super init];
 	if (self) {
-		username = [[account username] copy];
-		password = [[account password] copy];
+		username = [account.username copy];
+		password = [account.password copy];
+		appPassword = [account.appPassword copy];
 		_account = account;
-		accountObjectID = [[account objectID] copy];
-		psc = [[account managedObjectContext] persistentStoreCoordinator];
+		accountObjectID = [account.objectID copy];
+		psc = [account.managedObjectContext persistentStoreCoordinator];
 	}
 	return self;
 }
@@ -154,10 +155,7 @@
 					}
 				}
 				
-				NSString *escapedUsername = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)username, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
-				NSString *escapedPassword = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)password, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
-				NSString *reportDownloadBodyString = [NSString stringWithFormat:@"USERNAME=%@&PASSWORD=%@&VNDNUMBER=%@&TYPEOFREPORT=%@&DATETYPE=%@&REPORTTYPE=%@&REPORTDATE=%@",
-													  escapedUsername, escapedPassword, vendorID, @"Sales", dateType, @"Summary", reportDateString];
+				NSString *reportDownloadBodyString = [NSString stringWithFormat:@"USERNAME=%@&PASSWORD=%@&VNDNUMBER=%@&TYPEOFREPORT=%@&DATETYPE=%@&REPORTTYPE=%@&REPORTDATE=%@", NSStringPercentEscaped(username), NSStringPercentEscaped(appPassword), vendorID, @"Sales", dateType, @"Summary", reportDateString];
 				
 				NSData *reportDownloadBodyData = [reportDownloadBodyString dataUsingEncoding:NSUTF8StringEncoding];
 				NSMutableURLRequest *reportDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/autoingestion.tft"]];
@@ -272,144 +270,27 @@
 		
 		BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
 		if (downloadPayments && (numberOfReportsDownloaded > 0 || [account.payments count] == 0)) {
-			//==== Payments
-			NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-			NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
-			for (NSHTTPCookie *cookie in cookies) {
-				[cookieStorage deleteCookie:cookie];
-			}
-
-			cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];	
-			for (NSHTTPCookie *cookie in cookies) {
-				[cookieStorage deleteCookie:cookie];
-			}
-			
 			dispatch_async(dispatch_get_main_queue(), ^ {
 				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
 				_account.downloadProgress = 0.9;
 			});
 			
-			NSString *ittsBaseURL = @"https://itunesconnect.apple.com";
-			NSString *ittsLoginPageAction = @"/WebObjects/iTunesConnect.woa";
-			NSString *signoutSentinel = @"logouturl";
-			
-			NSURL *loginURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:ittsLoginPageAction]];
-			NSHTTPURLResponse *loginPageResponse = nil;
-			NSError *loginPageError = nil;
-			NSData *loginPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:loginURL] returningResponse:&loginPageResponse error:&loginPageError];
-			NSString *loginPage = [[NSString alloc] initWithData:loginPageData encoding:NSUTF8StringEncoding];
-				
-			if ([loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
-				// find the login action
-				NSScanner *loginPageScanner = [NSScanner scannerWithString:loginPage];
-				[loginPageScanner scanUpToString:@"action=\"" intoString:nil];
-				if (![loginPageScanner scanString:@"action=\"" intoString:nil]) {
-					dispatch_async(dispatch_get_main_queue(), ^ {
-						[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																			object:self 
-																		  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not parse iTunes Connect login page", nil)
-																											   forKey:kASReportDownloadErrorDescription]];
-					});
-					return;
-				}
-				NSString *loginAction = nil;
-				[loginPageScanner scanUpToString:@"\"" intoString:&loginAction];
-				
-				NSDictionary *postDict = [NSDictionary dictionaryWithObjectsAndKeys:
-										  username, @"theAccountName",
-										  password, @"theAccountPW", 
-										  @"39", @"1.Continue.x", // coordinates of submit button on screen.  any values seem to work
-										  @"7", @"1.Continue.y",
-										  nil];
-				loginPage = [self stringFromSynchronousPostRequestWithURL:[NSURL URLWithString:[ittsBaseURL stringByAppendingString:loginAction]] bodyDictionary:postDict];
-				
-				if (loginPage == nil || [loginPage rangeOfString:signoutSentinel].location == NSNotFound) {
-					dispatch_async(dispatch_get_main_queue(), ^ {
-						[[NSNotificationCenter defaultCenter] postNotificationName:ASReportDownloadFailedNotification 
-																			object:self 
-																		  userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not login. Please check your username and password.", nil) 
-																											   forKey:kASReportDownloadErrorDescription]];
-					});
-					return;
-				}
+			LoginManager *loginManager = [[LoginManager alloc] initWithAccount:_account];
+			loginManager.shouldDeleteCookies = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDeleteCookies];
+			loginManager.delegate = self;
+			[loginManager logIn];
+		} else {
+			if (numberOfReportsDownloaded > 0) {
+				dispatch_async(dispatch_get_main_queue(), ^ {
+					_account.downloadStatus = NSLocalizedString(@"Finished", nil);
+					_account.downloadProgress = 1.0;
+				});
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^ {
+					_account.downloadStatus = NSLocalizedString(@"No new reports found", nil);
+					_account.downloadProgress = 1.0;
+				});
 			}
-			
-			if ([self isCancelled]) {
-				return;
-			}
-			
-			dispatch_async(dispatch_get_main_queue(), ^ {
-				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
-				_account.downloadProgress = 0.95;
-			});
-			
-			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/da/jumpTo?page=paymentsAndFinancialReports"]] returningResponse:NULL error:NULL];
-			
-			if (paymentsPageData) {
-				NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
-				
-				NSMutableArray *vendorOptions = [NSMutableArray array];
-				NSString *vendorSelectName = nil;
-				NSString *switchVendorAction = nil;
-				NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
-				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
-				[vendorFormScanner scanUpToString:@"action=\"" intoString:NULL];
-				if ([vendorFormScanner scanString:@"action=\"" intoString:NULL]) {
-					[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
-					if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
-						NSString *vendorIDContainer = nil;
-						[vendorFormScanner scanUpToString:@"</div" intoString:&vendorIDContainer];
-						if (vendorIDContainer) {
-							vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
-							[vendorFormScanner scanUpToString:@"<select" intoString:NULL];
-							[vendorFormScanner scanUpToString:@"name=\"" intoString:NULL];
-							[vendorFormScanner scanString:@"name=\"" intoString:NULL];
-							[vendorFormScanner scanUpToString:@"\"" intoString:&vendorSelectName];
-							
-							while (![vendorFormScanner isAtEnd]) {
-								if ([vendorFormScanner scanUpToString:@"<option" intoString:NULL]) {
-									NSString *vendorOption = nil;
-									[vendorFormScanner scanUpToString:@"</option" intoString:&vendorOption];
-									if ([vendorOption rangeOfString:@"selected"].location == NSNotFound) {
-										NSString *optionValue = nil;
-										NSScanner *optionScanner = [NSScanner scannerWithString:vendorOption];
-										[optionScanner scanUpToString:@"value=\"" intoString:NULL];
-										[optionScanner scanString:@"value=\"" intoString:NULL];
-										[optionScanner scanUpToString:@"\"" intoString:&optionValue];
-										if (optionValue) {
-											[vendorOptions addObject:optionValue];
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				
-				[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
-				for (NSString *additionalVendorOption in vendorOptions) {
-					NSString *paymentsFormURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", switchVendorAction];
-					
-					NSData *additionalPaymentsPageData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:paymentsFormURLString]
-																					  bodyDictionary:[NSDictionary dictionaryWithObjectsAndKeys:additionalVendorOption, vendorSelectName, nil]
-																							response:NULL];
-					NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
-					[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption];
-				}
-				
-				NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
-				NSString *signoutFormAction = nil;
-				[logoutFormScanner scanUpToString:@"<form name=\"signOutForm\"" intoString:NULL];
-				[logoutFormScanner scanUpToString:@"action=\"" intoString:NULL];
-				if ([logoutFormScanner scanString:@"action=\"" intoString:NULL]) {
-					[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
-					NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:signoutFormAction]];
-					NSError *logoutPageError = nil;
-					[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:&logoutPageError];
-				}
-			}
-			
-			//==== /Payments
 		}
 		
 		if ([moc hasChanges]) {
@@ -421,19 +302,133 @@
 			}
 			[psc unlock];
 		}
-		
-		if (numberOfReportsDownloaded > 0) {
-			dispatch_async(dispatch_get_main_queue(), ^ {
-				_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-				_account.downloadProgress = 1.0;
-			});
-		} else {
-			dispatch_async(dispatch_get_main_queue(), ^ {
-				_account.downloadStatus = NSLocalizedString(@"No new reports found", nil);
-				_account.downloadProgress = 1.0;
-			});
-		}
 	}
+}
+
+- (void)loginSucceeded {
+	@autoreleasepool {
+		
+		dispatch_async(dispatch_get_main_queue(), ^ {
+			_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
+			_account.downloadProgress = 0.95;
+		});
+		
+		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+		[moc setPersistentStoreCoordinator:psc];
+		[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
+		
+		ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
+		
+		//==== Payments
+		
+		NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
+		NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:NULL error:NULL];
+		
+		if (paymentsPageData) {
+			NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
+			
+			NSString *switchVendorAction = nil;
+			NSString *switchVendorSelectName = nil;
+			NSMutableArray *vendorOptions = [NSMutableArray array];
+			NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
+			[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
+			[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:NULL];
+			if ([vendorFormScanner scanUpToString:@"action=\"" intoString:NULL]) {
+				[vendorFormScanner scanString:@"action=\"" intoString:NULL];
+				[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
+				if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
+					[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:NULL];
+					NSString *vendorIDContainer = nil;
+					[vendorFormScanner scanUpToString:@"</div>" intoString:&vendorIDContainer];
+					if (vendorIDContainer) {
+						vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
+						
+						if ([vendorFormScanner scanUpToString:@"name=\"" intoString:NULL]) {
+							[vendorFormScanner scanString:@"name=\"" intoString:NULL];
+							[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorSelectName];
+							[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
+							while ([vendorFormScanner scanString:@"<option" intoString:NULL]) {
+								NSString *value = nil;
+								NSString *vendorID = nil;
+								
+								// Parse vendor index.
+								[vendorFormScanner scanUpToString:@"value=\"" intoString:NULL];
+								[vendorFormScanner scanString:@"value=\"" intoString:NULL];
+								[vendorFormScanner scanUpToString:@"\"" intoString:&value];
+								
+								// Parse vendor ID.
+								[vendorFormScanner scanUpToString:@">" intoString:NULL];
+								[vendorFormScanner scanString:@">" intoString:NULL];
+								[vendorFormScanner scanUpToString:@"- " intoString:NULL];
+								[vendorFormScanner scanString:@"- " intoString:NULL];
+								[vendorFormScanner scanUpToString:@"</option>" intoString:&vendorID];
+								
+								NSMutableDictionary *vendorOption = [[NSMutableDictionary alloc] init];
+								vendorOption[@"id"] = vendorID;
+								vendorOption[@"value"] = value;
+								[vendorOptions addObject:vendorOption];
+								
+								[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
+							}
+						}
+					}
+				}
+			}
+			
+			[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
+			for (NSDictionary *additionalVendorOption in vendorOptions) {
+				NSString *bodyString = [NSString stringWithFormat:@"%@=%@", switchVendorSelectName, additionalVendorOption[@"value"]];
+				NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+				
+				NSURL *paymentsFormURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:switchVendorAction]];
+				NSMutableURLRequest *paymentsFormRequest = [NSMutableURLRequest requestWithURL:paymentsFormURL];
+				[paymentsFormRequest setHTTPMethod:@"POST"];
+				[paymentsFormRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+				[paymentsFormRequest setHTTPBody:bodyData];
+				
+				NSHTTPURLResponse *response = nil;
+				NSData *additionalPaymentsPageData = [NSURLConnection sendSynchronousRequest:paymentsFormRequest returningResponse:&response error:NULL];
+				NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
+				
+				[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption[@"id"]];
+			}
+			
+			NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
+			NSString *signoutFormAction = nil;
+			[logoutFormScanner scanUpToString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
+			[logoutFormScanner scanString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
+			[logoutFormScanner scanUpToString:@"<a href=\"" intoString:NULL];
+			if ([logoutFormScanner scanString:@"<a href=\"" intoString:NULL]) {
+				[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
+				NSURL *logoutURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:signoutFormAction]];
+				[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
+			}
+		}
+		
+		//==== /Payments
+		
+		if ([moc hasChanges]) {
+			[psc lock];
+			NSError *saveError = nil;
+			[moc save:&saveError];
+			if (saveError) {
+				NSLog(@"Could not save context: %@", saveError);
+			}
+			[psc unlock];
+		}
+		
+		dispatch_async(dispatch_get_main_queue(), ^ {
+			_account.downloadStatus = NSLocalizedString(@"Finished", nil);
+			_account.downloadProgress = 1.0;
+		});
+	}
+}
+
+- (void)loginFailed {
+	dispatch_async(dispatch_get_main_queue(), ^ {
+		_account.downloadStatus = NSLocalizedString(@"Finished", nil);
+		_account.downloadProgress = 1.0;
+	});
 }
 
 - (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID {

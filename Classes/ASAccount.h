@@ -18,8 +18,8 @@
 }
 
 @property (nonatomic, assign) BOOL isDownloadingReports;
-@property (nonatomic, strong) NSString *password;	// this property encapsulates the keychain access,
-													// it is not actually stored in the Core Data model
+@property (nonatomic, strong) NSString *password;		// these properties encapsulate the keychain access,
+@property (nonatomic, strong) NSString *appPassword;	// they are not actually stored in the Core Data model
 @property (nonatomic, strong) NSString *downloadStatus;
 @property (nonatomic, assign) float downloadProgress;
 
