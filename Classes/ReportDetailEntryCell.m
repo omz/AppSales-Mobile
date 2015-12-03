@@ -68,16 +68,14 @@
 		[percentageFormatter setMaximumFractionDigits:1];
 		[percentageFormatter setNumberStyle:NSNumberFormatterPercentStyle];
 		
-		self.backgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]] autorelease];
-		self.selectedBackgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]] autorelease];
+		self.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]];
+		self.selectedBackgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]];
 	}
 	return self;
 }
 
 - (void)setEntry:(ReportDetailEntry *)newEntry
 {
-	[newEntry retain];
-	[entry release];
 	entry = newEntry;
 	
 	NSString *revenueString = [revenueFormatter stringFromNumber:[NSNumber numberWithFloat:entry.revenue]];
@@ -129,18 +127,5 @@
 	revenueLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
-- (void)dealloc
-{
-	[entry release];
-	[iconView release];
-	[revenueLabel release];
-	[barBackgroundView release];
-	[barView release];
-	[percentageLabel release];
-	[subtitleLabel release];
-	[revenueFormatter release];
-	[percentageFormatter release];
-	[super dealloc];
-}
 
 @end

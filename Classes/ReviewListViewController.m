@@ -21,13 +21,13 @@
 {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
-		account = [acc retain];
-		managedObjectContext = [[account managedObjectContext] retain];
+		account = acc;
+		managedObjectContext = [account managedObjectContext];
 		rating = ratingFilter;
-		products = [reviewProducts retain];
+		products = reviewProducts;
 		self.title = NSLocalizedString(@"Reviews", nil);
 		
-		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Check.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)] autorelease];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Check.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)];
 	}
 	return self;
 }
@@ -71,7 +71,7 @@
 	static NSString *CellIdentifier = @"Cell";
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
 	
@@ -100,7 +100,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	Review *selectedReview = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	ReviewDetailViewController *vc = [[[ReviewDetailViewController alloc] initWithReview:selectedReview] autorelease];
+	ReviewDetailViewController *vc = [[ReviewDetailViewController alloc] initWithReview:selectedReview];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -112,7 +112,7 @@
 	if (fetchedResultsController != nil) {
 		return fetchedResultsController;
 	}
-	NSFetchRequest *fetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.managedObjectContext];
     
     NSMutableArray* args = [NSMutableArray arrayWithArray:products];
@@ -140,17 +140,17 @@
 	[fetchRequest setFetchBatchSize:20];
     
 	//Show latest unread reviews first:
-	NSSortDescriptor *sortDescriptorUnread = [[[NSSortDescriptor alloc] initWithKey:@"unread" ascending:NO] autorelease];
-	NSSortDescriptor *sortDescriptorDownloadDate = [[[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO] autorelease];
-	NSSortDescriptor *sortDescriptorReviewDate = [[[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO] autorelease];
+	NSSortDescriptor *sortDescriptorUnread = [[NSSortDescriptor alloc] initWithKey:@"unread" ascending:NO];
+	NSSortDescriptor *sortDescriptorDownloadDate = [[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO];
+	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO];
 	
     NSArray *sortDescriptors = [NSArray arrayWithObjects:sortDescriptorUnread, sortDescriptorReviewDate, sortDescriptorDownloadDate, nil];
     [fetchRequest setSortDescriptors:sortDescriptors];
     
-    NSFetchedResultsController *aFetchedResultsController = [[[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 																								 managedObjectContext:self.managedObjectContext 
 																								   sectionNameKeyPath:nil 
-																											cacheName:nil] autorelease];
+																											cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     
@@ -170,13 +170,5 @@
 	[self.tableView reloadData];
 }
 
-- (void)dealloc
-{
-	[products release];
-	[account release];
-	[fetchedResultsController release];
-	[managedObjectContext release];
-	[super dealloc];
-}
 
 @end

@@ -44,8 +44,8 @@ NSString *SSKeychainErrorDomain = @"com.samsoffes.sskeychain";
 		OSStatus status = SecItemCopyMatching((CFDictionaryRef)keychainQuery,
 											  (CFTypeRef *)&passwordData);
 		if (status == noErr && 0 < [(__bridge NSData *)passwordData length]) {
-			result = [[[NSString alloc] initWithData:(__bridge NSData *)passwordData
-											encoding:NSUTF8StringEncoding] autorelease];
+			result = [[NSString alloc] initWithData:(__bridge NSData *)passwordData
+											encoding:NSUTF8StringEncoding];
 		}
 		
 		if (passwordData != NULL) {

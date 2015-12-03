@@ -47,13 +47,13 @@ typedef NS_ENUM(NSInteger, DashboardViewMode) {
 	UIPopoverController *selectedReportPopover;
 }
 
-@property (nonatomic, retain) NSMutableArray *sortedDailyReports;
-@property (nonatomic, retain) NSMutableArray *sortedWeeklyReports;
-@property (nonatomic, retain) NSMutableArray *sortedCalendarMonthReports;
-@property (nonatomic, retain) NSMutableArray *sortedFiscalMonthReports;
+@property (nonatomic, strong) NSMutableArray *sortedDailyReports;
+@property (nonatomic, strong) NSMutableArray *sortedWeeklyReports;
+@property (nonatomic, strong) NSMutableArray *sortedCalendarMonthReports;
+@property (nonatomic, strong) NSMutableArray *sortedFiscalMonthReports;
 @property (nonatomic, assign) DashboardViewMode viewMode;
-@property (nonatomic, retain) GraphView *graphView;
-@property (nonatomic, retain) UIBarButtonItem *downloadReportsButtonItem;
-@property (nonatomic, retain) UIPopoverController *selectedReportPopover;
+@property (nonatomic, strong) GraphView *graphView;
+@property (nonatomic, strong) UIBarButtonItem *downloadReportsButtonItem;
+@property (nonatomic, strong) UIPopoverController *selectedReportPopover;
 
 @end

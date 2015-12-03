@@ -17,7 +17,7 @@
 {
 	self = [super init];
 	if (self) {
-		reports = [reportsArray retain];
+		reports = reportsArray;
 	}
 	return self;
 }
@@ -224,11 +224,5 @@
 	return [[self firstReport] valueForKey:@"account"];
 }
 
-- (void)dealloc
-{
-	[title release];
-	[reports release];
-	[super dealloc];
-}
 
 @end

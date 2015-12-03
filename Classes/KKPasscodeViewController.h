@@ -44,7 +44,7 @@ typedef NSUInteger KKPasscodeMode;
 
 @interface KKPasscodeViewController : UIViewController <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource> {
 	
-	id<KKPasscodeViewControllerDelegate> _delegate;
+	id<KKPasscodeViewControllerDelegate> __weak _delegate;
 	
 	UILabel* _passcodeConfirmationWarningLabel;
 	UIView* _failedAttemptsView;
@@ -74,12 +74,12 @@ typedef NSUInteger KKPasscodeMode;
 	BOOL _eraseData;
 }
 
-@property (nonatomic, assign) id <KKPasscodeViewControllerDelegate> delegate; 
+@property (nonatomic, weak) id <KKPasscodeViewControllerDelegate> delegate; 
 @property (nonatomic, assign) KKPasscodeMode mode;
 
-@property (nonatomic, retain) UITableView *enterPasscodeTableView;
-@property (nonatomic, retain) UITableView *setPasscodeTableView;
-@property (nonatomic, retain) UITableView *confirmPasscodeTableView;
+@property (nonatomic, strong) UITableView *enterPasscodeTableView;
+@property (nonatomic, strong) UITableView *setPasscodeTableView;
+@property (nonatomic, strong) UITableView *confirmPasscodeTableView;
 
 
 @end

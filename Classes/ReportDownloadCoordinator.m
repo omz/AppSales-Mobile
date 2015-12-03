@@ -50,7 +50,7 @@
 	if (account.isDownloadingReports) {
 		return;
 	}
-	ReportDownloadOperation *operation = [[[ReportDownloadOperation alloc] initWithAccount:account] autorelease];
+	ReportDownloadOperation *operation = [[ReportDownloadOperation alloc] initWithAccount:account];
 	account.isDownloadingReports = YES;
 	account.downloadStatus = NSLocalizedString(@"Waiting...", nil);
 	account.downloadProgress = 0.0;
@@ -89,7 +89,7 @@
 {
     if (product.isDownloadingPromoCodes) return;
     product.isDownloadingPromoCodes = YES;
-    PromoCodeOperation *operation = [[[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes] autorelease];
+    PromoCodeOperation *operation = [[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes];
     operation.completionBlock = ^ {
         dispatch_async(dispatch_get_main_queue(), ^{
             product.isDownloadingPromoCodes = NO;
@@ -110,7 +110,7 @@
 
 - (void)importReportsIntoAccount:(ASAccount *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag
 {
-	ReportImportOperation *operation = [[[ReportImportOperation alloc] initWithAccount:account] autorelease];
+	ReportImportOperation *operation = [[ReportImportOperation alloc] initWithAccount:account];
 	operation.importDirectory = path;
 	operation.deleteOriginalFilesAfterImport = deleteFlag;
 	account.isDownloadingReports = YES;
@@ -133,8 +133,6 @@
 - (void)dealloc
 {
 	[reportDownloadQueue removeObserver:self forKeyPath:@"operationCount"];
-	[reportDownloadQueue release];
-	[super dealloc];
 }
 
 @end

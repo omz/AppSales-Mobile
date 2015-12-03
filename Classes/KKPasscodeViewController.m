@@ -47,7 +47,7 @@
 	
 	self.view.backgroundColor = [UIColor whiteColor];
 	
-	self.enterPasscodeTableView = [[[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped] autorelease];
+	self.enterPasscodeTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
 	_enterPasscodeTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	_enterPasscodeTableView.delegate = self;
 	_enterPasscodeTableView.dataSource = self;
@@ -55,7 +55,7 @@
 	_enterPasscodeTableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	[self.view addSubview:_enterPasscodeTableView];
 	
-	self.setPasscodeTableView = [[[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped] autorelease];
+	self.setPasscodeTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
 	_setPasscodeTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	_setPasscodeTableView.delegate = self;
 	_setPasscodeTableView.dataSource = self;
@@ -63,7 +63,7 @@
 	_setPasscodeTableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	[self.view addSubview:_setPasscodeTableView];
 	
-	self.confirmPasscodeTableView = [[[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped] autorelease];
+	self.confirmPasscodeTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
 	_confirmPasscodeTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	_confirmPasscodeTableView.delegate = self;
 	_confirmPasscodeTableView.dataSource = self;
@@ -71,7 +71,7 @@
 	_confirmPasscodeTableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	[self.view addSubview:_confirmPasscodeTableView];
 	
-	[self.view addGestureRecognizer:[[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)] autorelease]];
+	[self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)]];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
@@ -106,7 +106,7 @@
 			[_tableViews addObject:_enterPasscodeTableView];
 			[_textFields addObject:_enterPasscodeTextField];
 			[_squares addObject:[self squares]];
-			UIView *squaresView = [[[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)] autorelease];
+			UIView *squaresView = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)];
 			squaresView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 			for (int i = 0; i < [[_squares lastObject] count]; i++) {
 				[squaresView addSubview:[[_squares lastObject] objectAtIndex:i]];
@@ -118,7 +118,7 @@
 		[_tableViews addObject:_setPasscodeTableView];
 		[_textFields addObject:_setPasscodeTextField];
 		[_squares addObject:[self squares]];
-		UIView *squaresView = [[[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)] autorelease];
+		UIView *squaresView = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)];
 		squaresView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 		for (int i = 0; i < [[_squares lastObject] count]; i++) {
 			[squaresView addSubview:[[_squares lastObject] objectAtIndex:i]];
@@ -129,7 +129,7 @@
 		[_tableViews addObject:_confirmPasscodeTableView];
 		[_textFields addObject:_confirmPasscodeTextField];
 		[_squares addObject:[self squares]];
-		UIView *squaresConfirmView = [[[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)] autorelease];
+		UIView *squaresConfirmView = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)];
 		squaresConfirmView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 		for (int i = 0; i < [[_squares lastObject] count]; i++) {
 			[squaresConfirmView addSubview:[[_squares lastObject] objectAtIndex:i]];
@@ -140,7 +140,7 @@
 		[_tableViews addObject:_enterPasscodeTableView];
 		[_textFields addObject:_enterPasscodeTextField];
 		[_squares addObject:[self squares]];
-		UIView *squaresView = [[[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)] autorelease];
+		UIView *squaresView = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width * 0.5 - 71.0 * 4 * 0.5, 0, 71.0 * 4, 53)];
 		squaresView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 		for (int i = 0; i < [[_squares lastObject] count]; i++) {
 			[squaresView addSubview:[[_squares lastObject] objectAtIndex:i]];
@@ -468,7 +468,7 @@
 	textField.hidden = YES;
 	[self.view addSubview:textField];
 	
-	UIView *headerView = [[[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.bounds.size.width, 70.0)] autorelease];
+	UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.bounds.size.width, 70.0)];
 	UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 27.5, self.view.bounds.size.width, 30.0)];
 	headerLabel.textColor = [UIColor colorWithRed:0.298 green:0.337 blue:0.424 alpha:1.0];
 	headerLabel.backgroundColor = [UIColor clearColor];
@@ -520,15 +520,12 @@
 		[headerView addSubview:_failedAttemptsView];
 		[headerView addSubview:_failedAttemptsLabel];
 		
-		[_failedAttemptsView release];
-		[_failedAttemptsLabel release];
 	}
 	
 	if (mode == KKPasscodeModeSet) {
 		self.navigationItem.title = @"Set Passcode";
 		UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 		self.navigationItem.leftBarButtonItem = cancel;
-		[cancel release];
 		
 		
 		if ([textField isEqual:_enterPasscodeTextField]) {
@@ -537,7 +534,6 @@
 			headerLabel.text = @"Enter a passcode";
 			UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 			self.navigationItem.leftBarButtonItem = cancel;
-			[cancel release];
 			
 		} else if ([textField isEqual:_confirmPasscodeTextField]) {
 			headerLabel.text = @"Re-enter your passcode";
@@ -546,14 +542,12 @@
 		self.navigationItem.title = @"Turn off Passcode";
 		UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 		self.navigationItem.leftBarButtonItem = cancel;
-		[cancel release];
 		
 		headerLabel.text = @"Enter your passcode";
 	} else if (mode == KKPasscodeModeChange) {
 		self.navigationItem.title = @"Change Passcode";
 		UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 		self.navigationItem.leftBarButtonItem = cancel;
-		[cancel release];
 		
 		if ([textField isEqual:_enterPasscodeTextField]) {
 			headerLabel.text = @"Enter your old passcode";
@@ -569,7 +563,6 @@
 	headerLabel.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin;
 	
 	[headerView addSubview:headerLabel];
-	[headerLabel release];
 	
 	return headerView;
 }
@@ -584,7 +577,6 @@
 		UIImageView *square = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"passcode_square_empty.png"]];
 		square.frame = CGRectMake(squareX, 74.0, 61.0, 53.0);
 		[squareViews addObject:square];
-		[square release];
 		squareX += 71.0;
 	}
 	return [NSArray arrayWithArray:squareViews];
@@ -610,7 +602,7 @@
 	
 	UITableViewCell *cell = [aTableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil) {
-		cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 	}
 	
@@ -758,15 +750,5 @@
 #pragma mark -
 #pragma mark Memory management
 
-- (void)dealloc 
-{	 
-	[_enterPasscodeTextField release];
-	[_setPasscodeTextField release];
-	[_confirmPasscodeTextField release];
-	[_tableViews release];
-	[_textFields release];
-	[_squares release];
-	[super dealloc];
-}
 
 @end

@@ -30,21 +30,21 @@ extern NSString *const SMXMLDocumentErrorDomain;
 
 @interface SMXMLElement : NSObject<NSXMLParserDelegate> {
 @private
-	SMXMLDocument *document; // nonretained
-	SMXMLElement *parent; // nonretained
+	SMXMLDocument *__weak document; // nonretained
+	SMXMLElement *__weak parent; // nonretained
 	NSString *name;
 	NSMutableString *value;
 	NSMutableArray *children;
 	NSDictionary *attributes;
 }
 
-@property (nonatomic, assign) SMXMLDocument *document;
-@property (nonatomic, assign) SMXMLElement *parent;
+@property (nonatomic, weak) SMXMLDocument *document;
+@property (nonatomic, weak) SMXMLElement *parent;
 @property (nonatomic, copy) NSString *name;
-@property (nonatomic, retain) NSString *value;
-@property (nonatomic, retain) NSArray *children;
-@property (nonatomic, readonly) SMXMLElement *firstChild, *lastChild;
-@property (nonatomic, retain) NSDictionary *attributes;
+@property (nonatomic, strong) NSString *value;
+@property (nonatomic, strong) NSArray *children;
+@property (weak, nonatomic, readonly) SMXMLElement *firstChild, *lastChild;
+@property (nonatomic, strong) NSDictionary *attributes;
 
 - (id)initWithDocument:(SMXMLDocument *)document;
 - (SMXMLElement *)childNamed:(NSString *)name;
@@ -62,8 +62,8 @@ extern NSString *const SMXMLDocumentErrorDomain;
 	NSError *error;
 }
 
-@property (nonatomic, retain) SMXMLElement *root;
-@property (nonatomic, retain) NSError *error;
+@property (nonatomic, strong) SMXMLElement *root;
+@property (nonatomic, strong) NSError *error;
 
 - (id)initWithData:(NSData *)data error:(NSError **)outError;
 

@@ -16,8 +16,8 @@
 	UIPopoverController *reviewsPopover;
 }
 
-@property (nonatomic, retain) ReviewSummaryView *reviewSummaryView;
-@property (nonatomic, retain) UIBarButtonItem *downloadReviewsButtonItem;
-@property (nonatomic, retain) UIPopoverController *reviewsPopover;
+@property (nonatomic, strong) ReviewSummaryView *reviewSummaryView;
+@property (nonatomic, strong) UIBarButtonItem *downloadReviewsButtonItem;
+@property (nonatomic, strong) UIPopoverController *reviewsPopover;
 
 @end

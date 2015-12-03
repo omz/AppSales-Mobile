@@ -42,19 +42,19 @@
 	ZipCompressionLevel _level;
 	BOOL _crypted;
 	NSUInteger _size;
-	NSDate *_date;
+	NSDate *__weak _date;
 	NSUInteger _crc32;
-	NSString *_name;
+	NSString *__weak _name;
 }
 
 - (id) initWithName:(NSString *)name length:(NSUInteger)length level:(ZipCompressionLevel)level crypted:(BOOL)crypted size:(NSUInteger)size date:(NSDate *)date crc32:(NSUInteger)crc32;
 
-@property (nonatomic, readonly) NSString *name;
+@property (weak, nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSUInteger length;
 @property (nonatomic, readonly) ZipCompressionLevel level;
 @property (nonatomic, readonly) BOOL crypted;
 @property (nonatomic, readonly) NSUInteger size;
-@property (nonatomic, readonly) NSDate *date;
+@property (weak, nonatomic, readonly) NSDate *date;
 @property (nonatomic, readonly) NSUInteger crc32;
 
 @end

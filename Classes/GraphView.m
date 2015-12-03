@@ -25,11 +25,11 @@
 		
 		cachedValues = [NSMutableDictionary new];
 		
-		UIView *scaleBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 46, self.bounds.size.height - 30)] autorelease];
+		UIView *scaleBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 46, self.bounds.size.height - 30)];
 		scaleBackgroundView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
 		[self addSubview:scaleBackgroundView];
 		
-		UIView *bottomLineView = [[[UIView alloc] initWithFrame:CGRectMake(46, self.bounds.size.height - 30, self.bounds.size.width - 46, 1)] autorelease];
+		UIView *bottomLineView = [[UIView alloc] initWithFrame:CGRectMake(46, self.bounds.size.height - 30, self.bounds.size.width - 46, 1)];
 		bottomLineView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 		bottomLineView.backgroundColor = [UIColor lightGrayColor];
 		[self addSubview:bottomLineView];
@@ -43,10 +43,10 @@
 		lockIndicatorView.hidden = YES;
 		[self addSubview:lockIndicatorView];
 		
-		UILongPressGestureRecognizer *lockScaleRecognizer = [[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lockScale:)] autorelease];
+		UILongPressGestureRecognizer *lockScaleRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(lockScale:)];
 		[scaleView addGestureRecognizer:lockScaleRecognizer];
 		
-		UILongPressGestureRecognizer *longPressRecognizer = [[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)] autorelease];
+		UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
 		longPressRecognizer.minimumPressDuration = 1.0;
 		[self addGestureRecognizer:longPressRecognizer];
 		
@@ -92,7 +92,7 @@
 				if ([self.delegate respondsToSelector:@selector(graphView:canDeleteBarAtIndex:)] && [self.delegate graphView:self canDeleteBarAtIndex:[index unsignedIntegerValue]]) {
 					selectedBarIndexForMenu = [index unsignedIntegerValue];
 					[self becomeFirstResponder];
-					NSArray *menuItems = [NSArray arrayWithObject:[[[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Delete", nil) action:@selector(deleteBar:)] autorelease]];
+					NSArray *menuItems = [NSArray arrayWithObject:[[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Delete", nil) action:@selector(deleteBar:)]];
 					[[UIMenuController sharedMenuController] setMenuItems:menuItems];
 				
 					CGRect targetRect = [barView convertRect:barView.bounds toView:self];
@@ -139,9 +139,9 @@
 		maxLocked = !maxLocked;
 		[MBProgressHUD hideHUDForView:self animated:YES];
 		
-		MBProgressHUD *hud = [[[MBProgressHUD alloc] initWithView:self] autorelease];
+		MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self];
 		hud.animationType = MBProgressHUDAnimationZoom;
-		hud.customView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:(maxLocked) ? @"Lock.png" : @"Unlock.png"]] autorelease];
+		hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(maxLocked) ? @"Lock.png" : @"Unlock.png"]];
 		hud.mode = MBProgressHUDModeCustomView;
 		if (maxLocked) {
 			hud.labelText = NSLocalizedString(@"Scale locked", nil);
@@ -339,12 +339,12 @@
 		if (!barView) {
 			NSArray *colors = [self.dataSource colorsForGraphView:self];
 			
-			barView = [[[StackedBarView alloc] initWithColors:colors] autorelease];
+			barView = [[StackedBarView alloc] initWithColors:colors];
 			[barView addTarget:self action:@selector(barSelected:) forControlEvents:UIControlEventTouchUpInside];
 			barView.frame = frameForBar;
 			barView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 			
-			UILabel *dateLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, frameForBar.size.height, frameForBar.size.width, 20)] autorelease];
+			UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, frameForBar.size.height, frameForBar.size.width, 20)];
 			dateLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 			dateLabel.backgroundColor = [UIColor clearColor];
 			dateLabel.textColor = [UIColor darkGrayColor];
@@ -362,7 +362,7 @@
 			
 			dateLabel.textColor = [self.dataSource graphView:self labelColorForXAxisAtIndex:i];
 			CGRect separatorFrame = CGRectMake(-(int)separatorWidth/2, frameForBar.size.height, separatorWidth, separatorHeight);
-			UIView *separatorView = [[[UIView alloc] initWithFrame:separatorFrame] autorelease];
+			UIView *separatorView = [[UIView alloc] initWithFrame:separatorFrame];
 			separatorView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 			separatorView.backgroundColor = [UIColor lightGrayColor];
 			[barView addSubview:separatorView];
@@ -424,16 +424,6 @@
 	}
 }
 
-- (void)dealloc
-{
-	[cachedValues release];
-	[scaleView release];
-	[scrollView release];
-	[visibleBarViews release];
-	[lockIndicatorView release];
-	[titleLabel release];
-	[super dealloc];
-}
 
 @end
 
@@ -447,7 +437,7 @@
 	if (self) {
 		segmentViews = [NSMutableArray new];
 		for (UIColor *color in colorArray) {
-			UIView *segmentView = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+			UIView *segmentView = [[UIView alloc] initWithFrame:CGRectZero];
 			segmentView.backgroundColor = color;
 			segmentView.userInteractionEnabled = NO;
 			[segmentViews addObject:segmentView];
@@ -526,7 +516,7 @@
 - (UIView *)selectedBackgroundView
 {
 	if (!selectedBackgroundView) {
-		selectedBackgroundView = [[[UIView alloc] initWithFrame:CGRectMake(2, 3, self.bounds.size.width - 4, self.bounds.size.height + 18)] autorelease];
+		selectedBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(2, 3, self.bounds.size.width - 4, self.bounds.size.height + 18)];
 		selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:0.8];
 		selectedBackgroundView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 		selectedBackgroundView.layer.cornerRadius = 5.0;
@@ -536,12 +526,6 @@
 	return selectedBackgroundView;
 }
 
-- (void)dealloc
-{
-	[segmentViews release];
-	[label release];
-	[super dealloc];
-}
 
 @end
 
@@ -581,8 +565,6 @@
 - (void)setUnit:(NSString *)newUnit
 {
 	if ([newUnit isEqualToString:unit]) return;
-	[newUnit retain];
-	[unit release];
 	unit = newUnit;
 	for (NSNumber *step in lineViews) {
 		LineView *lineView = [lineViews objectForKey:step];
@@ -643,7 +625,7 @@
 				float newY = totalHeight - (totalHeight * ([step floatValue] / newMax));
 				CGRect toLineFrame = CGRectMake(40, (int)newY, self.superview.bounds.size.width, 1);
 				CGRect fromLineFrame = CGRectMake(40, (int)oldY, self.superview.bounds.size.width, 1);
-				LineView *lineView = [[[LineView alloc] initWithFrame:(wasEmpty) ? toLineFrame : fromLineFrame] autorelease];
+				LineView *lineView = [[LineView alloc] initWithFrame:(wasEmpty) ? toLineFrame : fromLineFrame];
 				lineView.alpha = 0.0;
 				[lineView setLabelText:[NSString stringWithFormat:@"%@%@", unit, step]];
 				[self addSubview:lineView];
@@ -664,13 +646,6 @@
 	max = newMax;
 }
 
-- (void)dealloc
-{
-	[unit release];
-	[possibleUnits release];
-	[lineViews release];
-	[super dealloc];
-}
 
 @end
 
@@ -700,11 +675,6 @@
 	label.text = labelText;
 }
 
-- (void)dealloc
-{
-	[label release];
-	[super dealloc];
-}
 
 @end
 

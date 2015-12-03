@@ -36,8 +36,8 @@
 
 @interface ReportCache : NSManagedObject
 
-@property (nonatomic, retain) NSDictionary *content;
-@property (nonatomic, retain) Report *report;
+@property (nonatomic, strong) NSDictionary *content;
+@property (nonatomic, strong) Report *report;
 
 @end
 
@@ -55,7 +55,7 @@
 
 + (NSDictionary *)infoForReportCSV:(NSString *)csv
 {
-	NSMutableArray *rows = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
+	NSMutableArray *rows = [[csv componentsSeparatedByString:@"\n"] mutableCopy];
 	if ([rows count] < 3)  {
 		return nil;
 	}
@@ -100,7 +100,7 @@
 		if (SKU) [productsBySKU setObject:product forKey:SKU];
 	}
 	
-	NSMutableArray *rows = [[[csv componentsSeparatedByString:@"\n"] mutableCopy] autorelease];
+	NSMutableArray *rows = [[csv componentsSeparatedByString:@"\n"] mutableCopy];
 	if ([rows count] < 3)  {
 		return nil;
 	}
@@ -113,7 +113,7 @@
 	
 	[rows removeObjectAtIndex:0];
 	Report *report = nil;
-	for (NSString *row in rows) {
+	for (__strong NSString *row in rows) {
 		row = [row stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 		NSArray *rowFields = [row componentsSeparatedByString:@"\t"];
 		if ([rowFields count] > [columnHeaders count]) {
@@ -753,7 +753,7 @@
 
 - (NSString *)title
 {
-	NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 	return [dateFormatter stringFromDate:self.startDate];
@@ -778,14 +778,13 @@
 		return nil;
 	}
 	
-	NSCalendar *calendar = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
 	[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	NSDateComponents *components = [[NSDateComponents alloc] init];
 	[components setYear:year];
 	[components setMonth:month];
 	[components setDay:day];
 	NSDate *date = [calendar dateFromComponents:components];
-	[components release];
 	return date;
 }
 
@@ -795,7 +794,6 @@
 	[formatter setDateFormat:@"MM/dd/yyyy"];
 	[formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	NSString *reportIdentifier = [formatter stringFromDate:date];
-	[formatter release];
 	return reportIdentifier;
 }
 

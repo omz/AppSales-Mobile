@@ -41,16 +41,14 @@
 		[self.contentView addSubview:iconView];
 		[self.contentView addSubview:nameLabel];
 		
-		self.backgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]] autorelease];
-		self.selectedBackgroundView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]] autorelease];
+		self.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]];
+		self.selectedBackgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]];
     }
     return self;
 }
 
 - (void)setProduct:(Product *)newProduct
 {
-	[newProduct retain];
-	[product release];
 	product = newProduct;
 	
 	if (!product) {
@@ -86,13 +84,5 @@
 	nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
-- (void)dealloc
-{
-	[product release];
-	[iconView release];
-	[colorButton release];
-	[nameLabel release];
-	[super dealloc];
-}
 
 @end

@@ -15,7 +15,7 @@
 @interface WeeklyReport : Report {
 @private
 }
-@property (nonatomic, retain) NSDate * endDate;
-@property (nonatomic, retain) ASAccount *account;
+@property (nonatomic, strong) NSDate * endDate;
+@property (nonatomic, strong) ASAccount *account;
 
 @end

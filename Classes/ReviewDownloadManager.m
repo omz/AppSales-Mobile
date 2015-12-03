@@ -57,7 +57,7 @@
 		NSString *storeID = [storeInfo objectForKey:@"storeID"];
 		for (Product *product in products) {
 			if (product.parentSKU) continue; //don't download reviews for in-app-purchases
-			ReviewDownload *download = [[[ReviewDownload alloc] initWithProduct:product storeFront:storeID countryCode:country] autorelease];
+			ReviewDownload *download = [[ReviewDownload alloc] initWithProduct:product storeFront:storeID countryCode:country];
 			download.delegate = self;
 			[downloadQueue addObject:download];
 		}
@@ -85,7 +85,7 @@
 	if ([downloadQueue count] == 0) return;
 	if ([activeDownloads count] >= MAX_CONCURRENT_REVIEW_DOWNLOADS) return;
 	
-	ReviewDownload *nextDownload = [[[downloadQueue objectAtIndex:0] retain] autorelease];
+	ReviewDownload *nextDownload = [downloadQueue objectAtIndex:0];
 	[downloadQueue removeObjectAtIndex:0];
 	[activeDownloads addObject:nextDownload];
 	[nextDownload start];
@@ -112,12 +112,6 @@
 	return progress;
 }
 
-- (void)dealloc
-{
-	[activeDownloads release];
-	[downloadQueue release];
-	[super dealloc];
-}
 
 @end
 
@@ -131,11 +125,11 @@
 {
 	self = [super init];
 	if (self) {
-		_product = [app retain];
-		country = [countryCode retain];
+		_product = app;
+		country = countryCode;
 		productObjectID = [[app objectID] copy];
-		psc = [[[app managedObjectContext] persistentStoreCoordinator] retain];
-		storeFront = [storeFrontID retain];
+		psc = [[app managedObjectContext] persistentStoreCoordinator];
+		storeFront = storeFrontID;
 		data = [NSMutableData new];
 		page = 1;
 	}
@@ -219,7 +213,7 @@
                     [reviewInfos addObject:reviewInfo];
                 }
             }
-            NSManagedObjectContext *moc = [[[NSManagedObjectContext alloc] init] autorelease];
+            NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
             [moc setPersistentStoreCoordinator:psc];
             [moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
             Product *product = (Product *)[moc objectWithID:productObjectID];
@@ -227,7 +221,7 @@
             NSSet *downloadedUsers = [NSSet setWithArray:[reviewInfos valueForKey:kReviewInfoUser]];
             
             //Fetch existing reviews, based on username and country:
-            NSFetchRequest *existingReviewsFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+            NSFetchRequest *existingReviewsFetchRequest = [[NSFetchRequest alloc] init];
             [existingReviewsFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:moc]];
             [existingReviewsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND countryCode == %@ AND user IN %@", product, country, downloadedUsers]];
             NSArray *existingReviews = [moc executeFetchRequest:existingReviewsFetchRequest error:NULL];
@@ -404,16 +398,5 @@
 }
 
 
-- (void)dealloc
-{
-	[country release];
-	[_product release];
-	[productObjectID release];
-	[psc release];
-	[downloadConnection release];
-	[data release];
-	[storeFront release];
-	[super dealloc];
-}
 
 @end

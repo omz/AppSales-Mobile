@@ -61,7 +61,7 @@
 		return cachedIcon;
 	}
 	NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
-	UIImage *icon = [[[UIImage alloc] initWithContentsOfFile:iconPath] autorelease];
+	UIImage *icon = [[UIImage alloc] initWithContentsOfFile:iconPath];
 	if (icon) {
 		return icon;
 	}
@@ -74,7 +74,7 @@
 {
 	if ([downloadQueue count] == 0 || isDownloading) return;
 	
-	NSString *nextAppID = [[[downloadQueue objectAtIndex:0] copy] autorelease];
+	NSString *nextAppID = [[downloadQueue objectAtIndex:0] copy];
 	[downloadQueue removeObjectAtIndex:0];
 	
 	dispatch_async(queue, ^ {
@@ -121,11 +121,5 @@
     });
 }
 
-- (void)dealloc
-{
-	dispatch_release(queue);
-	[iconCache release];
-	[super dealloc];
-}
 
 @end

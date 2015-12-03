@@ -15,7 +15,7 @@
 {
 	self = [super initWithFrame:frame];
 	if (self) {
-		account = [anAccount retain];
+		account = anAccount;
 		self.backgroundColor = [UIColor clearColor];
 		activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(20, 5, 16, 16)];
 		activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
@@ -60,10 +60,6 @@
 {
 	[account removeObserver:self forKeyPath:@"isDownloadingReports"];
 	[account removeObserver:self forKeyPath:@"downloadStatus"];
-	[activityIndicator release];
-	[statusLabel release];
-	[account release];
-	[super dealloc];
 }
 
 @end

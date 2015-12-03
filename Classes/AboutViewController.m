@@ -23,12 +23,12 @@
 
 - (void)loadView
 {
-	self.webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
+	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	webView.delegate = self;
 	self.view = webView;
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)] autorelease];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -61,8 +61,6 @@
 - (void)dealloc
 {
 	webView.delegate = nil;
-	[webView release];
-	[super dealloc];
 }
 
 

@@ -35,8 +35,8 @@
 
 @interface GraphView : UIView <UIScrollViewDelegate> {
 
-	id<GraphViewDataSource> dataSource;
-	id<GraphViewDelegate> delegate;
+	id<GraphViewDataSource> __weak dataSource;
+	id<GraphViewDelegate> __weak delegate;
 	
 	NSMutableDictionary *cachedValues;
 	int barsPerPage;
@@ -55,12 +55,12 @@
 	UIButton *sectionLabelButton;
 }
 
-@property (nonatomic, assign) id<GraphViewDelegate> delegate;
-@property (nonatomic, assign) id<GraphViewDataSource> dataSource;
+@property (nonatomic, weak) id<GraphViewDelegate> delegate;
+@property (nonatomic, weak) id<GraphViewDataSource> dataSource;
 
-@property (nonatomic, retain) UIButton *sectionLabelButton;
-@property (nonatomic, retain) NSString *unit;
-@property (nonatomic, retain) NSString *title;
+@property (nonatomic, strong) UIButton *sectionLabelButton;
+@property (nonatomic, strong) NSString *unit;
+@property (nonatomic, strong) NSString *title;
 
 - (NSRange)visibleBarRange;
 - (CGRect)frameForBarAtIndex:(NSInteger)index;
@@ -102,7 +102,7 @@
 	NSMutableDictionary *lineViews;
 }
 
-@property (nonatomic, retain) NSString *unit;
+@property (nonatomic, strong) NSString *unit;
 
 - (void)setMax:(float)newMax animated:(BOOL)animated;
 

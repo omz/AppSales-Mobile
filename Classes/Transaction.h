@@ -14,13 +14,13 @@
 @interface Transaction : NSManagedObject {
 @private
 }
-@property (nonatomic, retain) NSString * countryCode;
-@property (nonatomic, retain) NSString * currency;
-@property (nonatomic, retain) NSString * promoType;
-@property (nonatomic, retain) NSNumber * revenue;
-@property (nonatomic, retain) NSString * type;
-@property (nonatomic, retain) NSNumber * units;
-@property (nonatomic, retain) Product *product;
-@property (nonatomic, retain) Report *report;
+@property (nonatomic, strong) NSString * countryCode;
+@property (nonatomic, strong) NSString * currency;
+@property (nonatomic, strong) NSString * promoType;
+@property (nonatomic, strong) NSNumber * revenue;
+@property (nonatomic, strong) NSString * type;
+@property (nonatomic, strong) NSNumber * units;
+@property (nonatomic, strong) Product *product;
+@property (nonatomic, strong) Report *report;
 
 @end

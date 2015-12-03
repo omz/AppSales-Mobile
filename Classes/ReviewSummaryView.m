@@ -23,7 +23,7 @@
 		for (int rating = 5; rating >= 1; rating--) {
 			CGRect barFrame = [self barFrameForRating:rating];
 			
-			UILabel *starLabel = [[[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, CGRectGetMidY(barFrame) - 15, 90, 29))] autorelease];
+			UILabel *starLabel = [[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, CGRectGetMidY(barFrame) - 15, 90, 29))];
 			starLabel.backgroundColor = [UIColor clearColor];
 			starLabel.textAlignment = NSTextAlignmentRight;
 			starLabel.textColor = [UIColor darkGrayColor];
@@ -33,12 +33,12 @@
 			starLabel.text = [@"" stringByPaddingToLength:rating withString:@"\u2605" startingAtIndex:0];
 			[self addSubview:starLabel];
 			
-			UIView *barBackgroundView = [[[UIView alloc] initWithFrame:barFrame] autorelease];
+			UIView *barBackgroundView = [[UIView alloc] initWithFrame:barFrame];
 			barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 			barBackgroundView.userInteractionEnabled = NO;
 			[self addSubview:barBackgroundView];
 			
-			UIView *barView = [[[UIView alloc] initWithFrame:barBackgroundView.frame] autorelease];
+			UIView *barView = [[UIView alloc] initWithFrame:barBackgroundView.frame];
 			barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];
 			barView.userInteractionEnabled = NO;
 			[self addSubview:barView];
@@ -52,7 +52,7 @@
 			[self insertSubview:showReviewsButton atIndex:0];
 			[showReviewsButton addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
 			
-			UILabel *barLabel = [[[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(barFrame) + 5, barFrame.origin.y, 30, barFrame.size.height)] autorelease];
+			UILabel *barLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(barFrame) + 5, barFrame.origin.y, 30, barFrame.size.height)];
 			barLabel.backgroundColor = [UIColor clearColor];
 			barLabel.textColor = [UIColor darkGrayColor];
 			barLabel.font = [UIFont systemFontOfSize:13.0];
@@ -65,7 +65,7 @@
 		}
 		
 		if (!iPad) {
-			UIView *separator = [[[UIView alloc] initWithFrame:CGRectMake(10, self.bounds.size.height - 44, self.bounds.size.width - 20, 1)] autorelease];
+			UIView *separator = [[UIView alloc] initWithFrame:CGRectMake(10, self.bounds.size.height - 44, self.bounds.size.width - 20, 1)];
 			separator.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 			[self addSubview:separator];
 		}
@@ -90,9 +90,9 @@
 		[allReviewsButton addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
 		if (iPad) {
 			CGRect barFrame = [self barFrameForRating:0];
-			averageLabel = [[[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, allReviewsButton.frame.origin.y, 90, 29)] autorelease];
+			averageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, allReviewsButton.frame.origin.y, 90, 29)];
 		} else {
-			averageLabel = [[[UILabel alloc] initWithFrame:CGRectMake(10, allReviewsButton.frame.origin.y, 90, 29)] autorelease];
+			averageLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, allReviewsButton.frame.origin.y, 90, 29)];
 		}
 		averageLabel.font = [UIFont boldSystemFontOfSize:15.0];
 		averageLabel.backgroundColor = [UIColor clearColor];
@@ -102,9 +102,9 @@
 		
 		if (iPad) {
 			CGRect barFrame = [self barFrameForRating:0];
-			sumLabel = [[[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(barFrame) + 5, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)] autorelease];
+			sumLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(barFrame) + 5, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)];
 		} else {
-			sumLabel = [[[UILabel alloc] initWithFrame:CGRectMake(260, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)] autorelease];
+			sumLabel = [[UILabel alloc] initWithFrame:CGRectMake(260, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)];
 		}
 		sumLabel.font = [UIFont systemFontOfSize:13.0];
 		sumLabel.backgroundColor = [UIColor clearColor];
@@ -156,7 +156,7 @@
 	sumLabel.text = [NSString stringWithFormat:@"%li", (long)total];
 	
 	float average = (float)starSum / (float)total;
-	NSNumberFormatter *averageFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	NSNumberFormatter *averageFormatter = [[NSNumberFormatter alloc] init];
 	[averageFormatter setMinimumFractionDigits:1];
 	[averageFormatter setMaximumFractionDigits:1];
 	averageLabel.text = [NSString stringWithFormat:@"\u2205 %@", [averageFormatter stringFromNumber:[NSNumber numberWithFloat:average]]];
@@ -185,11 +185,5 @@
 	}
 }
 
-- (void)dealloc
-{
-	[barViews release];
-	[barLabels release];
-	[super dealloc];
-}
 
 @end

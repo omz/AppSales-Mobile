@@ -24,9 +24,9 @@
 
 }
 
-@property (nonatomic, retain) ReportCache *cache;
-@property (nonatomic, retain) NSDate *startDate;
-@property (nonatomic, retain) NSSet *transactions;
+@property (nonatomic, strong) ReportCache *cache;
+@property (nonatomic, strong) NSDate *startDate;
+@property (nonatomic, strong) NSSet *transactions;
 
 + (BOOL)validateColumnHeaders:(NSArray *)columnHeaders;
 + (NSDictionary *)infoForReportCSV:(NSString *)csv;

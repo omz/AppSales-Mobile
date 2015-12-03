@@ -16,7 +16,7 @@
 	NSArray *sortedApps;
 }
 
-@property (nonatomic, retain) NSArray *sortedApps;
+@property (nonatomic, strong) NSArray *sortedApps;
 
 - (id)initWithAccount:(ASAccount *)anAccount;
 - (void)reloadData;

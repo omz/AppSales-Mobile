@@ -20,7 +20,7 @@
 
 @interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate>
 {
-	id<AccountsViewControllerDelegate> delegate;
+	id<AccountsViewControllerDelegate> __weak delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;
 	ASAccount *selectedAccount;
@@ -32,13 +32,13 @@
 	UIDocumentInteractionController *documentInteractionController;
 }
 
-@property (nonatomic, assign) id<AccountsViewControllerDelegate> delegate;
-@property (nonatomic, retain) UIBarButtonItem *refreshButtonItem;
-@property (nonatomic, retain) NSArray *accounts;
-@property (nonatomic, retain) ASAccount *selectedAccount;
-@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, retain) NSString *exportedReportsZipPath;
-@property (nonatomic, retain) UIDocumentInteractionController *documentInteractionController;
+@property (nonatomic, weak) id<AccountsViewControllerDelegate> delegate;
+@property (nonatomic, strong) UIBarButtonItem *refreshButtonItem;
+@property (nonatomic, strong) NSArray *accounts;
+@property (nonatomic, strong) ASAccount *selectedAccount;
+@property (nonatomic, strong) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, strong) NSString *exportedReportsZipPath;
+@property (nonatomic, strong) UIDocumentInteractionController *documentInteractionController;
 
 - (void)reloadAccounts;
 - (void)downloadReports:(id)sender;

@@ -101,7 +101,7 @@ typedef enum {
 	
 	float progress;
 	
-	id<MBProgressHUDDelegate> delegate;
+	id<MBProgressHUDDelegate> __weak delegate;
 	NSString *labelText;
 	NSString *detailsLabelText;
 	float opacity;
@@ -162,7 +162,7 @@ typedef enum {
  * The UIView (i.g., a UIIMageView) to be shown when the HUD is in MBProgressHUDModeCustomView.
  * For best results use a 37 by 37 pixel view (so the bounds match the build in indicator bounds). 
  */
-@property (retain) UIView *customView;
+@property (strong) UIView *customView;
 
 /** 
  * MBProgressHUD operation mode. Switches between indeterminate (MBProgressHUDModeIndeterminate) and determinate
@@ -184,7 +184,7 @@ typedef enum {
  * delegate should conform to the MBProgressHUDDelegate protocol and implement the hudWasHidden method. The delegate
  * object will not be retained.
  */
-@property (assign) id<MBProgressHUDDelegate> delegate;
+@property (weak) id<MBProgressHUDDelegate> delegate;
 
 /** 
  * An optional short message to be displayed below the activity indicator. The HUD is automatically resized to fit
@@ -264,12 +264,12 @@ typedef enum {
 /** 
  * Font to be used for the main label. Set this property if the default is not adequate. 
  */
-@property (retain) UIFont* labelFont;
+@property (strong) UIFont* labelFont;
 
 /** 
  * Font to be used for the details label. Set this property if the default is not adequate. 
  */
-@property (retain) UIFont* detailsLabelFont;
+@property (strong) UIFont* detailsLabelFont;
 
 /** 
  * The progress of the progress indicator, from 0.0 to 1.0. Defaults to 0.0. 

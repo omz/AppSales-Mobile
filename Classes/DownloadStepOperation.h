@@ -25,11 +25,11 @@ typedef void(^DownloadStepStartBlock)(DownloadStepOperation *operation);
 	NSMutableData *data;
 }
 
-@property (nonatomic, retain) DownloadStepOperation *inputOperation;
-@property (nonatomic, retain) NSURLRequest *request;
+@property (nonatomic, strong) DownloadStepOperation *inputOperation;
+@property (nonatomic, strong) NSURLRequest *request;
 @property (nonatomic, copy) DownloadStepStartBlock startBlock;
-@property (nonatomic, retain) NSURLConnection *connection;
-@property (nonatomic, retain) NSMutableData *data;
+@property (nonatomic, strong) NSURLConnection *connection;
+@property (nonatomic, strong) NSMutableData *data;
 @property (nonatomic, assign) BOOL paused;
 
 + (id)operationWithInput:(DownloadStepOperation *)otherOperation;

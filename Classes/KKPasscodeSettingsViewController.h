@@ -30,7 +30,7 @@
 
 @interface KKPasscodeSettingsViewController : UITableViewController <UIActionSheetDelegate, KKPasscodeViewControllerDelegate> {
 	
-	id <KKPasscodeSettingsViewControllerDelegate> _delegate;
+	id <KKPasscodeSettingsViewControllerDelegate> __weak _delegate;
 	
 	UISwitch* _eraseDataSwitch;
 	
@@ -38,6 +38,6 @@
 	BOOL _eraseDataOn;
 }
 
-@property (nonatomic, assign) id <KKPasscodeSettingsViewControllerDelegate> delegate;
+@property (nonatomic, weak) id <KKPasscodeSettingsViewControllerDelegate> delegate;
 
 @end

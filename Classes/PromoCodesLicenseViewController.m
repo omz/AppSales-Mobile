@@ -19,21 +19,21 @@
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		self.title = NSLocalizedString(@"License", nil);
-		licenseAgreementHTML = [licenseAgreement retain];
-		downloadOperation = [operation retain];
+		licenseAgreementHTML = licenseAgreement;
+		downloadOperation = operation;
 	}
 	return self;
 }
 
 - (void)loadView
 {
-	self.webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
+	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	webView.delegate = self;
 	self.view = webView;
-	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Agree", nil) style:UIBarButtonItemStyleDone target:self action:@selector(agree:)] autorelease];
-	self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)] autorelease];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Agree", nil) style:UIBarButtonItemStyleDone target:self action:@selector(agree:)];
+	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
 }
 
 - (void)agree:(id)sender
@@ -86,10 +86,6 @@
 - (void)dealloc
 {
 	webView.delegate = nil;
-	[webView release];
-	[downloadOperation release];
-	[licenseAgreementHTML release];
-	[super dealloc];
 }
 
 @end

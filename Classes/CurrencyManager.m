@@ -85,7 +85,7 @@
 	self.lastRefresh = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerLastRefresh"];
 	if (!self.lastRefresh) self.lastRefresh = [NSDate dateWithTimeIntervalSince1970:1225397963]; //Oct, 30, 2008
 	
-	exchangeRates = [[[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerExchangeRates"] retain];
+	exchangeRates = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerExchangeRates"];
 	if (!exchangeRates) {
 		exchangeRates = [NSMutableDictionary new];
         [exchangeRates setObject:[NSNumber numberWithFloat:0.2178] forKey:@"\"AED/EUR\""];
@@ -149,8 +149,6 @@
 {
 	[self.conversionDict removeAllObjects];
 	
-	[newBaseCurrency retain];
-	[baseCurrency release];
 	baseCurrency = newBaseCurrency;
 	[[NSUserDefaults standardUserDefaults] setObject:baseCurrency forKey:@"CurrencyManagerBaseCurrency"];
 	
@@ -222,51 +220,49 @@
 
 - (void)refreshExchangeRates
 {
-	NSAutoreleasePool *pool = [NSAutoreleasePool new];
-	NSMutableDictionary *newExchangeRates = [NSMutableDictionary dictionary];
-	
-	[newExchangeRates setObject:[NSNumber numberWithFloat:1.0] forKey:@"\"EUR/EUR\""];
-	
-	NSMutableString *urlString = [NSMutableString stringWithString:@"http://quote.yahoo.com/d/quotes.csv?s="];
-	int i = 0;
-	for (NSString *currency in self.availableCurrencies) {
-		if (i > 0) {
-			[urlString appendString:@"+"];
-		}
-		if (![currency isEqual:@"EUR"]) {
-			[urlString appendFormat:@"%@%@=X", currency, @"EUR"];
-		}
-		i++;
-	}
-	[urlString appendString:@"&f=nl1"];
+	@autoreleasepool {
+		NSMutableDictionary *newExchangeRates = [NSMutableDictionary dictionary];
 		
-	NSString *csv = [NSString stringWithContentsOfURL:[NSURL URLWithString:urlString] usedEncoding:NULL error:NULL];
-	if (!csv) {
-		[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
-		[pool release];
-		return;
-	}
-    csv = [csv stringByReplacingOccurrencesOfString:@" to " withString:@"/"];
-	NSArray *lines = [csv componentsSeparatedByString:@"\n"];
-	for (NSString *line in lines) {
-		NSArray *comps = [line componentsSeparatedByString:@","];
-		if ([comps count] == 2) {
-			NSString *currenciesString = [comps objectAtIndex:0]; //ex: "USD/EUR"
-			float exchangeRate = [[comps objectAtIndex:1] floatValue];
-			
-			[newExchangeRates setObject:[NSNumber numberWithFloat:exchangeRate] forKey:currenciesString];
+		[newExchangeRates setObject:[NSNumber numberWithFloat:1.0] forKey:@"\"EUR/EUR\""];
+		
+		NSMutableString *urlString = [NSMutableString stringWithString:@"http://quote.yahoo.com/d/quotes.csv?s="];
+		int i = 0;
+		for (NSString *currency in self.availableCurrencies) {
+			if (i > 0) {
+				[urlString appendString:@"+"];
+			}
+			if (![currency isEqual:@"EUR"]) {
+				[urlString appendFormat:@"%@%@=X", currency, @"EUR"];
+			}
+			i++;
 		}
+		[urlString appendString:@"&f=nl1"];
+			
+		NSString *csv = [NSString stringWithContentsOfURL:[NSURL URLWithString:urlString] usedEncoding:NULL error:NULL];
+		if (!csv) {
+			[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
+			return;
+		}
+    csv = [csv stringByReplacingOccurrencesOfString:@" to " withString:@"/"];
+		NSArray *lines = [csv componentsSeparatedByString:@"\n"];
+		for (NSString *line in lines) {
+			NSArray *comps = [line componentsSeparatedByString:@","];
+			if ([comps count] == 2) {
+				NSString *currenciesString = [comps objectAtIndex:0]; //ex: "USD/EUR"
+				float exchangeRate = [[comps objectAtIndex:1] floatValue];
+				
+				[newExchangeRates setObject:[NSNumber numberWithFloat:exchangeRate] forKey:currenciesString];
+			}
+		}
+		if (fabsf([[newExchangeRates objectForKey:@"\"USD/EUR\""] floatValue]) > 9999) {
+			//Yes, this could theoretically happen, but more likely, 
+			//Yahoo returned bogus values, which apparently does happen every now and then...
+			NSLog(@"Exchange rates returned by Yahoo are likely incorrect, ignoring...");
+			[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
+			return;
+		}
+		[self performSelectorOnMainThread:@selector(finishRefreshWithExchangeRates:) withObject:newExchangeRates waitUntilDone:YES];
 	}
-	if (fabsf([[newExchangeRates objectForKey:@"\"USD/EUR\""] floatValue]) > 9999) {
-		//Yes, this could theoretically happen, but more likely, 
-		//Yahoo returned bogus values, which apparently does happen every now and then...
-		NSLog(@"Exchange rates returned by Yahoo are likely incorrect, ignoring...");
-		[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
-		[pool release];
-		return;
-	}
-	[self performSelectorOnMainThread:@selector(finishRefreshWithExchangeRates:) withObject:newExchangeRates waitUntilDone:YES];
-	[pool release];
 }
 
 - (float)convertValue:(float)sourceValue fromCurrency:(NSString *)sourceCurrency
@@ -312,18 +308,5 @@
 	return sharedManager;
 }
 
-- (void)dealloc
-{
-	self.conversionDict = nil;
-
-	[numberFormatterWithFraction release];
-	[numberFormatterWithoutFraction release];
-	
-	[exchangeRates release];
-	[baseCurrency release];
-	[currencySymbols release];
-	
-	[super dealloc];
-}
 
 @end
