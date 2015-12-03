@@ -83,7 +83,7 @@
 			NSMutableArray *availableReportDateStrings = [NSMutableArray array];
 			NSMutableSet *availableReportDates = [NSMutableSet set];
 			
-			NSInteger maxNumberOfAvailableReports = [dateType isEqualToString:@"Daily"] ? 30 : 13;
+			NSInteger maxNumberOfAvailableReports = [dateType isEqualToString:@"Daily"] ? 31 : 20;
 			for (int i = 1; i <= maxNumberOfAvailableReports; i++) {
 				NSDate *date = nil;
 				if ([dateType isEqualToString:@"Daily"]) {
