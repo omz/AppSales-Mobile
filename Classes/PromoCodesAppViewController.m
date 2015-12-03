@@ -25,8 +25,8 @@
 
 - (id)initWithProduct:(Product *)aProduct
 {
-    self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
+	self = [super initWithStyle:UITableViewStyleGrouped];
+	if (self) {
 		product = aProduct;
 		queue = [[NSOperationQueue alloc] init];
 		[queue setMaxConcurrentOperationCount:1];
@@ -63,13 +63,13 @@
 		busyToolbarItems = [[NSArray alloc] initWithObjects:spinnerItem, flexSpace, statusItem, flexSpace, stopItem, nil];
 		
 		self.toolbarItems = (product.isDownloadingPromoCodes) ? busyToolbarItems : idleToolbarItems;
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+	[super viewDidLoad];
 	self.title = [product displayName];
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshHistory:)];
 	
@@ -120,8 +120,8 @@
 	if (self.activeSheet.visible) {
 		[self.activeSheet dismissWithClickedButtonIndex:activeSheet.cancelButtonIndex animated:NO];
 	}
-    UIActionSheet *deleteSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Promo Codes", nil) otherButtonTitles:nil];
-    deleteSheet.tag = kDeleteCodesSheetTag;
+	UIActionSheet *deleteSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Promo Codes", nil) otherButtonTitles:nil];
+	deleteSheet.tag = kDeleteCodesSheetTag;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		self.activeSheet = deleteSheet;
 		[deleteSheet showFromBarButtonItem:sender animated:YES];
@@ -181,12 +181,12 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 2;
+	return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -223,12 +223,12 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-    }
+	static NSString *CellIdentifier = @"Cell";
+	
+	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+	if (cell == nil) {
+		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+	}
 	
 	if (indexPath.section == 0) {
 		cell.textLabel.text = NSLocalizedString(@"Request New Codes...", nil);
@@ -246,7 +246,7 @@
 		cell.textLabel.textColor = (used) ? [UIColor grayColor] : [UIColor blackColor];
 	}
 	
-    return cell;
+	return cell;
 }
 
 
@@ -263,7 +263,7 @@
 								 NSLocalizedString(@"Email Code", nil), 
 								 NSLocalizedString(@"Copy", nil),
 								 (used) ? NSLocalizedString(@"Mark as Unused", nil) : NSLocalizedString(@"Mark as Used", nil) , nil];
-        sheet.tag = kActionsSheetTag;
+		sheet.tag = kActionsSheetTag;
 		[sheet showFromToolbar:self.navigationController.toolbar];
 	} else {
 		[tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -275,8 +275,8 @@
 {
 	[self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
 	
-    if (actionSheet.tag == kActionsSheetTag) {
-        if (buttonIndex != actionSheet.cancelButtonIndex) {
+	if (actionSheet.tag == kActionsSheetTag) {
+		if (buttonIndex != actionSheet.cancelButtonIndex) {
 			if (buttonIndex == 0) {
 				//email
 				if (![MFMailComposeViewController canSendMail]) {
@@ -298,8 +298,8 @@
 				self.selectedPromoCode.used = [NSNumber numberWithBool:![self.selectedPromoCode.used boolValue]];
 				[self.tableView reloadData];
 			}
-        }
-    } else if (actionSheet.tag == kActionsAllCodesSheetTag) {
+		}
+	} else if (actionSheet.tag == kActionsAllCodesSheetTag) {
 		if (buttonIndex != actionSheet.cancelButtonIndex) {
 			if (buttonIndex == 0) {
 				if (![MFMailComposeViewController canSendMail]) {
@@ -325,11 +325,11 @@
 			}
 		}
 	} else if (actionSheet.tag == kDeleteCodesSheetTag) {
-        if (buttonIndex != actionSheet.cancelButtonIndex) {
-            product.promoCodes = [NSSet set];
-            [self.navigationController popViewControllerAnimated:YES];
-        }
-    }
+		if (buttonIndex != actionSheet.cancelButtonIndex) {
+			product.promoCodes = [NSSet set];
+			[self.navigationController popViewControllerAnimated:YES];
+		}
+	}
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error

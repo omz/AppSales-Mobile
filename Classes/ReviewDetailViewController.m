@@ -23,11 +23,11 @@
 
 - (id)initWithReview:(Review *)aReview
 {
-    self = [super initWithNibName:nil bundle:nil];
-    if (self) {
+	self = [super initWithNibName:nil bundle:nil];
+	if (self) {
 		review = aReview;
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)loadView
@@ -84,7 +84,7 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		mailComposeViewController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
-    [self presentViewController:mailComposeViewController animated:YES completion:nil];
+	[self presentViewController:mailComposeViewController animated:YES completion:nil];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error

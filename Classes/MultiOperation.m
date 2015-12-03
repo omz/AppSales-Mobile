@@ -24,7 +24,7 @@
 		queue.maxConcurrentOperationCount = 1;
 		operations = partialOperations;
 	}
-    return self;
+	return self;
 }
 
 - (BOOL)isConcurrent

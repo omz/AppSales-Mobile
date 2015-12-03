@@ -33,19 +33,19 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef enum {
-    /** Progress is shown using an UIActivityIndicatorView. This is the default. */
-    MBProgressHUDModeIndeterminate,
-    /** Progress is shown using a MBRoundProgressView. */
+	/** Progress is shown using an UIActivityIndicatorView. This is the default. */
+	MBProgressHUDModeIndeterminate,
+	/** Progress is shown using a MBRoundProgressView. */
 	MBProgressHUDModeDeterminate,
 	/** Shows a custom view */
 	MBProgressHUDModeCustomView
 } MBProgressHUDMode;
 
 typedef enum {
-    /** Opacity animation */
-    MBProgressHUDAnimationFade,
-    /** Opacity + scale animation */
-    MBProgressHUDAnimationZoom
+	/** Opacity animation */
+	MBProgressHUDAnimationFade,
+	/** Opacity + scale animation */
+	MBProgressHUDAnimationZoom
 } MBProgressHUDAnimation;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,15 +71,15 @@ typedef enum {
 @interface MBProgressHUD : UIView {
 	
 	MBProgressHUDMode mode;
-    MBProgressHUDAnimation animationType;
+	MBProgressHUDAnimation animationType;
 	
 	SEL methodForExecution;
 	id targetForExecution;
 	id objectForExecution;
 	BOOL useAnimation;
 	
-    float yOffset;
-    float xOffset;
+	float yOffset;
+	float xOffset;
 	
 	float width;
 	float height;
@@ -108,7 +108,7 @@ typedef enum {
 	UIFont *labelFont;
 	UIFont *detailsLabelFont;
 	
-    BOOL isFinished;
+	BOOL isFinished;
 	BOOL removeFromSuperViewOnHide;
 	
 	UIView *customView;
@@ -353,7 +353,7 @@ typedef enum {
  */
 @interface MBRoundProgressView : UIView {
 @private
-    float _progress;
+	float _progress;
 }
 
 /**

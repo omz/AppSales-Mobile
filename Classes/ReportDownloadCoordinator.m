@@ -19,12 +19,12 @@
 
 - (id)init
 {
-    self = [super init];
-    if (self) {
+	self = [super init];
+	if (self) {
 		reportDownloadQueue = [[NSOperationQueue alloc] init];
 		reportDownloadQueue.maxConcurrentOperationCount = 1;
 		[reportDownloadQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
-    }
+	}
 	return self;
 }
 
@@ -87,15 +87,15 @@
 
 - (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes
 {
-    if (product.isDownloadingPromoCodes) return;
-    product.isDownloadingPromoCodes = YES;
-    PromoCodeOperation *operation = [[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes];
-    operation.completionBlock = ^ {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            product.isDownloadingPromoCodes = NO;
-        });
-    };
-    [reportDownloadQueue addOperation:operation];
+	if (product.isDownloadingPromoCodes) return;
+	product.isDownloadingPromoCodes = YES;
+	PromoCodeOperation *operation = [[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes];
+	operation.completionBlock = ^ {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			product.isDownloadingPromoCodes = NO;
+		});
+	};
+	[reportDownloadQueue addOperation:operation];
 }
 
 - (void)cancelAllDownloads

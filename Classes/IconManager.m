@@ -18,8 +18,8 @@
 
 - (id)init
 {
-    self = [super init];
-    if (self) {
+	self = [super init];
+	if (self) {
 		queue = dispatch_queue_create("app icon download", NULL);
 		iconCache = [NSMutableDictionary new];
 		downloadQueue = [NSMutableArray new];
@@ -113,12 +113,12 @@
 
 - (void)clearIconForAppID:(NSString *)appID
 {
-    dispatch_async(dispatch_get_main_queue(), ^ {
-        NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
-        [[NSFileManager defaultManager] removeItemAtPath:iconPath error:NULL];
-        [iconCache removeObjectForKey:appID];
-        [[NSNotificationCenter defaultCenter] postNotificationName:IconManagerClearedIconNotification object:self userInfo:[NSDictionary dictionaryWithObject:appID forKey:kIconManagerClearedIconNotificationAppID]];
-    });
+	dispatch_async(dispatch_get_main_queue(), ^ {
+		NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
+		[[NSFileManager defaultManager] removeItemAtPath:iconPath error:NULL];
+		[iconCache removeObjectForKey:appID];
+		[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerClearedIconNotification object:self userInfo:[NSDictionary dictionaryWithObject:appID forKey:kIconManagerClearedIconNotificationAppID]];
+	});
 }
 
 

@@ -20,7 +20,7 @@
 
 @interface Product : NSManagedObject {
 
-    BOOL isDownloadingPromoCodes;
+	BOOL isDownloadingPromoCodes;
 }
 
 @property (nonatomic, assign) BOOL isDownloadingPromoCodes;

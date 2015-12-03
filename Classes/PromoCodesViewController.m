@@ -18,16 +18,16 @@
 
 - (id)initWithAccount:(ASAccount *)anAccount
 {
-    self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
+	self = [super initWithStyle:UITableViewStyleGrouped];
+	if (self) {
 		account = anAccount;
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 				
 		self.title = NSLocalizedString(@"Promo Codes", nil);
 		self.tabBarItem.image = [UIImage imageNamed:@"PromoCodes.png"];
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)viewDidLoad
@@ -90,7 +90,7 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -110,7 +110,7 @@
 	if (cell == nil) {
 		cell = [[BadgedCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
 	}
-    
+	
 	Product *app = [sortedApps objectAtIndex:indexPath.row];
 	
 	NSFetchRequest *unusedPromoCodesRequest = [[NSFetchRequest alloc] init];
@@ -122,7 +122,7 @@
 	cell.badgeCount = count;
 	cell.textLabel.text = [app displayName];
 	
-    return cell;
+	return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

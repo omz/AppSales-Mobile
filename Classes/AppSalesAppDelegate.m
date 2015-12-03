@@ -43,7 +43,7 @@
 							  nil];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
 	
 	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	if (!iPad) {
@@ -257,7 +257,7 @@
 			nav.navigationBar.tintColor = accountsViewController.navigationController.navigationBar.tintColor;
 			nav.navigationBar.translucent = accountsViewController.navigationController.navigationBar.translucent;
 			nav.navigationBar.opaque = accountsViewController.navigationController.navigationBar.opaque;
-			nav.navigationBar.barStyle = accountsViewController.navigationController.navigationBar.barStyle;    
+			nav.navigationBar.barStyle = accountsViewController.navigationController.navigationBar.barStyle;	
 		}
 		UIViewController *viewControllerForPresentingPasscode = nil;
 		if (self.window.rootViewController.presentedViewController) {
@@ -275,7 +275,7 @@
 			[self.accountsPopover dismissPopoverAnimated:NO];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASWillShowPasscodeLockNotification object:self];
-        [viewControllerForPresentingPasscode presentViewController:nav animated:NO completion:nil];
+		[viewControllerForPresentingPasscode presentViewController:nav animated:NO completion:nil];
 	}
 }
 
@@ -289,7 +289,7 @@
 	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
 	PromoCodesLicenseViewController *vc = [[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]];
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
-    [self.window.rootViewController presentViewController:navController animated:YES completion:nil];
+	[self.window.rootViewController presentViewController:navController animated:YES completion:nil];
 }
 
 #pragma mark - Core Data
@@ -335,11 +335,11 @@
 
 - (NSManagedObjectModel *)managedObjectModel
 {
-    if (managedObjectModel != nil)
-    {
+	if (managedObjectModel != nil)
+	{
 		return managedObjectModel;
-    }
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AppSales" withExtension:@"momd"];
+	}
+	NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AppSales" withExtension:@"momd"];
 	managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 	return managedObjectModel;
 }
@@ -347,11 +347,11 @@
 
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
-    if (persistentStoreCoordinator != nil) {
-        return persistentStoreCoordinator;
-    }	
+	if (persistentStoreCoordinator != nil) {
+		return persistentStoreCoordinator;
+	}	
 	NSURL *storeURL = [[self applicationSupportDirectory] URLByAppendingPathComponent:@"AppSales.sqlite"];
-    
+	
 	NSError *error = nil;
 	persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
 	NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:

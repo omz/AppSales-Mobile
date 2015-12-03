@@ -17,14 +17,14 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame];
-    if (self) {
+	self = [super initWithFrame:frame];
+	if (self) {
 		self.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:1.0];
 		pinView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Pin.png"]]; 
 		pinView.alpha = 0.0;
 		[self addSubview:pinView];
-    }
-    return self;
+	}
+	return self;
 }
 
 - (NSDictionary *)polygonsByCountryCode

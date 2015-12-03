@@ -63,8 +63,8 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 
-        [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
-    }
+		[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+	}
 	return self;
 }
 
@@ -288,8 +288,8 @@
 	viewMode = newViewMode;
 	if (viewMode == DashboardViewModeSales || viewMode == DashboardViewModeRevenue) {
 		self.graphView.title = nil;
-    } else if (viewMode == DashboardViewModeRedownloads) {
-        self.graphView.title = NSLocalizedString(@"Redownloads", nil);
+	} else if (viewMode == DashboardViewModeRedownloads) {
+		self.graphView.title = NSLocalizedString(@"Redownloads", nil);
 	} else if (viewMode == DashboardViewModeEducationalSales) {
 		self.graphView.title = NSLocalizedString(@"Educational Sales", nil);
 	} else if (viewMode == DashboardViewModeGiftPurchases) {
@@ -411,8 +411,8 @@
 				self.viewMode = DashboardViewModeEducationalSales;
 			} else if (buttonIndex == 5) {
 				self.viewMode = DashboardViewModeGiftPurchases;
-            } else if (buttonIndex == 6) {
-                self.viewMode = DashboardViewModePromoCodes;
+			} else if (buttonIndex == 6) {
+				self.viewMode = DashboardViewModePromoCodes;
 			}
 			[[NSUserDefaults standardUserDefaults] setInteger:viewMode forKey:kSettingDashboardViewMode];
 			if (viewMode != DashboardViewModeRevenue) {
@@ -541,39 +541,39 @@
 			report = [self.sortedCalendarMonthReports objectAtIndex:index];
 		}
 	}
-    
-    float value = 0;
-    
-    NSArray* tProducts = ((self.selectedProducts) ? self.selectedProducts : self.visibleProducts);
-    
-    for (Product * selectedProduct in tProducts) {
-        if (viewMode == DashboardViewModeRevenue) {
-            value += [report totalRevenueInBaseCurrencyForProductWithID:selectedProduct.productID];
-        } else {
-            if (viewMode == DashboardViewModeSales) {
-                value += [report totalNumberOfPaidDownloadsForProductWithID:selectedProduct.productID];
-            } else if (viewMode == DashboardViewModeUpdates) {
-                value += [report totalNumberOfUpdatesForProductWithID:selectedProduct.productID];
-            } else if (viewMode == DashboardViewModeRedownloads) {
-                value += [report totalNumberOfRedownloadsForProductWithID:selectedProduct.productID];
-            } else if (viewMode == DashboardViewModeEducationalSales) {
-                value += [report totalNumberOfEducationalSalesForProductWithID:selectedProduct.productID];
-            } else if (viewMode == DashboardViewModeGiftPurchases) {
-                value += [report totalNumberOfGiftPurchasesForProductWithID:selectedProduct.productID];
-            } else if (viewMode == DashboardViewModePromoCodes) {
-                value += [report totalNumberOfPromoCodeTransactionsForProductWithID:selectedProduct.productID];
-            }
-        }
-    }
-    
-    NSString *labelText = @"";
-    if (viewMode == DashboardViewModeRevenue) {
-        labelText = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf(value)];
-    } else {
-        labelText = [NSString stringWithFormat:@"%i", (int)value];
-    }
-    
-    return labelText;
+	
+	float value = 0;
+	
+	NSArray* tProducts = ((self.selectedProducts) ? self.selectedProducts : self.visibleProducts);
+	
+	for (Product * selectedProduct in tProducts) {
+		if (viewMode == DashboardViewModeRevenue) {
+			value += [report totalRevenueInBaseCurrencyForProductWithID:selectedProduct.productID];
+		} else {
+			if (viewMode == DashboardViewModeSales) {
+				value += [report totalNumberOfPaidDownloadsForProductWithID:selectedProduct.productID];
+			} else if (viewMode == DashboardViewModeUpdates) {
+				value += [report totalNumberOfUpdatesForProductWithID:selectedProduct.productID];
+			} else if (viewMode == DashboardViewModeRedownloads) {
+				value += [report totalNumberOfRedownloadsForProductWithID:selectedProduct.productID];
+			} else if (viewMode == DashboardViewModeEducationalSales) {
+				value += [report totalNumberOfEducationalSalesForProductWithID:selectedProduct.productID];
+			} else if (viewMode == DashboardViewModeGiftPurchases) {
+				value += [report totalNumberOfGiftPurchasesForProductWithID:selectedProduct.productID];
+			} else if (viewMode == DashboardViewModePromoCodes) {
+				value += [report totalNumberOfPromoCodeTransactionsForProductWithID:selectedProduct.productID];
+			}
+		}
+	}
+	
+	NSString *labelText = @"";
+	if (viewMode == DashboardViewModeRevenue) {
+		labelText = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf(value)];
+	} else {
+		labelText = [NSString stringWithFormat:@"%i", (int)value];
+	}
+	
+	return labelText;
 }
 
 - (NSString *)graphView:(GraphView *)graphView labelForSectionAtIndex:(NSUInteger)index
@@ -620,8 +620,8 @@
 					valueForProduct = (float)[report totalNumberOfPaidDownloadsForProductWithID:productID];
 				} else if (viewMode == DashboardViewModeUpdates) {
 					valueForProduct = (float)[report totalNumberOfUpdatesForProductWithID:productID];
-                } else if (viewMode == DashboardViewModeRedownloads) {
-                    valueForProduct = (float)[report totalNumberOfRedownloadsForProductWithID:productID];
+				} else if (viewMode == DashboardViewModeRedownloads) {
+					valueForProduct = (float)[report totalNumberOfRedownloadsForProductWithID:productID];
 				} else if (viewMode == DashboardViewModeEducationalSales) {
 					valueForProduct = (float)[report totalNumberOfEducationalSalesForProductWithID:productID];
 				} else if (viewMode == DashboardViewModeGiftPurchases) {
@@ -745,8 +745,8 @@
 				latestNumber = [latestReport totalNumberOfPaidDownloadsForProductWithID:product.productID];
 			} else if (viewMode == DashboardViewModeUpdates) {
 				latestNumber = [latestReport totalNumberOfUpdatesForProductWithID:product.productID];
-            } else if (viewMode == DashboardViewModeRedownloads) {
-                latestNumber = [latestReport totalNumberOfRedownloadsForProductWithID:product.productID];
+			} else if (viewMode == DashboardViewModeRedownloads) {
+				latestNumber = [latestReport totalNumberOfRedownloadsForProductWithID:product.productID];
 			} else if (viewMode == DashboardViewModeEducationalSales) {
 				latestNumber = [latestReport totalNumberOfEducationalSalesForProductWithID:product.productID];
 			} else if (viewMode == DashboardViewModeGiftPurchases) {
@@ -774,7 +774,7 @@
 								 NSLocalizedString(@"Revenue", nil), 
 								 NSLocalizedString(@"Sales", nil), 
 								 NSLocalizedString(@"Updates", nil),
-                                 NSLocalizedString(@"Redownloads", nil),
+								 NSLocalizedString(@"Redownloads", nil),
 								 NSLocalizedString(@"Educational Sales", nil),
 								 NSLocalizedString(@"Gift Purchases", nil), 
 								 NSLocalizedString(@"Promo Codes", nil), nil];
@@ -786,13 +786,13 @@
 #pragma mark - Table view delegate
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    [super handleLongPress:gestureRecognizer];
-    [self.graphView reloadValuesAnimated:YES];
+	[super handleLongPress:gestureRecognizer];
+	[self.graphView reloadValuesAnimated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [super tableView:tableView didDeselectRowAtIndexPath:indexPath];
-    [self.graphView reloadValuesAnimated:YES];
+	[super tableView:tableView didDeselectRowAtIndexPath:indexPath];
+	[self.graphView reloadValuesAnimated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

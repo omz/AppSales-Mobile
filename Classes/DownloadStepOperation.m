@@ -18,11 +18,11 @@
 
 - (id)init
 {
-    self = [super init];
-    if (self) {
+	self = [super init];
+	if (self) {
 		
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)setStartBlock:(DownloadStepStartBlock)block

@@ -35,7 +35,7 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+	[super viewDidLoad];
 }
 
 
@@ -86,8 +86,8 @@
 	} else {
 		cell.textLabel.textColor = [UIColor grayColor];
 	}
-    
-    return cell;
+	
+	return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -114,46 +114,46 @@
 	}
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.managedObjectContext];
-    
-    NSMutableArray* args = [NSMutableArray arrayWithArray:products];
-    NSMutableString* pred = [NSMutableString stringWithString:@""];
+	
+	NSMutableArray* args = [NSMutableArray arrayWithArray:products];
+	NSMutableString* pred = [NSMutableString stringWithString:@""];
 
-    if (products) {
-        [pred appendString:@"(product == nil"];
-        for (Product* p __attribute__((unused)) in products) {
-            [pred appendString:@" OR product == %@"];
-        }
-        [pred appendString:@")"];
-    } else {
-        [pred appendString:@"product.account == %@"];
-        [args addObject:account];
-    }
-    
-    if (rating != 0) {
-        [pred appendString:@" AND rating = %@"];
-        [args addObject:[NSNumber numberWithInteger:rating]];
-    }
+	if (products) {
+		[pred appendString:@"(product == nil"];
+		for (Product* p __attribute__((unused)) in products) {
+			[pred appendString:@" OR product == %@"];
+		}
+		[pred appendString:@")"];
+	} else {
+		[pred appendString:@"product.account == %@"];
+		[args addObject:account];
+	}
+	
+	if (rating != 0) {
+		[pred appendString:@" AND rating = %@"];
+		[args addObject:[NSNumber numberWithInteger:rating]];
+	}
 
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
-    
+	[fetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
+	
 	[fetchRequest setEntity:entity];
 	[fetchRequest setFetchBatchSize:20];
-    
+	
 	//Show latest unread reviews first:
 	NSSortDescriptor *sortDescriptorUnread = [[NSSortDescriptor alloc] initWithKey:@"unread" ascending:NO];
 	NSSortDescriptor *sortDescriptorDownloadDate = [[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO];
 	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO];
 	
-    NSArray *sortDescriptors = [NSArray arrayWithObjects:sortDescriptorUnread, sortDescriptorReviewDate, sortDescriptorDownloadDate, nil];
-    [fetchRequest setSortDescriptors:sortDescriptors];
-    
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
+	NSArray *sortDescriptors = [NSArray arrayWithObjects:sortDescriptorUnread, sortDescriptorReviewDate, sortDescriptorDownloadDate, nil];
+	[fetchRequest setSortDescriptors:sortDescriptors];
+	
+	NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 																								 managedObjectContext:self.managedObjectContext 
 																								   sectionNameKeyPath:nil 
 																											cacheName:nil];
-    aFetchedResultsController.delegate = self;
-    self.fetchedResultsController = aFetchedResultsController;
-    
+	aFetchedResultsController.delegate = self;
+	self.fetchedResultsController = aFetchedResultsController;
+	
 	NSError *error = nil;
 	if (![self.fetchedResultsController performFetch:&error]) {
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);

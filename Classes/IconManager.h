@@ -10,8 +10,8 @@
 
 #define kIconManagerDownloadedIconNotificationAppID		@"appID"
 #define IconManagerDownloadedIconNotification			@"IconManagerDownloadedIconNotification"
-#define kIconManagerClearedIconNotificationAppID    @"appID"
-#define IconManagerClearedIconNotification              @"IconManagerClearedIconNotification"
+#define kIconManagerClearedIconNotificationAppID	@"appID"
+#define IconManagerClearedIconNotification			  @"IconManagerClearedIconNotification"
 
 @interface IconManager : NSObject {
 	

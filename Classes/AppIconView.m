@@ -18,7 +18,7 @@
 	if ([newProductID isEqualToString:productID]) return;
 	if (!productID) {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconDownloaded:) name:IconManagerDownloadedIconNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
 	}
 	
 	productID = newProductID;
@@ -39,9 +39,9 @@
 
 - (void)iconCleared:(NSNotification *)notification
 {
-    if ([[[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID] isEqualToString:self.productID]) {
-        self.image = [UIImage imageNamed:@"GenericApp.png"];
-    }
+	if ([[[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID] isEqualToString:self.productID]) {
+		self.image = [UIImage imageNamed:@"GenericApp.png"];
+	}
 }
 
 - (void)dealloc

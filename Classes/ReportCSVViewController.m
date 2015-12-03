@@ -16,11 +16,11 @@
 
 - (id)initWithReport:(Report *)selectedReport
 {
-    self = [super initWithNibName:nil bundle:nil];
-    if (self) {
+	self = [super initWithNibName:nil bundle:nil];
+	if (self) {
 		report = selectedReport;
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)loadView

@@ -6,7 +6,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,7 +55,7 @@
 		if (string != nil) {
 			NSMutableDictionary *addDict = existsQueryDictionary;
 			[addDict setObject:data forKey:(id)kSecValueData];
-      
+	  
 			res = SecItemAdd((CFDictionaryRef)addDict, NULL);
 			NSAssert1(res == errSecSuccess, @"Recieved %ld from SecItemAdd!", (long)res);
 		}

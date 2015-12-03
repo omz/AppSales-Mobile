@@ -69,44 +69,44 @@
 	NSMutableDictionary *sumsByYear = [NSMutableDictionary dictionary];
 	NSSet *allPayments = account.payments;
 	for (NSManagedObject *payment in allPayments) {
-        NSNumber *year = [payment valueForKey:@"year"];
+		NSNumber *year = [payment valueForKey:@"year"];
 		NSMutableDictionary *paymentsForYear = [paymentsByYear objectForKey:year];
 		if (!paymentsForYear) {
 			paymentsForYear = [NSMutableDictionary dictionary];
 			[paymentsByYear setObject:paymentsForYear forKey:year];
 		}
-        NSNumber *month = [payment valueForKey:@"month"];
-        NSMutableArray *paymentsForMonth = [paymentsForYear objectForKey:month];
-        if (!paymentsForMonth) {
-            paymentsForMonth = [NSMutableArray array];
-            [paymentsForYear setObject:paymentsForMonth forKey:month];
-        }
-        [paymentsForMonth addObject:payment];
-        
-        float currentSum = [[sumsByYear objectForKey:year] floatValue];
-        [sumsByYear setObject:[NSNumber numberWithFloat:currentSum + [[payment valueForKey:@"amount"] floatValue]] forKey:year];
-    }
-    
-    NSMutableDictionary *labelsByYear = [NSMutableDictionary dictionary];
-    for (NSNumber *year in paymentsByYear) {
-        NSDictionary *paymentsForYear = [paymentsByYear objectForKey:year];
-        for (NSNumber *month in paymentsForYear) {
-            NSArray *payments = [paymentsForYear objectForKey:month];
-            if ([payments count] > 0) {
-                NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
-                NSString *currency = [[payments objectAtIndex:0] valueForKey:@"currency"];
-                NSString *label = [NSString stringWithFormat:@"%@%@", [numberFormatter stringFromNumber:sum], [[CurrencyManager sharedManager] currencySymbolForCurrency:currency]];
-                NSMutableDictionary *labelsForYear = [labelsByYear objectForKey:year];
-                if (!labelsForYear) {
-                    labelsForYear = [NSMutableDictionary dictionary];
-                    [labelsByYear setObject:labelsForYear forKey:year];
-                }
-                [labelsForYear setObject:label forKey:month];
-            }
-        }
-    }
-    
-    
+		NSNumber *month = [payment valueForKey:@"month"];
+		NSMutableArray *paymentsForMonth = [paymentsForYear objectForKey:month];
+		if (!paymentsForMonth) {
+			paymentsForMonth = [NSMutableArray array];
+			[paymentsForYear setObject:paymentsForMonth forKey:month];
+		}
+		[paymentsForMonth addObject:payment];
+		
+		float currentSum = [[sumsByYear objectForKey:year] floatValue];
+		[sumsByYear setObject:[NSNumber numberWithFloat:currentSum + [[payment valueForKey:@"amount"] floatValue]] forKey:year];
+	}
+	
+	NSMutableDictionary *labelsByYear = [NSMutableDictionary dictionary];
+	for (NSNumber *year in paymentsByYear) {
+		NSDictionary *paymentsForYear = [paymentsByYear objectForKey:year];
+		for (NSNumber *month in paymentsForYear) {
+			NSArray *payments = [paymentsForYear objectForKey:month];
+			if ([payments count] > 0) {
+				NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
+				NSString *currency = [[payments objectAtIndex:0] valueForKey:@"currency"];
+				NSString *label = [NSString stringWithFormat:@"%@%@", [numberFormatter stringFromNumber:sum], [[CurrencyManager sharedManager] currencySymbolForCurrency:currency]];
+				NSMutableDictionary *labelsForYear = [labelsByYear objectForKey:year];
+				if (!labelsForYear) {
+					labelsForYear = [NSMutableDictionary dictionary];
+					[labelsByYear setObject:labelsForYear forKey:year];
+				}
+				[labelsForYear setObject:label forKey:month];
+			}
+		}
+	}
+	
+	
 	NSArray *sortedYears = [[paymentsByYear allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	if ([sortedYears count] == 0) {
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
@@ -147,17 +147,17 @@
 {
 	[self reloadData];
 	CATransition *fadeTransition = [CATransition animation];
-    fadeTransition.duration = duration;
+	fadeTransition.duration = duration;
 	fadeTransition.type = kCATransitionFade;
 	fadeTransition.removedOnCompletion = YES;
 	fadeTransition.fillMode = kCAFillModeForwards;
 	
 	
 	//for (CALayer *aLayer in self.scrollView.layer.sublayers)
-      //  [aLayer removeAllAnimations];
+	  //  [aLayer removeAllAnimations];
 	
 	
-    [self.scrollView.layer addAnimation:fadeTransition forKey:@"transition"];
+	[self.scrollView.layer addAnimation:fadeTransition forKey:@"transition"];
 }
 
 

@@ -60,7 +60,7 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldWillBeginEditing:) name:UITextFieldTextDidBeginEditingNotification object:nil];
 	}
-    return self;
+	return self;
 }
 
 
@@ -227,7 +227,7 @@
 	cell.textLabel.textAlignment = NSTextAlignmentLeft;
 	cell.textLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	cell.accessoryType = UITableViewCellAccessoryNone;
-    CGSize labelSize = [field.title sizeWithAttributes:@{NSFontAttributeName : cell.textLabel.font}];
+	CGSize labelSize = [field.title sizeWithAttributes:@{NSFontAttributeName : cell.textLabel.font}];
 	CGRect textLabelFrame = CGRectMake(10, 0, labelSize.width, 10);
 	
 	cell.detailTextLabel.text = @"";
@@ -321,7 +321,7 @@
 		}
 	}
   if (field.type == FieldSpecifierTypeButton) {
-    cell.detailTextLabel.text = field.defaultValue;
+	cell.detailTextLabel.text = field.defaultValue;
   }
 	if (field.type == FieldSpecifierTypeButton && field.shouldDisplayDisclosureIndicator) {
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -329,7 +329,7 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
-{    
+{	
 	UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"];
 	
 	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:indexPath.section];

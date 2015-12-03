@@ -14,8 +14,8 @@
 #define ZLIB_FILEFUNC_SEEK_END (2)
 #define ZLIB_FILEFUNC_SEEK_SET (0)
 
-#define ZLIB_FILEFUNC_MODE_READ      (1)
-#define ZLIB_FILEFUNC_MODE_WRITE     (2)
+#define ZLIB_FILEFUNC_MODE_READ	  (1)
+#define ZLIB_FILEFUNC_MODE_WRITE	 (2)
 #define ZLIB_FILEFUNC_MODE_READWRITEFILTER (3)
 
 #define ZLIB_FILEFUNC_MODE_EXISTING (4)
@@ -40,19 +40,19 @@ typedef uLong  (ZCALLBACK *read_file_func) OF((voidpf opaque, voidpf stream, voi
 typedef uLong  (ZCALLBACK *write_file_func) OF((voidpf opaque, voidpf stream, const void* buf, uLong size));
 typedef long   (ZCALLBACK *tell_file_func) OF((voidpf opaque, voidpf stream));
 typedef long   (ZCALLBACK *seek_file_func) OF((voidpf opaque, voidpf stream, uLong offset, int origin));
-typedef int    (ZCALLBACK *close_file_func) OF((voidpf opaque, voidpf stream));
-typedef int    (ZCALLBACK *testerror_file_func) OF((voidpf opaque, voidpf stream));
+typedef int	(ZCALLBACK *close_file_func) OF((voidpf opaque, voidpf stream));
+typedef int	(ZCALLBACK *testerror_file_func) OF((voidpf opaque, voidpf stream));
 
 typedef struct zlib_filefunc_def_s
 {
-    open_file_func      zopen_file;
-    read_file_func      zread_file;
-    write_file_func     zwrite_file;
-    tell_file_func      ztell_file;
-    seek_file_func      zseek_file;
-    close_file_func     zclose_file;
-    testerror_file_func zerror_file;
-    voidpf              opaque;
+	open_file_func	  zopen_file;
+	read_file_func	  zread_file;
+	write_file_func	 zwrite_file;
+	tell_file_func	  ztell_file;
+	seek_file_func	  zseek_file;
+	close_file_func	 zclose_file;
+	testerror_file_func zerror_file;
+	voidpf			  opaque;
 } zlib_filefunc_def;
 
 

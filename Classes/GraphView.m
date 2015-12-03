@@ -80,7 +80,7 @@
 		visibleBarViews = [NSMutableDictionary new];
 		max = -1.0;
 	}
-    return self;
+	return self;
 }
 
 - (void)longPress:(UILongPressGestureRecognizer *)recognizer

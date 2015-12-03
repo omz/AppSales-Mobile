@@ -109,7 +109,7 @@ static NSError *SMXMLDocumentError(NSXMLParser *parser, NSError *parseError) {
 	for (SMXMLElement *child in children)
 		if ([child.name isEqual:nodeName])
 			[array addObject:child];
-    return array.count ? [array copy] : nil;
+	return array.count ? [array copy] : nil;
 }
 
 - (SMXMLElement *)childWithAttribute:(NSString *)attributeName value:(NSString *)attributeValue {
@@ -146,7 +146,7 @@ static NSError *SMXMLDocumentError(NSXMLParser *parser, NSError *parseError) {
 @synthesize root, error;
 
 - (id)initWithData:(NSData *)data error:(NSError **)outError {
-    self = [super init];
+	self = [super init];
 	if (self) {
 		NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
 		[parser setDelegate:self];
@@ -160,8 +160,8 @@ static NSError *SMXMLDocumentError(NSXMLParser *parser, NSError *parseError) {
 				*outError = self.error;
 			return nil;
 		}
-        else if (outError)
-            *outError = nil;
+		else if (outError)
+			*outError = nil;
 	}
 	return self;
 }

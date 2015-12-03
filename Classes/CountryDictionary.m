@@ -25,7 +25,7 @@
 	self = [super init];
 	if (self) {
 		countryNamesByISOCode = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"country_names" ofType:@"plist"]];
-    }
+	}
 	return self;
 }
 

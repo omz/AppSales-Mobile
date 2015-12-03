@@ -77,7 +77,7 @@
 
 
 @interface StackedBarView : UIControl {
-    
+	
 	NSMutableArray *segmentViews;
 	UILabel *label;
 	UIView *selectedBackgroundView;

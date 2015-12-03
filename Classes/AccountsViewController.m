@@ -72,8 +72,8 @@
 	
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] addObserver:self forKeyPath:@"isBusy" options:NSKeyValueObservingOptionNew context:nil];
 	
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
-    
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
+	
 	[self reloadAccounts];
 }
 
@@ -136,13 +136,13 @@
 	} else {
 		aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 	}
-    [self presentViewController:aboutNavController animated:YES completion:nil];
+	[self presentViewController:aboutNavController animated:YES completion:nil];
 }
 
 
 - (void)viewDidUnload
 {
-    [super viewDidUnload];
+	[super viewDidUnload];
 }
 
 
@@ -297,7 +297,7 @@
 		[context deleteObject:account];
 		[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
 		[self reloadAccounts];
-        [self.navigationController popViewControllerAnimated:YES];
+		[self.navigationController popViewControllerAnimated:YES];
 	}
 }
 
@@ -367,8 +367,8 @@
 	for (Product *product in allProducts) {
 		FieldSpecifier *productNameField = [FieldSpecifier textFieldWithKey:[NSString stringWithFormat:@"product.name.%@", product.productID] title:NSLocalizedString(@"Name", nil) defaultValue:[product displayName]];
 		FieldSpecifier *hideProductField = [FieldSpecifier switchFieldWithKey:[NSString stringWithFormat:@"product.hidden.%@", product.productID] title:NSLocalizedString(@"Hide in Dashboard", nil) defaultValue:[product.hidden boolValue]];
-        FieldSpecifier *reloadProductInfoField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.reload.%@", product.productID] title:NSLocalizedString(@"Reload App Icon...", nil)];
-        FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productNameField, hideProductField, reloadProductInfoField, nil] title:nil description:nil];
+		FieldSpecifier *reloadProductInfoField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.reload.%@", product.productID] title:NSLocalizedString(@"Reload App Icon...", nil)];
+		FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productNameField, hideProductField, reloadProductInfoField, nil] title:nil description:nil];
 		FieldSpecifier *showInAppStoreField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.appstore.%@", product.productID] title:NSLocalizedString(@"Show in App Store...", nil)];
 		NSString *productFooter = [NSString stringWithFormat:@"Current version: %@\nApple ID: %@", ((product.currentVersion) ? product.currentVersion : @"N/A"), product.productID];
 		FieldSectionSpecifier *showInAppStoreSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:showInAppStoreField] title:nil description:productFooter];
@@ -405,9 +405,9 @@
 	// main section
 	passcodeLockField = [FieldSpecifier buttonFieldWithKey:kPasscodeLockButton title:NSLocalizedString(@"Passcode Lock", nil)];
   if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
-    passcodeLockField.defaultValue = @"On";
+	passcodeLockField.defaultValue = @"On";
   } else {
-    passcodeLockField.defaultValue = @"Off";
+	passcodeLockField.defaultValue = @"Off";
   }
   
 	NSString *baseCurrency = [[CurrencyManager sharedManager] baseCurrency];
@@ -550,10 +550,10 @@
 {
 	
   if ([key isEqualToString:kPasscodeLockButton]) {
-    KKPasscodeSettingsViewController *vc = [[KKPasscodeSettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-    vc.delegate = self;
-    [settingsNavController pushViewController:vc animated:YES];
-     } else if ([key isEqualToString:kUpdateExchangeRatesButton]) {
+	KKPasscodeSettingsViewController *vc = [[KKPasscodeSettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+	vc.delegate = self;
+	[settingsNavController pushViewController:vc animated:YES];
+	 } else if ([key isEqualToString:kUpdateExchangeRatesButton]) {
 		[[CurrencyManager sharedManager] forceRefresh];
 	} else if ([key isEqualToString:kImportReportsButton]) {
 		ASAccount *account = (ASAccount *)editor.context;
@@ -579,10 +579,10 @@
 		NSString *productID = [key substringFromIndex:[@"product.appstore." length]];
 		NSString *appStoreURLString = [NSString stringWithFormat:@"http://itunes.apple.com/app/id%@", productID];
 		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreURLString]];
-    } else if ([key hasPrefix:@"product.reload."]) {
-        NSString *productID = [key substringFromIndex:[@"product.reload." length]];
-        IconManager *iconManager = [IconManager sharedManager];
-        [iconManager clearIconForAppID:productID];
+	} else if ([key hasPrefix:@"product.reload."]) {
+		NSString *productID = [key substringFromIndex:[@"product.reload." length]];
+		IconManager *iconManager = [IconManager sharedManager];
+		[iconManager clearIconForAppID:productID];
 	} else if ([key isEqualToString:kDeleteAccountButton]) {
 		UIAlertView *confirmDeleteAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Delete Account?", nil) 
 																	  message:NSLocalizedString(@"Do you really want to delete this account and all of its data?", nil) 
@@ -752,9 +752,9 @@
 {
   
   if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
-    passcodeLockField.defaultValue = @"On";
+	passcodeLockField.defaultValue = @"On";
   } else {
-    passcodeLockField.defaultValue = @"Off";
+	passcodeLockField.defaultValue = @"Off";
   }
   
   [settingsViewController.tableView reloadData];
@@ -762,11 +762,11 @@
 
 - (void)iconCleared:(NSNotification *)notification
 {
-    NSString *productID = [[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID];
-    if (productID) {
-        // reload Icon
-        [[IconManager sharedManager] iconForAppID:productID];
-    }
+	NSString *productID = [[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID];
+	if (productID) {
+		// reload Icon
+		[[IconManager sharedManager] iconForAppID:productID];
+	}
 }
 
 #pragma mark -

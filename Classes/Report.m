@@ -135,7 +135,7 @@
 		BOOL isWeeklyReport = ![beginDate isEqual:endDate];
 		NSString *productName = [rowDictionary objectForKey:kReportColumnTitle];
 		if (!productName) productName = [rowDictionary objectForKey:kReportColumnTitle2];
-        productName = [productName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		productName = [productName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		
 		Transaction *transaction = [NSEntityDescription insertNewObjectForEntityForName:@"Transaction" inManagedObjectContext:moc];
 		transaction.units = [NSNumber numberWithInteger:[[rowDictionary objectForKey:kReportColumnUnits] integerValue]];
@@ -154,19 +154,19 @@
 		[transaction setValue:[rowDictionary objectForKey:kReportColumnCountryCode] forKey:@"countryCode"];
 		NSString *productSKU = [rowDictionary objectForKey:kReportColumnSKU];
 		if (!productSKU) productSKU = [rowDictionary objectForKey:kReportColumnSKU2];
-        
-        if ([productSKU hasSuffix:@" "])
-        { // bug in 26th October reports, sku has trailing space
-            // first delete 'productSKU plus space' duplicate and clean up the mess
-            Product *product = [productsBySKU objectForKey:productSKU];
-            if (product)
-                [moc deleteObject:product];
-            // now fix the SKU so it does not happen again
-            int len = (int)productSKU.length;
-            productSKU = [productSKU substringToIndex:len-1];
-        }
-        productSKU = [productSKU stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        
+		
+		if ([productSKU hasSuffix:@" "])
+		{ // bug in 26th October reports, sku has trailing space
+			// first delete 'productSKU plus space' duplicate and clean up the mess
+			Product *product = [productsBySKU objectForKey:productSKU];
+			if (product)
+				[moc deleteObject:product];
+			// now fix the SKU so it does not happen again
+			int len = (int)productSKU.length;
+			productSKU = [productSKU substringToIndex:len-1];
+		}
+		productSKU = [productSKU stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		
 		NSString *productVersion = [rowDictionary objectForKey:kReportColumnVersion];
 		Product *product = [productsBySKU objectForKey:productSKU];
 		if (!product) {
@@ -193,20 +193,20 @@
 		if (!platformsByTransactionType) {
 			platformsByTransactionType = [[NSDictionary alloc] initWithObjectsAndKeys:
 										  kProductPlatformiPhone, @"1",
-                                          kProductPlatformiPhone, @"3",
+										  kProductPlatformiPhone, @"3",
 										  kProductPlatformiPhone, @"7",
 										  kProductPlatformUniversal, @"1F",
-                                          kProductPlatformUniversal, @"3F",
+										  kProductPlatformUniversal, @"3F",
 										  kProductPlatformUniversal, @"7F",
 										  kProductPlatformiPad, @"1T",
-                                          kProductPlatformiPad, @"3T",
+										  kProductPlatformiPad, @"3T",
 										  kProductPlatformiPad, @"7T",
 										  kProductPlatformMac, @"F1",
-                                          kProductPlatformMac, @"F3",
+										  kProductPlatformMac, @"F3",
 										  kProductPlatformMac, @"F7",
 										  kProductPlatformInApp, @"IA1",
 										  kProductPlatformInApp, @"IA9",
-                                          kProductPlatformAppBundle, @"1-B",
+										  kProductPlatformAppBundle, @"1-B",
 										  nil];
 		}
 		NSString *platform = [platformsByTransactionType objectForKey:[rowDictionary objectForKey:kReportColumnProductTypeIdentifier]];
@@ -300,9 +300,9 @@
 			NSString *promoType = transaction.promoType;
 			//Some old reports have "FREE" as the promo code identifier for updates, in newer reports, the field is empty.
 			if (promoType && ![promoType isEqualToString:@"FREE"]) {
-                if (promoType && ![promoType isEqualToString:@"FREE"] && ![promoType isEqualToString:@" "]) {
-                    transactionType = [NSString stringWithFormat:@"%@.%@", transactionType, promoType];
-                }
+				if (promoType && ![promoType isEqualToString:@"FREE"] && ![promoType isEqualToString:@" "]) {
+					transactionType = [NSString stringWithFormat:@"%@.%@", transactionType, promoType];
+				}
 			}
 			NSInteger count = [[[transactionsByType objectForKey:productIdentifier] objectForKey:transactionType] integerValue];
 			count += transactionUnits;
@@ -406,66 +406,66 @@
 
 - (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct
 {
-    NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
-    NSMutableDictionary *result = [NSMutableDictionary dictionary];
-    for (Transaction *transaction in self.transactions) {
-        if (transaction.units.integerValue < 0) {
-            continue;
-        }
-        NSString *type = transaction.type;
-        NSString *promoType = transaction.promoType;
-        if(promoType != nil) {
-            promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            if([promoType isEqualToString:@""])promoType = nil;
-        }
-        NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
-        if (![paidTransactionTypes containsObject:combinedType]) {
-            continue;
-        }
-        NSString *transactionCountry = transaction.countryCode;
-        NSString *transactionProductID = transaction.product.productID;
-        NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
-        if (!paidDownloadsByProduct) {
-            paidDownloadsByProduct = [NSMutableDictionary dictionary];
-            [result setObject:paidDownloadsByProduct forKey:transactionCountry];
-        }
-        NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
-        NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
-        [paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
-    }
-    return result;
+	NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
+	NSMutableDictionary *result = [NSMutableDictionary dictionary];
+	for (Transaction *transaction in self.transactions) {
+		if (transaction.units.integerValue < 0) {
+			continue;
+		}
+		NSString *type = transaction.type;
+		NSString *promoType = transaction.promoType;
+		if(promoType != nil) {
+			promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			if([promoType isEqualToString:@""])promoType = nil;
+		}
+		NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
+		if (![paidTransactionTypes containsObject:combinedType]) {
+			continue;
+		}
+		NSString *transactionCountry = transaction.countryCode;
+		NSString *transactionProductID = transaction.product.productID;
+		NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+		if (!paidDownloadsByProduct) {
+			paidDownloadsByProduct = [NSMutableDictionary dictionary];
+			[result setObject:paidDownloadsByProduct forKey:transactionCountry];
+		}
+		NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+		NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
+		[paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+	}
+	return result;
 }
 
 - (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct
 {
-    NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
-    NSMutableDictionary *result = [NSMutableDictionary dictionary];
-    for (Transaction *transaction in self.transactions) {
-        if (transaction.units.integerValue > 0) {
-            continue;
-        }
-        NSString *type = transaction.type;
-        NSString *promoType = transaction.promoType;
-        if(promoType != nil) {
-            promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            if([promoType isEqualToString:@""])promoType = nil;
-        }
-        NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
-        if (![paidTransactionTypes containsObject:combinedType]) {
-            continue;
-        }
-        NSString *transactionCountry = transaction.countryCode;
-        NSString *transactionProductID = transaction.product.productID;
-        NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
-        if (!paidDownloadsByProduct) {
-            paidDownloadsByProduct = [NSMutableDictionary dictionary];
-            [result setObject:paidDownloadsByProduct forKey:transactionCountry];
-        }
-        NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
-        NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
-        [paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
-    }
-    return result;
+	NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
+	NSMutableDictionary *result = [NSMutableDictionary dictionary];
+	for (Transaction *transaction in self.transactions) {
+		if (transaction.units.integerValue > 0) {
+			continue;
+		}
+		NSString *type = transaction.type;
+		NSString *promoType = transaction.promoType;
+		if(promoType != nil) {
+			promoType = [promoType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			if([promoType isEqualToString:@""])promoType = nil;
+		}
+		NSString *combinedType = (promoType != nil) ? [NSString stringWithFormat:@"%@.%@", type, promoType] : type;
+		if (![paidTransactionTypes containsObject:combinedType]) {
+			continue;
+		}
+		NSString *transactionCountry = transaction.countryCode;
+		NSString *transactionProductID = transaction.product.productID;
+		NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+		if (!paidDownloadsByProduct) {
+			paidDownloadsByProduct = [NSMutableDictionary dictionary];
+			[result setObject:paidDownloadsByProduct forKey:transactionCountry];
+		}
+		NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+		NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
+		[paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+	}
+	return result;
 }
 
 - (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
@@ -507,7 +507,7 @@
 
 - (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID
 {
-    return [self totalNumberOfTransactionsInSet:[[self class] combinedRedownloadedTransactionTypes] forProductWithID:productID];
+	return [self totalNumberOfTransactionsInSet:[[self class] combinedRedownloadedTransactionTypes] forProductWithID:productID];
 }
 
 - (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
@@ -555,25 +555,25 @@
 	if (!combinedPaidTransactionTypes) {
 		combinedPaidTransactionTypes = [[NSSet alloc] initWithObjects:
 							@"1",		//iPhone App
-                            @"1. ",     //iPhone App
-                            @"1-B",     //App Bundle
-                            @"1-B. ",   //App Bundle
+							@"1. ",	 //iPhone App
+							@"1-B",	 //App Bundle
+							@"1-B. ",   //App Bundle
 							@"1F",		//Universal App
-                            @"1F. ",    //Universal App
+							@"1F. ",	//Universal App
 							@"1T",		//iPad App
-                            @"1T. ",    //iPad App
+							@"1T. ",	//iPad App
 							@"F1",		//Mac App
-                            @"F1. ",    //Mac App
-                            @"FI1",     //Mac In-App Purchase
-                            @"FI1. ",   //Mac In-App Purchase
+							@"F1. ",	//Mac App
+							@"FI1",	 //Mac In-App Purchase
+							@"FI1. ",   //Mac In-App Purchase
 							@"IA1",		//In-App Purchase
-                            @"IA1. ",   //In-App Purchase
-                            @"IA9",		//In-App Subscription
-                            @"IA9. ",	//In-App Subscription
-                            @"IAY",		//In-App Renewable Subscription
-                            @"IAY. ",	//In-App Renewable Subscription
-                            @"IAC",     //In-App Free Subscription
-                            @"IAC. "    //In-App Free Subscription
+							@"IA1. ",   //In-App Purchase
+							@"IA9",		//In-App Subscription
+							@"IA9. ",	//In-App Subscription
+							@"IAY",		//In-App Renewable Subscription
+							@"IAY. ",	//In-App Renewable Subscription
+							@"IAC",	 //In-App Free Subscription
+							@"IAC. "	//In-App Free Subscription
 							@"1.GP",	//GP = Gift Purchase
 							@"1F.GP",
 							@"1T.GP",
@@ -615,16 +615,16 @@
 
 + (NSSet *)combinedRedownloadedTransactionTypes
 {
-    static NSSet *combinedRedownloadedTransactionTypes = nil;
-    if (!combinedRedownloadedTransactionTypes) {
-        combinedRedownloadedTransactionTypes = [[NSSet alloc] initWithObjects:
-                                                @"3",
-                                                @"3F",
-                                                @"3T",
-                                                @"F3",
-                                                nil];
-    }
-    return combinedRedownloadedTransactionTypes;
+	static NSSet *combinedRedownloadedTransactionTypes = nil;
+	if (!combinedRedownloadedTransactionTypes) {
+		combinedRedownloadedTransactionTypes = [[NSSet alloc] initWithObjects:
+												@"3",
+												@"3F",
+												@"3T",
+												@"F3",
+												nil];
+	}
+	return combinedRedownloadedTransactionTypes;
 }
 
 + (NSSet *)combinedEducationalTransactionTypes
@@ -637,13 +637,13 @@
 										@"1T.EDU",
 										@"F1.EDU",
 										@"IA1.EDU",
-                                        @"IA9.EDU",
-                                        @"IAY.EDU",
-                                        @"FI1.EDU",
-                                        @"1E.EDU",
-                                        @"1EP.EDU",
-                                        @"1EU.EDU",
-                                        @"1-B.EDU",
+										@"IA9.EDU",
+										@"IAY.EDU",
+										@"FI1.EDU",
+										@"1E.EDU",
+										@"1EP.EDU",
+										@"1EU.EDU",
+										@"1-B.EDU",
 										nil];
 	}
 	return combinedEducationalTransactionTypes;
@@ -660,12 +660,12 @@
 										@"F1.GP",
 										@"IA1.GP",
 										@"IA9.GP",
-                                        @"IAY.GP",
-                                        @"FI1.GP",
-                                        @"1E.GP",
-                                        @"1EP.GP",
-                                        @"1EU.GP",
-                                        @"1-B.GP",
+										@"IAY.GP",
+										@"FI1.GP",
+										@"1E.GP",
+										@"1EP.GP",
+										@"1EU.GP",
+										@"1-B.GP",
 										nil];
 	}
 	return combinedGiftPurchaseTransactionTypes;
@@ -681,13 +681,13 @@
 												@"1T.CR-RW",
 												@"F1.CR-RW",
 												@"IA1.CR-RW",
-                                                @"IA9.CR-RW",
-                                                @"IAY.CR-RW",
-                                                @"FI1.CR-RW",
-                                                @"1E.CR-RW",
-                                                @"1EP.CR-RW",
-                                                @"1EU.CR-RW",
-                                                @"1-B.CR-RW",
+												@"IA9.CR-RW",
+												@"IAY.CR-RW",
+												@"FI1.CR-RW",
+												@"1E.CR-RW",
+												@"1EP.CR-RW",
+												@"1EU.CR-RW",
+												@"1-B.CR-RW",
 												nil];
 	}
 	return combinedPromoCodeTransactionTypes;
@@ -704,12 +704,12 @@
 								@"F1",		//Mac App
 								@"IA1",		//In-App Purchase
 								@"IA9",		//In-App Subscription
-                                @"IAY",     //In-App Auto-Renewable Subscription
-                                @"FI1",     //Mac In-App Purchase
-                                @"1E",      //Paid App (Custom iPhone)
-                                @"1EP",     //Paid App (Custom iPad)
-                                @"1EU",     //Paid App (Custom Universal)
-                                @"1-B",     //App Bundle
+								@"IAY",	 //In-App Auto-Renewable Subscription
+								@"FI1",	 //Mac In-App Purchase
+								@"1E",	  //Paid App (Custom iPhone)
+								@"1EP",	 //Paid App (Custom iPad)
+								@"1EU",	 //Paid App (Custom Universal)
+								@"1-B",	 //App Bundle
 								nil];
 	}
 	return paidTransactionTypes;
@@ -765,11 +765,11 @@
 	BOOL containsSlash = [dateString rangeOfString:@"/"].location != NSNotFound;
 	int year, month, day;
 	if (!containsSlash && [dateString length] == 8) {
-        //old date format
+		//old date format
 		year = [[dateString substringWithRange:NSMakeRange(0, 4)] intValue];
 		month = [[dateString substringWithRange:NSMakeRange(4, 2)] intValue];
 		day = [[dateString substringWithRange:NSMakeRange(6, 2)] intValue];
-    } else if (containsSlash && [dateString length] == 10) {
+	} else if (containsSlash && [dateString length] == 10) {
 		// new date format
 		year = [[dateString substringWithRange:NSMakeRange(6, 4)] intValue];
 		month = [[dateString substringWithRange:NSMakeRange(0, 2)] intValue];

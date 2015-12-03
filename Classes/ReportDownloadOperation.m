@@ -28,15 +28,15 @@
 
 - (id)initWithAccount:(ASAccount *)account
 {
-    self = [super init];
-    if (self) {
+	self = [super init];
+	if (self) {
 		username = [[account username] copy];
 		password = [[account password] copy];
 		_account = account;
 		accountObjectID = [[account objectID] copy];
 		psc = [[account managedObjectContext] persistentStoreCoordinator];
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)main
@@ -57,7 +57,7 @@
 		NSInteger previousBadge = [account.reportsBadge integerValue];
 		NSString *vendorID = account.vendorID;
 		
-    NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
 		for (NSString *dateType in [NSArray arrayWithObjects:@"Daily", @"Weekly", nil]) {
 			//Determine which reports should be available for download:
 			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -172,30 +172,30 @@
 				NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:NULL];
 				
 				NSString *errorMessage = [[response allHeaderFields] objectForKey:@"Errormsg"];
-            // The message "Daily Reports are only available for past 365 days. Please enter a new date."
-            // just means that the report in question has not yet been released.
-            // We can safely ignore this error and move on.
-            if ([errorMessage rangeOfString:@"past 365 days"].location == NSNotFound) {
-                NSLog(@"%@ -> %@", reportDateString, errorMessage);
-                
-                NSInteger year = [[reportDateString substringWithRange:NSMakeRange(0, 4)] intValue];
-                NSInteger month = [[reportDateString substringWithRange:NSMakeRange(4, 2)] intValue];
-                NSInteger day = [[reportDateString substringWithRange:NSMakeRange(6, 2)] intValue];
-                
-                NSDateComponents *components = [[NSDateComponents alloc] init];
-                [components setYear:year];
-                [components setMonth:month];
-                [components setDay:day];
-                
-                NSDate *reportDate = [[NSCalendar currentCalendar] dateFromComponents:components];
-                
-                NSMutableDictionary *reportTypes = [[NSMutableDictionary alloc] initWithDictionary:errors[errorMessage]];
-                
-                NSMutableArray *reports = [[NSMutableArray alloc] initWithArray:reportTypes[dateType]];
-                [reports addObject:reportDate];
-                reportTypes[dateType] = reports;
-                
-                errors[errorMessage] = reportTypes;
+			// The message "Daily Reports are only available for past 365 days. Please enter a new date."
+			// just means that the report in question has not yet been released.
+			// We can safely ignore this error and move on.
+			if ([errorMessage rangeOfString:@"past 365 days"].location == NSNotFound) {
+				NSLog(@"%@ -> %@", reportDateString, errorMessage);
+				
+				NSInteger year = [[reportDateString substringWithRange:NSMakeRange(0, 4)] intValue];
+				NSInteger month = [[reportDateString substringWithRange:NSMakeRange(4, 2)] intValue];
+				NSInteger day = [[reportDateString substringWithRange:NSMakeRange(6, 2)] intValue];
+				
+				NSDateComponents *components = [[NSDateComponents alloc] init];
+				[components setYear:year];
+				[components setMonth:month];
+				[components setDay:day];
+				
+				NSDate *reportDate = [[NSCalendar currentCalendar] dateFromComponents:components];
+				
+				NSMutableDictionary *reportTypes = [[NSMutableDictionary alloc] initWithDictionary:errors[errorMessage]];
+				
+				NSMutableArray *reports = [[NSMutableArray alloc] initWithArray:reportTypes[dateType]];
+				[reports addObject:reportDate];
+				reportTypes[dateType] = reports;
+				
+				errors[errorMessage] = reportTypes;
 				} else if (reportData) {
 					NSString *originalFilename = [[response allHeaderFields] objectForKey:@"Filename"];
 					NSData *inflatedReportData = [reportData gzipInflate];
@@ -247,30 +247,30 @@
 		if ([self isCancelled]) {
 			return;
 		}
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.timeStyle = NSDateFormatterNoStyle;
-        dateFormatter.dateStyle = NSDateFormatterShortStyle;
-        for (NSString *error in errors.allKeys) {
-            NSString *message = error;
-            
-            NSDictionary *reportTypes = errors[error];
-            for (NSString *reportType in reportTypes.allKeys) {
-                message = [message stringByAppendingFormat:@"\n\n%@ Reports:", reportType];
-                for (NSDate *reportDate in reportTypes[reportType]) {
-                    message = [message stringByAppendingFormat:@"\n%@", [dateFormatter stringFromDate:reportDate]];
-                }
-            }
-            
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil)
-                                                                message:message
-                                                               delegate:nil
-                                                      cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                                                      otherButtonTitles:nil];
-            [alertView show];
-        }
-    });
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.timeStyle = NSDateFormatterNoStyle;
+		dateFormatter.dateStyle = NSDateFormatterShortStyle;
+		for (NSString *error in errors.allKeys) {
+			NSString *message = error;
+			
+			NSDictionary *reportTypes = errors[error];
+			for (NSString *reportType in reportTypes.allKeys) {
+				message = [message stringByAppendingFormat:@"\n\n%@ Reports:", reportType];
+				for (NSDate *reportDate in reportTypes[reportType]) {
+					message = [message stringByAppendingFormat:@"\n%@", [dateFormatter stringFromDate:reportDate]];
+				}
+			}
+			
+			UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil)
+																message:message
+															   delegate:nil
+													  cancelButtonTitle:NSLocalizedString(@"OK", nil)
+													  otherButtonTitles:nil];
+			[alertView show];
+		}
+	});
 		
 		BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
 		if (downloadPayments && (numberOfReportsDownloaded > 0 || [account.payments count] == 0)) {
@@ -281,7 +281,7 @@
 				[cookieStorage deleteCookie:cookie];
 			}
 
-			cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];    
+			cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];	
 			for (NSHTTPCookie *cookie in cookies) {
 				[cookieStorage deleteCookie:cookie];
 			}
@@ -343,78 +343,78 @@
 			dispatch_async(dispatch_get_main_queue(), ^ {
 				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
 				_account.downloadProgress = 0.95;
-        });
-        
-        NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/da/jumpTo?page=paymentsAndFinancialReports"]] returningResponse:NULL error:NULL];
-        
-        if (paymentsPageData) {
-            NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
-            
-            NSMutableArray *vendorOptions = [NSMutableArray array];
-            NSString *vendorSelectName = nil;
-            NSString *switchVendorAction = nil;
-            NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
-            [vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
-            [vendorFormScanner scanUpToString:@"action=\"" intoString:NULL];
-            if ([vendorFormScanner scanString:@"action=\"" intoString:NULL]) {
-                [vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
-                if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
-                    NSString *vendorIDContainer = nil;
-                    [vendorFormScanner scanUpToString:@"</div" intoString:&vendorIDContainer];
-                    if (vendorIDContainer) {
-                        vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
-                        [vendorFormScanner scanUpToString:@"<select" intoString:NULL];
-                        [vendorFormScanner scanUpToString:@"name=\"" intoString:NULL];
-                        [vendorFormScanner scanString:@"name=\"" intoString:NULL];
-                        [vendorFormScanner scanUpToString:@"\"" intoString:&vendorSelectName];
-                        
-                        while (![vendorFormScanner isAtEnd]) {
-                            if ([vendorFormScanner scanUpToString:@"<option" intoString:NULL]) {
-                                NSString *vendorOption = nil;
-                                [vendorFormScanner scanUpToString:@"</option" intoString:&vendorOption];
-                                if ([vendorOption rangeOfString:@"selected"].location == NSNotFound) {
-                                    NSString *optionValue = nil;
-                                    NSScanner *optionScanner = [NSScanner scannerWithString:vendorOption];
-                                    [optionScanner scanUpToString:@"value=\"" intoString:NULL];
-                                    [optionScanner scanString:@"value=\"" intoString:NULL];
-                                    [optionScanner scanUpToString:@"\"" intoString:&optionValue];
-                                    if (optionValue) {
-                                        [vendorOptions addObject:optionValue];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            [self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
-            for (NSString *additionalVendorOption in vendorOptions) {
-                NSString *paymentsFormURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", switchVendorAction];
-                
-                NSData *additionalPaymentsPageData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:paymentsFormURLString]
-                                                                                  bodyDictionary:[NSDictionary dictionaryWithObjectsAndKeys:additionalVendorOption, vendorSelectName, nil]
-                                                                                        response:NULL];
-                NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
-                [self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption];
-            }
-            
-            NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
-            NSString *signoutFormAction = nil;
-            [logoutFormScanner scanUpToString:@"<form name=\"signOutForm\"" intoString:NULL];
-            [logoutFormScanner scanUpToString:@"action=\"" intoString:NULL];
-            if ([logoutFormScanner scanString:@"action=\"" intoString:NULL]) {
-                [logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
-                NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:signoutFormAction]];
-                NSError *logoutPageError = nil;
-                [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:&logoutPageError];
-            }
-        }
-        
-        //==== /Payments
-    }
-    
-    if ([moc hasChanges]) {
+		});
+		
+		NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/da/jumpTo?page=paymentsAndFinancialReports"]] returningResponse:NULL error:NULL];
+		
+		if (paymentsPageData) {
+			NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
+			
+			NSMutableArray *vendorOptions = [NSMutableArray array];
+			NSString *vendorSelectName = nil;
+			NSString *switchVendorAction = nil;
+			NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
+			[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
+			[vendorFormScanner scanUpToString:@"action=\"" intoString:NULL];
+			if ([vendorFormScanner scanString:@"action=\"" intoString:NULL]) {
+				[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
+				if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
+					NSString *vendorIDContainer = nil;
+					[vendorFormScanner scanUpToString:@"</div" intoString:&vendorIDContainer];
+					if (vendorIDContainer) {
+						vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
+						[vendorFormScanner scanUpToString:@"<select" intoString:NULL];
+						[vendorFormScanner scanUpToString:@"name=\"" intoString:NULL];
+						[vendorFormScanner scanString:@"name=\"" intoString:NULL];
+						[vendorFormScanner scanUpToString:@"\"" intoString:&vendorSelectName];
+						
+						while (![vendorFormScanner isAtEnd]) {
+							if ([vendorFormScanner scanUpToString:@"<option" intoString:NULL]) {
+								NSString *vendorOption = nil;
+								[vendorFormScanner scanUpToString:@"</option" intoString:&vendorOption];
+								if ([vendorOption rangeOfString:@"selected"].location == NSNotFound) {
+									NSString *optionValue = nil;
+									NSScanner *optionScanner = [NSScanner scannerWithString:vendorOption];
+									[optionScanner scanUpToString:@"value=\"" intoString:NULL];
+									[optionScanner scanString:@"value=\"" intoString:NULL];
+									[optionScanner scanUpToString:@"\"" intoString:&optionValue];
+									if (optionValue) {
+										[vendorOptions addObject:optionValue];
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
+			for (NSString *additionalVendorOption in vendorOptions) {
+				NSString *paymentsFormURLString = [NSString stringWithFormat:@"https://itunesconnect.apple.com%@", switchVendorAction];
+				
+				NSData *additionalPaymentsPageData = [self dataFromSynchronousPostRequestWithURL:[NSURL URLWithString:paymentsFormURLString]
+																				  bodyDictionary:[NSDictionary dictionaryWithObjectsAndKeys:additionalVendorOption, vendorSelectName, nil]
+																						response:NULL];
+				NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
+				[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption];
+			}
+			
+			NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
+			NSString *signoutFormAction = nil;
+			[logoutFormScanner scanUpToString:@"<form name=\"signOutForm\"" intoString:NULL];
+			[logoutFormScanner scanUpToString:@"action=\"" intoString:NULL];
+			if ([logoutFormScanner scanString:@"action=\"" intoString:NULL]) {
+				[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
+				NSURL *logoutURL = [NSURL URLWithString:[ittsBaseURL stringByAppendingString:signoutFormAction]];
+				NSError *logoutPageError = nil;
+				[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:&logoutPageError];
+			}
+		}
+		
+		//==== /Payments
+	}
+	
+	if ([moc hasChanges]) {
 			[psc lock];
 			NSError *saveError = nil;
 			[moc save:&saveError];
@@ -435,7 +435,7 @@
 				_account.downloadProgress = 1.0;
 			});
 		}
-    
+	
 	}
 }
 

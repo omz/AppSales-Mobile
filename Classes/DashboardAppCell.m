@@ -18,8 +18,8 @@
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
+	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+	if (self) {
 		CGSize contentSize = self.contentView.bounds.size;
 		
 		nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(44, 10, contentSize.width - 49, 20)];
@@ -30,7 +30,7 @@
 		nameLabel.shadowColor = [UIColor whiteColor];
 		nameLabel.highlightedTextColor = [UIColor whiteColor];
 		nameLabel.shadowOffset = CGSizeMake(0, 1);
-        nameLabel.adjustsFontSizeToFitWidth = YES;
+		nameLabel.adjustsFontSizeToFitWidth = YES;
 		
 		colorButton = [[ColorButton alloc] initWithFrame:CGRectMake(5, 5, 30, 30)];
 		colorButton.showOutline = NO;
@@ -43,8 +43,8 @@
 		
 		self.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]];
 		self.selectedBackgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]];
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)setProduct:(Product *)newProduct

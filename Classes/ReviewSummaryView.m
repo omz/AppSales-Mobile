@@ -14,8 +14,8 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame];
-    if (self) {
+	self = [super initWithFrame:frame];
+	if (self) {
 		BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 		barViews = [NSMutableArray new];
 		barLabels = [NSMutableArray new];
@@ -110,8 +110,8 @@
 		sumLabel.backgroundColor = [UIColor clearColor];
 		sumLabel.textColor = [UIColor darkGrayColor];
 		[self addSubview:sumLabel];
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)reloadDataAnimated:(BOOL)animated

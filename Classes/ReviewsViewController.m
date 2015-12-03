@@ -24,9 +24,9 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reviewDownloadProgressDidChange:) name:ReviewDownloadManagerDidUpdateProgressNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}
-    
-    [self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
-    
+	
+	[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+	
 	return self;
 }
 
@@ -69,7 +69,7 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (BOOL)shouldShowStatusBar
@@ -121,21 +121,21 @@
 	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
 
-    NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@"];
-    NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
-    [args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
-    
+	NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@"];
+	NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
+	[args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
+	
 	if (![self.selectedProducts count]) {
-        [pred appendString:@" AND product.account = %@"];
-        [args addObject:self.account];
-        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
+		[pred appendString:@" AND product.account = %@"];
+		[args addObject:self.account];
+		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
-        [pred appendString:@" AND (product == nil"];
-        for (Product* p __attribute__((unused)) in self.selectedProducts) {
-            [pred appendString:@" OR product == %@"];
-        }
-        [pred appendString:@")"];
-        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
+		[pred appendString:@" AND (product == nil"];
+		for (Product* p __attribute__((unused)) in self.selectedProducts) {
+			[pred appendString:@" OR product == %@"];
+		}
+		[pred appendString:@")"];
+		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	}
 	NSUInteger numberOfReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:NULL];	
 	return numberOfReviewsForRating;
@@ -147,22 +147,22 @@
 	
 	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
-    
-    NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
-    NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
-    [args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
-    
+	
+	NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
+	NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
+	[args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
+	
 	if (![self.selectedProducts count]) {
-        [pred appendString:@" AND product.account = %@"];
-        [args addObject:self.account];
-        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
+		[pred appendString:@" AND product.account = %@"];
+		[args addObject:self.account];
+		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
-        [pred appendString:@" AND (product == nil"];
-        for (Product* p __attribute__((unused)) in self.selectedProducts) {
-            [pred appendString:@" OR product == %@"];
-        }
-        [pred appendString:@")"];
-        [reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
+		[pred appendString:@" AND (product == nil"];
+		for (Product* p __attribute__((unused)) in self.selectedProducts) {
+			[pred appendString:@" OR product == %@"];
+		}
+		[pred appendString:@")"];
+		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	}
 	NSUInteger numberOfUnreadReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:NULL];	
 	return numberOfUnreadReviewsForRating;
@@ -183,8 +183,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [super tableView:tableView didDeselectRowAtIndexPath:indexPath];
-    [self.reviewSummaryView reloadDataAnimated:YES];
+	[super tableView:tableView didDeselectRowAtIndexPath:indexPath];
+	[self.reviewSummaryView reloadDataAnimated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -194,8 +194,8 @@
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    [super handleLongPress:gestureRecognizer];
-    [self.reviewSummaryView reloadDataAnimated:YES];
+	[super handleLongPress:gestureRecognizer];
+	[self.reviewSummaryView reloadDataAnimated:YES];
 }
 
 

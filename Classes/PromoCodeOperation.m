@@ -316,24 +316,24 @@
 //						dispatch_async(dispatch_get_main_queue(), ^ {
 //							NSString *promoCodeFile = [[[NSString alloc] initWithData:codeDownloadStep.data encoding:NSUTF8StringEncoding] autorelease];
 //							NSArray *promoCodes = [promoCodeFile componentsSeparatedByString:@"\n"];
-//                            if ([promoCodes count] > 51) {
-//                                [PromoCodeOperation errorNotification:@"parsing the downloaded promo codes failed"];
-//                                [operation cancel];
-//                                return;
-//                            }
+//							if ([promoCodes count] > 51) {
+//								[PromoCodeOperation errorNotification:@"parsing the downloaded promo codes failed"];
+//								[operation cancel];
+//								return;
+//							}
 //							for (NSString *promoCode in promoCodes) {
-//                                promoCode = [promoCode stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+//								promoCode = [promoCode stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 //								if ([promoCode length] == 12 && ![existingCodes containsObject:promoCode]) {
 //									PromoCode *newPromoCode = [NSEntityDescription insertNewObjectForEntityForName:@"PromoCode" inManagedObjectContext:aProduct.managedObjectContext];
 //									newPromoCode.code = promoCode;
 //									newPromoCode.requestDate = date;
 //									[[aProduct mutableSetValueForKey:@"promoCodes"] addObject:newPromoCode];
 //								}
-//                                if ([promoCode length] > 0 && [promoCode length] != 12) {
-//                                    [PromoCodeOperation errorNotification:@"parsing the downloaded promo codes failed"];
-//                                    [operation cancel];
-//                                    return;
-//                                }
+//								if ([promoCode length] > 0 && [promoCode length] != 12) {
+//									[PromoCodeOperation errorNotification:@"parsing the downloaded promo codes failed"];
+//									[operation cancel];
+//									return;
+//								}
 //							}
 //						});
 //					};
@@ -441,7 +441,7 @@
 //		[super initWithOperations:[NSArray arrayWithObjects:step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, nil]];
 //	}
 	
-    return self;
+	return self;
 }
 
 + (NSString *)scanNameForFormField:(NSString *)field withScanner:(NSScanner *)scanner
