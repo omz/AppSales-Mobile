@@ -29,7 +29,6 @@
 		nameLabel.shadowColor = [UIColor whiteColor];
 		nameLabel.highlightedTextColor = [UIColor whiteColor];
 		nameLabel.shadowOffset = CGSizeMake(0, 1);
-		nameLabel.adjustsFontSizeToFitWidth = YES;
 		
 		colorButton = [[ColorButton alloc] initWithFrame:CGRectMake(5, 5, 30, 30)];
 		colorButton.showOutline = NO;
