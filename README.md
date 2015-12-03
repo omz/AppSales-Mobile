@@ -20,15 +20,6 @@ AppSales requires the iOS 5.0 SDK or later.
 
 Because there is no API to access some parts of iTunes Connect, AppSales scrapes [itunesconnect.apple.com](https://itunesconnect.apple.com). This means that even small changes on this website can break some functionality. In most cases, this is easy to fix and I'll try to make a new version available here. The report download itself uses Apple's auto-ingestion interface to iTunes Connect and should generally be unaffected by changes to the website.
 
-##Push Notifications
-Because sales reports are not always available at the same time, I run a web service to send out push notifications when the daily reports have been generated.
-
-You can get a notification when new reports are available with the free [Boxcar](http://itunes.apple.com/us/app/boxcar/id321493542) app. Boxcar can also be installed directly from the settings in AppSales.
-
-If AppSales is installed, opening the push notification will automatically trigger the download of new reports but you can also use the push service without AppSales being installed. To do so, install [Boxcar](http://itunes.apple.com/us/app/boxcar/id321493542) and just add AppSales from the list of services in Boxcar.
-
-Except for the total number of subscribers, I don't collect any data with the push service. You can stop receiving notifications at any time by simply removing AppSales from Boxcar.
-
 ##About
 You can follow me on Twitter for updates on the development: [@olemoritz](http://twitter.com/olemoritz)
 

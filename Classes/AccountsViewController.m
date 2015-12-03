@@ -36,8 +36,6 @@
 #define kPasscodeLockButton					@"PasscodeLockButton"
 #define kImportReportsButton				@"ImportReportsButton"
 #define kExportReportsButton				@"ExportReportsButton"
-#define kDownloadBoxcarButton				@"DownloadBoxcarButton"
-#define kAddToBoxcarButton					@"AddToBoxcarButton"
 #define	kDeleteAccountButton				@"DeleteAccount"
 #define kAlertTagConfirmImport				1
 #define kAlertTagExportCompleted			2
@@ -444,17 +442,8 @@
 	FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productsSectionField, nil] 
 																				  title:NSLocalizedString(@"Products", nil) 
 																			description:NSLocalizedString(@"", nil)];
-	
-	// push section
-	FieldSpecifier *downloadBoxcarButtonField = [FieldSpecifier buttonFieldWithKey:kDownloadBoxcarButton title:NSLocalizedString(@"Install Boxcar...", nil)];
-	FieldSpecifier *addToBoxcarButtonField = [FieldSpecifier buttonFieldWithKey:kAddToBoxcarButton title:NSLocalizedString(@"Add AppSales to Boxcar...", nil)];
-	FieldSectionSpecifier *pushSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:downloadBoxcarButtonField, addToBoxcarButtonField, nil] 
-																			title:NSLocalizedString(@"Push Notifications", nil) 
-																	  description:NSLocalizedString(@"To receive push notifications when new sales reports are available you have to install the free Boxcar app.", nil)];
-	FieldSpecifier *pushSectionField = [FieldSpecifier subsectionFieldWithSection:pushSection key:@"PushSection"];
-	FieldSectionSpecifier *pushSectionFieldSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:pushSectionField] title:NSLocalizedString(@"Push Notifications", nil) description:nil];
 		  
-	NSArray *sections = [NSArray arrayWithObjects:generalSection, paymentsSection, productsSection, pushSectionFieldSection, nil];
+	NSArray *sections = [NSArray arrayWithObjects:generalSection, paymentsSection, productsSection, nil];
 	settingsViewController = [[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)];
 	settingsViewController.doneButtonTitle = NSLocalizedString(@"Done", nil);
 	settingsViewController.delegate = self;
@@ -622,20 +611,6 @@
 		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
 		hud.labelText = NSLocalizedString(@"Fetching Vendor ID...", nil);
 		[hud showWhileExecuting:@selector(findVendorIDsWithLogin:) onTarget:self withObject:loginInfo animated:YES];
-	} else if ([key isEqualToString:kDownloadBoxcarButton]) {
-		if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"boxcar://provider/965"]]) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Boxcar Already Installed", nil) 
-										 message:NSLocalizedString(@"The Boxcar app is already installed on your device. Please tap \"Add AppSales to Boxcar\" to start receiving push notifications.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-		} else {
-			[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://itunes.apple.com/app/boxcar/id321493542"]];
-		}
-	} else if ([key isEqualToString:kAddToBoxcarButton]) {
-		if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"boxcar://provider/965"]]) {
-			[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"boxcar://provider/965"]];
-		} else {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Boxcar Not Installed", nil) 
-										 message:NSLocalizedString(@"The Boxcar app is not installed on your device. Please download it from the App Store and try again.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-		}
 	}
 }
 
