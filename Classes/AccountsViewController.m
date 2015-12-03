@@ -347,7 +347,16 @@
 																			  description:nil /*NSLocalizedString(@"Use iTunes file sharing to import report files from your computer.",nil)*/];
 	
 	NSMutableArray *productFields = [NSMutableArray array];
-	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
+	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+		NSInteger productID1 = product1.productID.integerValue;
+		NSInteger productID2 = product2.productID.integerValue;
+		if (productID1 < productID2) {
+			return (NSComparisonResult)NSOrderedDescending;
+		} else if (productID1 > productID2) {
+			return (NSComparisonResult)NSOrderedAscending;
+		}
+		return (NSComparisonResult)NSOrderedSame;
+	}];
 	
 	for (Product *product in allProducts) {
 		FieldSpecifier *productNameField = [FieldSpecifier textFieldWithKey:[NSString stringWithFormat:@"product.name.%@", product.productID] title:NSLocalizedString(@"Name", nil) defaultValue:[product displayName]];
