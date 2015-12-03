@@ -109,8 +109,8 @@
 	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
 
-	NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@"];
-	NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
+	NSMutableString *pred = [NSMutableString stringWithString:@"rating == %@"];
+	NSMutableArray *args = [NSMutableArray arrayWithArray:self.selectedProducts];
 	[args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
 	
 	if (![self.selectedProducts count]) {
@@ -119,7 +119,7 @@
 		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
 		[pred appendString:@" AND (product == nil"];
-		for (Product* p __attribute__((unused)) in self.selectedProducts) {
+		for (Product *p __attribute__((unused)) in self.selectedProducts) {
 			[pred appendString:@" OR product == %@"];
 		}
 		[pred appendString:@")"];
@@ -135,8 +135,8 @@
 	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
 	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
 	
-	NSMutableString * pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
-	NSMutableArray * args = [NSMutableArray arrayWithArray:self.selectedProducts];
+	NSMutableString *pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
+	NSMutableArray *args = [NSMutableArray arrayWithArray:self.selectedProducts];
 	[args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
 	
 	if (![self.selectedProducts count]) {
@@ -145,7 +145,7 @@
 		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	} else {
 		[pred appendString:@" AND (product == nil"];
-		for (Product* p __attribute__((unused)) in self.selectedProducts) {
+		for (Product *p __attribute__((unused)) in self.selectedProducts) {
 			[pred appendString:@" OR product == %@"];
 		}
 		[pred appendString:@")"];

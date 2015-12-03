@@ -23,9 +23,9 @@
 
 @interface KKPasscodeViewController(Private)
 
-- (UITextField*)newPasscodeTextField;
-- (NSArray*)squares;
-- (UIView*)passwordHeaderViewForTextField:(UITextField*)textField;
+- (UITextField *)newPasscodeTextField;
+- (NSArray *)squares;
+- (UIView *)passwordHeaderViewForTextField:(UITextField *)textField;
 - (void)moveToNextTableView;
 - (void)moveToPreviousTableView;
 
@@ -175,7 +175,7 @@
 #pragma mark -
 #pragma mark Private
 
-- (UITextField*)newPasscodeTextField {
+- (UITextField *)newPasscodeTextField {
 	UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(29.0, 18.0, 271.0, 24.0)];
 	textField.font = [UIFont systemFontOfSize:14];
 	textField.text = @"";
@@ -449,7 +449,7 @@
 	}
 }
 
-- (UIView*)passwordHeaderViewForTextField:(UITextField*)textField {
+- (UIView *)passwordHeaderViewForTextField:(UITextField *)textField {
 	textField.keyboardType = UIKeyboardTypeNumberPad;
 	
 	textField.hidden = YES;
@@ -554,7 +554,7 @@
 	return headerView;
 }
 
-- (NSArray*)squares {
+- (NSArray *)squares {
 	NSMutableArray *squareViews = [NSMutableArray array];
 	
 	CGFloat squareX = 0.0;

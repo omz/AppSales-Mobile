@@ -23,13 +23,13 @@
 	NSUInteger _attemptsAllowed;
 }
 
-+ (KKPasscodeLock*)sharedLock;
++ (KKPasscodeLock *)sharedLock;
 
 - (BOOL)isPasscodeRequired;
 
 - (void)setDefaultSettings;
 
-@property (nonatomic,assign) BOOL eraseOption;
-@property (nonatomic,assign) NSUInteger attemptsAllowed;
+@property (nonatomic, assign) BOOL eraseOption;
+@property (nonatomic, assign) NSUInteger attemptsAllowed;
 
 @end

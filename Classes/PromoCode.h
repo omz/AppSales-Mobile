@@ -15,9 +15,9 @@
 
 }
 
-@property (nonatomic, strong) NSString * code;
-@property (nonatomic, strong) NSDate * requestDate;
-@property (nonatomic, strong) NSNumber * used;
+@property (nonatomic, strong) NSString *code;
+@property (nonatomic, strong) NSDate *requestDate;
+@property (nonatomic, strong) NSNumber *used;
 @property (nonatomic, strong) Product *product;
 
 @end

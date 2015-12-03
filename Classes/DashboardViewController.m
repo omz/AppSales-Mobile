@@ -211,14 +211,14 @@
 }
 
 - (void)reloadData {
-  NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+  NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 
   NSArray *allProducts;
   if ([productSortByValue isEqualToString:@"color"]) {
 	// Sort products by color
 	allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^(id obj1, id obj2){
-	  Product* product1 = (Product*)obj1;
-	  Product* product2 = (Product*)obj2;
+	  Product *product1 = (Product *)obj1;
+	  Product *product2 = (Product *)obj2;
 	  if ([product1.color luminance] < [product2.color luminance]) {
 		return (NSComparisonResult)NSOrderedAscending;
 	  } else if ([product1.color luminance]> [product2.color luminance]) {
@@ -327,9 +327,9 @@
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
 	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-		DashboardAppCell * cell = ((DashboardAppCell*)gestureRecognizer.view);
+		DashboardAppCell *cell = ((DashboardAppCell *)gestureRecognizer.view);
 		NSUInteger i = [self.visibleProducts indexOfObject:cell.product];
-		NSIndexPath * indexPath = [NSIndexPath indexPathForRow:i + 1 inSection:0];
+		NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i + 1 inSection:0];
 		[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 		
 		if (cell.product) {
@@ -342,19 +342,19 @@
 					if (self.selectedProducts.count == 0) {
 						self.selectedProducts = nil;
 						[self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
-						NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+						NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 						[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 					}
 				}
 			} else {
 				self.selectedProducts = [NSMutableArray arrayWithObject:cell.product];
-				NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+				NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 				[self.productsTableView deselectRowAtIndexPath:indexPath animated:NO];
 			}
 		} else {
 			self.selectedProducts = nil;
 			[self deselectAllRowsInTableView:self.productsTableView exceptForIndexPath:nil];
-			NSIndexPath * indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+			NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 			[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 		}
 	}
@@ -366,7 +366,7 @@
 
 #pragma mark - Table view delegate
 
-- (void)deselectAllRowsInTableView:(UITableView*)tableView exceptForIndexPath:(NSIndexPath*)indexPath  {
+- (void)deselectAllRowsInTableView:(UITableView *)tableView exceptForIndexPath:(NSIndexPath *)indexPath  {
 	for (NSIndexPath *i in [tableView indexPathsForSelectedRows]) {
 		if ([i isEqual:indexPath]) continue;
 		[tableView deselectRowAtIndexPath:i animated:NO];

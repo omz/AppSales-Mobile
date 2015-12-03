@@ -383,12 +383,12 @@
 - (void)showSettings {
 	// main section
 	passcodeLockField = [FieldSpecifier buttonFieldWithKey:kPasscodeLockButton title:NSLocalizedString(@"Passcode Lock", nil)];
-  if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
-	passcodeLockField.defaultValue = @"On";
-  } else {
-	passcodeLockField.defaultValue = @"Off";
-  }
-  
+	if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
+		passcodeLockField.defaultValue = @"On";
+	} else {
+		passcodeLockField.defaultValue = @"Off";
+	}
+	
 	NSString *baseCurrency = [[CurrencyManager sharedManager] baseCurrency];
 	NSArray *availableCurrencies = [[CurrencyManager sharedManager] availableCurrencies];
 	NSMutableArray *currencyFields = [NSMutableArray array];
@@ -410,7 +410,7 @@
 
   
 	// products section
-	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 	FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
 																			defaultValue:[productSortByValue isEqualToString:@"productId"]];
 	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
@@ -719,7 +719,7 @@
 	[editor dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)didSettingsChanged:(KKPasscodeSettingsViewController*)viewController {
+- (void)didSettingsChanged:(KKPasscodeSettingsViewController *)viewController {
   
   if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
 	passcodeLockField.defaultValue = @"On";

@@ -158,13 +158,13 @@
 	}
 	SMXMLElement *feed = document.root;
 	//NSLog(@"feed = %@", [feed name]);
-	//SMXMLElement * firstEntryChild = [feed childNamed:@"entry"];
+	//SMXMLElement *firstEntryChild = [feed childNamed:@"entry"];
 	//NSArray *children = [firstEntryChild children];
 	// for (SMXMLElement *child in children){
 	//	 NSLog(@"child name = %@", [child name]);
 	// }
 	if (1 > 0) { // always true
-		NSString * stringBlank = @"";
+		NSString *stringBlank = @"";
 		dispatch_async(dispatch_get_global_queue(0, 0), ^ {
 			
 			NSMutableArray *reviewInfos = [NSMutableArray new];
@@ -221,7 +221,7 @@
 				
 				// CREATE REVIEW DATE BY COMPONENTS
 				NSInteger year = [[[reviewInfo objectForKey:kReviewInfoDateString] substringToIndex:4] intValue];
-				NSString * temp1 = [[reviewInfo objectForKey:kReviewInfoDateString] substringFromIndex:5];
+				NSString *temp1 = [[reviewInfo objectForKey:kReviewInfoDateString] substringFromIndex:5];
 				NSInteger month = [[temp1 substringToIndex:2] intValue];
 				NSInteger day = [[temp1 substringFromIndex:3] intValue];
 				
@@ -235,7 +235,7 @@
 				[components setMinute:0];
 				[components setSecond:0];
 				// Generate a new NSDate from components.
-				NSDate * combinedReviewDate = [gregorianCalendar dateFromComponents:components];
+				NSDate *combinedReviewDate = [gregorianCalendar dateFromComponents:components];
 				
 				if (!existingReview) {
 					Review *newReview = [NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];

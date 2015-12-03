@@ -52,7 +52,7 @@
 	yearRect.origin.y += 10;
 	[[UIColor darkGrayColor] set];
 	UIFont *yearFont = [UIFont boldSystemFontOfSize:27];
-	NSMutableParagraphStyle* style = [NSMutableParagraphStyle new];
+	NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
 	[style setAlignment:NSTextAlignmentCenter];
 	[[NSString stringWithFormat:@"%li", (long)year] drawInRect:yearRect withAttributes:@{NSFontAttributeName : yearFont,
 																				  NSParagraphStyleAttributeName : style}];
@@ -83,7 +83,7 @@
 		[monthComponents setMonth:i + 1];
 		NSDate *monthDate = [calendar dateFromComponents:monthComponents];
 		NSString *month = [monthFormatter stringFromDate:monthDate];
-		NSMutableParagraphStyle* style = [NSMutableParagraphStyle new];
+		NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
 		[style setAlignment:NSTextAlignmentLeft];
 		[month drawInRect:monthRect withAttributes:@{NSFontAttributeName : monthFont,
 													 NSParagraphStyleAttributeName : style}];
@@ -102,7 +102,7 @@
 	}
 	
 	CGRect footerRect = CGRectMake(margin, self.bounds.size.height - footerHeight + 3, self.bounds.size.width - 2 * margin, 20);
-	NSMutableParagraphStyle* style2 = [NSMutableParagraphStyle new];
+	NSMutableParagraphStyle *style2 = [NSMutableParagraphStyle new];
 	[style2 setAlignment:NSTextAlignmentCenter];
 	[self.footerText drawInRect:footerRect withAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:14.0],
 												 NSParagraphStyleAttributeName : style2}];

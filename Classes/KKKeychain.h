@@ -21,8 +21,8 @@
 	
 }
 
-+ (BOOL)setString:(NSString*)string forKey:(NSString*)key;
++ (BOOL)setString:(NSString *)string forKey:(NSString *)key;
 
-+ (NSString*)getStringForKey:(NSString*)key;
++ (NSString *)getStringForKey:(NSString *)key;
 
 @end

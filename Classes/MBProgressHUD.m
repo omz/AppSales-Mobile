@@ -19,7 +19,7 @@
 - (void)handleMinShowTimer:(NSTimer *)theTimer;
 - (void)setTransformForCurrentOrientation:(BOOL)animated;
 - (void)cleanUp;
-- (void)deviceOrientationDidChange:(NSNotification*)notification;
+- (void)deviceOrientationDidChange:(NSNotification *)notification;
 - (void)launchExecution;
 - (void)deviceOrientationDidChange:(NSNotification *)notification;
 - (void)hideDelayed:(NSNumber *)animated;
@@ -480,7 +480,7 @@
 	}
 }
 
-- (void)animationFinished:(NSString *)animationID finished:(BOOL)finished context:(void*)context {
+- (void)animationFinished:(NSString *)animationID finished:(BOOL)finished context:(void *)context {
 	[self done];
 }
 

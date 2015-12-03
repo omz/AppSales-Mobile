@@ -33,10 +33,10 @@ typedef NSUInteger KKPasscodeMode;
 
 @optional
 
-- (void)didPasscodeEnteredCorrectly:(KKPasscodeViewController*)viewController;
-- (void)didPasscodeEnteredIncorrectly:(KKPasscodeViewController*)viewController;
-- (void)shouldEraseApplicationData:(KKPasscodeViewController*)viewController;
-- (void)didSettingsChanged:(KKPasscodeViewController*)viewController;
+- (void)didPasscodeEnteredCorrectly:(KKPasscodeViewController *)viewController;
+- (void)didPasscodeEnteredIncorrectly:(KKPasscodeViewController *)viewController;
+- (void)shouldEraseApplicationData:(KKPasscodeViewController *)viewController;
+- (void)didSettingsChanged:(KKPasscodeViewController *)viewController;
 
 @end
 
@@ -46,27 +46,27 @@ typedef NSUInteger KKPasscodeMode;
 	
 	id<KKPasscodeViewControllerDelegate> __weak _delegate;
 	
-	UILabel* _passcodeConfirmationWarningLabel;
-	UIView* _failedAttemptsView;
-	UILabel* _failedAttemptsLabel;
+	UILabel *_passcodeConfirmationWarningLabel;
+	UIView *_failedAttemptsView;
+	UILabel *_failedAttemptsLabel;
 	NSInteger _failedAttemptsCount;
 	
 	NSUInteger _tableIndex;
-	NSMutableArray* _tableViews;
-	NSMutableArray* _textFields;
-	NSMutableArray* _squares;
+	NSMutableArray *_tableViews;
+	NSMutableArray *_textFields;
+	NSMutableArray *_squares;
 	
-	UITableView* _enterPasscodeTableView;
-	UITextField* _enterPasscodeTextField;
-	NSArray* _enterPasscodeSquareImageViews;
+	UITableView *_enterPasscodeTableView;
+	UITextField *_enterPasscodeTextField;
+	NSArray *_enterPasscodeSquareImageViews;
 	
-	UITableView* _setPasscodeTableView;
-	UITextField* _setPasscodeTextField;
-	NSArray* _setPasscodeSquareImageViews;
+	UITableView *_setPasscodeTableView;
+	UITextField *_setPasscodeTextField;
+	NSArray *_setPasscodeSquareImageViews;
 	
-	UITableView* _confirmPasscodeTableView;
-	UITextField* _confirmPasscodeTextField;
-	NSArray* _confirmPasscodeSquareImageViews;
+	UITableView *_confirmPasscodeTableView;
+	UITextField *_confirmPasscodeTextField;
+	NSArray *_confirmPasscodeSquareImageViews;
 	
 	KKPasscodeMode _mode;
 	

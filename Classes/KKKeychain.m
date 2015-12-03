@@ -20,7 +20,7 @@
 
 @implementation KKKeychain
 
-+ (NSString*)appName  {	
++ (NSString *)appName  {
 	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 	NSString *appName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (!appName) {
@@ -29,7 +29,7 @@
 	return appName;
 }
 
-+ (BOOL)setString:(NSString*)string forKey:(NSString*)key  {
++ (BOOL)setString:(NSString *)string forKey:(NSString *)key  {
 	if (string == nil || key == nil) {
 		return NO;
 	}
@@ -69,7 +69,7 @@
 	return YES;
 }
 
-+ (NSString*)getStringForKey:(NSString*)key  {  
++ (NSString *)getStringForKey:(NSString *)key  {
 	key = [NSString stringWithFormat:@"%@ - %@", [KKKeychain appName], key];
 	NSMutableDictionary *existsQueryDictionary = [NSMutableDictionary dictionary];
 	[existsQueryDictionary setObject:(id)kSecClassGenericPassword forKey:(id)kSecClass];

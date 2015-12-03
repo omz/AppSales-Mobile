@@ -105,12 +105,12 @@
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.managedObjectContext];
 	
-	NSMutableArray* args = [NSMutableArray arrayWithArray:products];
-	NSMutableString* pred = [NSMutableString stringWithString:@""];
+	NSMutableArray *args = [NSMutableArray arrayWithArray:products];
+	NSMutableString *pred = [NSMutableString stringWithString:@""];
 
 	if (products) {
 		[pred appendString:@"(product == nil"];
-		for (Product* p __attribute__((unused)) in products) {
+		for (Product *p __attribute__((unused)) in products) {
 			[pred appendString:@" OR product == %@"];
 		}
 		[pred appendString:@")"];

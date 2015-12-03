@@ -24,7 +24,7 @@
 
 @optional
 
-- (void)didSettingsChanged:(KKPasscodeSettingsViewController*)viewController;
+- (void)didSettingsChanged:(KKPasscodeSettingsViewController *)viewController;
 
 @end
 
@@ -32,7 +32,7 @@
 	
 	id <KKPasscodeSettingsViewControllerDelegate> __weak _delegate;
 	
-	UISwitch* _eraseDataSwitch;
+	UISwitch *_eraseDataSwitch;
 	
 	BOOL _passcodeLockOn;
 	BOOL _eraseDataOn;

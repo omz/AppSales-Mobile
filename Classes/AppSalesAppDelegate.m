@@ -73,8 +73,8 @@
 	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
-	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
-	if (productSortByValue==nil) {
+	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+	if (productSortByValue == nil) {
 		[[NSUserDefaults standardUserDefaults] setObject:@"productId" forKey:@"ProductSortby"];
 	}
 	

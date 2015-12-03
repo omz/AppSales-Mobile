@@ -518,9 +518,9 @@
 	
 	float value = 0;
 	
-	NSArray* tProducts = ((self.selectedProducts) ? self.selectedProducts : self.visibleProducts);
+	NSArray *tProducts = ((self.selectedProducts) ? self.selectedProducts : self.visibleProducts);
 	
-	for (Product * selectedProduct in tProducts) {
+	for (Product *selectedProduct in tProducts) {
 		if (viewMode == DashboardViewModeRevenue) {
 			value += [report totalRevenueInBaseCurrencyForProductWithID:selectedProduct.productID];
 		} else {

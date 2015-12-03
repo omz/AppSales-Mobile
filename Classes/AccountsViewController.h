@@ -10,10 +10,10 @@
 #import "FieldEditorViewController.h"
 #import "KKPasscodeSettingsViewController.h"
 
-#define kAccountUsername					@"username"
-#define kAccountPassword					@"password"
-#define kAccountVendorID					@"vendorID"
-#define ASViewSettingsDidChangeNotification	@"ASViewSettingsDidChangeNotification"
+#define kAccountUsername                    @"username"
+#define kAccountPassword                    @"password"
+#define kAccountVendorID                    @"vendorID"
+#define ASViewSettingsDidChangeNotification @"ASViewSettingsDidChangeNotification"
 
 @class ASAccount;
 @protocol AccountsViewControllerDelegate;
