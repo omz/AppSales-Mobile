@@ -10,7 +10,6 @@
 #import "ASAccount.h"
 #import "Report.h"
 #import "WeeklyReport.h"
-#import "RegexKitLite.h"
 #import "NSData+Compression.h"
 #import "NSDictionary+HTTP.h"
 

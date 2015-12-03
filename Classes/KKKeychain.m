@@ -82,14 +82,13 @@
 	[existsQueryDictionary setObject:key forKey:(id)kSecAttrAccount];
 	
 	// We want the data back!
-	NSData *data = nil;
+	CFDataRef data = nil;
 	
 	[existsQueryDictionary setObject:(id)kCFBooleanTrue forKey:(id)kSecReturnData];
 	
 	OSStatus res = SecItemCopyMatching((CFDictionaryRef)existsQueryDictionary, (CFTypeRef *)&data);
-	[data autorelease];
 	if (res == errSecSuccess) {
-		NSString *string = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+		NSString *string = [[[NSString alloc] initWithData:(__bridge NSData *)data encoding:NSUTF8StringEncoding] autorelease];
 		return string;
 	} else {
 		NSAssert1(res == errSecItemNotFound, @"SecItemCopyMatching returned %ld!", (long)res);

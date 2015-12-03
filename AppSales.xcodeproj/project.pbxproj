@@ -651,7 +651,6 @@
 		7FF88AD513E428720016AA17 /* Star@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD113E428720016AA17 /* Star@2x.png */; };
 		7FF88AD613E428720016AA17 /* Star_Highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD213E428720016AA17 /* Star_Highlighted.png */; };
 		7FF88AD713E428720016AA17 /* Star_Highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FF88AD313E428720016AA17 /* Star_Highlighted@2x.png */; };
-		7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */; };
 		7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */; };
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
@@ -1386,8 +1385,6 @@
 		7FF88AD113E428720016AA17 /* Star@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Star@2x.png"; sourceTree = "<group>"; };
 		7FF88AD213E428720016AA17 /* Star_Highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Star_Highlighted.png; sourceTree = "<group>"; };
 		7FF88AD313E428720016AA17 /* Star_Highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Star_Highlighted@2x.png"; sourceTree = "<group>"; };
-		7FFE4BAF13BD497A00D9D078 /* RegexKitLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegexKitLite.h; sourceTree = "<group>"; };
-		7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegexKitLite.m; sourceTree = "<group>"; };
 		7FFE4BB313BD4B9700D9D078 /* NSDictionary+HTTP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+HTTP.h"; sourceTree = "<group>"; };
 		7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+HTTP.m"; sourceTree = "<group>"; };
 		7FFFB39513D4573700AD18E3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
@@ -1787,8 +1784,6 @@
 				7F1499C913BE15F500D89064 /* NSData+Compression.m */,
 				7FFE4BB313BD4B9700D9D078 /* NSDictionary+HTTP.h */,
 				7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */,
-				7FFE4BAF13BD497A00D9D078 /* RegexKitLite.h */,
-				7FFE4BB013BD497A00D9D078 /* RegexKitLite.m */,
 				7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */,
 				7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */,
 			);
@@ -2985,7 +2980,6 @@
 				7F709D6C13BCC3C80008DBAD /* SSKeychain.m in Sources */,
 				7F709D8C13BD03D40008DBAD /* SalesViewController.m in Sources */,
 				7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */,
-				7FFE4BB113BD497A00D9D078 /* RegexKitLite.m in Sources */,
 				7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */,
 				7F1499CA13BE15F500D89064 /* NSData+Compression.m in Sources */,
 				7F1499D013BE311600D89064 /* ReportDownloadOperation.m in Sources */,
