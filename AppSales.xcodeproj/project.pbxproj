@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		6282129517F57BC200DFE448 /* SMXMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6282129417F57BC200DFE448 /* SMXMLDocument.m */; };
 		62E09F1B19E693F3002917FE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62E09F1A19E693F3002917FE /* Images.xcassets */; };
-		62E09F1D19E69457002917FE /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 62E09F1C19E69457002917FE /* Launch.storyboard */; };
 		6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574914CB3C2B005E8F3F /* KKKeychain.m */; };
 		6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */; };
 		6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574D14CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m */; };
@@ -657,13 +656,13 @@
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
+		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6282129317F57BC200DFE448 /* SMXMLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMXMLDocument.h; sourceTree = "<group>"; };
 		6282129417F57BC200DFE448 /* SMXMLDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMXMLDocument.m; sourceTree = "<group>"; };
 		62E09F1A19E693F3002917FE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = AppSales/Images.xcassets; sourceTree = "<group>"; };
-		62E09F1C19E69457002917FE /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		6D81574814CB3C2B005E8F3F /* KKKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKKeychain.h; sourceTree = "<group>"; };
 		6D81574914CB3C2B005E8F3F /* KKKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKKeychain.m; sourceTree = "<group>"; };
 		6D81574A14CB3C2B005E8F3F /* KKPasscodeLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKPasscodeLock.h; sourceTree = "<group>"; };
@@ -1396,6 +1395,7 @@
 		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
 		DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurityCodeInputController.m; sourceTree = "<group>"; };
+		DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = AppSales/LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1515,7 +1515,7 @@
 			isa = PBXGroup;
 			children = (
 				62E09F1A19E693F3002917FE /* Images.xcassets */,
-				62E09F1C19E69457002917FE /* Launch.storyboard */,
+				DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */,
 				7F1B159E13C9D1CA00243AA3 /* Classes */,
 				7FAB532913DCF00F0027274F /* Other Sources */,
 				7F709D3413BC98860008DBAD /* Supporting Files */,
@@ -2437,7 +2437,6 @@
 				7FDF6E8313D89B1000B8CC4E /* countries_simple.plist in Resources */,
 				7FDF6E8A13D8A96300B8CC4E /* countries@2x.png in Resources */,
 				7FDF6E8B13D8A96300B8CC4E /* countries.png in Resources */,
-				62E09F1D19E69457002917FE /* Launch.storyboard in Resources */,
 				7FDF6E8D13D8BA5A00B8CC4E /* HideMap.png in Resources */,
 				7FDF6E8F13D8BBD800B8CC4E /* ShowMap.png in Resources */,
 				7FDF6E9213D8C68800B8CC4E /* Forward.png in Resources */,
@@ -2495,6 +2494,7 @@
 				7FDF70B813D8D4AE00B8CC4E /* bj.png in Resources */,
 				7FDF70B913D8D4AE00B8CC4E /* bj@2x.png in Resources */,
 				7FDF70BA13D8D4AE00B8CC4E /* bl.png in Resources */,
+				DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */,
 				7FDF70BB13D8D4AE00B8CC4E /* bl@2x.png in Resources */,
 				7FDF70BC13D8D4AE00B8CC4E /* bm.png in Resources */,
 				7FDF70BD13D8D4AE00B8CC4E /* bm@2x.png in Resources */,
