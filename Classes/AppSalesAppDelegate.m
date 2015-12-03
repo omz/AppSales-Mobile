@@ -24,8 +24,7 @@
 
 @synthesize window, accountsViewController, accountsPopover;
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	[[KKPasscodeLock sharedLock] setDefaultSettings];
 	[[KKPasscodeLock sharedLock] setEraseOption:NO];
 	
@@ -104,15 +103,13 @@
 	return YES;
 }
 
-- (void)selectAccount:(id)sender
-{
+- (void)selectAccount:(id)sender {
 	if (!self.window.rootViewController.presentedViewController) {
 		[self.accountsPopover presentPopoverFromRect:CGRectMake(50, 50, 1, 1) inView:self.window.rootViewController.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
 	}
 }
 
-- (void)accountsViewController:(AccountsViewController *)viewController didSelectAccount:(ASAccount *)account
-{
+- (void)accountsViewController:(AccountsViewController *)viewController didSelectAccount:(ASAccount *)account {
 	[self.accountsPopover dismissPopoverAnimated:YES];
 	[self loadAccount:account];
 	
@@ -120,8 +117,7 @@
 	[[NSUserDefaults standardUserDefaults] setObject:accountIDURIString forKey:kSettingSelectedAccountID];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		NSFetchRequest *accountsFetchRequest = [[NSFetchRequest alloc] init];
 		[accountsFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:self.managedObjectContext]];
@@ -132,8 +128,7 @@
 	}
 }
 
-- (void)loadAccount:(ASAccount *)account
-{
+- (void)loadAccount:(ASAccount *)account {
 	UIBarButtonItem *selectAccountButtonItem1 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)];
 	UIBarButtonItem *selectAccountButtonItem2 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)];
 	UIBarButtonItem *selectAccountButtonItem3 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)];
@@ -163,14 +158,12 @@
 	self.window.rootViewController = tabController;
 }
 
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
-{
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
 	[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
 	return YES;
 }
 
-- (BOOL)migrateDataIfNeeded
-{
+- (BOOL)migrateDataIfNeeded {
 	NSString *documentsDirectory = [self applicationDocumentsDirectory];
 	NSString *legacyReportDirectory = [documentsDirectory stringByAppendingPathComponent:@"OriginalReports"];
 	NSFileManager *fm = [NSFileManager defaultManager];
@@ -220,28 +213,23 @@
 	return YES;
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
+- (void)applicationDidEnterBackground:(UIApplication *)application {
 	[self saveContext];
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
+- (void)applicationWillEnterForeground:(UIApplication *)application {
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
+- (void)applicationDidBecomeActive:(UIApplication *)application {
 	[[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application
-{
+- (void)applicationWillResignActive:(UIApplication *)application {
 	[self showPasscodeLockIfNeeded];
 }
 
-- (void)showPasscodeLockIfNeeded
-{
+- (void)showPasscodeLockIfNeeded {
 	if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
 		
 		KKPasscodeViewController *vc = [[KKPasscodeViewController alloc] initWithNibName:nil bundle:nil];
@@ -279,13 +267,11 @@
 	}
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application
-{
+- (void)applicationWillTerminate:(UIApplication *)application {
 	[self saveContext];
 }
 
-- (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification
-{
+- (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification {
 	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
 	PromoCodesLicenseViewController *vc = [[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]];
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
@@ -294,8 +280,7 @@
 
 #pragma mark - Core Data
 
-- (void)saveContext
-{
+- (void)saveContext {
 	[self.persistentStoreCoordinator lock];
 	NSError *error = nil;
 	NSManagedObjectContext *moc = self.managedObjectContext;
@@ -308,8 +293,7 @@
 
 #pragma mark - Core Data stack
 
-- (NSManagedObjectContext *)managedObjectContext
-{
+- (NSManagedObjectContext *)managedObjectContext {
 	if (managedObjectContext != nil) {
 		return managedObjectContext;
 	}
@@ -323,8 +307,7 @@
 	return managedObjectContext;
 }
 
-- (void)mergeChanges:(NSNotification *)notification
-{
+- (void)mergeChanges:(NSNotification *)notification {
 	NSManagedObjectContext *moc = [notification object];
 	dispatch_async(dispatch_get_main_queue(), ^ {
 		if (moc != self.managedObjectContext && moc.persistentStoreCoordinator == self.persistentStoreCoordinator) {
@@ -333,10 +316,8 @@
 	});
 }
 
-- (NSManagedObjectModel *)managedObjectModel
-{
-	if (managedObjectModel != nil)
-	{
+- (NSManagedObjectModel *)managedObjectModel {
+	if (managedObjectModel != nil) {
 		return managedObjectModel;
 	}
 	NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"AppSales" withExtension:@"momd"];
@@ -345,8 +326,7 @@
 }
 
 
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
-{
+- (NSPersistentStoreCoordinator *)persistentStoreCoordinator {
 	if (persistentStoreCoordinator != nil) {
 		return persistentStoreCoordinator;
 	}	
@@ -365,20 +345,17 @@
 }
 
 
-- (NSString *)applicationDocumentsDirectory
-{
+- (NSString *)applicationDocumentsDirectory {
 	return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
-- (NSURL *)applicationSupportDirectory
-{
+- (NSURL *)applicationSupportDirectory {
 	NSURL *appSupportDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
 	[[NSFileManager defaultManager] createDirectoryAtPath:[appSupportDirectory path] withIntermediateDirectories:YES attributes:nil error:NULL];
 	return appSupportDirectory;
 }
 
-- (void)reportDownloadFailed:(NSNotification *)notification
-{
+- (void)reportDownloadFailed:(NSNotification *)notification {
 	NSString *errorMessage = [[notification userInfo] objectForKey:kASReportDownloadErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@", nil), (errorMessage) ? errorMessage : @""];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
@@ -388,8 +365,7 @@
 					   otherButtonTitles:nil] show];
 }
 
-- (void)promoCodeDownloadFailed:(NSNotification *)notification
-{
+- (void)promoCodeDownloadFailed:(NSNotification *)notification {
 	NSString *errorDescription = [[notification userInfo] objectForKey:kASPromoCodeDownloadFailedErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:@"An error occured while downloading the promo codes (%@).", errorDescription];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
@@ -399,8 +375,7 @@
 					   otherButtonTitles:nil] show];
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

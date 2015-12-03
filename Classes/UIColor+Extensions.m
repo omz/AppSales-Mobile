@@ -11,8 +11,7 @@
 
 @implementation UIColor (ASExtensions)
 
-+ (NSArray *)crayonColorPalette
-{
++ (NSArray *)crayonColorPalette {
 	return [NSArray arrayWithObjects:
 			[UIColor colorWithRed:0.573 green:0.067 blue:0.031 alpha:1.0],
 			[UIColor colorWithRed:0.573 green:0.561 blue:0.090 alpha:1.0],
@@ -69,16 +68,14 @@
 			[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0], nil];
 }
 
-+ (UIColor *)randomColor 
-{
++ (UIColor *)randomColor  {
 	return [UIColor colorWithRed:(CGFloat)random() / RAND_MAX
 						   green:(CGFloat)random() / RAND_MAX
 							blue:(CGFloat)random() / RAND_MAX
 						   alpha:1.0f];
 }
 
-- (BOOL)red:(CGFloat *)red green:(CGFloat *)green blue:(CGFloat *)blue alpha:(CGFloat *)alpha 
-{
+- (BOOL)red:(CGFloat *)red green:(CGFloat *)green blue:(CGFloat *)blue alpha:(CGFloat *)alpha  {
 	const CGFloat *components = CGColorGetComponents(self.CGColor);
 	CGFloat r,g,b,a;
 	switch (CGColorSpaceGetModel(CGColorGetColorSpace(self.CGColor))) {
@@ -102,8 +99,7 @@
 	return YES;
 }
 
-- (UIColor *)colorByMultiplyingBy:(CGFloat)f 
-{	
+- (UIColor *)colorByMultiplyingBy:(CGFloat)f  {	
 	CGFloat r,g,b,a;
 	if (![self red:&r green:&g blue:&b alpha:&a]) return nil;
 	return [UIColor colorWithRed:MAX(0.0, MIN(1.0, f * r))
@@ -114,13 +110,11 @@
 
 
 // Calculate the luminance for an arbitrary UIColor instance
-- (CGFloat)luminance
-{
+- (CGFloat)luminance {
 	CGColorRef cgColor = self.CGColor;
 	const CGFloat *components = CGColorGetComponents(cgColor);
 	CGFloat luminance = 0.0;
-	switch(CGColorSpaceGetModel(CGColorGetColorSpace(cgColor)))
-	{
+	switch(CGColorSpaceGetModel(CGColorGetColorSpace(cgColor))) {
 		case kCGColorSpaceModelMonochrome:
 			// For grayscale colors, the luminance is the color value
 			luminance = components[0];

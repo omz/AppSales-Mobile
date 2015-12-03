@@ -50,8 +50,7 @@
 
 @synthesize managedObjectContext, accounts, selectedAccount, refreshButtonItem, delegate, exportedReportsZipPath, documentInteractionController;
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 	
 	self.refreshButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReports:)];
@@ -77,8 +76,7 @@
 	[self reloadAccounts];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"isBusy"]) {
 		dispatch_async(dispatch_get_main_queue(), ^ {
 			self.refreshButtonItem.enabled = ![[ReportDownloadCoordinator sharedReportDownloadCoordinator] isBusy];
@@ -86,22 +84,19 @@
 	}
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
 	if (![[ReportDownloadCoordinator sharedReportDownloadCoordinator] isBusy] && [self.accounts count] == 0) {
 		[self addNewAccount];
 	}
 }
 
-- (void)contextDidChange:(NSNotification *)notification
-{
+- (void)contextDidChange:(NSNotification *)notification {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[self.tableView performSelector:@selector(reloadData) withObject:nil afterDelay:0.1];
 }
 
-- (void)reloadAccounts
-{
+- (void)reloadAccounts {
 	NSFetchRequest *accountsFetchRequest = [[NSFetchRequest alloc] init];
 	[accountsFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:self.managedObjectContext]];
 	[accountsFetchRequest setSortDescriptors:[NSArray arrayWithObjects:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES], [[NSSortDescriptor alloc] initWithKey:@"username" ascending:YES], nil]];
@@ -110,8 +105,7 @@
 	[self.tableView reloadData];
 }
 
-- (void)downloadReports:(id)sender
-{
+- (void)downloadReports:(id)sender {
 	for (ASAccount *account in self.accounts) {
 		if (account.password && account.password.length > 0) { //Only download reports for accounts with login
 			if (!account.vendorID || account.vendorID.length == 0) {
@@ -127,8 +121,7 @@
 	}
 }
 
-- (void)showInfo:(id)sender
-{
+- (void)showInfo:(id)sender {
 	AboutViewController *aboutViewController = [[AboutViewController alloc] initWithNibName:nil bundle:nil];
 	UINavigationController *aboutNavController = [[UINavigationController alloc] initWithRootViewController:aboutViewController];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -140,16 +133,14 @@
 }
 
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
 	[super viewDidUnload];
 }
 
 
 #pragma mark - Table view
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return nil;
 	
 	if ([self.accounts count] == 0) {
@@ -163,8 +154,7 @@
 	return title;
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return 1;
 	
 	if ([self.accounts count] == 0) {
@@ -173,8 +163,7 @@
 	return [self.accounts count];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return self.accounts.count;
 	
 	if ([self.accounts count] == 0) {
@@ -183,8 +172,7 @@
 	return 5;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	static NSString *cellIdentifier = @"Cell";
 	BadgedCell *cell = (BadgedCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (cell == nil) {
@@ -232,15 +220,13 @@
 	return cell;
 }
 
-- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {
 	//iPad only
 	ASAccount *account = [self.accounts objectAtIndex:indexPath.row];
 	[self editAccount:account];
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
-{
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return nil;
 	
 	if ([self.accounts count] == 0) {
@@ -250,19 +236,16 @@
 	return [[AccountStatusView alloc] initWithFrame:CGRectMake(0, 0, 320, 26) account:account];
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
 	return 26.0;
 }
 
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	return 44.0;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		if (self.delegate) {
 			ASAccount *account = [self.accounts objectAtIndex:indexPath.row];
@@ -290,8 +273,7 @@
 
 #pragma mark -
 
-- (void)deleteAccount:(NSManagedObject *)account
-{
+- (void)deleteAccount:(NSManagedObject *)account {
 	if (account) {
 		NSManagedObjectContext *context = self.managedObjectContext;
 		[context deleteObject:account];
@@ -301,8 +283,7 @@
 	}
 }
 
-- (void)addNewAccount
-{
+- (void)addNewAccount {
 	FieldSpecifier *titleField = [FieldSpecifier textFieldWithKey:kAccountTitle title:@"Description" defaultValue:@""];
 	titleField.placeholder = NSLocalizedString(@"optional", nil);
 	FieldSectionSpecifier *titleSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:titleField] title:nil description:nil];
@@ -332,8 +313,7 @@
 	[self presentViewController:navigationController animated:YES completion:nil];
 }
 
-- (void)editAccount:(ASAccount *)account
-{
+- (void)editAccount:(ASAccount *)account {
 	self.selectedAccount = account;
 	NSString *username = account.username;
 	NSString *password = account.password;
@@ -400,8 +380,7 @@
 	[self.navigationController pushViewController:editAccountViewController animated:YES];
 }
 
-- (void)showSettings
-{
+- (void)showSettings {
 	// main section
 	passcodeLockField = [FieldSpecifier buttonFieldWithKey:kPasscodeLockButton title:NSLocalizedString(@"Passcode Lock", nil)];
   if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
@@ -470,8 +449,7 @@
 	[self presentViewController:settingsNavController animated:YES completion:nil];
 }
 
-- (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues
-{
+- (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues {
 	if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier] || [editor.editorIdentifier isEqualToString:kEditAccountEditorIdentifier]) {
 		NSString *username = [returnValues objectForKey:kAccountUsername];
 		NSString *password = [returnValues objectForKey:kAccountPassword];
@@ -546,8 +524,7 @@
 	[self reloadAccounts];
 }
 
-- (void)fieldEditor:(FieldEditorViewController *)editor pressedButtonWithKey:(NSString *)key
-{
+- (void)fieldEditor:(FieldEditorViewController *)editor pressedButtonWithKey:(NSString *)key {
 	
   if ([key isEqualToString:kPasscodeLockButton]) {
 	KKPasscodeSettingsViewController *vc = [[KKPasscodeSettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -630,8 +607,7 @@
 	}
 }
 
-- (void)doExport
-{
+- (void)doExport {
 	NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 	NSString *exportFolder = [self folderNameForExportingReportsOfAccount:self.selectedAccount];
 	NSString *exportPath = [docPath stringByAppendingPathComponent:exportFolder];
@@ -687,8 +663,7 @@
 	});
 }
 
-- (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account
-{
+- (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account {
 	NSString *folder = account.title;
 	if (!folder || folder.length == 0) {
 		folder = account.username;
@@ -706,8 +681,7 @@
 	return folder;
 }
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
 	if (alertView.tag == kAlertTagConfirmImport) {
 		if (buttonIndex != [alertView cancelButtonIndex]) {
 			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:self.selectedAccount];
@@ -724,8 +698,7 @@
 	}
 }
 
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
 	if (alertView.tag == kAlertTagExportCompleted) {
 		if (buttonIndex != alertView.cancelButtonIndex) {
 			self.documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:[NSURL fileURLWithPath:self.exportedReportsZipPath]];
@@ -738,18 +711,15 @@
 	}
 }
 
-- (void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller
-{
+- (void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller {
 	self.documentInteractionController = nil;
 }
 
-- (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
-{
+- (void)fieldEditorDidCancel:(FieldEditorViewController *)editor {
 	[editor dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)didSettingsChanged:(KKPasscodeSettingsViewController*)viewController
-{
+- (void)didSettingsChanged:(KKPasscodeSettingsViewController*)viewController {
   
   if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
 	passcodeLockField.defaultValue = @"On";
@@ -760,8 +730,7 @@
   [settingsViewController.tableView reloadData];
 }
 
-- (void)iconCleared:(NSNotification *)notification
-{
+- (void)iconCleared:(NSNotification *)notification {
 	NSString *productID = [[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID];
 	if (productID) {
 		// reload Icon
@@ -771,8 +740,7 @@
 
 #pragma mark -
 
-- (void)saveContext
-{
+- (void)saveContext {
 	NSError *error = nil;
 	if (![[self managedObjectContext] save:&error]) { 
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);

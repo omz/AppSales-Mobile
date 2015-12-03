@@ -14,8 +14,7 @@
 
 @synthesize webView;
 
-- (id)initWithLicenseAgreement:(NSString *)licenseAgreement operation:(DownloadStepOperation *)operation
-{
+- (id)initWithLicenseAgreement:(NSString *)licenseAgreement operation:(DownloadStepOperation *)operation {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		self.title = NSLocalizedString(@"License", nil);
@@ -25,8 +24,7 @@
 	return self;
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
@@ -36,36 +34,31 @@
 	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
 }
 
-- (void)agree:(id)sender
-{
+- (void)agree:(id)sender {
 	downloadOperation.paused = NO;
 	[downloadOperation start];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)cancel:(id)sender
-{
+- (void)cancel:(id)sender {
 	[downloadOperation cancel];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
 	[self.webView loadHTMLString:licenseAgreementHTML baseURL:nil];
 	
 	[MBProgressHUD showHUDAddedTo:self.view animated:YES];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
-{
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
 	if (navigationType == UIWebViewNavigationTypeLinkClicked) {
 		[[UIApplication sharedApplication] openURL:[request URL]];
 		return NO;
@@ -73,18 +66,15 @@
 	return YES;
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
 	[MBProgressHUD hideHUDForView:self.view animated:YES];
 }
 
-- (void)done:(id)sender
-{
+- (void)done:(id)sender {
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	webView.delegate = nil;
 }
 

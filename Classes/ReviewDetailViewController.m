@@ -21,8 +21,7 @@
 
 @synthesize webView;
 
-- (id)initWithReview:(Review *)aReview
-{
+- (id)initWithReview:(Review *)aReview {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		review = aReview;
@@ -30,16 +29,14 @@
 	return self;
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	self.view = webView;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:NULL];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.title];
 	NSString *ratingString = [@"" stringByPaddingToLength:[review.rating integerValue] withString:@"\u2605" startingAtIndex:0];
@@ -57,20 +54,17 @@
 	[self.webView loadHTMLString:template baseURL:nil];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
 	review.unread = [NSNumber numberWithBool:NO];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
-- (void)sendReviewViaEmail
-{
+- (void)sendReviewViaEmail {
 	if (![MFMailComposeViewController canSendMail]) {
 		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 		return;
@@ -87,8 +81,7 @@
 	[self presentViewController:mailComposeViewController animated:YES completion:nil];
 }
 
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
-{
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 

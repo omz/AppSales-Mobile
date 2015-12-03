@@ -41,8 +41,7 @@
 #pragma mark -
 #pragma mark UIViewController
 
-- (void)loadView
-{
+- (void)loadView {
 	[super loadView];
 	
 	self.view.backgroundColor = [UIColor whiteColor];
@@ -74,13 +73,11 @@
 	[self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)]];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
 	return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) || (toInterfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];	
 	
 	_passcodeLockOn = [[KKKeychain getStringForKey:@"passcode_on"] isEqualToString:@"YES"];
@@ -88,8 +85,7 @@
 	
 }
 
-- (void)viewWillAppear:(BOOL)animated 
-{
+- (void)viewWillAppear:(BOOL)animated  {
 	[super viewWillAppear:animated];
 	
 	_enterPasscodeTextField = [self newPasscodeTextField];
@@ -172,16 +168,14 @@
 	}
 }
 
-- (void)viewTapped:(UITapGestureRecognizer *)recognizer
-{
+- (void)viewTapped:(UITapGestureRecognizer *)recognizer {
 	[[_textFields objectAtIndex:_tableIndex] becomeFirstResponder];
 }
 
 #pragma mark -
 #pragma mark Private
 
-- (UITextField*)newPasscodeTextField
-{
+- (UITextField*)newPasscodeTextField {
 	UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(29.0, 18.0, 271.0, 24.0)];
 	textField.font = [UIFont systemFontOfSize:14];
 	textField.text = @"";
@@ -192,8 +186,7 @@
 	return textField;
 }
 
-- (void)cancelButtonPressed:(id)sender
-{
+- (void)cancelButtonPressed:(id)sender {
 	if ([_delegate respondsToSelector:@selector(didSettingsChanged:)]) {
 		[_delegate performSelector:@selector(didSettingsChanged:) withObject:self];
 	}
@@ -201,8 +194,7 @@
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)incrementAndShowFailedAttemptsLabel
-{
+- (void)incrementAndShowFailedAttemptsLabel {
 	_enterPasscodeTextField.text = @"";
 	for (int i = 0; i < 4; i++) {
 		[[[_squares objectAtIndex:_tableIndex] objectAtIndex:i] setImage:[UIImage imageNamed:@"passcode_square_empty.png"]];
@@ -253,8 +245,7 @@
 	
 }
 
-- (void)moveToNextTableView
-{
+- (void)moveToNextTableView {
 	_tableIndex += 1;
 	UITableView *oldTableView = [_tableViews objectAtIndex:_tableIndex - 1];
 	UITableView *newTableView = [_tableViews objectAtIndex:_tableIndex];
@@ -275,8 +266,7 @@
 	[[_textFields objectAtIndex:_tableIndex] becomeFirstResponder];
 }
 
-- (void)moveToPreviousTableView
-{
+- (void)moveToPreviousTableView {
 	_tableIndex -= 1;
 	UITableView *oldTableView = [_tableViews objectAtIndex:_tableIndex + 1];
 	UITableView *newTableView = [_tableViews objectAtIndex:_tableIndex];
@@ -296,8 +286,7 @@
 	[[_textFields objectAtIndex:_tableIndex] becomeFirstResponder];
 }
 
-- (void)nextDigitPressed
-{
+- (void)nextDigitPressed {
 	UITextField *textField = [_textFields objectAtIndex:_tableIndex];
 	
 	if (![textField.text isEqualToString:@""]) {
@@ -363,8 +352,7 @@
 	}		 
 }
 
-- (void)doneButtonPressed
-{	 
+- (void)doneButtonPressed {	 
 	UITextField *textField = [_textFields objectAtIndex:_tableIndex];
 	
 	if (mode == KKPasscodeModeEnter) {
@@ -461,8 +449,7 @@
 	}
 }
 
-- (UIView*)passwordHeaderViewForTextField:(UITextField*)textField
-{
+- (UIView*)passwordHeaderViewForTextField:(UITextField*)textField {
 	textField.keyboardType = UIKeyboardTypeNumberPad;
 	
 	textField.hidden = YES;
@@ -567,8 +554,7 @@
 	return headerView;
 }
 
-- (NSArray*)squares
-{
+- (NSArray*)squares {
 	NSMutableArray *squareViews = [NSMutableArray array];
 	
 	CGFloat squareX = 0.0;
@@ -585,18 +571,15 @@
 #pragma mark -
 #pragma mark Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 0;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	return 1;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	
 	static NSString *CellIdentifier = @"Cell";
 	
@@ -621,8 +604,7 @@
 #pragma mark -
 #pragma mark UITextFieldDelegate
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
 	if ([textField isEqual:[_textFields lastObject]]) {
 		[self doneButtonPressed];
 	} else {
@@ -632,8 +614,7 @@
 }
 
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
 	if (YES) {
 		NSString *result = [textField.text stringByReplacingCharactersInRange:range withString:string];
 		textField.text = result;

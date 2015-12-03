@@ -15,8 +15,7 @@
 
 @synthesize importDirectory, deleteOriginalFilesAfterImport;
 
-+ (BOOL)filesAvailableToImport
-{
++ (BOOL)filesAvailableToImport {
 	NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 	NSFileManager *fm = [[NSFileManager alloc] init];
 	NSArray *filenames = [fm contentsOfDirectoryAtPath:docPath error:NULL];
@@ -28,8 +27,7 @@
 	return NO;
 }
 
-- (id)initWithAccount:(ASAccount *)account
-{
+- (id)initWithAccount:(ASAccount *)account {
 	self = [super init];
 	if (self) {
 		_account = account;
@@ -39,8 +37,7 @@
 	return self;
 }
 
-- (void)main
-{
+- (void)main {
 	@autoreleasepool {
 	
 		dispatch_async(dispatch_get_main_queue(), ^ {

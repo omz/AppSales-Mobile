@@ -13,8 +13,7 @@
 
 @synthesize color, displayAsEllipse, showOutline;
 
-- (void)drawRect:(CGRect)rect
-{
+- (void)drawRect:(CGRect)rect {
 	if (!color) return;
 	
 	UIBezierPath *roundRect = [UIBezierPath bezierPathWithRoundedRect:self.bounds cornerRadius:5.0];
@@ -36,15 +35,13 @@
 	}
 }
 
-- (void)setColor:(UIColor *)newColor
-{
+- (void)setColor:(UIColor *)newColor {
 	if (newColor == color) return;
 	color = newColor;
 	[self setNeedsDisplay];
 }
 
-- (void)setHighlighted:(BOOL)flag
-{
+- (void)setHighlighted:(BOOL)flag {
 	[super setHighlighted:flag];
 	[self setNeedsDisplay];
 }

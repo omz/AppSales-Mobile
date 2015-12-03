@@ -13,8 +13,7 @@
 
 @synthesize productID;
 
-- (void)setProductID:(NSString *)newProductID
-{
+- (void)setProductID:(NSString *)newProductID {
 	if ([newProductID isEqualToString:productID]) return;
 	if (!productID) {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconDownloaded:) name:IconManagerDownloadedIconNotification object:nil];
@@ -30,22 +29,19 @@
 	}
 }
 
-- (void)iconDownloaded:(NSNotification *)notification
-{
+- (void)iconDownloaded:(NSNotification *)notification {
 	if ([[[notification userInfo] objectForKey:kIconManagerDownloadedIconNotificationAppID] isEqualToString:self.productID]) {
 		self.image = [[IconManager sharedManager] iconForAppID:productID];
 	}
 }
 
-- (void)iconCleared:(NSNotification *)notification
-{
+- (void)iconCleared:(NSNotification *)notification {
 	if ([[[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID] isEqualToString:self.productID]) {
 		self.image = [UIImage imageNamed:@"GenericApp.png"];
 	}
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

@@ -18,8 +18,7 @@
 @class ASAccount;
 @protocol AccountsViewControllerDelegate;
 
-@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate>
-{
+@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate> {
 	id<AccountsViewControllerDelegate> __weak delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;

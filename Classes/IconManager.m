@@ -16,8 +16,7 @@
 
 @implementation IconManager
 
-- (id)init
-{
+- (id)init {
 	self = [super init];
 	if (self) {
 		queue = dispatch_queue_create("app icon download", NULL);
@@ -33,8 +32,7 @@
 	return self;
 }
 
-+ (id)sharedManager
-{
++ (id)sharedManager {
 	static id sharedManager = nil;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -43,15 +41,13 @@
 	return sharedManager;
 }
 
-- (NSString *)iconDirectory
-{
+- (NSString *)iconDirectory {
 	NSString *appSupportPath = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) lastObject];
 	NSString *iconDirectory = [appSupportPath stringByAppendingPathComponent:@"AppIcons"];
 	return iconDirectory;
 }
 
-- (UIImage *)iconForAppID:(NSString *)appID
-{
+- (UIImage *)iconForAppID:(NSString *)appID {
 	if ([appID length] < 4) {
 		NSLog(@"Invalid app ID for icon download (%@)", appID);
 		return nil;
@@ -70,8 +66,7 @@
 	return [UIImage imageNamed:@"GenericApp.png"];
 }
 
-- (void)dequeueDownload
-{
+- (void)dequeueDownload {
 	if ([downloadQueue count] == 0 || isDownloading) return;
 	
 	NSString *nextAppID = [[downloadQueue objectAtIndex:0] copy];
@@ -111,8 +106,7 @@
 	});
 }
 
-- (void)clearIconForAppID:(NSString *)appID
-{
+- (void)clearIconForAppID:(NSString *)appID {
 	dispatch_async(dispatch_get_main_queue(), ^ {
 		NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
 		[[NSFileManager defaultManager] removeItemAtPath:iconPath error:NULL];

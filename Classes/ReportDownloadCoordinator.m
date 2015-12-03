@@ -17,8 +17,7 @@
 
 @synthesize isBusy;
 
-- (id)init
-{
+- (id)init {
 	self = [super init];
 	if (self) {
 		reportDownloadQueue = [[NSOperationQueue alloc] init];
@@ -28,8 +27,7 @@
 	return self;
 }
 
-+ (id)sharedReportDownloadCoordinator
-{
++ (id)sharedReportDownloadCoordinator {
 	static id sharedCoordinator = nil;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -38,15 +36,13 @@
 	return sharedCoordinator;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"operationCount"]) {
 		self.isBusy = (reportDownloadQueue.operationCount > 0);
 	}
 }
 
-- (void)downloadReportsForAccount:(ASAccount *)account
-{
+- (void)downloadReportsForAccount:(ASAccount *)account {
 	if (account.isDownloadingReports) {
 		return;
 	}
@@ -74,8 +70,7 @@
 	[reportDownloadQueue addOperation:operation];
 }
 
-- (void)cancelDownloadForAccount:(ASAccount *)account
-{
+- (void)cancelDownloadForAccount:(ASAccount *)account {
 	if (!account.isDownloadingReports) return;
 	account.downloadStatus = NSLocalizedString(@"Cancelling...", nil);
 	for (NSOperation *operation in [reportDownloadQueue operations]) {
@@ -85,8 +80,7 @@
 	}
 }
 
-- (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes
-{
+- (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes {
 	if (product.isDownloadingPromoCodes) return;
 	product.isDownloadingPromoCodes = YES;
 	PromoCodeOperation *operation = [[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes];
@@ -98,18 +92,15 @@
 	[reportDownloadQueue addOperation:operation];
 }
 
-- (void)cancelAllDownloads
-{
+- (void)cancelAllDownloads {
 	[reportDownloadQueue cancelAllOperations];
 }
 
-- (void)importReportsIntoAccount:(ASAccount *)account
-{
+- (void)importReportsIntoAccount:(ASAccount *)account {
 	[self importReportsIntoAccount:account fromDirectory:nil deleteAfterImport:NO];
 }
 
-- (void)importReportsIntoAccount:(ASAccount *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag
-{
+- (void)importReportsIntoAccount:(ASAccount *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag {
 	ReportImportOperation *operation = [[ReportImportOperation alloc] initWithAccount:account];
 	operation.importDirectory = path;
 	operation.deleteOriginalFilesAfterImport = deleteFlag;
@@ -130,8 +121,7 @@
 	[reportDownloadQueue addOperation:operation];
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[reportDownloadQueue removeObserver:self forKeyPath:@"operationCount"];
 }
 

@@ -16,8 +16,7 @@
 
 @synthesize sortedApps;
 
-- (id)initWithAccount:(ASAccount *)anAccount
-{
+- (id)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self) {
 		account = anAccount;
@@ -30,13 +29,11 @@
 	return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[self reloadData];
 }
 
-- (void)contextDidChange:(NSNotification *)notification
-{
+- (void)contextDidChange:(NSNotification *)notification {
 	NSSet *relevantEntityNames = [NSSet setWithObject:@"PromoCode"];
 	NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
 	NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
@@ -71,8 +68,7 @@
 	}
 }
 
-- (void)reloadData
-{
+- (void)reloadData {
 	NSArray *allApps = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
 	NSMutableArray *filteredApps = [NSMutableArray array];
 	for (Product *app in allApps) {
@@ -85,26 +81,22 @@
 	[self.tableView reloadData];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	return [sortedApps count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	static NSString *CellIdentifier = @"Cell";
 	BadgedCell *cell = (BadgedCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil) {
@@ -125,15 +117,13 @@
 	return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	Product *product = [sortedApps objectAtIndex:indexPath.row];
 	PromoCodesAppViewController *vc = [[PromoCodesAppViewController alloc] initWithProduct:product];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

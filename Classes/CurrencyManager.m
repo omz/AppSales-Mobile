@@ -38,8 +38,7 @@
 @synthesize availableCurrencies;
 @synthesize conversionDict;
 
-- (id)init
-{
+- (id)init {
 	if (!(self=[super init])) {
 		return nil;
 	}
@@ -140,13 +139,11 @@
 	return self;
 }
 
-- (NSString*) baseCurrency 
-{
+- (NSString*) baseCurrency  {
 	return baseCurrency;
 }
 
-- (void)setBaseCurrency:(NSString *)newBaseCurrency
-{
+- (void)setBaseCurrency:(NSString *)newBaseCurrency {
 	[self.conversionDict removeAllObjects];
 	
 	baseCurrency = newBaseCurrency;
@@ -155,32 +152,27 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:CurrencyManagerDidChangeBaseCurrencyNotification object:self];
 }
 
-- (NSString *)baseCurrencyDescription
-{
+- (NSString *)baseCurrencyDescription {
 	NSString *currencySymbol = [currencySymbols objectForKey:baseCurrency];
 	return (currencySymbol != nil) ? currencySymbol : baseCurrency;
 }
 
-- (NSString *)currencySymbolForCurrency:(NSString *)currencyCode
-{
+- (NSString *)currencySymbolForCurrency:(NSString *)currencyCode {
 	NSString *currencySymbol = [currencySymbols objectForKey:currencyCode];
 	return (currencySymbol != nil) ? currencySymbol : currencyCode;
 }
 
-- (NSString *)baseCurrencyDescriptionForAmount:(NSString *)amount
-{
+- (NSString *)baseCurrencyDescriptionForAmount:(NSString *)amount {
 	return [NSString stringWithFormat:@"%@%@", [self baseCurrencyDescription], amount];
 }
 
-- (NSString *)baseCurrencyDescriptionForAmount:(NSNumber *)amount withFraction:(BOOL)withFraction
-{
+- (NSString *)baseCurrencyDescriptionForAmount:(NSNumber *)amount withFraction:(BOOL)withFraction {
 	NSNumberFormatter *numberFormatter = (withFraction) ? (numberFormatterWithFraction) : (numberFormatterWithoutFraction);
 	NSString *formattedAmount = [numberFormatter stringFromNumber:amount];
 	return [self baseCurrencyDescriptionForAmount:formattedAmount];
 }
 
-- (void)refreshIfNeeded
-{
+- (void)refreshIfNeeded {
 	if (!isRefreshing && ([[NSDate date] timeIntervalSinceDate:self.lastRefresh] > 21600)) { 
 		isRefreshing = YES;
 		[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
@@ -188,8 +180,7 @@
 	}
 }
 
-- (void)forceRefresh
-{
+- (void)forceRefresh {
 	if (!isRefreshing) {
 		isRefreshing = YES;
 		[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
@@ -197,16 +188,14 @@
 	}
 }
 
-- (void)refreshFailed
-{
+- (void)refreshFailed {
 	isRefreshing = NO;
 	[self.conversionDict removeAllObjects];
 	[[NSNotificationCenter defaultCenter] postNotificationName:CurrencyManagerErrorNotification object:self];
 	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
-- (void)finishRefreshWithExchangeRates:(NSMutableDictionary *)newExchangeRates
-{
+- (void)finishRefreshWithExchangeRates:(NSMutableDictionary *)newExchangeRates {
 	isRefreshing = NO;
 	self.exchangeRates = newExchangeRates;
 	self.lastRefresh = [NSDate date];
@@ -218,8 +207,7 @@
 	[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
-- (void)refreshExchangeRates
-{
+- (void)refreshExchangeRates {
 	@autoreleasepool {
 		NSMutableDictionary *newExchangeRates = [NSMutableDictionary dictionary];
 		
@@ -265,8 +253,7 @@
 	}
 }
 
-- (float)convertValue:(float)sourceValue fromCurrency:(NSString *)sourceCurrency
-{
+- (float)convertValue:(float)sourceValue fromCurrency:(NSString *)sourceCurrency {
 	/* short-circuit if the source is the same as the destination */
 	if ([sourceCurrency isEqualToString:self.baseCurrency])
 		return sourceValue;
@@ -300,8 +287,7 @@
 	return (sourceValue * conversionFactor);
 }
 
-+ (CurrencyManager *)sharedManager
-{
++ (CurrencyManager *)sharedManager {
 	static CurrencyManager *sharedManager = nil;
 	if (sharedManager == nil)
 		sharedManager = [CurrencyManager new];

@@ -15,8 +15,7 @@
 
 @synthesize scrollView, pageControl;
 
-- (id)initWithAccount:(ASAccount *)paymentAccount
-{
+- (id)initWithAccount:(ASAccount *)paymentAccount {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		account = paymentAccount;
@@ -31,8 +30,7 @@
 	return self;
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	[super loadView];
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	
@@ -51,13 +49,11 @@
 	[self.view addSubview:pageControl];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	[self reloadData];
 }
 
-- (void)reloadData
-{
+- (void)reloadData {
 	for (UIView *v in [NSArray arrayWithArray:self.scrollView.subviews]) [v removeFromSuperview];
 	
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
@@ -138,13 +134,11 @@
 	self.pageControl.currentPage = pageControl.numberOfPages - 1;
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
 	[self reloadData];
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
 	[self reloadData];
 	CATransition *fadeTransition = [CATransition animation];
 	fadeTransition.duration = duration;
@@ -161,14 +155,12 @@
 }
 
 
-- (void)deletePayments:(id)sender
-{
+- (void)deletePayments:(id)sender {
 	UIActionSheet *deletePaymentsSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all payments for this account? Payments will be reloaded from iTunes Connect when sales reports are downloaded.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Payments", nil) otherButtonTitles:nil];
 	[deletePaymentsSheet showInView:self.view];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		account.payments = [NSSet set];
 		[[account managedObjectContext] save:NULL];
@@ -178,8 +170,7 @@
 	}
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 	account.paymentsBadge = [NSNumber numberWithInteger:0];
 	if ([account.managedObjectContext hasChanges]) {
@@ -187,21 +178,18 @@
 	}
 }
 
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)aScrollView
-{
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)aScrollView {
 	self.pageControl.currentPage = (scrollView.contentOffset.x + scrollView.bounds.size.width * 0.5) / scrollView.bounds.size.width;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		[account removeObserver:self forKeyPath:@"payments"];
 	}

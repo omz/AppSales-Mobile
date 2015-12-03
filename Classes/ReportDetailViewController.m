@@ -28,8 +28,7 @@
 @synthesize selectedCountry, selectedProduct;
 @synthesize headerView, headerLabel, headerIconView;
 
-- (id)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex
-{
+- (id)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		reports = reportsArray;
@@ -48,8 +47,7 @@
 	return self;
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	[super loadView];
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	
@@ -146,8 +144,7 @@
 	[self updateHeader];
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
 	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && !mapHidden) {
 		[self toggleMap:nil];
 	}
@@ -157,8 +154,7 @@
 	self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
 	if (!UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
 		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)];
 	} else {
@@ -166,8 +162,7 @@
 	}
 }
 
-- (void)switchMode:(UISegmentedControl *)sender
-{
+- (void)switchMode:(UISegmentedControl *)sender {
 	if ([sender selectedSegmentIndex] == 0) {
 		viewMode = ReportDetailViewModeProducts;
 	} else {
@@ -177,23 +172,19 @@
 	[self updateHeader];
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
 	[super viewDidUnload];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationIsLandscape(interfaceOrientation));
 }
 
-- (void)toggleMap:(id)sender
-{
+- (void)toggleMap:(id)sender {
 	if (mapHidden) {
 		mapView.report = self.selectedReport;
 		mapView.selectedCountry = self.selectedCountry;
@@ -224,8 +215,7 @@
 	[[NSUserDefaults standardUserDefaults] setBool:mapHidden forKey:kSettingReportDetailMapHidden];
 }
 
-- (void)showCSV:(id)sender
-{
+- (void)showCSV:(id)sender {
 	NSArray *allReports = [self.selectedReport allReports];
 	if ([allReports count] == 1) {
 		ReportCSVViewController *csvViewController = [[ReportCSVViewController alloc] initWithReport:self.selectedReport];
@@ -238,8 +228,7 @@
 	}
 }
 
-- (void)setSelectedReport:(Report *)report
-{
+- (void)setSelectedReport:(Report *)report {
 	if (report == selectedReport) return;
 	selectedReport = report;
 	
@@ -249,8 +238,7 @@
 	}
 }
 
-- (void)reloadData
-{
+- (void)reloadData {
 	self.navigationItem.title = [selectedReport title];
 	NSDictionary *revenuesByCountry = [selectedReport revenueInBaseCurrencyByCountryForProductWithID:self.selectedProduct.productID];
 	NSArray *sortedCountries = [revenuesByCountry keysSortedByValueUsingSelector:@selector(compare:)];
@@ -333,8 +321,7 @@
 	[self reloadTableView];
 }
 
-- (void)reloadTableView
-{
+- (void)reloadTableView {
 	NSInteger selectedCountryIndex = 0;
 	NSInteger selectedProductIndex = 0;
 	if (self.selectedProduct) {
@@ -366,27 +353,23 @@
 	}
 }
 
-- (void)setSelectedReportIndex:(NSUInteger)index
-{
+- (void)setSelectedReportIndex:(NSUInteger)index {
 	selectedReportIndex = index;
 	[self updateNavigationButtons];
 }
 
-- (void)selectNextReport:(id)sender
-{
+- (void)selectNextReport:(id)sender {
 	if (selectedReportIndex >= [reports count] - 1) return;
 	self.selectedReportIndex = self.selectedReportIndex + 1;
 	self.selectedReport = [reports objectAtIndex:selectedReportIndex];
 }
 
-- (void)updateNavigationButtons
-{
+- (void)updateNavigationButtons {
 	self.prevItem.enabled = (selectedReportIndex > 0);
 	self.nextItem.enabled = (selectedReportIndex < [reports count]-1);
 }
 
-- (void)updateHeader
-{
+- (void)updateHeader {
 	if (viewMode == ReportDetailViewModeCountries) {
 		if (self.selectedProduct) {
 			self.headerIconView.productID = self.selectedProduct.productID;
@@ -409,20 +392,17 @@
 	}
 }
 
-- (void)selectPreviousReport:(id)sender
-{
+- (void)selectPreviousReport:(id)sender {
 	if (selectedReportIndex <= 0) return;
 	self.selectedReportIndex = self.selectedReportIndex - 1;
 	self.selectedReport = [reports objectAtIndex:selectedReportIndex];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	if (viewMode == ReportDetailViewModeCountries) {
 		return [self.countryEntries count];
 	} else {
@@ -430,13 +410,11 @@
 	}
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	return 40.0;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	NSString *cellIdentifier = @"Cell";
 	ReportDetailEntryCell *cell = (ReportDetailEntryCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (!cell) {
@@ -447,8 +425,7 @@
 	return cell;
 }
 
-- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (viewMode == ReportDetailViewModeCountries) {
 		if (indexPath.row > 0) {
 			self.selectedCountry = [[countryEntries objectAtIndex:indexPath.row] country];
@@ -469,8 +446,7 @@
 	[self updateHeader];
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
 	self.shadowView.alpha = MAX(0.0, MIN(1.0, (scrollView.contentOffset.y - 20) / 20.0));
 }
 

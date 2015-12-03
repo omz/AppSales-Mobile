@@ -7,8 +7,7 @@
 
 @implementation NSData (Compression)
 
-- (NSData *)zlibInflate
-{
+- (NSData *)zlibInflate {
 	if ([self length] == 0) return self;
 	
 	unsigned full_length = (unsigned)[self length];
@@ -27,8 +26,7 @@
 	
 	if (inflateInit (&strm) != Z_OK) return nil;
 	
-	while (!done)
-	{
+	while (!done) {
 		// Make sure we have enough room and reset the lengths.
 		if (strm.total_out >= [decompressed length])
 			[decompressed increaseLengthBy: half_length];
@@ -43,16 +41,14 @@
 	if (inflateEnd (&strm) != Z_OK) return nil;
 	
 	// Set real length.
-	if (done)
-	{
+	if (done) {
 		[decompressed setLength: strm.total_out];
 		return [NSData dataWithData: decompressed];
 	}
 	else return nil;
 }
 
-- (NSData *)zlibDeflate
-{
+- (NSData *)zlibDeflate {
 	if ([self length] == 0) return self;
 	
 	z_stream strm;
@@ -92,8 +88,7 @@
 	return [NSData dataWithData: compressed];
 }
 
-- (NSData *)gzipInflate
-{
+- (NSData *)gzipInflate {
 	if ([self length] == 0) return self;
 	
 	unsigned full_length = (unsigned)[self length];
@@ -111,8 +106,7 @@
 	strm.zfree = Z_NULL;
 	
 	if (inflateInit2(&strm, (15+32)) != Z_OK) return nil;
-	while (!done)
-	{
+	while (!done) {
 		// Make sure we have enough room and reset the lengths.
 		if (strm.total_out >= [decompressed length])
 			[decompressed increaseLengthBy: half_length];
@@ -127,16 +121,14 @@
 	if (inflateEnd (&strm) != Z_OK) return nil;
 	
 	// Set real length.
-	if (done)
-	{
+	if (done) {
 		[decompressed setLength: strm.total_out];
 		return [NSData dataWithData: decompressed];
 	}
 	else return nil;
 }
 
-- (NSData *)gzipDeflate
-{
+- (NSData *)gzipDeflate {
 	if ([self length] == 0) return self;
 	
 	z_stream strm;

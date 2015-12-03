@@ -16,8 +16,7 @@
 
 @synthesize inputOperation, startBlock, request, connection, data, paused;
 
-- (id)init
-{
+- (id)init {
 	self = [super init];
 	if (self) {
 		
@@ -25,25 +24,21 @@
 	return self;
 }
 
-- (void)setStartBlock:(DownloadStepStartBlock)block
-{
+- (void)setStartBlock:(DownloadStepStartBlock)block {
 	startBlock = [block copy];
 }
 
-+ (id)operationWithInput:(DownloadStepOperation *)otherOperation
-{
++ (id)operationWithInput:(DownloadStepOperation *)otherOperation {
 	DownloadStepOperation *operation = [[self alloc] init];
 	operation.inputOperation = otherOperation;
 	return operation;
 }
 
-- (BOOL)isConcurrent
-{
+- (BOOL)isConcurrent {
 	return YES;
 }
 
-- (void)start
-{
+- (void)start {
 	//NSOperationQueue ignores the return value of isConcurrent since Mac OS X 10.6 (iOS 4.0?), so 
 	//we have to ensure that we run on the main thread ourselves...
 	if (![NSThread isMainThread]) {
@@ -85,27 +80,22 @@
 	}
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)chunk
-{
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)chunk {
 	[self.data appendData:chunk];
 }
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	[self finish];
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
 	[self cancel];
 }
 
-- (void)cancel
-{
+- (void)cancel {
 	[super cancel];
 	[self.connection cancel];
 	//iOS 5 will complain if we mark an operation as finished without starting it...
@@ -113,8 +103,7 @@
 	[self finish];
 }
 
-- (void)finish
-{
+- (void)finish {
 	[self willChangeValueForKey:@"isFinished"];
 	[self willChangeValueForKey:@"isExecuting"];
 	finished = YES;
@@ -123,13 +112,11 @@
 	[self didChangeValueForKey:@"isExecuting"];
 }
 
-- (BOOL)isExecuting
-{
+- (BOOL)isExecuting {
 	return executing;
 }
 
-- (BOOL)isFinished
-{
+- (BOOL)isFinished {
 	return finished;
 }
 

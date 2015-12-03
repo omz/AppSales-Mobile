@@ -16,8 +16,7 @@
 
 @synthesize queue;
 
-- (id)initWithOperations:(NSArray *)partialOperations
-{
+- (id)initWithOperations:(NSArray *)partialOperations {
 	self = [super init];
 	if (self) {
 		queue = [[NSOperationQueue alloc] init];
@@ -27,13 +26,11 @@
 	return self;
 }
 
-- (BOOL)isConcurrent
-{
+- (BOOL)isConcurrent {
 	return YES;
 }
 
-- (void)start
-{
+- (void)start {
 	if ([self isCancelled]) {
 		return;
 	}
@@ -49,24 +46,21 @@
 	[self didChangeValueForKey:@"isExecuting"];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([queue operationCount] == 0) {
 		[queue removeObserver:self forKeyPath:@"operationCount"];
 		[self finish];
 	}
 }
 
-- (void)cancel
-{
+- (void)cancel {
 	[super cancel];
 	[self start];
 	[queue cancelAllOperations];
 	[self finish];
 }
 
-- (void)finish
-{
+- (void)finish {
 	[self willChangeValueForKey:@"isFinished"];
 	[self willChangeValueForKey:@"isExecuting"];
 	finished = YES;
@@ -75,13 +69,11 @@
 	[self didChangeValueForKey:@"isExecuting"];
 }
 
-- (BOOL)isExecuting
-{
+- (BOOL)isExecuting {
 	return executing;
 }
 
-- (BOOL)isFinished
-{
+- (BOOL)isFinished {
 	return finished;
 }
 

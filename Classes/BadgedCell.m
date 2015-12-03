@@ -13,8 +13,7 @@
 
 @synthesize badgeCount;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
 		badgeView = [[UIImageView alloc] initWithFrame:CGRectMake(self.contentView.bounds.size.width - 32 - 10, self.contentView.bounds.size.height * 0.5 - 10, 32, 20)];
@@ -35,13 +34,11 @@
 	return self;
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
 	[super setSelected:selected animated:animated];
 }
 
-- (void)setBadgeCount:(NSInteger)count
-{
+- (void)setBadgeCount:(NSInteger)count {
 	badgeCount = count;
 	if (badgeCount == 0) {
 		badgeView.hidden = YES;

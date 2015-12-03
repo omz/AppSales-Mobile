@@ -17,8 +17,7 @@
 
 @synthesize fetchedResultsController, managedObjectContext;
 
-- (id)initWithAccount:(ASAccount *)acc products:(NSArray *)reviewProducts rating:(NSUInteger)ratingFilter
-{
+- (id)initWithAccount:(ASAccount *)acc products:(NSArray *)reviewProducts rating:(NSUInteger)ratingFilter {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
 		account = acc;
@@ -33,19 +32,16 @@
 }
 
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 }
 
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)markAllAsRead:(id)sender
-{
+- (void)markAllAsRead:(id)sender {
 	for (Review *review in self.fetchedResultsController.fetchedObjects) {
 		if ([review.unread boolValue]) {
 			review.unread = [NSNumber numberWithBool:NO];
@@ -56,18 +52,15 @@
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return [[self.fetchedResultsController sections] count];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	return [[[self.fetchedResultsController sections] objectAtIndex:section] numberOfObjects];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	static NSString *CellIdentifier = @"Cell";
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil) {
@@ -90,15 +83,13 @@
 	return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	return 50.0;
 }
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	Review *selectedReview = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	ReviewDetailViewController *vc = [[ReviewDetailViewController alloc] initWithReview:selectedReview];
 	[self.navigationController pushViewController:vc animated:YES];
@@ -107,8 +98,7 @@
 
 #pragma mark - Fetched results controller
 
-- (NSFetchedResultsController *)fetchedResultsController
-{
+- (NSFetchedResultsController *)fetchedResultsController {
 	if (fetchedResultsController != nil) {
 		return fetchedResultsController;
 	}
@@ -165,8 +155,7 @@
 
 #pragma mark - Fetched results controller delegate
 
-- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
-{
+- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
 	[self.tableView reloadData];
 }
 

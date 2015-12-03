@@ -30,8 +30,7 @@
 @synthesize fieldSections, values, doneButtonTitle, cancelButtonTitle, delegate, context, editorIdentifier;
 @synthesize isSubSection, hasChanges, selectedTextField;
 
-- (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title
-{
+- (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title {
 	if (self = [super initWithStyle:UITableViewStyleGrouped]) {
 		self.title = title;
 		self.values = [NSMutableDictionary dictionary];
@@ -64,8 +63,7 @@
 }
 
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	if (!self.isSubSection) {
 		if (self.doneButtonTitle) {
@@ -90,8 +88,7 @@
 	}
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 	if (self.isSubSection) {
 		if (!isOpeningSubsection) {
@@ -104,35 +101,30 @@
 	}
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return toInterfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
-- (void)done
-{
+- (void)done {
 	if (self.delegate && [self.delegate respondsToSelector:@selector(fieldEditor:didFinishEditingWithValues:)]) {
 		[delegate fieldEditor:self didFinishEditingWithValues:self.values];
 	}
 }
 
-- (void)cancel
-{
+- (void)cancel {
 	if (self.delegate && [self.delegate respondsToSelector:@selector(fieldEditorDidCancel:)]) {
 		[delegate fieldEditorDidCancel:self];
 	}
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
+- (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
 }
 
-- (void)textFieldDidChange:(NSNotification *)note
-{
+- (void)textFieldDidChange:(NSNotification *)note {
 	if ([[note object] isKindOfClass:[NamedTextField class]]) {
 		self.hasChanges = YES;
 		NamedTextField *textField = [note object];
@@ -141,8 +133,7 @@
 	}
 }
 
-- (void)textFieldWillBeginEditing:(NSNotification *)note
-{
+- (void)textFieldWillBeginEditing:(NSNotification *)note {
 	NamedTextField *textField = [note object];
 	if ([textField isKindOfClass:[NamedTextField class]]) {
 		NSString *name = [textField name];
@@ -167,56 +158,47 @@
 	}
 }
 
-- (void)textFieldDidBeginEditing:(UITextField *)textField
-{
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
 	self.selectedTextField = textField;
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
 	[textField performSelector:@selector(resignFirstResponder) withObject:nil afterDelay:0];
 	self.selectedTextField = nil;
 	return YES;
 }
 
-- (void)dismissKeyboard
-{
+- (void)dismissKeyboard {
 	[self.selectedTextField resignFirstResponder];
 }
 
-- (void)switchValueDidChange:(NamedSwitch *)switchControl
-{
+- (void)switchValueDidChange:(NamedSwitch *)switchControl {
 	self.hasChanges = YES;
 	[self.values setObject:[NSNumber numberWithBool:switchControl.on] forKey:switchControl.name];
 }
 
 #pragma mark Table view methods
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView  {
 	return [self.fieldSections count];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex {
 	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:sectionIndex];
 	return [section.fields count];
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)sectionIndex
-{
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)sectionIndex {
 	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:sectionIndex];
 	return section.title;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)sectionIndex
-{
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)sectionIndex {
 	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:sectionIndex];
 	return section.description;
 }
 
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
 	[[cell.contentView viewWithTag:TEXTFIELDTAG] removeFromSuperview];
 	[[cell.contentView viewWithTag:SWITCHTAG] removeFromSuperview];
 	
@@ -328,8 +310,7 @@
 	}
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
-{	
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath  {	
 	UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"];
 	
 	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:indexPath.section];
@@ -344,8 +325,7 @@
 }
 
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath  {
 	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:indexPath.section];
 	NSArray *fields = section.fields;
 	FieldSpecifier *field = [fields objectAtIndex:indexPath.row];
@@ -389,8 +369,7 @@
 	}
 }
 
-- (void)openSubsection:(FieldSpecifier *)subsectionField
-{
+- (void)openSubsection:(FieldSpecifier *)subsectionField {
 	isOpeningSubsection = YES;
 	
 	NSArray *sections = subsectionField.subsections;
@@ -412,15 +391,13 @@
 	[self.navigationController pushViewController:subController animated:YES];
 }
 
-- (void)fieldEditor:(FieldEditorViewController *)editor pressedButtonWithKey:(NSString *)key
-{
+- (void)fieldEditor:(FieldEditorViewController *)editor pressedButtonWithKey:(NSString *)key {
 	if ([self.delegate respondsToSelector:@selector(fieldEditor:pressedButtonWithKey:)]) {
 		[delegate fieldEditor:self pressedButtonWithKey:key];
 	}
 }
 
-- (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues
-{
+- (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues {
 	isOpeningSubsection = NO;
 	if (editor.hasChanges) {
 		self.hasChanges = YES;
@@ -429,14 +406,12 @@
 	[self.tableView reloadData];
 }
 
-- (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
-{
+- (void)fieldEditorDidCancel:(FieldEditorViewController *)editor {
 	isOpeningSubsection = NO;
 	[self.navigationController popToViewController:self animated:YES];
 }
 
-- (void)dealloc 
-{
+- (void)dealloc  {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -458,8 +433,7 @@
 
 @synthesize name;
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -471,8 +445,7 @@
 
 @synthesize fields, title, description, exclusiveSelection;
 
-+ (FieldSectionSpecifier *)sectionWithFields:(NSArray *)f title:(NSString *)t description:(NSString *)d
-{
++ (FieldSectionSpecifier *)sectionWithFields:(NSArray *)f title:(NSString *)t description:(NSString *)d {
 	FieldSectionSpecifier *section = [FieldSectionSpecifier new];
 	section.fields = f;
 	section.title = t;
@@ -490,79 +463,69 @@
 
 @synthesize type, subsections, key, title, defaultValue, placeholder, shouldDisplayDisclosureIndicator;
 
-+ (FieldSpecifier *)fieldWithType:(FieldSpecifierType)t key:(NSString *)k
-{
++ (FieldSpecifier *)fieldWithType:(FieldSpecifierType)t key:(NSString *)k {
 	FieldSpecifier *field = [FieldSpecifier new];
 	field.type = t;
 	field.key = k;
 	return field;
 }
 
-+ (FieldSpecifier *)switchFieldWithKey:(NSString *)k title:(NSString *)switchTitle defaultValue:(BOOL)flag
-{
++ (FieldSpecifier *)switchFieldWithKey:(NSString *)k title:(NSString *)switchTitle defaultValue:(BOOL)flag {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeSwitch key:k];
 	field.title = switchTitle;
 	field.defaultValue = [NSNumber numberWithBool:flag];
 	return field;
 }
 
-+ (FieldSpecifier *)emailFieldWithKey:(NSString *)k title:(NSString *)emailTitle defaultValue:(NSString *)defaultEmail
-{
++ (FieldSpecifier *)emailFieldWithKey:(NSString *)k title:(NSString *)emailTitle defaultValue:(NSString *)defaultEmail {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeEmail key:k];
 	field.title = emailTitle;
 	field.defaultValue = defaultEmail;
 	return field;
 }
 
-+ (FieldSpecifier *)URLFieldWithKey:(NSString *)k title:(NSString *)URLTitle defaultValue:(NSString *)defaultURL
-{
++ (FieldSpecifier *)URLFieldWithKey:(NSString *)k title:(NSString *)URLTitle defaultValue:(NSString *)defaultURL {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeURL key:k];
 	field.title = URLTitle;
 	field.defaultValue = defaultURL;
 	return field;
 }
 
-+ (FieldSpecifier *)passwordFieldWithKey:(NSString *)k title:(NSString *)passwordTitle defaultValue:(NSString *)defaultPassword
-{
++ (FieldSpecifier *)passwordFieldWithKey:(NSString *)k title:(NSString *)passwordTitle defaultValue:(NSString *)defaultPassword {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypePassword key:k];
 	field.title = passwordTitle;
 	field.defaultValue = defaultPassword;
 	return field;
 }
 
-+ (FieldSpecifier *)textFieldWithKey:(NSString *)k title:(NSString *)textTitle defaultValue:(NSString *)defaultText
-{
++ (FieldSpecifier *)textFieldWithKey:(NSString *)k title:(NSString *)textTitle defaultValue:(NSString *)defaultText {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeText key:k];
 	field.title = textTitle;
 	field.defaultValue = defaultText;
 	return field;
 }
 
-+ (FieldSpecifier *)numericFieldWithKey:(NSString *)k title:(NSString *)numericTitle defaultValue:(NSString *)defaultText
-{
++ (FieldSpecifier *)numericFieldWithKey:(NSString *)k title:(NSString *)numericTitle defaultValue:(NSString *)defaultText {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeNumeric key:k];
 	field.title = numericTitle;
 	field.defaultValue = defaultText;
 	return field;
 }
 
-+ (FieldSpecifier *)checkFieldWithKey:(NSString *)k title:(NSString *)checkmarkTitle defaultValue:(BOOL)checked
-{
++ (FieldSpecifier *)checkFieldWithKey:(NSString *)k title:(NSString *)checkmarkTitle defaultValue:(BOOL)checked {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeCheck key:k];
 	field.title = checkmarkTitle;
 	field.defaultValue = [NSNumber numberWithBool:checked];
 	return field;
 }
 
-+ (FieldSpecifier *)buttonFieldWithKey:(NSString *)k title:(NSString *)buttonTitle
-{
++ (FieldSpecifier *)buttonFieldWithKey:(NSString *)k title:(NSString *)buttonTitle {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeButton key:k];
 	field.title = buttonTitle;
 	return field;
 }
 
-+ (FieldSpecifier *)subsectionFieldWithSections:(NSArray *)sections key:(NSString *)k title:(NSString *)subTitle
-{
++ (FieldSpecifier *)subsectionFieldWithSections:(NSArray *)sections key:(NSString *)k title:(NSString *)subTitle {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeSection key:k];
 	field.title = subTitle;
 	field.defaultValue = nil;
@@ -570,8 +533,7 @@
 	return field;
 }
 
-+ (FieldSpecifier *)subsectionFieldWithSection:(FieldSectionSpecifier *)section key:(NSString *)k
-{
++ (FieldSpecifier *)subsectionFieldWithSection:(FieldSectionSpecifier *)section key:(NSString *)k {
 	return [self subsectionFieldWithSections:[NSArray arrayWithObject:section] key:k title:section.title];
 }
 

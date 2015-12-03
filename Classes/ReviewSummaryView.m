@@ -12,8 +12,7 @@
 
 @synthesize dataSource, delegate;
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
 		BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
@@ -114,8 +113,7 @@
 	return self;
 }
 
-- (void)reloadDataAnimated:(BOOL)animated
-{
+- (void)reloadDataAnimated:(BOOL)animated {
 	if (animated) {
 		[UIView beginAnimations:nil context:nil];
 		[UIView setAnimationBeginsFromCurrentState:YES];
@@ -166,8 +164,7 @@
 	}
 }
 
-- (CGRect)barFrameForRating:(NSInteger)rating
-{
+- (CGRect)barFrameForRating:(NSInteger)rating {
 	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
 	if (!iPad) {
 		CGRect barFrame = CGRectMake(110, 12 + (5-rating) * 30, 145, 24);
@@ -178,8 +175,7 @@
 	}
 }
 
-- (void)showReviews:(UIButton *)button
-{
+- (void)showReviews:(UIButton *)button {
 	if (self.delegate && [self.delegate respondsToSelector:@selector(reviewSummaryView:didSelectRating:)]) {
 		[self.delegate reviewSummaryView:self didSelectRating:button.tag];
 	}

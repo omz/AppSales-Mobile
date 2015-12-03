@@ -14,8 +14,7 @@
 
 @synthesize webView;
 
-- (id)initWithReport:(Report *)selectedReport
-{
+- (id)initWithReport:(Report *)selectedReport {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		report = selectedReport;
@@ -23,8 +22,7 @@
 	return self;
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
@@ -33,8 +31,7 @@
 	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReport:)];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
 	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 	[formatter setDateStyle:NSDateFormatterShortStyle];
 	[formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
@@ -54,18 +51,15 @@
 }
 
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)done:(id)sender
-{
+- (void)done:(id)sender {
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)sendReport:(id)sender
-{
+- (void)sendReport:(id)sender {
 	NSString *reportCSV = [report valueForKeyPath:@"originalReport.content"];
 	NSString *filename = [report valueForKeyPath:@"originalReport.filename"];
 	if ([filename hasSuffix:@".gz"]) {
@@ -83,8 +77,7 @@
 	}
 }
 
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
-{
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
 	[controller dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -94,8 +87,7 @@
 
 @implementation ReportCSVSelectionViewController
 
-- (id)initWithReports:(NSArray *)allReports
-{
+- (id)initWithReports:(NSArray *)allReports {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
 		reports = allReports;
@@ -106,24 +98,20 @@
 	return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	return [reports count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	NSString *cellIdentifier = @"Cell";
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (!cell) {
@@ -135,14 +123,12 @@
 	return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	ReportCSVViewController *vc = [[ReportCSVViewController alloc] initWithReport:[reports objectAtIndex:indexPath.row]];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
-- (void)done:(id)sender
-{
+- (void)done:(id)sender {
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 

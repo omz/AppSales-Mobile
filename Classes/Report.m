@@ -53,8 +53,7 @@
 
 @dynamic startDate, transactions, cache;
 
-+ (NSDictionary *)infoForReportCSV:(NSString *)csv
-{
++ (NSDictionary *)infoForReportCSV:(NSString *)csv {
 	NSMutableArray *rows = [[csv componentsSeparatedByString:@"\n"] mutableCopy];
 	if ([rows count] < 3)  {
 		return nil;
@@ -89,8 +88,7 @@
 			beginDate, kReportInfoDate, nil];
 }
 
-+ (Report *)insertNewReportWithCSV:(NSString *)csv inAccount:(ASAccount *)account
-{
++ (Report *)insertNewReportWithCSV:(NSString *)csv inAccount:(ASAccount *)account {
 	NSManagedObjectContext *moc = account.managedObjectContext;
 	NSSet *allProducts = account.products;
 	
@@ -155,8 +153,7 @@
 		NSString *productSKU = [rowDictionary objectForKey:kReportColumnSKU];
 		if (!productSKU) productSKU = [rowDictionary objectForKey:kReportColumnSKU2];
 		
-		if ([productSKU hasSuffix:@" "])
-		{ // bug in 26th October reports, sku has trailing space
+		if ([productSKU hasSuffix:@" "]) { // bug in 26th October reports, sku has trailing space
 			// first delete 'productSKU plus space' duplicate and clean up the mess
 			Product *product = [productsBySKU objectForKey:productSKU];
 			if (product)
@@ -230,8 +227,7 @@
 	return report;
 }
 
-+ (BOOL)validateColumnHeaders:(NSArray *)columnHeaders
-{
++ (BOOL)validateColumnHeaders:(NSArray *)columnHeaders {
 	static NSSet *requiredColumnsSet1 = nil;
 	static NSSet *requiredColumnsSet2 = nil;
 	static dispatch_once_t onceToken;
@@ -272,8 +268,7 @@
 	return NO;
 }
 
-- (void)generateCache
-{
+- (void)generateCache {
 	NSMutableDictionary *tmpSummary = [NSMutableDictionary dictionary];
 	NSMutableDictionary *revenueByCurrency = [NSMutableDictionary dictionary];
 	[tmpSummary setObject:revenueByCurrency forKey:kReportSummaryRevenue];
@@ -318,8 +313,7 @@
 	self.cache.content = [NSDictionary dictionaryWithDictionary:tmpSummary];
 }
 
-- (float)totalRevenueInBaseCurrency
-{
+- (float)totalRevenueInBaseCurrency {
 	float total = 0.0;
 	NSDictionary *revenueByProduct = [self.cache.content objectForKey:kReportSummaryRevenue];
 	for (NSString *productID in [revenueByProduct allKeys]) {
@@ -333,13 +327,11 @@
 	return total;
 }
 
-- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID
-{
+- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID {
 	return [self totalRevenueInBaseCurrencyForProductWithID:productID inCountry:nil];
 }
 
-- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID inCountry:(NSString *)country
-{
+- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID inCountry:(NSString *)country {
 	if (!country) {
 		if (!productID) {
 			return [self totalRevenueInBaseCurrency];
@@ -370,13 +362,11 @@
 	}
 }
 
-- (NSInteger)totalNumberOfPaidDownloads
-{
+- (NSInteger)totalNumberOfPaidDownloads {
 	return [self totalNumberOfPaidDownloadsForProductWithID:nil];
 }
 
-- (NSDictionary *)totalNumberOfPaidDownloadsByCountryAndProduct
-{
+- (NSDictionary *)totalNumberOfPaidDownloadsByCountryAndProduct {
 	NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	for (Transaction *transaction in self.transactions) {
@@ -404,8 +394,7 @@
 	return result;
 }
 
-- (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct
-{
+- (NSDictionary *)totalNumberOfPaidNonRefundDownloadsByCountryAndProduct {
 	NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	for (Transaction *transaction in self.transactions) {
@@ -436,8 +425,7 @@
 	return result;
 }
 
-- (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct
-{
+- (NSDictionary *)totalNumberOfRefundedDownloadsByCountryAndProduct {
 	NSSet *paidTransactionTypes = [[self class] combinedPaidTransactionTypes];
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	for (Transaction *transaction in self.transactions) {
@@ -468,8 +456,7 @@
 	return result;
 }
 
-- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
-{
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country {
 	NSSet *paidTransactionTypes = [[self class] paidTransactionTypes];
 	NSInteger total = 0;
 	for (Transaction *transaction in self.transactions) {
@@ -495,38 +482,31 @@
 	return total;
 }
 
-- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedPaidTransactionTypes] forProductWithID:productID];
 }
 
-- (NSInteger)totalNumberOfUpdatesForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfUpdatesForProductWithID:(NSString *)productID {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedUpdateTransactionTypes] forProductWithID:productID];
 }
 
-- (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedRedownloadedTransactionTypes] forProductWithID:productID];
 }
 
-- (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedEducationalTransactionTypes] forProductWithID:productID];
 }
 
-- (NSInteger)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedGiftPurchaseTransactionTypes] forProductWithID:productID];
 }
 
-- (NSInteger)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID {
 	return [self totalNumberOfTransactionsInSet:[[self class] combinedPromoCodeTransactionTypes] forProductWithID:productID];
 }
 
-- (int)totalNumberOfTransactionsInSet:(NSSet *)transactionTypes forProductWithID:(NSString *)productID
-{
+- (int)totalNumberOfTransactionsInSet:(NSSet *)transactionTypes forProductWithID:(NSString *)productID {
 	int total = 0;
 	NSDictionary *transactionsByProduct = [self.cache.content objectForKey:kReportSummaryTransactions];
 	if (productID) {
@@ -549,8 +529,7 @@
 	return total;
 }
 
-+ (NSSet *)combinedPaidTransactionTypes
-{
++ (NSSet *)combinedPaidTransactionTypes {
 	static NSSet *combinedPaidTransactionTypes = nil;
 	if (!combinedPaidTransactionTypes) {
 		combinedPaidTransactionTypes = [[NSSet alloc] initWithObjects:
@@ -591,8 +570,7 @@
 	return combinedPaidTransactionTypes;
 }
 
-+ (NSSet *)combinedUpdateTransactionTypes
-{
++ (NSSet *)combinedUpdateTransactionTypes {
 	static NSSet *combinedUpdateTransactionTypes = nil;
 	if (!combinedUpdateTransactionTypes) {
 		combinedUpdateTransactionTypes = [[NSSet alloc] initWithObjects:
@@ -613,8 +591,7 @@
 	return combinedUpdateTransactionTypes;
 }
 
-+ (NSSet *)combinedRedownloadedTransactionTypes
-{
++ (NSSet *)combinedRedownloadedTransactionTypes {
 	static NSSet *combinedRedownloadedTransactionTypes = nil;
 	if (!combinedRedownloadedTransactionTypes) {
 		combinedRedownloadedTransactionTypes = [[NSSet alloc] initWithObjects:
@@ -627,8 +604,7 @@
 	return combinedRedownloadedTransactionTypes;
 }
 
-+ (NSSet *)combinedEducationalTransactionTypes
-{
++ (NSSet *)combinedEducationalTransactionTypes {
 	static NSSet *combinedEducationalTransactionTypes = nil;
 	if (!combinedEducationalTransactionTypes) {
 		combinedEducationalTransactionTypes = [[NSSet alloc] initWithObjects:
@@ -649,8 +625,7 @@
 	return combinedEducationalTransactionTypes;
 }
 
-+ (NSSet *)combinedGiftPurchaseTransactionTypes
-{
++ (NSSet *)combinedGiftPurchaseTransactionTypes {
 	static NSSet *combinedGiftPurchaseTransactionTypes = nil;
 	if (!combinedGiftPurchaseTransactionTypes) {
 		combinedGiftPurchaseTransactionTypes = [[NSSet alloc] initWithObjects:
@@ -671,8 +646,7 @@
 	return combinedGiftPurchaseTransactionTypes;
 }
 
-+ (NSSet *)combinedPromoCodeTransactionTypes
-{
++ (NSSet *)combinedPromoCodeTransactionTypes {
 	static NSSet *combinedPromoCodeTransactionTypes = nil;
 	if (!combinedPromoCodeTransactionTypes) {
 		combinedPromoCodeTransactionTypes = [[NSSet alloc] initWithObjects:
@@ -693,8 +667,7 @@
 	return combinedPromoCodeTransactionTypes;
 }
 
-+ (NSSet *)paidTransactionTypes
-{
++ (NSSet *)paidTransactionTypes {
 	static NSSet *paidTransactionTypes = nil;
 	if (!paidTransactionTypes) {
 		paidTransactionTypes = [[NSSet alloc] initWithObjects:
@@ -715,13 +688,11 @@
 	return paidTransactionTypes;
 }
 
-- (NSDictionary *)revenueInBaseCurrencyByCountry
-{
+- (NSDictionary *)revenueInBaseCurrencyByCountry {
 	return [self revenueInBaseCurrencyByCountryForProductWithID:nil];
 }
 
-- (NSDictionary *)revenueInBaseCurrencyByCountryForProductWithID:(NSString *)productID
-{
+- (NSDictionary *)revenueInBaseCurrencyByCountryForProductWithID:(NSString *)productID {
 	NSMutableDictionary *revenueByCountry = [NSMutableDictionary dictionary];
 	for (Transaction *transaction in self.transactions) {
 		if (productID && ![transaction.product.productID isEqualToString:productID]) {
@@ -739,28 +710,24 @@
 	return revenueByCountry;
 }
 
-- (Report *)firstReport
-{
+- (Report *)firstReport {
 	//ReportSummary protocol method, allows us to treat "virtual" reports (like months) the same as actual reports in many situations.
 	return self;
 }
 
-- (NSArray *)allReports
-{
+- (NSArray *)allReports {
 	//ReportSummary protocol method, allows us to treat "virtual" reports (like months) the same as actual reports in many situations.
 	return [NSArray arrayWithObject:self];
 }
 
-- (NSString *)title
-{
+- (NSString *)title {
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 	return [dateFormatter stringFromDate:self.startDate];
 }
 
-+ (NSDate *)dateFromReportDateString:(NSString *)dateString
-{
++ (NSDate *)dateFromReportDateString:(NSString *)dateString {
 	dateString = [dateString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 	BOOL containsSlash = [dateString rangeOfString:@"/"].location != NSNotFound;
 	int year, month, day;
@@ -788,8 +755,7 @@
 	return date;
 }
 
-+ (NSString *)identifierForDate:(NSDate *)date
-{
++ (NSString *)identifierForDate:(NSDate *)date {
 	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 	[formatter setDateFormat:@"MM/dd/yyyy"];
 	[formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];

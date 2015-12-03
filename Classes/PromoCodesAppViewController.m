@@ -23,8 +23,7 @@
 
 @synthesize promoCodes, selectedPromoCode, activeSheet;
 
-- (id)initWithProduct:(Product *)aProduct
-{
+- (id)initWithProduct:(Product *)aProduct {
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self) {
 		product = aProduct;
@@ -67,8 +66,7 @@
 	return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 	self.title = [product displayName];
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshHistory:)];
@@ -76,8 +74,7 @@
 	[self reloadPromoCodes];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"promoCodes"]) {
 		[self reloadPromoCodes];
 	} else if ([keyPath isEqualToString:@"isDownloadingPromoCodes"]) {
@@ -85,15 +82,13 @@
 	}
 }
 
-- (void)reloadPromoCodes
-{
+- (void)reloadPromoCodes {
 	self.promoCodes = [[product.promoCodes allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"requestDate" ascending:NO]]];
 	
 	[self.tableView reloadData];
 }
 
-- (void)requestNewCodes:(id)sender
-{
+- (void)requestNewCodes:(id)sender {
 	FieldSpecifier *numberOfCodesField = [FieldSpecifier numericFieldWithKey:@"numberOfCodes" title:NSLocalizedString(@"Number of Codes", nil) defaultValue:@""];
 	
 	FieldSectionSpecifier *numberOfCodesSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:numberOfCodesField] 
@@ -110,13 +105,11 @@
 	[self presentViewController:navController animated:YES completion:nil];
 }
 
-- (void)stopDownload:(id)sender
-{
+- (void)stopDownload:(id)sender {
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] cancelAllDownloads];
 }
 
-- (void)deletePromoCodes:(id)sender
-{
+- (void)deletePromoCodes:(id)sender {
 	if (self.activeSheet.visible) {
 		[self.activeSheet dismissWithClickedButtonIndex:activeSheet.cancelButtonIndex animated:NO];
 	}
@@ -130,8 +123,7 @@
 	}
 }
 
-- (void)shareCodes:(id)sender
-{
+- (void)shareCodes:(id)sender {
 	if (self.activeSheet.visible) {
 		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
 	}
@@ -151,8 +143,7 @@
 	}
 }
 
-- (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues
-{
+- (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues {
 	NSInteger numberOfCodes = [[returnValues objectForKey:@"numberOfCodes"] integerValue];
 	if (numberOfCodes <= 0) {
 		[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
@@ -166,63 +157,54 @@
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadPromoCodesForProduct:product numberOfCodes:numberOfCodes];
 }
 
-- (void)fieldEditorDidCancel:(FieldEditorViewController *)editor
-{
+- (void)fieldEditorDidCancel:(FieldEditorViewController *)editor {
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)refreshHistory:(id)sender
-{
+- (void)refreshHistory:(id)sender {
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadPromoCodesForProduct:product numberOfCodes:0];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 2;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	if (section == 0) {
 		return 1;
 	}
 	return [self.promoCodes count];
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
 	if (section == 1) {
 		return NSLocalizedString(@"Promo Code History", nil);
 	}
 	return nil;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
-{
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
 	if (section == 1) {
 		return NSLocalizedString(@"Tap the refresh button to load promo codes you recently requested without AppSales.", nil);
 	}
 	return nil;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (indexPath.section == 0) {
 		return 44.0;
 	}
 	return 55.0;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	static NSString *CellIdentifier = @"Cell";
 	
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -250,8 +232,7 @@
 }
 
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (indexPath.section == 1) {
 		self.selectedPromoCode = [self.promoCodes objectAtIndex:indexPath.row];
 		BOOL used = [selectedPromoCode.used boolValue];
@@ -271,8 +252,7 @@
 	}
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
 	[self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
 	
 	if (actionSheet.tag == kActionsSheetTag) {
@@ -332,8 +312,7 @@
 	}
 }
 
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
-{
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
 	if (self.selectedPromoCode && result == MFMailComposeResultSent) {
 		self.selectedPromoCode.used = [NSNumber numberWithBool:YES];
 		[self.tableView reloadData];
@@ -343,8 +322,7 @@
 
 
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[product removeObserver:self forKeyPath:@"promoCodes"];
 	[product removeObserver:self forKeyPath:@"isDownloadingPromoCodes"];
 }

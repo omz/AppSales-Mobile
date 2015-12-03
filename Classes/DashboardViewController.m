@@ -19,8 +19,7 @@
 @synthesize productsTableView, topView, shadowView, colorPopover, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
 @synthesize activeSheet;
 
-- (id)initWithAccount:(ASAccount *)anAccount
-{
+- (id)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithNibName:nil bundle:nil];
 	if (self) {
 		self.account = anAccount;
@@ -32,8 +31,7 @@
 	return self;
 }
 
-- (void)willShowPasscodeLock:(NSNotification *)notification
-{
+- (void)willShowPasscodeLock:(NSNotification *)notification {
 	if (self.colorPopover.popoverVisible) {
 		[self.colorPopover dismissPopoverAnimated:NO];
 	}
@@ -42,8 +40,7 @@
 	}
 }
 
-- (void)contextDidChange:(NSNotification *)notification
-{
+- (void)contextDidChange:(NSNotification *)notification {
 	NSSet *relevantEntityNames = [self entityNamesTriggeringReload];
 	NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
 	NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
@@ -78,13 +75,11 @@
 	}
 }
 
-- (NSSet *)entityNamesTriggeringReload
-{
+- (NSSet *)entityNamesTriggeringReload {
 	return [NSSet setWithObjects:@"Product", nil];
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	[super loadView];
 	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
@@ -157,19 +152,16 @@
 	[self.view addSubview:statusToolbar];
 }
 
-- (void)stopDownload:(id)sender
-{
+- (void)stopDownload:(id)sender {
 	//subclasses should override this
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 	[self reloadData];
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
 	[super viewDidUnload];
 	self.productsTableView = nil;
 	self.shadowView = nil;
@@ -179,13 +171,11 @@
 	self.progressBar = nil;
 }
 
-- (BOOL)shouldShowStatusBar
-{
+- (BOOL)shouldShowStatusBar {
 	return NO;
 }
 
-- (void)showOrHideStatusBar
-{
+- (void)showOrHideStatusBar {
 	BOOL statusBarShouldBeVisible = [self shouldShowStatusBar];
 	if (statusBarShouldBeVisible == statusVisible) return;
 	statusVisible = statusBarShouldBeVisible;
@@ -220,8 +210,7 @@
 	[UIView commitAnimations];
 }
 
-- (void)reloadData
-{
+- (void)reloadData {
   NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 
   NSArray *allProducts;
@@ -250,8 +239,7 @@
 }
 
 
-- (void)reloadTableView
-{
+- (void)reloadTableView {
 	//Reload the table view, preserving the current selection:
 	NSArray *selectedIndexPaths = [self.productsTableView indexPathsForSelectedRows];
 	[self.productsTableView reloadData];
@@ -265,8 +253,7 @@
   	}
 }
 
-- (void)changeColor:(UIButton *)sender
-{
+- (void)changeColor:(UIButton *)sender {
 	NSInteger row = sender.tag;
 	Product *product = [self.visibleProducts objectAtIndex:row - 1];
 	
@@ -284,8 +271,7 @@
 	}
 }
 
-- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(NSInteger)colorIndex
-{
+- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(NSInteger)colorIndex {
 	Product *product = (Product *)picker.context;
 	product.color = color;
 	[product.managedObjectContext save:NULL];
@@ -299,23 +285,19 @@
 
 #pragma mark - Tableview data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	return [self.visibleProducts count] + 1;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	return 40.0;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	NSString *cellIdentifier = @"DashboardApp";
 	DashboardAppCell *cell = (DashboardAppCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 	if (!cell) {
@@ -343,8 +325,7 @@
 	return cell;
 }
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
-{
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
 	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
 		DashboardAppCell * cell = ((DashboardAppCell*)gestureRecognizer.view);
 		NSUInteger i = [self.visibleProducts indexOfObject:cell.product];
@@ -379,23 +360,20 @@
 	}
 }
 
-- (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath {
 	return nil;
 }
 
 #pragma mark - Table view delegate
 
-- (void)deselectAllRowsInTableView:(UITableView*)tableView exceptForIndexPath:(NSIndexPath*)indexPath 
-{
+- (void)deselectAllRowsInTableView:(UITableView*)tableView exceptForIndexPath:(NSIndexPath*)indexPath  {
 	for (NSIndexPath *i in [tableView indexPathsForSelectedRows]) {
 		if ([i isEqual:indexPath]) continue;
 		[tableView deselectRowAtIndexPath:i animated:NO];
 	}
 }
 
-- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath 
-{
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath  {
 	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
 	[tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 	if (indexPath.row != 0) {
@@ -406,25 +384,21 @@
 	}
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
 	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
 	self.shadowView.alpha = MAX(0.0, MIN(1.0, (scrollView.contentOffset.y - 20) / 20.0));
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

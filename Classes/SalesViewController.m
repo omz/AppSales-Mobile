@@ -37,8 +37,7 @@
 @synthesize graphView, downloadReportsButtonItem;
 @synthesize selectedReportPopover;
 
-- (id)initWithAccount:(ASAccount *)anAccount
-{
+- (id)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithAccount:anAccount];
 	if (self) {
 		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
@@ -68,16 +67,14 @@
 	return self;
 }
 
-- (void)willShowPasscodeLock:(NSNotification *)notification
-{
+- (void)willShowPasscodeLock:(NSNotification *)notification {
 	[super willShowPasscodeLock:notification];
 	if (self.selectedReportPopover.popoverVisible) {
 		[self.selectedReportPopover dismissPopoverAnimated:NO];
 	}
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	[super loadView];
 	
 	self.viewMode = [[NSUserDefaults standardUserDefaults] integerForKey:kSettingDashboardViewMode];
@@ -134,34 +131,29 @@
 	}
 }
 
-- (BOOL)shouldShowStatusBar
-{
+- (BOOL)shouldShowStatusBar {
 	return self.account.isDownloadingReports;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
 	[super viewDidLoad];
 	previousOrientation = self.interfaceOrientation;
 	[self reloadData];
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
 	[super viewDidUnload];
 	self.graphView = nil;
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	if (self.interfaceOrientation != previousOrientation) {
 		[self willAnimateRotationToInterfaceOrientation:self.interfaceOrientation duration:0.0];
 	}
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
 	self.account.reportsBadge = [NSNumber numberWithInteger:0];
 	if ([self.account.managedObjectContext hasChanges]) {
@@ -169,16 +161,14 @@
 	}
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return UIInterfaceOrientationIsLandscape(interfaceOrientation) || interfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
 	if (self.selectedReportPopover.popoverVisible) {
 		[self.selectedReportPopover dismissPopoverAnimated:YES];
 	}
@@ -199,13 +189,11 @@
 	previousOrientation = toInterfaceOrientation;
 }
 
-- (NSSet *)entityNamesTriggeringReload
-{
+- (NSSet *)entityNamesTriggeringReload {
 	return [NSSet setWithObjects:@"DailyReport", @"WeeklyReport", @"Product", nil];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"isDownloadingReports"]) {
 		self.downloadReportsButtonItem.enabled = !self.account.isDownloadingReports;
 		[self showOrHideStatusBar];
@@ -215,8 +203,7 @@
 	}
 }
 
-- (void)reloadData
-{
+- (void)reloadData {
 	[super reloadData];
 	[sortedDailyReports removeAllObjects];
 	[sortedWeeklyReports removeAllObjects];
@@ -283,8 +270,7 @@
 }
 
 
-- (void)setViewMode:(DashboardViewMode)newViewMode
-{
+- (void)setViewMode:(DashboardViewMode)newViewMode {
 	viewMode = newViewMode;
 	if (viewMode == DashboardViewModeSales || viewMode == DashboardViewModeRevenue) {
 		self.graphView.title = nil;
@@ -303,8 +289,7 @@
 
 #pragma mark - Actions
 
-- (void)downloadReports:(id)sender
-{
+- (void)downloadReports:(id)sender {
 	if (self.account.password && self.account.password.length > 0) { //Only download reports for accounts with login
 		if (!account.vendorID || account.vendorID.length == 0) {
 			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
@@ -325,14 +310,12 @@
 	
 }
 
-- (void)stopDownload:(id)sender
-{
+- (void)stopDownload:(id)sender {
 	self.stopButtonItem.enabled = NO;
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] cancelDownloadForAccount:self.account];
 }
 
-- (void)switchTab:(UISegmentedControl *)modeControl
-{
+- (void)switchTab:(UISegmentedControl *)modeControl {
 	selectedTab = modeControl.selectedSegmentIndex;
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		if (selectedTab == 0) {
@@ -357,8 +340,7 @@
 	[self.graphView reloadData];
 }
 
-- (void)showGraphOptions:(id)sender
-{
+- (void)showGraphOptions:(id)sender {
 	if (selectedTab == 0) {
 		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
 											 delegate:self 
@@ -377,8 +359,7 @@
 	[self.activeSheet showInView:self.view];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
 	if (buttonIndex != [actionSheet cancelButtonIndex]) {
 		if (actionSheet.tag == kSheetTagDailyGraphOptions) {
 			if (buttonIndex == 0) {
@@ -427,8 +408,7 @@
 }
 
 
-- (void)switchGraphMode:(id)sender
-{
+- (void)switchGraphMode:(id)sender {
 	if (viewMode != DashboardViewModeRevenue) {
 		self.viewMode = DashboardViewModeRevenue;
 	} else {
@@ -447,8 +427,7 @@
 
 #pragma mark - Graph view data source
 
-- (NSArray *)colorsForGraphView:(GraphView *)graphView
-{
+- (NSArray *)colorsForGraphView:(GraphView *)graphView {
 	NSMutableArray *colors = [NSMutableArray array];
 	for (Product *product in self.products) {
 		if ([product.hidden boolValue]) {
@@ -460,8 +439,7 @@
 	return colors;
 }
 
-- (NSUInteger)numberOfBarsInGraphView:(GraphView *)graphView
-{
+- (NSUInteger)numberOfBarsInGraphView:(GraphView *)graphView {
 	if (selectedTab == 0) {
 		return [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count];
 	} else if (selectedTab == 1) {
@@ -474,8 +452,7 @@
 	return 0;
 }
 
-- (NSArray *)graphView:(GraphView *)graphView valuesForBarAtIndex:(NSUInteger)index
-{
+- (NSArray *)graphView:(GraphView *)graphView valuesForBarAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
 		return [self stackedValuesForReport:[((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index]];
 	} else if (selectedTab == 1) {
@@ -488,8 +465,7 @@
 	return [NSArray array];
 }
 
-- (NSString *)graphView:(GraphView *)graphView labelForXAxisAtIndex:(NSUInteger)index
-{
+- (NSString *)graphView:(GraphView *)graphView labelForXAxisAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
 		Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
 		if (showWeeks) {
@@ -516,8 +492,7 @@
 	}
 }
 
-- (UIColor *)graphView:(GraphView *)graphView labelColorForXAxisAtIndex:(NSUInteger)index
-{
+- (UIColor *)graphView:(GraphView *)graphView labelColorForXAxisAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
 		id<ReportSummary> report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
 		NSDateComponents *dateComponents = [calendar components:NSDayCalendarUnit | NSWeekdayCalendarUnit fromDate:report.startDate];
@@ -529,8 +504,7 @@
 	return [UIColor darkGrayColor];
 }
 
-- (NSString *)graphView:(GraphView *)graphView labelForBarAtIndex:(NSUInteger)index
-{
+- (NSString *)graphView:(GraphView *)graphView labelForBarAtIndex:(NSUInteger)index {
 	id<ReportSummary> report = nil;
 	if (selectedTab == 0) {
 		report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
@@ -576,8 +550,7 @@
 	return labelText;
 }
 
-- (NSString *)graphView:(GraphView *)graphView labelForSectionAtIndex:(NSUInteger)index
-{
+- (NSString *)graphView:(GraphView *)graphView labelForSectionAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
 		if ([((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count] > index) {
 			Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
@@ -606,8 +579,7 @@
 	}
 }
 
-- (NSArray *)stackedValuesForReport:(id<ReportSummary>)report
-{
+- (NSArray *)stackedValuesForReport:(id<ReportSummary>)report {
 	NSMutableArray *stackedValues = [NSMutableArray array];
 	for (Product *product in self.products) {
 		NSString *productID = product.productID;
@@ -640,8 +612,7 @@
 
 #pragma mark - Graph view delegate
 
-- (void)graphView:(GraphView *)view didSelectBarAtIndex:(NSUInteger)index withFrame:(CGRect)barFrame
-{
+- (void)graphView:(GraphView *)view didSelectBarAtIndex:(NSUInteger)index withFrame:(CGRect)barFrame {
 	NSArray *reports = nil;
 	if (selectedTab == 0) {
 		reports = ((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports);
@@ -681,14 +652,12 @@
 	}
 }
 
-- (BOOL)graphView:(GraphView *)view canDeleteBarAtIndex:(NSUInteger)index
-{
+- (BOOL)graphView:(GraphView *)view canDeleteBarAtIndex:(NSUInteger)index {
 	//Only allow deletion of actual reports, not monthly summaries:
 	return selectedTab == 0;
 }
 
-- (void)graphView:(GraphView *)view deleteBarAtIndex:(NSUInteger)index
-{
+- (void)graphView:(GraphView *)view deleteBarAtIndex:(NSUInteger)index {
 	Report *report = nil;
 	if (showWeeks) {
 		report = [self.sortedWeeklyReports objectAtIndex:index];
@@ -705,8 +674,7 @@
 
 #pragma mark - Table view data source
 
-- (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath {
 	Product *product = nil;
 	if (indexPath.row != 0) {
 		product = [self.visibleProducts objectAtIndex:indexPath.row - 1];
@@ -763,8 +731,7 @@
 	return nil;
 }
 
-- (void)selectAdvancedViewMode:(UILongPressGestureRecognizer *)gestureRecognizer
-{
+- (void)selectAdvancedViewMode:(UILongPressGestureRecognizer *)gestureRecognizer {
 	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
 		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
 															delegate:self 
@@ -795,16 +762,14 @@
 	[self.graphView reloadValuesAnimated:YES];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[super tableView:tableView didSelectRowAtIndexPath:indexPath];
 	[self.graphView reloadValuesAnimated:YES];
 }
 
 #pragma mark -
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:ASViewSettingsDidChangeNotification object:nil];
 	
 	[account removeObserver:self forKeyPath:@"isDownloadingReports"];

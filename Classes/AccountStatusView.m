@@ -11,8 +11,7 @@
 
 @implementation AccountStatusView
 
-- (id)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount
-{
+- (id)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount {
 	self = [super initWithFrame:frame];
 	if (self) {
 		account = anAccount;
@@ -40,8 +39,7 @@
 	return self;
 }
 
-- (void)updateStatus
-{
+- (void)updateStatus {
 	if (account.isDownloadingReports) {
 		[activityIndicator startAnimating];
 		statusLabel.text = account.downloadStatus;
@@ -51,13 +49,11 @@
 	}
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	[self updateStatus];
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
 	[account removeObserver:self forKeyPath:@"isDownloadingReports"];
 	[account removeObserver:self forKeyPath:@"downloadStatus"];
 }

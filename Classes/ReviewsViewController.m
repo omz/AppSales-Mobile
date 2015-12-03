@@ -15,8 +15,7 @@
 
 @synthesize reviewSummaryView, downloadReviewsButtonItem, reviewsPopover;
 
-- (id)initWithAccount:(ASAccount *)anAccount
-{
+- (id)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithAccount:anAccount];
 	if (self) {
 		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
@@ -30,16 +29,14 @@
 	return self;
 }
 
-- (void)willShowPasscodeLock:(NSNotification *)notification
-{
+- (void)willShowPasscodeLock:(NSNotification *)notification {
 	[super willShowPasscodeLock:notification];
 	if (self.reviewsPopover.popoverVisible) {
 		[self.reviewsPopover dismissPopoverAnimated:NO];
 	}
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	[super loadView];
 	
 	self.reviewSummaryView = [[ReviewSummaryView alloc] initWithFrame:self.topView.frame];
@@ -58,27 +55,23 @@
 	}
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
 	[super viewDidUnload];
 	self.reviewSummaryView = nil;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (BOOL)shouldShowStatusBar
-{
+- (BOOL)shouldShowStatusBar {
 	return [[ReviewDownloadManager sharedManager] isDownloading];
 }
 
-- (void)reviewDownloadProgressDidChange:(NSNotification *)notification
-{
+- (void)reviewDownloadProgressDidChange:(NSNotification *)notification {
 	self.downloadReviewsButtonItem.enabled = ![[ReviewDownloadManager sharedManager] isDownloading];
 	[self showOrHideStatusBar];
 	if (!self.account.isDownloadingReports) {
@@ -91,31 +84,26 @@
 	}
 }
 
-- (NSSet *)entityNamesTriggeringReload
-{
+- (NSSet *)entityNamesTriggeringReload {
 	return [NSSet setWithObjects:@"Review", @"Product", nil];
 }
 
-- (void)reloadData
-{
+- (void)reloadData {
 	[super reloadData];
 	[self.reviewSummaryView reloadDataAnimated:NO];
 }
 
-- (void)downloadReviews:(id)sender
-{
+- (void)downloadReviews:(id)sender {
 	[[ReviewDownloadManager sharedManager] downloadReviewsForProducts:self.visibleProducts];
 }
 
-- (void)stopDownload:(id)sender
-{
+- (void)stopDownload:(id)sender {
 	self.stopButtonItem.enabled = NO;
 	[[ReviewDownloadManager sharedManager] cancelAllDownloads];
 	self.statusLabel.text = NSLocalizedString(@"Cancelled", nil);
 }
 
-- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfReviewsForRating:(NSInteger)rating
-{
+- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfReviewsForRating:(NSInteger)rating {
 	if (!self.account) return 0;
 	
 	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
@@ -141,8 +129,7 @@
 	return numberOfReviewsForRating;
 }
 
-- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfUnreadReviewsForRating:(NSInteger)rating
-{
+- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfUnreadReviewsForRating:(NSInteger)rating {
 	if (!self.account) return 0;
 	
 	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
@@ -168,8 +155,7 @@
 	return numberOfUnreadReviewsForRating;
 }
 
-- (void)reviewSummaryView:(ReviewSummaryView *)view didSelectRating:(NSInteger)rating
-{
+- (void)reviewSummaryView:(ReviewSummaryView *)view didSelectRating:(NSInteger)rating {
 	if (!self.account) return;
 	
 	ReviewListViewController *vc = [[ReviewListViewController alloc] initWithAccount:self.account products:self.selectedProducts rating:rating];
@@ -187,8 +173,7 @@
 	[self.reviewSummaryView reloadDataAnimated:YES];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[super tableView:tableView didSelectRowAtIndexPath:indexPath];
 	[self.reviewSummaryView reloadDataAnimated:YES];
 }

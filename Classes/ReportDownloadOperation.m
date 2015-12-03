@@ -26,8 +26,7 @@
 
 @synthesize downloadCount, accountObjectID;
 
-- (id)initWithAccount:(ASAccount *)account
-{
+- (id)initWithAccount:(ASAccount *)account {
 	self = [super init];
 	if (self) {
 		username = [[account username] copy];
@@ -39,8 +38,7 @@
 	return self;
 }
 
-- (void)main
-{
+- (void)main {
 	@autoreleasepool {
 	
 		int numberOfReportsDownloaded = 0;
@@ -439,8 +437,7 @@
 	}
 }
 
-- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID
-{
+- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID {
 	NSManagedObjectContext *moc = [account managedObjectContext];
 	
 	NSScanner *graphDataScanner = [NSScanner scannerWithString:paymentsPage];
@@ -508,8 +505,7 @@
 	}
 }
 
-- (NSData *)dataFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary response:(NSHTTPURLResponse **)response
-{
+- (NSData *)dataFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary response:(NSHTTPURLResponse **)response {
 	NSString *postDictString = [bodyDictionary formatForHTTP];
 	NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
 	NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:URL];
@@ -519,8 +515,7 @@
 	return data;
 }
 
-- (NSString *)stringFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary
-{
+- (NSString *)stringFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary {
 	NSData *data = [self dataFromSynchronousPostRequestWithURL:URL bodyDictionary:bodyDictionary response:NULL];
 	if (data) {
 		return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];

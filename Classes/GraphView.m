@@ -16,8 +16,7 @@
 @synthesize delegate, dataSource;
 @synthesize sectionLabelButton;
 
-- (id)initWithFrame:(CGRect)frameRect
-{
+- (id)initWithFrame:(CGRect)frameRect {
 	self = [super initWithFrame:frameRect];
 	if (self) {
 		self.clipsToBounds = YES;
@@ -83,8 +82,7 @@
 	return self;
 }
 
-- (void)longPress:(UILongPressGestureRecognizer *)recognizer
-{
+- (void)longPress:(UILongPressGestureRecognizer *)recognizer {
 	if ([recognizer state] == UIGestureRecognizerStateBegan) {
 		for (NSNumber *index in visibleBarViews) {
 			StackedBarView *barView = [visibleBarViews objectForKey:index];
@@ -104,37 +102,31 @@
 	}
 }
 
-- (void)deleteBar:(id)sender
-{
+- (void)deleteBar:(id)sender {
 	if ([self.delegate respondsToSelector:@selector(graphView:deleteBarAtIndex:)]) {
 		[self.delegate graphView:self deleteBarAtIndex:selectedBarIndexForMenu];
 	}
 }
 
-- (BOOL)canBecomeFirstResponder
-{
+- (BOOL)canBecomeFirstResponder {
 	return YES;
 }
 
-- (BOOL)canPerformAction:(SEL)action withSender:(id)sender
-{
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
 	if (action == @selector(deleteBar:)) return YES;
 	return NO;
 }
 
 
-- (void)setTitle:(NSString *)title
-{
+- (void)setTitle:(NSString *)title {
 	titleLabel.text = title;
 }
 
-- (NSString *)title
-{
+- (NSString *)title {
 	return titleLabel.text;
 }
 
-- (void)lockScale:(UILongPressGestureRecognizer *)recognizer
-{
+- (void)lockScale:(UILongPressGestureRecognizer *)recognizer {
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
 		maxLocked = !maxLocked;
 		[MBProgressHUD hideHUDForView:self animated:YES];
@@ -162,13 +154,11 @@
 	}
 }
 
-- (void)hideHUD
-{
+- (void)hideHUD {
 	[MBProgressHUD hideHUDForView:self animated:YES];
 }
 
-- (void)barSelected:(StackedBarView *)barView
-{
+- (void)barSelected:(StackedBarView *)barView {
 	if ([[UIMenuController sharedMenuController] isMenuVisible]) return;
 	for (NSNumber *barIndex in visibleBarViews) {
 		StackedBarView *view = [visibleBarViews objectForKey:barIndex];
@@ -181,19 +171,16 @@
 	}
 }
 
-- (NSString *)unit
-{
+- (NSString *)unit {
 	return scaleView.unit;
 }
 
-- (void)setUnit:(NSString *)unit
-{
+- (void)setUnit:(NSString *)unit {
 	[scaleView setUnit:unit];
 }
 
 
-- (void)reloadData
-{
+- (void)reloadData {
 	[cachedValues removeAllObjects];
 	
 	NSUInteger numberOfBars = [self.dataSource numberOfBarsInGraphView:self];
@@ -216,8 +203,7 @@
 }
 
 
-- (void)reloadValuesAnimated:(BOOL)animated
-{
+- (void)reloadValuesAnimated:(BOOL)animated {
 	[cachedValues removeAllObjects];
 	
 	if (!maxLocked) {
@@ -245,21 +231,18 @@
 	}
 }
 
-- (void)setFrame:(CGRect)frame
-{
+- (void)setFrame:(CGRect)frame {
 	[super setFrame:frame];
 	[self scrollViewDidScroll:scrollView];
 }
 
-- (void)setNumberOfBarsPerPage:(int)newBarsPerPage
-{
+- (void)setNumberOfBarsPerPage:(int)newBarsPerPage {
 	barsPerPage = newBarsPerPage;
 	barWidth = scrollView.bounds.size.width / barsPerPage;
 	[self reloadData];
 }
 
-- (NSRange)visibleBarRange
-{
+- (NSRange)visibleBarRange {
 	NSUInteger numberOfBars = [self.dataSource numberOfBarsInGraphView:self];
 	barsPerPage = scrollView.bounds.size.width / barWidth;
 	int firstVisibleBarIndex = MIN(numberOfBars, MAX(0, scrollView.contentOffset.x / barWidth));
@@ -270,8 +253,7 @@
 	return newVisibleRange;
 }
 
-- (float)maxVisibleValue
-{
+- (float)maxVisibleValue {
 	float maxValue = 0.0;
 	for (NSInteger i = visibleRange.location; i < visibleRange.location + visibleRange.length; i++) {
 		NSArray *stackedValues = [self.dataSource graphView:self valuesForBarAtIndex:i];
@@ -281,22 +263,19 @@
 	return maxValue;
 }
 
-- (CGRect)frameForBarAtIndex:(NSInteger)index
-{
+- (CGRect)frameForBarAtIndex:(NSInteger)index {
 	float marginBottom = 30.0;
 	CGRect barFrame =  CGRectMake(barWidth * index, 0, barWidth, self.bounds.size.height - marginBottom);
 	return CGRectIntegral(barFrame);
 }
 
-- (NSString *)labelTextForIndex:(NSUInteger)index
-{
+- (NSString *)labelTextForIndex:(NSUInteger)index {
 	if (barWidth < 20) return nil;
 	NSString *labelText = [self.dataSource graphView:self labelForBarAtIndex:index];
 	return labelText;
 }
 
-- (void)reloadColors
-{
+- (void)reloadColors {
 	for (UIView *barView in [visibleBarViews allValues]) {
 		[barView removeFromSuperview];
 	}
@@ -307,8 +286,7 @@
 	[self scrollViewDidScroll:scrollView];
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)aScrollView
-{
+- (void)scrollViewDidScroll:(UIScrollView *)aScrollView {
 	NSRange newVisibleRange = [self visibleBarRange];
 	if (NSEqualRanges(newVisibleRange, visibleRange)) {
 		return;
@@ -376,8 +354,7 @@
 	}
 }
 
-- (NSArray *)stackedValuesForBarAtIndex:(NSUInteger)index
-{
+- (NSArray *)stackedValuesForBarAtIndex:(NSUInteger)index {
 	NSArray *stackedAbsoluteValues = [cachedValues objectForKey:[NSNumber numberWithUnsignedInteger:index]];
 	if (!stackedAbsoluteValues) {
 		stackedAbsoluteValues = [self.dataSource graphView:self valuesForBarAtIndex:index];
@@ -395,16 +372,14 @@
 	return stackedValues;
 }
 
-- (void)scrollViewDidEndDragging:(UIScrollView *)aScrollView willDecelerate:(BOOL)decelerate
-{
+- (void)scrollViewDidEndDragging:(UIScrollView *)aScrollView willDecelerate:(BOOL)decelerate {
 	if (!decelerate) {
 		[self scrollViewDidEndDecelerating:aScrollView];
 	}
 }
 
 
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
 	if (!maxLocked) {
 		float oldMax = max;
 		max = [self maxVisibleValue];
@@ -431,8 +406,7 @@
 
 @implementation StackedBarView
 
-- (id)initWithColors:(NSArray *)colorArray
-{
+- (id)initWithColors:(NSArray *)colorArray {
 	self = [super initWithFrame:CGRectZero];
 	if (self) {
 		segmentViews = [NSMutableArray new];
@@ -457,13 +431,11 @@
 }
 
 
-- (void)setSegmentValues:(NSArray *)values
-{
+- (void)setSegmentValues:(NSArray *)values {
 	[self setSegmentValues:values label:@""];
 }
 
-- (void)setSegmentValues:(NSArray *)values label:(NSString *)labelText
-{
+- (void)setSegmentValues:(NSArray *)values label:(NSString *)labelText {
 	NSAssert([values count] == [segmentViews count], @"The number of values must always be equal to the number of colors");
 	
 	CGFloat padding = 3.0;
@@ -486,8 +458,7 @@
 	}
 }
 
-- (CGFloat)stackHeight
-{
+- (CGFloat)stackHeight {
 	CGFloat stackHeight = 0.0;
 	for (UIView *segmentView in segmentViews) {
 		stackHeight += segmentView.frame.size.height;
@@ -495,26 +466,22 @@
 	return stackHeight;
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	[self selectedBackgroundView].alpha = 1.0;
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
 	[UIView beginAnimations:nil context:nil];
 	[self selectedBackgroundView].alpha = 0.0;
 	[UIView commitAnimations];
 	[self sendActionsForControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
-{
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
 	selectedBackgroundView.alpha = 0.0;
 }
 
-- (UIView *)selectedBackgroundView
-{
+- (UIView *)selectedBackgroundView {
 	if (!selectedBackgroundView) {
 		selectedBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(2, 3, self.bounds.size.width - 4, self.bounds.size.height + 18)];
 		selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:0.8];
@@ -534,8 +501,7 @@
 
 @synthesize unit;
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
 		lineViews = [NSMutableDictionary new];
@@ -562,8 +528,7 @@
 	return self;
 }
 
-- (void)setUnit:(NSString *)newUnit
-{
+- (void)setUnit:(NSString *)newUnit {
 	if ([newUnit isEqualToString:unit]) return;
 	unit = newUnit;
 	for (NSNumber *step in lineViews) {
@@ -573,8 +538,7 @@
 	
 }
 
-- (void)setMax:(float)newMax animated:(BOOL)animated
-{
+- (void)setMax:(float)newMax animated:(BOOL)animated {
 	float animationDuration = (animated) ? ANIMATION_DURATION : 0.0;
 	
 	[UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations: ^ {
@@ -652,8 +616,7 @@
 
 @implementation LineView
 
-- (id)initWithFrame:(CGRect)frameRect
-{
+- (id)initWithFrame:(CGRect)frameRect {
 	self = [super initWithFrame:frameRect];
 	if (self) {
 		self.backgroundColor = [UIColor colorWithWhite:0.75 alpha:1.0];
@@ -670,8 +633,7 @@
 	return self;
 }
 
-- (void)setLabelText:(NSString *)labelText
-{
+- (void)setLabelText:(NSString *)labelText {
 	label.text = labelText;
 }
 
@@ -681,8 +643,7 @@
 
 @implementation TouchCancellingScrollView
 
-- (BOOL)touchesShouldCancelInContentView:(UIView *)view
-{
+- (BOOL)touchesShouldCancelInContentView:(UIView *)view {
 	return YES;
 }
 

@@ -15,8 +15,7 @@
 
 @synthesize report, selectedProduct, selectedCountry;
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
 		self.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:1.0];
@@ -27,30 +26,26 @@
 	return self;
 }
 
-- (NSDictionary *)polygonsByCountryCode
-{
+- (NSDictionary *)polygonsByCountryCode {
 	if (!polygonsByCountryCode) {
 		polygonsByCountryCode = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"countries_simple" ofType:@"plist"]];
 	}
 	return polygonsByCountryCode;
 }
 
-- (void)setReport:(Report *)newReport
-{
+- (void)setReport:(Report *)newReport {
 	if (report == newReport) return;
 	report = newReport;
 	[self setNeedsDisplay];
 }
 
-- (void)setSelectedProduct:(Product *)product
-{
+- (void)setSelectedProduct:(Product *)product {
 	if (product == selectedProduct) return;
 	selectedProduct = product;
 	[self setNeedsDisplay];
 }
 
-- (void)drawRect:(CGRect)rect
-{
+- (void)drawRect:(CGRect)rect {
 	if (!self.report) return;
 	
 	CGContextRef c = UIGraphicsGetCurrentContext();
@@ -91,8 +86,7 @@
 	CGContextFillRect(c, CGRectMake(0, height-1, width, 1));	
 }
 
-- (void)setSelectedCountry:(NSString *)country
-{
+- (void)setSelectedCountry:(NSString *)country {
 	if ([country isEqualToString:selectedCountry]) return;
 	selectedCountry = country;
 	
@@ -117,8 +111,7 @@
 	}
 }
 
-- (CGPoint)centerPointForCountry:(NSString *)country
-{
+- (CGPoint)centerPointForCountry:(NSString *)country {
 	NSArray *paths = [self polygonPathsForCountry:country];
 	CGRect largestBoundingBox = CGRectZero;
 	for (UIBezierPath *path in paths) {
@@ -130,8 +123,7 @@
 	return CGPointMake(CGRectGetMidX(largestBoundingBox), CGRectGetMidY(largestBoundingBox));
 }
 
-- (NSArray *)polygonPathsForCountry:(NSString *)country
-{
+- (NSArray *)polygonPathsForCountry:(NSString *)country {
 	CGFloat width = self.bounds.size.width;
 	CGFloat height = self.bounds.size.height;
 	NSMutableArray *paths = [NSMutableArray array];

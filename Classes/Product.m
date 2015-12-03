@@ -30,22 +30,19 @@
 @dynamic lastModified;
 @dynamic promoCodes;
 
-- (void)awakeFromInsert
-{
+- (void)awakeFromInsert {
 	[super awakeFromInsert];
 	self.color = [UIColor randomColor];
 }
 
-- (NSString *)displayName
-{
+- (NSString *)displayName {
 	if (self.customName && ![self.customName isEqualToString:@""]) {
 		return self.customName;
 	}
 	return [NSString stringWithFormat:@"%@ (%@)", self.name, self.platform];
 }
 
-- (NSString *)defaultDisplayName
-{
+- (NSString *)defaultDisplayName {
 	return [NSString stringWithFormat:@"%@ (%@)", self.name, self.platform];
 }
 

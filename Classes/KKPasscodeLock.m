@@ -27,8 +27,7 @@ static KKPasscodeLock *sharedLock = nil;
 @synthesize eraseOption = _eraseOption;
 @synthesize attemptsAllowed = _attemptsAllowed;
 
-+ (KKPasscodeLock*)sharedLock
-{
++ (KKPasscodeLock*)sharedLock {
 	@synchronized(self) {
 		if (sharedLock == nil) {
 			sharedLock = [[self alloc] init];
@@ -39,13 +38,11 @@ static KKPasscodeLock *sharedLock = nil;
 	return sharedLock;
 }
 
-- (BOOL)isPasscodeRequired
-{
+- (BOOL)isPasscodeRequired {
 	return [[KKKeychain getStringForKey:@"passcode_on"] isEqualToString:@"YES"];
 }
 
-- (void)setDefaultSettings
-{
+- (void)setDefaultSettings {
 	if (![KKKeychain getStringForKey:@"passcode_on"]) {
 		[KKKeychain setString:@"NO" forKey:@"passcode_on"];
 	}

@@ -27,8 +27,7 @@
 
 @implementation ReviewDownloadManager
 
-- (id)init
-{
+- (id)init {
 	self = [super init];
 	if (self) {
 		activeDownloads = [NSMutableSet new];
@@ -37,8 +36,7 @@
 	return self;
 }
 
-+ (id)sharedManager
-{
++ (id)sharedManager {
 	static id sharedManager = nil;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -47,8 +45,7 @@
 	return sharedManager;
 }
 
-- (void)downloadReviewsForProducts:(NSArray *)products
-{
+- (void)downloadReviewsForProducts:(NSArray *)products {
 	if ([activeDownloads count] > 0 || [downloadQueue count] > 0) return;
 	
 	NSDictionary *storeInfos = [[NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"stores" ofType:@"plist"]] objectForKey:@"StoreInfos"];
@@ -68,8 +65,7 @@
 	[self dequeueDownload];
 }
 
-- (void)cancelAllDownloads
-{
+- (void)cancelAllDownloads {
 	[downloadQueue removeAllObjects];
 	for (ReviewDownload *download in activeDownloads) {
 		[download cancel];
@@ -80,8 +76,7 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewDownloadManagerDidUpdateProgressNotification object:self];
 }
 
-- (void)dequeueDownload
-{
+- (void)dequeueDownload {
 	if ([downloadQueue count] == 0) return;
 	if ([activeDownloads count] >= MAX_CONCURRENT_REVIEW_DOWNLOADS) return;
 	
@@ -93,21 +88,18 @@
 	[self dequeueDownload];
 }
 
-- (void)reviewDownloadDidFinish:(ReviewDownload *)download
-{
+- (void)reviewDownloadDidFinish:(ReviewDownload *)download {
 	[activeDownloads removeObject:download];
 	completedDownloadsCount++;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ReviewDownloadManagerDidUpdateProgressNotification object:self];
 	[self dequeueDownload];
 }
 
-- (BOOL)isDownloading
-{
+- (BOOL)isDownloading {
 	return [downloadQueue count] != 0 || [activeDownloads count] != 0;
 }
 
-- (float)downloadProgress
-{
+- (float)downloadProgress {
 	float progress = (totalDownloadsCount == 0) ? 1.0 : (float)completedDownloadsCount / (float)totalDownloadsCount;
 	return progress;
 }
@@ -121,8 +113,7 @@
 
 @synthesize delegate, downloadConnection;
 
-- (id)initWithProduct:(Product *)app storeFront:(NSString *)storeFrontID countryCode:(NSString *)countryCode
-{
+- (id)initWithProduct:(Product *)app storeFront:(NSString *)storeFrontID countryCode:(NSString *)countryCode {
 	self = [super init];
 	if (self) {
 		_product = app;
@@ -136,8 +127,7 @@
 	return self;
 }
 
-- (void)start
-{
+- (void)start {
 	backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
 	NSString *productID = _product.productID;
 	NSString *URLString = [NSString stringWithFormat:@"https://itunes.apple.com/%@/rss/customerreviews/id=%@/sortBy=mostRecent/xml", country, productID];
@@ -146,8 +136,7 @@
 	self.downloadConnection = [NSURLConnection connectionWithRequest:request delegate:self];
 }
 
-- (void)cancel
-{
+- (void)cancel {
 	if (backgroundTaskID != UIBackgroundTaskInvalid) {
 		[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
 	}
@@ -155,13 +144,11 @@
 	[self.downloadConnection cancel];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)dataChunk
-{
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)dataChunk {
 	[data appendData:dataChunk];
 }
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	NSError *error;
 	SMXMLDocument *document = [SMXMLDocument documentWithData:data error:&error];
 	// check for errors
@@ -176,14 +163,12 @@
 	// for (SMXMLElement *child in children){
 	//	 NSLog(@"child name = %@", [child name]);
 	// }
-	if (1 > 0) // always true
-	{
+	if (1 > 0) { // always true
 		NSString * stringBlank = @"";
 		dispatch_async(dispatch_get_global_queue(0, 0), ^ {
 			
 			NSMutableArray *reviewInfos = [NSMutableArray new];
-			for (SMXMLElement *entry in [feed childrenNamed:@"entry"])
-			{
+			for (SMXMLElement *entry in [feed childrenNamed:@"entry"]) {
 				
 				if ([entry valueWithPath:@"artist"] == nil || [entry valueWithPath:@"artist"]  == stringBlank ){
 					
@@ -328,8 +313,7 @@
 	}
 }
 
-- (NSArray *)reviewInfosFromHTML:(NSString *)html
-{
+- (NSArray *)reviewInfosFromHTML:(NSString *)html {
 	NSMutableArray *reviews = [NSMutableArray array];
 	NSScanner *scanner = [NSScanner scannerWithString:html];
 	while (![scanner isAtEnd]) {
@@ -389,8 +373,7 @@
 	return reviews;
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
 	if (backgroundTaskID != UIBackgroundTaskInvalid) {
 		[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
 	}

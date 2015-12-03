@@ -16,8 +16,7 @@
 
 @synthesize product, colorButton;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
 		CGSize contentSize = self.contentView.bounds.size;
@@ -47,8 +46,7 @@
 	return self;
 }
 
-- (void)setProduct:(Product *)newProduct
-{
+- (void)setProduct:(Product *)newProduct {
 	product = newProduct;
 	
 	if (!product) {
@@ -68,16 +66,14 @@
 	}
 }
 
-- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated 
-{
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated  {
 	[super setHighlighted:highlighted animated:animated];
 	colorButton.selected = NO;
 	colorButton.highlighted = NO;
 	nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated 
-{
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated  {
 	[super setSelected:selected animated:animated];
 	colorButton.selected = NO;
 	colorButton.highlighted = NO;

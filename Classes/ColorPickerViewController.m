@@ -14,15 +14,13 @@
 
 @synthesize delegate, name, selectedColor, context;
 
-- (id)initWithColors:(NSArray *)colorArray
-{
+- (id)initWithColors:(NSArray *)colorArray {
 	if (!(self = [super initWithNibName:nil bundle:nil])) return nil;
 	colors = colorArray;
 	return self;
 }
 
-- (void)loadView
-{
+- (void)loadView {
 	[super loadView];
 	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	CGFloat height = self.view.bounds.size.height;
@@ -47,8 +45,7 @@
 	
 }
 
-- (void)selectColor:(id)sender
-{
+- (void)selectColor:(id)sender {
 	ColorButton *button = (ColorButton *)sender;
 	UIColor *pickedColor = button.color;
 	if (delegate && [delegate respondsToSelector:@selector(colorPicker:didPickColor:atIndex:)]) {

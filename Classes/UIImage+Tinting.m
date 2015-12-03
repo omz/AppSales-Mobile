@@ -10,8 +10,7 @@
 
 @implementation UIImage (Tinting)
 
-+ (UIImage *)as_tintedImageNamed:(NSString *)name color:(UIColor *)color
-{
++ (UIImage *)as_tintedImageNamed:(NSString *)name color:(UIColor *)color {
 	UIImage *image = [UIImage imageNamed:name];
 	CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
 	UIGraphicsBeginImageContextWithOptions(rect.size, NO, image.scale);

@@ -10,8 +10,7 @@
 
 @implementation AppleFiscalCalendar
 
-- (id)init
-{
+- (id)init {
 	self = [super init];
 	if (self) {
 		
@@ -73,8 +72,7 @@
 	return self;
 }
 
-- (NSString *)fiscalMonthForDate:(NSDate *)requestedDate
-{
+- (NSString *)fiscalMonthForDate:(NSDate *)requestedDate {
 	NSUInteger indexOfNextMonth = [self indexOfNextMonthForDate:requestedDate];
 	if (indexOfNextMonth > 0) {
 		return [sortedFiscalMonthNames objectAtIndex:indexOfNextMonth - 1];
@@ -83,8 +81,7 @@
 	}
 }
 
-- (NSDate *)representativeDateForFiscalMonthOfDate:(NSDate *)requestedDate
-{
+- (NSDate *)representativeDateForFiscalMonthOfDate:(NSDate *)requestedDate {
 	NSUInteger indexOfNextMonth = [self indexOfNextMonthForDate:requestedDate];
 	if (indexOfNextMonth > 0) {
 		NSDate *startOfFiscalMonth = [sortedDates objectAtIndex:indexOfNextMonth - 1];
@@ -95,8 +92,7 @@
 	}
 }
 
-- (NSUInteger)indexOfNextMonthForDate:(NSDate *)requestedDate
-{
+- (NSUInteger)indexOfNextMonthForDate:(NSDate *)requestedDate {
 	NSUInteger indexOfNextMonth = [sortedDates indexOfObject:requestedDate 
 											   inSortedRange:NSMakeRange(0, [sortedDates count])
 													 options:NSBinarySearchingLastEqual|NSBinarySearchingInsertionIndex
@@ -108,8 +104,7 @@
 	return indexOfNextMonth;
 }
 
-+ (AppleFiscalCalendar *)sharedFiscalCalendar
-{
++ (AppleFiscalCalendar *)sharedFiscalCalendar {
 	static id sharedFiscalCalendar = nil;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{

@@ -21,13 +21,11 @@
 
 @implementation PromoCodeOperation
 
-- (id)initWithProduct:(Product *)aProduct
-{
+- (id)initWithProduct:(Product *)aProduct {
 	return [self initWithProduct:aProduct numberOfCodes:0];
 }
 
-- (id)initWithProduct:(Product *)aProduct numberOfCodes:(NSInteger)numberOfCodes
-{
+- (id)initWithProduct:(Product *)aProduct numberOfCodes:(NSInteger)numberOfCodes {
 	self = [super init];
 	
 	// TODO: This should be re-implemented if enough people actually use it.
@@ -444,8 +442,7 @@
 	return self;
 }
 
-+ (NSString *)scanNameForFormField:(NSString *)field withScanner:(NSScanner *)scanner
-{
++ (NSString *)scanNameForFormField:(NSString *)field withScanner:(NSScanner *)scanner {
 	[scanner scanUpToString:[NSString stringWithFormat:@"class='%@'", field] intoString:NULL];
 	[scanner scanUpToString:@"name=\"" intoString:NULL];
 	if ([scanner scanString:@"name=\"" intoString:NULL]) {
@@ -456,8 +453,7 @@
 	return nil;
 }
 
-+ (NSURLRequest *)postRequestWithURL:(NSURL *)URL body:(NSDictionary *)bodyDict
-{
++ (NSURLRequest *)postRequestWithURL:(NSURL *)URL body:(NSDictionary *)bodyDict {
 	NSString *postDictString = [bodyDict formatForHTTP];
 	NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
@@ -466,8 +462,7 @@
 	return request;
 }
 
-+ (void)errorNotification:(NSString *)errorDescription
-{
++ (void)errorNotification:(NSString *)errorDescription {
 	dispatch_async(dispatch_get_main_queue(), ^ {
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASPromoCodeDownloadFailedNotification object:nil userInfo:[NSDictionary dictionaryWithObject:errorDescription forKey:kASPromoCodeDownloadFailedErrorDescription]];
 	});

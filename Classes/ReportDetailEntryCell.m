@@ -16,8 +16,7 @@
 
 @synthesize entry;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
-{
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
 		//self.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
@@ -74,8 +73,7 @@
 	return self;
 }
 
-- (void)setEntry:(ReportDetailEntry *)newEntry
-{
+- (void)setEntry:(ReportDetailEntry *)newEntry {
 	entry = newEntry;
 	
 	NSString *revenueString = [revenueFormatter stringFromNumber:[NSNumber numberWithFloat:entry.revenue]];
@@ -110,8 +108,7 @@
 	subtitleLabel.text = entry.subtitle;
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
 	[super setSelected:selected animated:animated];
 	barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 	barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];
@@ -119,8 +116,7 @@
 	revenueLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
 }
 
-- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
-{
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
 	[super setHighlighted:highlighted animated:animated];
 	barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 	barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];

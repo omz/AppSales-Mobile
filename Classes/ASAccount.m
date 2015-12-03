@@ -16,23 +16,19 @@
 @dynamic username, vendorID, title, sortIndex, dailyReports, weeklyReports, products, payments, reportsBadge, paymentsBadge;
 @synthesize isDownloadingReports, downloadStatus, downloadProgress;
 
-- (NSString *)password
-{
+- (NSString *)password {
 	return [SSKeychain passwordForService:kAccountKeychainServiceIdentifier account:self.username];
 }
 
-- (void)setPassword:(NSString *)newPassword
-{
+- (void)setPassword:(NSString *)newPassword {
 	[SSKeychain setPassword:newPassword forService:kAccountKeychainServiceIdentifier account:self.username];
 }
 
-- (void)deletePassword
-{
+- (void)deletePassword {
 	[SSKeychain deletePasswordForService:kAccountKeychainServiceIdentifier account:self.username];
 }
 
-- (NSString *)displayName
-{
+- (NSString *)displayName {
 	if (self.title && ![self.title isEqualToString:@""]) {
 		return self.title;
 	}

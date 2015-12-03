@@ -13,8 +13,7 @@
 
 @synthesize title;
 
-- (id)initWithReports:(NSArray *)reportsArray
-{
+- (id)initWithReports:(NSArray *)reportsArray {
 	self = [super init];
 	if (self) {
 		reports = reportsArray;
@@ -22,19 +21,16 @@
 	return self;
 }
 
-- (NSDate *)startDate
-{
+- (NSDate *)startDate {
 	Report *firstReport = [reports objectAtIndex:0];
 	return firstReport.startDate;
 }
 
-- (float)totalRevenueInBaseCurrency
-{
+- (float)totalRevenueInBaseCurrency {
 	return [[reports valueForKeyPath:@"@sum.totalRevenueInBaseCurrency"] floatValue];
 }
 
-- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID
-{
+- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID {
 	float sum = 0.0;
 	for (Report *report in reports) {
 		sum += [report totalRevenueInBaseCurrencyForProductWithID:productID];
@@ -42,8 +38,7 @@
 	return sum;
 }
 
-- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID {
 	NSInteger total = 0;
 	for (Report *report in reports) {
 		total += [report totalNumberOfPaidDownloadsForProductWithID:productID];
@@ -51,8 +46,7 @@
 	return total;
 }
 
-- (NSInteger)totalNumberOfUpdatesForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfUpdatesForProductWithID:(NSString *)productID {
 	NSInteger total = 0;
 	for (Report *report in reports) {
 		total += [report totalNumberOfUpdatesForProductWithID:productID];
@@ -60,8 +54,7 @@
 	return total;
 }
 
-- (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfRedownloadsForProductWithID:(NSString *)productID {
 	NSInteger total = 0;
 	for (Report *report in reports) {
 		total += [report totalNumberOfRedownloadsForProductWithID:productID];
@@ -69,8 +62,7 @@
 	return total;
 }
 
-- (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfEducationalSalesForProductWithID:(NSString *)productID {
 	NSInteger total = 0;
 	for (Report *report in reports) {
 		total += [report totalNumberOfEducationalSalesForProductWithID:productID];
@@ -78,8 +70,7 @@
 	return total;
 }
 
-- (NSInteger)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfGiftPurchasesForProductWithID:(NSString *)productID {
 	NSInteger total = 0;
 	for (Report *report in reports) {
 		total += [report totalNumberOfGiftPurchasesForProductWithID:productID];
@@ -87,8 +78,7 @@
 	return total;
 }
 
-- (NSInteger)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID
-{
+- (NSInteger)totalNumberOfPromoCodeTransactionsForProductWithID:(NSString *)productID {
 	NSInteger total = 0;
 	for (Report *report in reports) {
 		total += [report totalNumberOfPromoCodeTransactionsForProductWithID:productID];
@@ -96,8 +86,7 @@
 	return total;
 }
 
-- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country
-{
+- (NSInteger)totalNumberOfPaidDownloadsForProductWithID:(NSString *)productID inCountry:(NSString *)country {
 	NSInteger total = 0;
 	for (Report *report in reports) {
 		total += [report totalNumberOfPaidDownloadsForProductWithID:productID inCountry:country];
@@ -105,8 +94,7 @@
 	return total;
 }
 
-- (NSDictionary *)totalNumberOfPaidDownloadsByCountryAndProduct
-{
+- (NSDictionary *)totalNumberOfPaidDownloadsByCountryAndProduct {
 	NSMutableDictionary *result = [NSMutableDictionary dictionary];
 	for (Report *report in reports) {
 		NSDictionary *paidDownloadsForReport = [report totalNumberOfPaidDownloadsByCountryAndProduct];
@@ -169,8 +157,7 @@
 	return result;
 }
 
-- (NSDictionary *)revenueInBaseCurrencyByCountry
-{
+- (NSDictionary *)revenueInBaseCurrencyByCountry {
 	NSMutableDictionary *revenueByCountry = [NSMutableDictionary dictionary];
 	for (Report *report in reports) {
 		NSDictionary *revenueByCountryForReport = [report revenueInBaseCurrencyByCountry];
@@ -183,8 +170,7 @@
 	return revenueByCountry;
 }
 
-- (NSDictionary *)revenueInBaseCurrencyByCountryForProductWithID:(NSString *)productID
-{
+- (NSDictionary *)revenueInBaseCurrencyByCountryForProductWithID:(NSString *)productID {
 	if (!productID) {
 		return [self revenueInBaseCurrencyByCountry];
 	}
@@ -200,8 +186,7 @@
 	return revenueByCountry;
 }
 
-- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID inCountry:(NSString *)country
-{
+- (float)totalRevenueInBaseCurrencyForProductWithID:(NSString *)productID inCountry:(NSString *)country {
 	float total = 0.0;
 	for (Report *report in reports) {
 		total += [report totalRevenueInBaseCurrencyForProductWithID:productID inCountry:country];
@@ -209,18 +194,15 @@
 	return total;
 }
 
-- (Report *)firstReport
-{
+- (Report *)firstReport {
 	return [reports objectAtIndex:0];
 }
 
-- (NSArray *)allReports
-{
+- (NSArray *)allReports {
 	return [NSArray arrayWithArray:reports];
 }
 
-- (ASAccount *)account
-{
+- (ASAccount *)account {
 	return [[self firstReport] valueForKey:@"account"];
 }
 
