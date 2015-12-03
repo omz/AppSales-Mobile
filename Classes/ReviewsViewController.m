@@ -39,6 +39,9 @@
 - (void)loadView {
 	[super loadView];
 	
+	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStyleBordered target:self action:nil];
+	self.navigationItem.backBarButtonItem = backButton;
+	
 	self.reviewSummaryView = [[ReviewSummaryView alloc] initWithFrame:self.topView.frame];
 	reviewSummaryView.dataSource = self;
 	reviewSummaryView.delegate = self;

@@ -139,6 +139,9 @@
 	[super viewDidLoad];
 	previousOrientation = self.interfaceOrientation;
 	[self reloadData];
+	
+	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStyleBordered target:self action:nil];
+	self.navigationItem.backBarButtonItem = backButton;
 }
 
 - (void)viewDidUnload {
