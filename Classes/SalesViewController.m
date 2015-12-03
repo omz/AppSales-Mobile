@@ -559,7 +559,7 @@
 			Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
 			NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 			[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			[monthFormatter setDateFormat:@"MMM '´'yy"];
+			[monthFormatter setDateFormat:@"MMM '’'yy"];
 			return [monthFormatter stringFromDate:report.startDate];
 		} else {
 			return @"N/A";
