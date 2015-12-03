@@ -57,9 +57,7 @@
 	for (UIView *v in [NSArray arrayWithArray:self.scrollView.subviews]) [v removeFromSuperview];
 	
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-	[numberFormatter setMaximumFractionDigits:2];
-	[numberFormatter setGroupingSize:3];
-	[numberFormatter setUsesGroupingSeparator:YES];
+	[numberFormatter setNumberStyle:NSNumberFormatterCurrencyStyle];
 	
 	NSMutableDictionary *paymentsByYear = [NSMutableDictionary dictionary];
 	NSMutableDictionary *sumsByYear = [NSMutableDictionary dictionary];
@@ -91,7 +89,8 @@
 			if ([payments count] > 0) {
 				NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
 				NSString *currency = [[payments objectAtIndex:0] valueForKey:@"currency"];
-				NSString *label = [NSString stringWithFormat:@"%@%@", [numberFormatter stringFromNumber:sum], [[CurrencyManager sharedManager] currencySymbolForCurrency:currency]];
+				[numberFormatter setCurrencySymbol:[[CurrencyManager sharedManager] currencySymbolForCurrency:currency]];
+				NSString *label = [numberFormatter stringFromNumber:sum];
 				NSMutableDictionary *labelsForYear = [labelsByYear objectForKey:year];
 				if (!labelsForYear) {
 					labelsForYear = [NSMutableDictionary dictionary];
@@ -118,9 +117,8 @@
 		yearView.labelsByMonth = [labelsByYear objectForKey:year];
 		if ([allPayments count] > 0) {
 			//We assume that all payments have the same currency:
-			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@%@", 
-								   [[CurrencyManager sharedManager] currencySymbolForCurrency:[[allPayments anyObject] valueForKey:@"currency"]], 
-								   [numberFormatter stringFromNumber:[sumsByYear objectForKey:year]]];
+			[numberFormatter setCurrencySymbol:[[CurrencyManager sharedManager] currencySymbolForCurrency:[[allPayments anyObject] valueForKey:@"currency"]]];
+			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@", [numberFormatter stringFromNumber:[sumsByYear objectForKey:year]]];
 		}
 		yearView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 		[scrollView addSubview:yearView];
