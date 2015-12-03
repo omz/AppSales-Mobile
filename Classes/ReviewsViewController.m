@@ -186,5 +186,8 @@
 	[self.reviewSummaryView reloadDataAnimated:YES];
 }
 
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
+}
 
 @end

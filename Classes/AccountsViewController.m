@@ -780,6 +780,8 @@
 	}
 }
 
-
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
+}
 
 @end

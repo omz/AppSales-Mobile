@@ -103,6 +103,18 @@
 	return YES;
 }
 
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
+	NSUInteger orientations = iPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskAllButUpsideDown;
+	
+	if (self.window.rootViewController) {
+		UIViewController *presentedViewController = [[(UINavigationController *)self.window.rootViewController viewControllers] lastObject];
+		orientations = [presentedViewController supportedInterfaceOrientations];
+	}
+	
+	return orientations;
+}
+
 - (void)selectAccount:(id)sender {
 	if (!self.window.rootViewController.presentedViewController) {
 		[self.accountsPopover presentPopoverFromRect:CGRectMake(50, 50, 1, 1) inView:self.window.rootViewController.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];

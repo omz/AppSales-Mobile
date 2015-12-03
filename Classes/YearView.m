@@ -33,7 +33,7 @@
 	CGContextRestoreGState(c);
 	
 	CGFloat headerHeight = 52.0;
-	CGFloat footerHeight = 92.0;
+	CGFloat footerHeight = 42.0;
 	CGFloat monthsHeight = self.bounds.size.height - 2 * margin - headerHeight - footerHeight;
 	CGFloat singleMonthHeight = monthsHeight / 4;
 	CGFloat singleMonthWidth = (self.bounds.size.width - 2 * margin) / 3.0;
@@ -84,9 +84,9 @@
 		NSDate *monthDate = [calendar dateFromComponents:monthComponents];
 		NSString *month = [monthFormatter stringFromDate:monthDate];
 		NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
-		[style setAlignment:NSTextAlignmentLeft];
-		[month drawInRect:monthRect withAttributes:@{NSFontAttributeName : monthFont,
-													 NSParagraphStyleAttributeName : style}];
+		style.alignment = NSTextAlignmentLeft;
+		[month drawInRect:monthRect withAttributes:@{NSFontAttributeName: monthFont,
+													 NSParagraphStyleAttributeName: style}];
 		
 		NSString *label = [labelsByMonth objectForKey:[NSNumber numberWithInt:i+1]];
 		if (label) {
@@ -97,15 +97,19 @@
 				size = [label sizeWithAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:fontSize]}];
 			}
 			CGRect labelRect = CGRectMake(monthRect.origin.x, monthRect.origin.y + monthRect.size.height/2 - size.height/2, monthRect.size.width, size.height);
-			[label drawInRect:labelRect withAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:fontSize]}];
+			
+			NSMutableParagraphStyle *labelStyle = [NSMutableParagraphStyle new];
+			labelStyle.alignment = NSTextAlignmentCenter;
+			[label drawInRect:labelRect withAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:fontSize],
+														 NSParagraphStyleAttributeName: labelStyle}];
 		}
 	}
 	
 	CGRect footerRect = CGRectMake(margin, self.bounds.size.height - footerHeight + 3, self.bounds.size.width - 2 * margin, 20);
 	NSMutableParagraphStyle *style2 = [NSMutableParagraphStyle new];
-	[style2 setAlignment:NSTextAlignmentCenter];
-	[self.footerText drawInRect:footerRect withAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:14.0],
-												 NSParagraphStyleAttributeName : style2}];
+	style2.alignment = NSTextAlignmentCenter;
+	[self.footerText drawInRect:footerRect withAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:14.0],
+															NSParagraphStyleAttributeName: style2}];
 	
 }
 

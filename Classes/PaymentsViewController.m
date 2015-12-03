@@ -32,7 +32,8 @@
 
 - (void)loadView {
 	[super loadView];
-	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+	
+	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
 	
 	self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
 	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -112,7 +113,7 @@
 	
 	CGFloat x = 0.0;
 	for (NSNumber *year in sortedYears) {
-		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)];
+		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 64 - 10)];
 		yearView.year = [year integerValue];
 		yearView.labelsByMonth = [labelsByYear objectForKey:year];
 		if ([allPayments count] > 0) {
@@ -191,6 +192,10 @@
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		[account removeObserver:self forKeyPath:@"payments"];
 	}
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

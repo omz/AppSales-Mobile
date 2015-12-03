@@ -537,6 +537,8 @@
 	return [self subsectionFieldWithSections:[NSArray arrayWithObject:section] key:k title:section.title];
 }
 
-
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
+}
 
 @end

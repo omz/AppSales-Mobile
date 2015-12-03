@@ -50,7 +50,6 @@
 	[self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:tempPath]]];
 }
 
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
@@ -79,6 +78,10 @@
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
 	[controller dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
 }
 
 
@@ -131,6 +134,5 @@
 - (void)done:(id)sender {
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
-
 
 @end

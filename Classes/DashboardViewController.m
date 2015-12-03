@@ -110,7 +110,7 @@
 	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
 	productsTableView.allowsMultipleSelection = YES;
 	
-	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
+	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
 	[self.view addSubview:self.productsTableView];
 	
 	self.shadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];

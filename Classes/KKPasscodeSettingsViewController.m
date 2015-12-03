@@ -211,10 +211,8 @@
 	
 }
 
-#pragma mark -
-#pragma mark Memory management
-
-
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
+}
 
 @end
-

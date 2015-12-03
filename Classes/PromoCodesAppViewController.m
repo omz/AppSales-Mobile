@@ -320,11 +320,13 @@
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
-
-
 - (void)dealloc {
 	[product removeObserver:self forKeyPath:@"promoCodes"];
 	[product removeObserver:self forKeyPath:@"isDownloadingPromoCodes"];
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

@@ -159,5 +159,8 @@
 	[self.tableView reloadData];
 }
 
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
+}
 
 @end

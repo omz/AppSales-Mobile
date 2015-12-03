@@ -56,5 +56,8 @@
 	webView.delegate = nil;
 }
 
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
+}
 
 @end
