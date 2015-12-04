@@ -1,27 +1,29 @@
-#AppSales
+# AppSales
 
 AppSales allows iOS and Mac App Store developers to download and analyze their sales reports from iTunes Connect on the iPhone.
 
-##Features
-* Automatic download of daily and weekly sales reports from iTunes Connect
-* Stacked bar graphs to see all your sales at a glance
-* Show your sales on a world map
-* View actual payments by Apple on a calendar
-* Group daily reports by fiscal or calendar month to predict your next payment
-* Automatic conversion to your currency of choice
-* Download customer reviews of your apps
-* Import reports that you downloaded elsewhere (for example with [AppViz](http://www.ideaswarm.com) on your Mac) via iTunes File Sharing
-* Optional push notifications when new reports are available via Boxcar
+## Features
+
+* Automatic download of daily and weekly sales reports from iTunes Connect.
+* Stacked bar graphs to see all your sales at a glance.
+* Show your sales on a world map.
+* View actual payments by Apple on a calendar.
+* Group daily reports by fiscal or calendar month to predict your next payment.
+* Automatic conversion to your currency of choice.
+* Download customer reviews of your apps.
+* Import reports that you downloaded elsewhere via iTunes File Sharing.
 
 Please see the screenshot below for a visual guide to AppSales' main interface and some tips and tricks.
 
-##Requirements
-AppSales requires the iOS 5.0 SDK or later.
+## Requirements
+
+AppSales requires the iOS 8.0 SDK or later.
 
 Because there is no API to access some parts of iTunes Connect, AppSales scrapes [itunesconnect.apple.com](https://itunesconnect.apple.com). This means that even small changes on this website can break some functionality. In most cases, this is easy to fix and I'll try to make a new version available here. The report download itself uses Apple's auto-ingestion interface to iTunes Connect and should generally be unaffected by changes to the website.
 
-##About
-You can follow me on Twitter for updates on the development: [@olemoritz](http://twitter.com/olemoritz)
+## About
+
+You can follow me on Twitter for updates on the development: [@olemoritz](https://twitter.com/olemoritz)
 
 If you'd like to support this effort, please consider a donation via PayPal or Flattr:
 
@@ -30,7 +32,8 @@ If you'd like to support this effort, please consider a donation via PayPal or F
 
 ![AppSales Screenshot](Screenshot.png?raw=true)
 
-##License
+## License
+
 In addition to the BSD-2 license below, I ask that you do not publicly distribute the app as a whole in binary form (e.g. on the App Store).
 
     Copyright (c) 2011, Ole Zorn
