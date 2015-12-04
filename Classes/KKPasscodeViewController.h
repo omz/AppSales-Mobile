@@ -68,19 +68,19 @@ typedef NSUInteger KKPasscodeMode;
 	UITextField *_confirmPasscodeTextField;
 	NSArray *_confirmPasscodeSquareImageViews;
 	
-	KKPasscodeMode _mode;
-	
 	BOOL _passcodeLockOn;
 	BOOL _eraseData;
 }
 
 @property (nonatomic, weak) id <KKPasscodeViewControllerDelegate> delegate; 
 @property (nonatomic, assign) KKPasscodeMode mode;
+@property (nonatomic, assign) BOOL startTouchID;
 
 @property (nonatomic, strong) UITableView *enterPasscodeTableView;
 @property (nonatomic, strong) UITableView *setPasscodeTableView;
 @property (nonatomic, strong) UITableView *confirmPasscodeTableView;
 
++ (BOOL)hasTouchID;
+- (void)authenticateWithTouchID;
 
 @end
-

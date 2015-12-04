@@ -654,6 +654,7 @@
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
 		DA4357F81C10E33D0056702C /* ReviewsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4357F71C10E33D0056702C /* ReviewsParser.m */; };
+		DA4357FC1C113B670056702C /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4357FB1C113B670056702C /* LocalAuthentication.framework */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
@@ -1391,6 +1392,7 @@
 		7FFFB39C13D4599300AD18E3 /* DateButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButton.png; sourceTree = "<group>"; };
 		DA4357F61C10E33D0056702C /* ReviewsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewsParser.h; path = Classes/ReviewsParser.h; sourceTree = "<group>"; };
 		DA4357F71C10E33D0056702C /* ReviewsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewsParser.m; path = Classes/ReviewsParser.m; sourceTree = "<group>"; };
+		DA4357FB1C113B670056702C /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
 		DA9DB1B11C0FEC48007B0178 /* LoginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginManager.h; sourceTree = "<group>"; };
 		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
@@ -1410,6 +1412,7 @@
 				7F709D2E13BC98860008DBAD /* Foundation.framework in Frameworks */,
 				7F709D3213BC98860008DBAD /* CoreData.framework in Frameworks */,
 				7F3796CC13F8245800FA6E49 /* MessageUI.framework in Frameworks */,
+				DA4357FC1C113B670056702C /* LocalAuthentication.framework in Frameworks */,
 				7F3796CD13F8246200FA6E49 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1527,6 +1530,7 @@
 			isa = PBXGroup;
 			children = (
 				7F1499CC13BE172300D89064 /* libz.dylib */,
+				DA4357FB1C113B670056702C /* LocalAuthentication.framework */,
 				7F3796C913F8244000FA6E49 /* MessageUI.framework */,
 				7FD2C1EA13CE486A002868C7 /* QuartzCore.framework */,
 				7F709D6D13BCC4270008DBAD /* Security.framework */,

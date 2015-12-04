@@ -22,6 +22,7 @@
 	NSPersistentStoreCoordinator *persistentStoreCoordinator;
 	
 	UIPopoverController *accountsPopover;
+	KKPasscodeViewController *passcodeVC;
 }
 
 @property (nonatomic, strong) UIWindow *window;
@@ -37,6 +38,6 @@
 - (NSURL *)applicationSupportDirectory;
 - (void)loadAccount:(ASAccount *)account;
 - (void)selectAccount:(id)sender;
-- (void)showPasscodeLockIfNeeded;
+- (void)showPasscodeLockIfNeededWithTouchID:(BOOL)useTouchID;
 
 @end

@@ -32,10 +32,12 @@
 	
 	id <KKPasscodeSettingsViewControllerDelegate> __weak _delegate;
 	
-	UISwitch *_eraseDataSwitch;
+	UISwitch *unlockWithTouchIDSwitch;
+	UISwitch *eraseDataSwitch;
 	
-	BOOL _passcodeLockOn;
-	BOOL _eraseDataOn;
+	BOOL passcodeLockOn;
+	BOOL unlockWithTouchIDOn;
+	BOOL eraseDataOn;
 }
 
 @property (nonatomic, weak) id <KKPasscodeSettingsViewControllerDelegate> delegate;

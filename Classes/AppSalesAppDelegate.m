@@ -85,7 +85,7 @@
 		[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
 	}
 	
-	[self showPasscodeLockIfNeeded];
+	[self showPasscodeLockIfNeededWithTouchID:YES];
 	if (iPad) {
 		//Restore previously-selected account:
 		NSString *accountIDURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kSettingSelectedAccountID];
@@ -164,7 +164,7 @@
 	promoNavController.toolbarHidden = NO;
 	promoNavController.toolbar.barStyle = UIBarStyleBlackOpaque;
 	
-	UITabBarController *tabController = [[UITabBarController alloc] initWithNibName:nil bundle:nil];
+	UITabBarController *tabController = [[UITabBarController alloc] init];
 	[tabController setViewControllers:[NSArray arrayWithObjects:salesNavController, reviewsNavController, paymentsNavController, promoNavController, nil]];
 	
 	self.window.rootViewController = tabController;
@@ -227,25 +227,37 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
 	[self saveContext];
-	[self showPasscodeLockIfNeeded];
+	[self showPasscodeLockIfNeededWithTouchID:NO];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
 	[[CurrencyManager sharedManager] refreshIfNeeded];
+	[self showPasscodeLockIfNeededWithTouchID:YES];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
 	[[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
-- (void)showPasscodeLockIfNeeded {
+- (void)showPasscodeLockIfNeededWithTouchID:(BOOL)useTouchID {
 	if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
+		if (passcodeVC) {
+			if (useTouchID) {
+				[passcodeVC authenticateWithTouchID];
+			}
+			return;
+		}
 		
-		KKPasscodeViewController *vc = [[KKPasscodeViewController alloc] initWithNibName:nil bundle:nil];
-		vc.mode = KKPasscodeModeEnter;
-		vc.delegate = self;
+		if (self.accountsPopover.popoverVisible) {
+			[self.accountsPopover dismissPopoverAnimated:NO];
+		}
 		
-		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+		passcodeVC = [[KKPasscodeViewController alloc] init];
+		passcodeVC.mode = KKPasscodeModeEnter;
+		passcodeVC.startTouchID = useTouchID;
+		passcodeVC.delegate = self;
+		
+		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:passcodeVC];
 		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 			nav.modalPresentationStyle = UIModalPresentationFullScreen;
 			nav.navigationBar.barStyle = UIBarStyleBlack;
@@ -254,26 +266,17 @@
 			nav.navigationBar.tintColor = accountsViewController.navigationController.navigationBar.tintColor;
 			nav.navigationBar.translucent = accountsViewController.navigationController.navigationBar.translucent;
 			nav.navigationBar.opaque = accountsViewController.navigationController.navigationBar.opaque;
-			nav.navigationBar.barStyle = accountsViewController.navigationController.navigationBar.barStyle;	
+			nav.navigationBar.barStyle = accountsViewController.navigationController.navigationBar.barStyle;
 		}
-		UIViewController *viewControllerForPresentingPasscode = nil;
-		if (self.window.rootViewController.presentedViewController) {
-			if ([self.window.rootViewController.presentedViewController isKindOfClass:[UINavigationController class]]
-				&& [[[(UINavigationController *)self.window.rootViewController.presentedViewController viewControllers] objectAtIndex:0] isKindOfClass:[KKPasscodeViewController class]]) {
-				//The passcode dialog is already shown...
-				return;
-			}
-			//We're in the settings or add account dialog...
-			viewControllerForPresentingPasscode = self.window.rootViewController.presentedViewController;
-		} else {
-			viewControllerForPresentingPasscode = self.window.rootViewController;
-		}
-		if (self.accountsPopover.popoverVisible) {
-			[self.accountsPopover dismissPopoverAnimated:NO];
-		}
+		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ASWillShowPasscodeLockNotification object:self];
-		[viewControllerForPresentingPasscode presentViewController:nav animated:NO completion:nil];
+		
+		[self.window.rootViewController.presentedViewController ?: self.window.rootViewController presentViewController:nav animated:NO completion:nil];
 	}
+}
+
+- (void)didPasscodeEnteredCorrectly:(KKPasscodeViewController *)viewController {
+	passcodeVC = nil;
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

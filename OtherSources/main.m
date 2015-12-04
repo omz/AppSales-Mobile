@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AppSalesAppDelegate.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char * argv[]) {
 	@autoreleasepool {
-		int retVal = UIApplicationMain(argc, argv, nil, @"AppSalesAppDelegate");
-		return retVal;
+		return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppSalesAppDelegate class]));
 	}
 }
