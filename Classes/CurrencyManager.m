@@ -82,7 +82,7 @@
 	if (!self.baseCurrency) self.baseCurrency = @"USD";
 	
 	self.lastRefresh = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerLastRefresh"];
-	if (!self.lastRefresh) self.lastRefresh = [NSDate dateWithTimeIntervalSince1970:1225397963]; //Oct, 30, 2008
+	if (!self.lastRefresh) self.lastRefresh = [NSDate dateWithTimeIntervalSince1970:1225397963]; // Oct 30, 2008
 	
 	exchangeRates = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerExchangeRates"];
 	if (!exchangeRates) {
@@ -213,7 +213,7 @@
 		
 		[newExchangeRates setObject:[NSNumber numberWithFloat:1.0] forKey:@"\"EUR/EUR\""];
 		
-		NSMutableString *urlString = [NSMutableString stringWithString:@"http://quote.yahoo.com/d/quotes.csv?s="];
+		NSMutableString *urlString = [NSMutableString stringWithString:@"https://download.finance.yahoo.com/d/quotes.csv?s="];
 		int i = 0;
 		for (NSString *currency in self.availableCurrencies) {
 			if (i > 0) {
@@ -231,20 +231,20 @@
 			[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
 			return;
 		}
-	csv = [csv stringByReplacingOccurrencesOfString:@" to " withString:@"/"];
+		csv = [csv stringByReplacingOccurrencesOfString:@" to " withString:@"/"];
 		NSArray *lines = [csv componentsSeparatedByString:@"\n"];
 		for (NSString *line in lines) {
 			NSArray *comps = [line componentsSeparatedByString:@","];
 			if ([comps count] == 2) {
-				NSString *currenciesString = [comps objectAtIndex:0]; //ex: "USD/EUR"
+				NSString *currenciesString = [comps objectAtIndex:0]; // ex: "USD/EUR"
 				float exchangeRate = [[comps objectAtIndex:1] floatValue];
 				
 				[newExchangeRates setObject:[NSNumber numberWithFloat:exchangeRate] forKey:currenciesString];
 			}
 		}
 		if (fabsf([[newExchangeRates objectForKey:@"\"USD/EUR\""] floatValue]) > 9999) {
-			//Yes, this could theoretically happen, but more likely, 
-			//Yahoo returned bogus values, which apparently does happen every now and then...
+			// Yes, this could theoretically happen, but more likely,
+			// Yahoo returned bogus values, which apparently does happen every now and then...
 			NSLog(@"Exchange rates returned by Yahoo are likely incorrect, ignoring...");
 			[self performSelectorOnMainThread:@selector(refreshFailed) withObject:nil waitUntilDone:YES];
 			return;
