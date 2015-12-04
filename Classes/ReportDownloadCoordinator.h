@@ -11,7 +11,6 @@
 @class ASAccount, Product;
 
 @interface ReportDownloadCoordinator : NSObject {
-	
 	NSOperationQueue *reportDownloadQueue;
 	BOOL isBusy;
 }

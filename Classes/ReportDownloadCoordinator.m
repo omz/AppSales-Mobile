@@ -50,23 +50,6 @@
 	account.isDownloadingReports = YES;
 	account.downloadStatus = NSLocalizedString(@"Waiting...", nil);
 	account.downloadProgress = 0.0;
-	[[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-	UIBackgroundTaskIdentifier backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
-		NSLog(@"Background task for downloading reports has expired!");
-	}];
-	[operation setCompletionBlock:^ {
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			account.isDownloadingReports = NO;
-			if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
-				NSInteger numberOfReportsDownloaded = operation.downloadCount;
-				[[UIApplication sharedApplication] setApplicationIconBadgeNumber:numberOfReportsDownloaded];
-			}
-			[[UIApplication sharedApplication] setIdleTimerDisabled:NO];
-			if (backgroundTaskID != UIBackgroundTaskInvalid) {
-				[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-			}
-		});
-	}];
 	[reportDownloadQueue addOperation:operation];
 }
 

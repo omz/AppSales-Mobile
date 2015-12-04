@@ -15,14 +15,13 @@
 @class ASAccount;
 
 @interface ReportDownloadOperation : NSOperation <LoginManagerDelegate> {
-	
 	ASAccount *_account;
 	NSString *username;
 	NSString *password;
 	NSString *appPassword;
 	NSPersistentStoreCoordinator *psc;
 	NSManagedObjectID *accountObjectID;
-	NSInteger downloadCount;
+	UIBackgroundTaskIdentifier backgroundTaskID;
 }
 
 @property (readonly) NSInteger downloadCount;

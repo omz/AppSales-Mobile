@@ -21,10 +21,9 @@
 
 @end
 
-
 @implementation ReportDownloadOperation
 
-@synthesize downloadCount, accountObjectID;
+@synthesize accountObjectID;
 
 - (id)initWithAccount:(ASAccount *)account {
 	self = [super init];
@@ -35,6 +34,11 @@
 		_account = account;
 		accountObjectID = [account.objectID copy];
 		psc = [account.managedObjectContext persistentStoreCoordinator];
+		
+		[UIApplication sharedApplication].idleTimerDisabled = YES;
+		backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
+			NSLog(@"Background task for downloading reports has expired!");
+		}];
 	}
 	return self;
 }
@@ -58,7 +62,7 @@
 		
 		NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
 		for (NSString *dateType in [NSArray arrayWithObjects:@"Daily", @"Weekly", nil]) {
-			//Determine which reports should be available for download:
+			// Determine which reports should be available for download.
 			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 			[dateFormatter setDateFormat:@"yyyyMMdd"];
 			[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
@@ -67,7 +71,7 @@
 			
 			NSDate *today = [NSDate date];
 			if ([dateType isEqualToString:@"Weekly"]) {
-				//Find the next sunday:
+				// Find the next Sunday.
 				NSInteger weekday = -1;
 				while (YES) {
 					NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:today];
@@ -88,7 +92,7 @@
 				NSDate *date = nil;
 				if ([dateType isEqualToString:@"Daily"]) {
 					date = [today dateByAddingTimeInterval:i * -24 * 60 * 60];
-				} else { //weekly
+				} else { // Weekly
 					date = [today dateByAddingTimeInterval:i * -7 * 24 * 60 * 60];
 				}
 				NSDateComponents *components = [calendar components:NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit fromDate:date];
@@ -98,7 +102,7 @@
 				[availableReportDates addObject:normalizedDate];
 			}
 			
-			//Filter out reports we already have:
+			// Filter out reports we already have.
 			NSFetchRequest *existingReportsFetchRequest = [[NSFetchRequest alloc] init];
 			if ([dateType isEqualToString:@"Daily"]) {
 				[existingReportsFetchRequest setEntity:[NSEntityDescription entityForName:@"DailyReport" inManagedObjectContext:moc]];
@@ -124,7 +128,16 @@
 			int i = 0;
 			NSUInteger numberOfReportsAvailable = [availableReportDateStrings count];
 			for (NSString *reportDateString in availableReportDateStrings) {
-				if ([self isCancelled]) {
+				if (self.isCancelled) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						_account.downloadStatus = NSLocalizedString(@"Finished", nil);
+						_account.downloadProgress = 1.0;
+						_account.isDownloadingReports = NO;
+						[UIApplication sharedApplication].idleTimerDisabled = NO;
+						if (backgroundTaskID != UIBackgroundTaskInvalid) {
+							[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+						}
+					});
 					return;
 				}
 				if (i == 0) {
@@ -197,11 +210,11 @@
 					NSData *inflatedReportData = [reportData gzipInflate];
 					NSString *reportCSV = [[NSString alloc] initWithData:inflatedReportData encoding:NSUTF8StringEncoding];
 					if (originalFilename && [reportCSV length] > 0) {
-						//Parse report CSV:
+						// Parse report CSV.
 						Report *report = [Report insertNewReportWithCSV:reportCSV inAccount:account];
 						
-						//Check if the downloaded report is actually the one we expect
-						//(mostly to work around a bug in iTC that causes the wrong weekly report to be downloaded):
+						// Check if the downloaded report is actually the one we expect.
+						// (mostly to work around a bug in ITC that causes the wrong weekly report to be downloaded).
 						NSString *downloadedReportDateString = nil;
 						if ([report isKindOfClass:[WeeklyReport class]]) {
 							WeeklyReport *weeklyReport = (WeeklyReport *)report;
@@ -227,7 +240,7 @@
 						} else {
 							NSLog(@"Could not parse report %@", originalFilename);
 						}
-						//Save data:
+						// Save data.
 						[psc lock];
 						NSError *saveError = nil;
 						[moc save:&saveError];
@@ -240,7 +253,16 @@
 				i++;
 			}
 		}
-		if ([self isCancelled]) {
+		if (self.isCancelled) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_account.downloadStatus = NSLocalizedString(@"Finished", nil);
+				_account.downloadProgress = 1.0;
+				_account.isDownloadingReports = NO;
+				[UIApplication sharedApplication].idleTimerDisabled = NO;
+				if (backgroundTaskID != UIBackgroundTaskInvalid) {
+					[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+				}
+			});
 			return;
 		}
 	
@@ -269,7 +291,7 @@
 		});
 		
 		BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
-		if (downloadPayments && (numberOfReportsDownloaded > 0 || [account.payments count] == 0)) {
+		if (downloadPayments && ((numberOfReportsDownloaded > 0) || (account.payments.count == 0))) {
 			dispatch_async(dispatch_get_main_queue(), ^ {
 				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
 				_account.downloadProgress = 0.9;
@@ -281,14 +303,24 @@
 			[loginManager logIn];
 		} else {
 			if (numberOfReportsDownloaded > 0) {
-				dispatch_async(dispatch_get_main_queue(), ^ {
+				dispatch_async(dispatch_get_main_queue(), ^{
 					_account.downloadStatus = NSLocalizedString(@"Finished", nil);
 					_account.downloadProgress = 1.0;
+					_account.isDownloadingReports = NO;
+					[UIApplication sharedApplication].idleTimerDisabled = NO;
+					if (backgroundTaskID != UIBackgroundTaskInvalid) {
+						[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+					}
 				});
 			} else {
-				dispatch_async(dispatch_get_main_queue(), ^ {
+				dispatch_async(dispatch_get_main_queue(), ^{
 					_account.downloadStatus = NSLocalizedString(@"No new reports found", nil);
 					_account.downloadProgress = 1.0;
+					_account.isDownloadingReports = NO;
+					[UIApplication sharedApplication].idleTimerDisabled = NO;
+					if (backgroundTaskID != UIBackgroundTaskInvalid) {
+						[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+					}
 				});
 			}
 		}
@@ -325,7 +357,18 @@
 			NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
 			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:NULL error:NULL];
 			
-			if (paymentsPageData) {
+			if (self.isCancelled) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					_account.downloadStatus = NSLocalizedString(@"Finished", nil);
+					_account.downloadProgress = 1.0;
+					_account.isDownloadingReports = NO;
+					[UIApplication sharedApplication].idleTimerDisabled = NO;
+					if (backgroundTaskID != UIBackgroundTaskInvalid) {
+						[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+					}
+				});
+				return;
+			} else if (paymentsPageData) {
 				NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
 				
 				NSString *switchVendorAction = nil;
@@ -418,18 +461,28 @@
 				[psc unlock];
 			}
 			
-			dispatch_async(dispatch_get_main_queue(), ^ {
+			dispatch_async(dispatch_get_main_queue(), ^{
 				_account.downloadStatus = NSLocalizedString(@"Finished", nil);
 				_account.downloadProgress = 1.0;
+				_account.isDownloadingReports = NO;
+				[UIApplication sharedApplication].idleTimerDisabled = NO;
+				if (backgroundTaskID != UIBackgroundTaskInvalid) {
+					[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+				}
 			});
 		}
 	});
 }
 
 - (void)loginFailed {
-	dispatch_async(dispatch_get_main_queue(), ^ {
+	dispatch_async(dispatch_get_main_queue(), ^{
 		_account.downloadStatus = NSLocalizedString(@"Finished", nil);
 		_account.downloadProgress = 1.0;
+		_account.isDownloadingReports = NO;
+		[UIApplication sharedApplication].idleTimerDisabled = NO;
+		if (backgroundTaskID != UIBackgroundTaskInvalid) {
+			[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+		}
 	});
 }
 
@@ -522,6 +575,5 @@
 	}
 	return nil;
 }
-
 
 @end
