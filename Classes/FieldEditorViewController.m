@@ -68,7 +68,11 @@
 	if (!self.isSubSection) {
 		if (self.doneButtonTitle) {
 			UIBarButtonItem *doneButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.doneButtonTitle style:UIBarButtonItemStyleDone target:self action:@selector(done)];
-			self.navigationItem.rightBarButtonItem = doneButtonItem;
+			if (self.showDoneButtonOnLeft) {
+				self.navigationItem.leftBarButtonItem = doneButtonItem;
+			} else {
+				self.navigationItem.rightBarButtonItem = doneButtonItem;
+			}
 		}
 		if (self.cancelButtonTitle) {
 			UIBarButtonItem *cancelButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.cancelButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(cancel)];

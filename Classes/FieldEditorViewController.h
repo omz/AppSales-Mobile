@@ -57,6 +57,7 @@ typedef enum FieldSpecifierType {
 @property (nonatomic, strong) NSString *editorIdentifier;
 @property (nonatomic, assign) BOOL isSubSection;
 @property (nonatomic, assign) BOOL hasChanges;
+@property (nonatomic, assign) BOOL showDoneButtonOnLeft;
 @property (nonatomic, strong) UITextField *selectedTextField;
 
 - (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title;

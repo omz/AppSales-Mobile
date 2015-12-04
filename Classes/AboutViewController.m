@@ -26,7 +26,7 @@
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
 	webView.delegate = self;
 	self.view = webView;
-	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
+	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

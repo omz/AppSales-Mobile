@@ -124,7 +124,7 @@
 }
 
 - (void)showInfo:(id)sender {
-	AboutViewController *aboutViewController = [[AboutViewController alloc] initWithNibName:nil bundle:nil];
+	AboutViewController *aboutViewController = [[AboutViewController alloc] init];
 	UINavigationController *aboutNavController = [[UINavigationController alloc] initWithRootViewController:aboutViewController];
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
 		aboutNavController.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -448,6 +448,7 @@
 	NSArray *sections = [NSArray arrayWithObjects:generalSection, paymentsSection, productsSection, nil];
 	settingsViewController = [[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)];
 	settingsViewController.doneButtonTitle = NSLocalizedString(@"Done", nil);
+	settingsViewController.showDoneButtonOnLeft = YES;
 	settingsViewController.delegate = self;
 	settingsViewController.editorIdentifier = kSettingsEditorIdentifier;
 	
