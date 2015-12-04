@@ -227,6 +227,7 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
 	[self saveContext];
+	[self showPasscodeLockIfNeeded];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -235,10 +236,6 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
 	[[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-	[self showPasscodeLockIfNeeded];
 }
 
 - (void)showPasscodeLockIfNeeded {
