@@ -10,10 +10,11 @@
 #import "ReviewDownloadManager.h"
 #import "ReviewListViewController.h"
 #import "ASAccount.h"
+#import "Product.h"
 
 @implementation ReviewsViewController
 
-@synthesize reviewSummaryView, downloadReviewsButtonItem, reviewsPopover;
+@synthesize reviewSummaryView, reviewsPopover;
 
 - (id)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithAccount:anAccount];
@@ -48,7 +49,7 @@
 	reviewSummaryView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 	[self.view addSubview:reviewSummaryView];
 	
-	self.downloadReviewsButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReviews:)];
+	downloadReviewsButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReviews:)];
 	downloadReviewsButtonItem.enabled = ![[ReviewDownloadManager sharedManager] isDownloading];
 	self.navigationItem.rightBarButtonItem = downloadReviewsButtonItem;
 	
@@ -75,7 +76,7 @@
 }
 
 - (void)reviewDownloadProgressDidChange:(NSNotification *)notification {
-	self.downloadReviewsButtonItem.enabled = ![[ReviewDownloadManager sharedManager] isDownloading];
+	downloadReviewsButtonItem.enabled = ![[ReviewDownloadManager sharedManager] isDownloading];
 	[self showOrHideStatusBar];
 	if (!self.account.isDownloadingReports) {
 		self.progressBar.progress = [[ReviewDownloadManager sharedManager] downloadProgress];
@@ -93,6 +94,10 @@
 
 - (void)reloadData {
 	[super reloadData];
+	self.visibleProducts = [self.products filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
+		return !(product.parentSKU.length > 1); // In-App Purchases can't have reviews, so don't include them.
+	}]];
+	[self reloadTableView];
 	[self.reviewSummaryView reloadDataAnimated:NO];
 }
 

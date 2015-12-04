@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6282129517F57BC200DFE448 /* SMXMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6282129417F57BC200DFE448 /* SMXMLDocument.m */; };
 		62E09F1B19E693F3002917FE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62E09F1A19E693F3002917FE /* Images.xcassets */; };
 		6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574914CB3C2B005E8F3F /* KKKeychain.m */; };
 		6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */; };
@@ -654,14 +653,13 @@
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
+		DA4357F81C10E33D0056702C /* ReviewsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4357F71C10E33D0056702C /* ReviewsParser.m */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6282129317F57BC200DFE448 /* SMXMLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMXMLDocument.h; sourceTree = "<group>"; };
-		6282129417F57BC200DFE448 /* SMXMLDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMXMLDocument.m; sourceTree = "<group>"; };
 		62E09F1A19E693F3002917FE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = AppSales/Images.xcassets; sourceTree = "<group>"; };
 		6D81574814CB3C2B005E8F3F /* KKKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKKeychain.h; sourceTree = "<group>"; };
 		6D81574914CB3C2B005E8F3F /* KKKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKKeychain.m; sourceTree = "<group>"; };
@@ -1391,6 +1389,8 @@
 		7FFFB39513D4573700AD18E3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
 		7FFFB39713D4573700AD18E3 /* Sales.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Sales.png; sourceTree = "<group>"; };
 		7FFFB39C13D4599300AD18E3 /* DateButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButton.png; sourceTree = "<group>"; };
+		DA4357F61C10E33D0056702C /* ReviewsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewsParser.h; path = Classes/ReviewsParser.h; sourceTree = "<group>"; };
+		DA4357F71C10E33D0056702C /* ReviewsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewsParser.m; path = Classes/ReviewsParser.m; sourceTree = "<group>"; };
 		DA9DB1B11C0FEC48007B0178 /* LoginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginManager.h; sourceTree = "<group>"; };
 		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
@@ -1417,15 +1417,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6282129217F57BC200DFE448 /* SMXMLDocument */ = {
-			isa = PBXGroup;
-			children = (
-				6282129317F57BC200DFE448 /* SMXMLDocument.h */,
-				6282129417F57BC200DFE448 /* SMXMLDocument.m */,
-			);
-			path = SMXMLDocument;
-			sourceTree = "<group>";
-		};
 		7F1499D113BE312100D89064 /* Report Download */ = {
 			isa = PBXGroup;
 			children = (
@@ -1720,6 +1711,8 @@
 			children = (
 				7F89BCDC13DFA45F001C607F /* ReviewDownloadManager.h */,
 				7F89BCDD13DFA45F001C607F /* ReviewDownloadManager.m */,
+				DA4357F61C10E33D0056702C /* ReviewsParser.h */,
+				DA4357F71C10E33D0056702C /* ReviewsParser.m */,
 			);
 			name = "Review Download";
 			path = ..;
@@ -1783,7 +1776,6 @@
 		7FDF601C13DD2107005F1E2D /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				6282129217F57BC200DFE448 /* SMXMLDocument */,
 				7FDCCE721594315100124140 /* ZipFile */,
 				7F454F9E13D5C24F00AE47D1 /* UIColor+Extensions.h */,
 				7F454F9F13D5C24F00AE47D1 /* UIColor+Extensions.m */,
@@ -3024,7 +3016,6 @@
 				7F4065CA13DD379B006148AA /* ReportDetailEntryCell.m in Sources */,
 				7F137EB313DDDABF004655D8 /* CountryDictionary.m in Sources */,
 				7F398EBD13DE1F2D004BEC44 /* MBProgressHUD.m in Sources */,
-				6282129517F57BC200DFE448 /* SMXMLDocument.m in Sources */,
 				7F398ED213DF21F2004BEC44 /* Transaction.m in Sources */,
 				7F398ED513DF570E004BEC44 /* ReportDetailEntry.m in Sources */,
 				7F89BCDE13DFA45F001C607F /* ReviewDownloadManager.m in Sources */,
@@ -3055,6 +3046,7 @@
 				6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */,
 				7FDCCE7D1594316600124140 /* ioapi.c in Sources */,
 				7FDCCE7F1594316600124140 /* unzip.c in Sources */,
+				DA4357F81C10E33D0056702C /* ReviewsParser.m in Sources */,
 				7FDCCE801594316600124140 /* zip.c in Sources */,
 				7FDCCE8B1594317300124140 /* FileInZipInfo.m in Sources */,
 				7FDCCE8C1594317300124140 /* ZipException.m in Sources */,

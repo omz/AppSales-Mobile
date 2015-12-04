@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SMXMLDocument.h"
+#import "ReviewsParser.h"
 
 #define ReviewDownloadManagerDidUpdateProgressNotification	@"ReviewDownloadManagerDidUpdateProgressNotification"
 
@@ -44,7 +44,6 @@
 	Product *_product;
 	NSManagedObjectID *productObjectID;
 	
-	NSString *storeFront;
 	NSString *country;
 	NSURLConnection *downloadConnection;
 	NSMutableData *data;
@@ -58,9 +57,8 @@
 @property (nonatomic, weak) id<ReviewDownloadDelegate> delegate;
 @property (nonatomic, strong) NSURLConnection *downloadConnection;
 
-- (id)initWithProduct:(Product *)app storeFront:(NSString *)storeFrontID countryCode:(NSString *)countryCode;
+- (id)initWithProduct:(Product *)app countryCode:(NSString *)countryCode;
 - (void)start;
 - (void)cancel;
-- (NSArray *)reviewInfosFromHTML:(NSString *)html;
 
 @end
