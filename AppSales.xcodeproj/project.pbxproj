@@ -653,6 +653,7 @@
 		7FFFB39813D4573700AD18E3 /* Reviews.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39513D4573700AD18E3 /* Reviews.png */; };
 		7FFFB39A13D4573700AD18E3 /* Sales.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39713D4573700AD18E3 /* Sales.png */; };
 		7FFFB39D13D4599300AD18E3 /* DateButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 7FFFB39C13D4599300AD18E3 /* DateButton.png */; };
+		DA2995C91C115FA20009D4F1 /* Icon72.png in Resources */ = {isa = PBXBuildFile; fileRef = DA2995C81C115FA20009D4F1 /* Icon72.png */; };
 		DA4357F81C10E33D0056702C /* ReviewsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4357F71C10E33D0056702C /* ReviewsParser.m */; };
 		DA4357FC1C113B670056702C /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4357FB1C113B670056702C /* LocalAuthentication.framework */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
@@ -1390,6 +1391,7 @@
 		7FFFB39513D4573700AD18E3 /* Reviews.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Reviews.png; sourceTree = "<group>"; };
 		7FFFB39713D4573700AD18E3 /* Sales.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Sales.png; sourceTree = "<group>"; };
 		7FFFB39C13D4599300AD18E3 /* DateButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = DateButton.png; sourceTree = "<group>"; };
+		DA2995C81C115FA20009D4F1 /* Icon72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon72.png; sourceTree = "<group>"; };
 		DA4357F61C10E33D0056702C /* ReviewsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewsParser.h; path = Classes/ReviewsParser.h; sourceTree = "<group>"; };
 		DA4357F71C10E33D0056702C /* ReviewsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewsParser.m; path = Classes/ReviewsParser.m; sourceTree = "<group>"; };
 		DA4357FB1C113B670056702C /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
@@ -1563,6 +1565,7 @@
 		7F709D6F13BCCB8B0008DBAD /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				DA2995C81C115FA20009D4F1 /* Icon72.png */,
 				6D81576114CB44BE005E8F3F /* passcode_square_empty.png */,
 				6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */,
 				6D81576314CB44BE005E8F3F /* passcode_square_filled.png */,
@@ -2641,6 +2644,7 @@
 				7FDF714E13D8D4AE00B8CC4E /* ie.png in Resources */,
 				7FDF714F13D8D4AE00B8CC4E /* ie@2x.png in Resources */,
 				7FDF715013D8D4AE00B8CC4E /* il.png in Resources */,
+				DA2995C91C115FA20009D4F1 /* Icon72.png in Resources */,
 				7FDF715113D8D4AE00B8CC4E /* il@2x.png in Resources */,
 				7FDF715213D8D4AE00B8CC4E /* im.png in Resources */,
 				7FDF715313D8D4AE00B8CC4E /* im@2x.png in Resources */,
