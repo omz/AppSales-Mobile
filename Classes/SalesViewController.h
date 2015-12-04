@@ -1,5 +1,5 @@
 //
-//  DashboardViewController.h
+//  SalesViewController.h
 //  AppSales
 //
 //  Created by Ole Zorn on 30.06.11.
@@ -21,7 +21,9 @@ typedef NS_ENUM(NSInteger, DashboardViewMode) {
 	DashboardViewModeRedownloads,
 	DashboardViewModeEducationalSales,
 	DashboardViewModeGiftPurchases,
-	DashboardViewModePromoCodes
+	DashboardViewModePromoCodes,
+	DashboardViewModeTotalRevenue,
+	DashboardViewModeTotalSales
 };
 
 @interface SalesViewController : DashboardViewController <UIActionSheetDelegate, GraphViewDelegate, GraphViewDataSource> {

@@ -367,6 +367,8 @@
 			NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 			[self.productsTableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 		}
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:DashboardViewControllerSelectedProductsDidChangeNotification object:nil];
 	}
 }
 
@@ -397,6 +399,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
 	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:DashboardViewControllerSelectedProductsDidChangeNotification object:nil];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {

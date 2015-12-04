@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "ColorPickerViewController.h"
 
+#define DashboardViewControllerSelectedProductsDidChangeNotification @"DashboardViewControllerSelectedProductsDidChangeNotification"
+
 @class ASAccount, Product;
 
 @interface DashboardViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, ColorPickerViewControllerDelegate> {

@@ -1,5 +1,5 @@
 //
-//  DashboardViewController.m
+//  SalesViewController.m
 //  AppSales
 //
 //  Created by Ole Zorn on 30.06.11.
@@ -21,9 +21,9 @@
 #import "AppleFiscalCalendar.h"
 #import "AccountsViewController.h"
 
-#define kSheetTagDailyGraphOptions		1
-#define kSheetTagMonthlyGraphOptions	2
-#define kSheetTagAdvancedViewMode		3
+#define kSheetTagDailyGraphOptions   1
+#define kSheetTagMonthlyGraphOptions 2
+#define kSheetTagAdvancedViewMode    3
 
 @interface SalesViewController ()
 
@@ -62,6 +62,7 @@
 		showFiscalMonths = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingShowFiscalMonths];
 		showWeeks = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDashboardShowWeeks];
 		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:DashboardViewControllerSelectedProductsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 
@@ -82,6 +83,9 @@
 	self.edgesForExtendedLayout = UIRectEdgeNone;
 	
 	self.viewMode = [[NSUserDefaults standardUserDefaults] integerForKey:kSettingDashboardViewMode];
+	if ((self.viewMode == DashboardViewModeTotalRevenue) || (self.viewMode == DashboardViewModeTotalSales)) {
+		self.viewMode = DashboardViewModeRevenue;
+	}
 	
 	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
@@ -285,6 +289,10 @@
 		self.graphView.title = NSLocalizedString(@"Promo Codes", nil);
 	} else if (viewMode == DashboardViewModeUpdates) {
 		self.graphView.title = NSLocalizedString(@"Updates", nil);
+	} else if (viewMode == DashboardViewModeTotalRevenue) {
+		self.graphView.title = NSLocalizedString(@"Total Revenue", nil);
+	} else if (viewMode == DashboardViewModeTotalSales) {
+		self.graphView.title = NSLocalizedString(@"Total Sales", nil);
 	}
 }
 
@@ -395,12 +403,14 @@
 				self.viewMode = DashboardViewModeGiftPurchases;
 			} else if (buttonIndex == 6) {
 				self.viewMode = DashboardViewModePromoCodes;
+			} else if (buttonIndex == 7) {
+				self.viewMode = DashboardViewModeTotalRevenue;
 			}
 			[[NSUserDefaults standardUserDefaults] setInteger:viewMode forKey:kSettingDashboardViewMode];
-			if (viewMode != DashboardViewModeRevenue) {
-				[self.graphView setUnit:@""];
-			} else {
+			if ((viewMode == DashboardViewModeRevenue) || (viewMode == DashboardViewModeTotalRevenue)) {
 				[self.graphView setUnit:[[CurrencyManager sharedManager] baseCurrencyDescription]];
+			} else {
+				[self.graphView setUnit:@""];
 			}
 			[self.graphView reloadValuesAnimated:YES];
 			[self reloadTableView];
@@ -410,16 +420,22 @@
 
 
 - (void)switchGraphMode:(id)sender {
-	if (viewMode != DashboardViewModeRevenue) {
-		self.viewMode = DashboardViewModeRevenue;
-	} else {
+	if (viewMode == DashboardViewModeRevenue) {
 		self.viewMode = DashboardViewModeSales;
+	} else if (viewMode == DashboardViewModeSales) {
+		self.viewMode = DashboardViewModeRevenue;
+	} else if (viewMode == DashboardViewModeTotalRevenue) {
+		self.viewMode = DashboardViewModeTotalSales;
+	} else if (viewMode == DashboardViewModeTotalSales) {
+		self.viewMode = DashboardViewModeTotalRevenue;
+	} else {
+		self.viewMode = DashboardViewModeRevenue;
 	}
 	[[NSUserDefaults standardUserDefaults] setInteger:viewMode forKey:kSettingDashboardViewMode];
-	if (viewMode != DashboardViewModeRevenue) {
-		[self.graphView setUnit:@""];
-	} else {
+	if ((viewMode == DashboardViewModeRevenue) || (viewMode == DashboardViewModeTotalRevenue)) {
 		[self.graphView setUnit:[[CurrencyManager sharedManager] baseCurrencyDescription]];
+	} else {
+		[self.graphView setUnit:@""];
 	}
 	[self.graphView reloadValuesAnimated:YES];
 	[self reloadTableView];
@@ -698,10 +714,38 @@
 			}
 		}
 		
-		if (viewMode == DashboardViewModeRevenue) {
-			NSString *label = [NSString stringWithFormat:@"%@%i", 
-							   [[CurrencyManager sharedManager] baseCurrencyDescription], 
-							   (int)roundf([latestReport totalRevenueInBaseCurrencyForProductWithID:product.productID])];
+		if ((viewMode == DashboardViewModeTotalRevenue) || (viewMode == DashboardViewModeTotalSales)) {
+			float value = 0;
+			
+			for (id<ReportSummary> dailyReport in self.sortedDailyReports) {
+				if (!product.productID) {
+					NSArray *tProducts = self.selectedProducts ?: self.visibleProducts;
+					for (Product *selectedProduct in tProducts) {
+						if (viewMode == DashboardViewModeTotalRevenue) {
+							value += [dailyReport totalRevenueInBaseCurrencyForProductWithID:selectedProduct.productID];
+						} else if (viewMode == DashboardViewModeTotalSales) {
+							value += [dailyReport totalNumberOfPaidDownloadsForProductWithID:selectedProduct.productID];
+						}
+					}
+				} else {
+					if (viewMode == DashboardViewModeTotalRevenue) {
+						value += [dailyReport totalRevenueInBaseCurrencyForProductWithID:product.productID];
+					} else if (viewMode == DashboardViewModeTotalSales) {
+						value += [dailyReport totalNumberOfPaidDownloadsForProductWithID:product.productID];
+					}
+				}
+			}
+			
+			NSString *buttonText = @"";
+			if (viewMode == DashboardViewModeTotalRevenue) {
+				buttonText = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf(value)];
+			} else {
+				buttonText = [NSString stringWithFormat:@"%i", (int)value];
+			}
+			
+			[latestValueButton setTitle:buttonText forState:UIControlStateNormal];
+		} else if (viewMode == DashboardViewModeRevenue) {
+			NSString *label = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf([latestReport totalRevenueInBaseCurrencyForProductWithID:product.productID])];
 			[latestValueButton setTitle:label forState:UIControlStateNormal];
 		} else {
 			NSInteger latestNumber = 0;
@@ -729,18 +773,19 @@
 
 - (void)selectAdvancedViewMode:(UILongPressGestureRecognizer *)gestureRecognizer {
 	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
-															delegate:self 
-												   cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-											  destructiveButtonTitle:nil 
-												   otherButtonTitles:
-								 NSLocalizedString(@"Revenue", nil), 
-								 NSLocalizedString(@"Sales", nil), 
-								 NSLocalizedString(@"Updates", nil),
-								 NSLocalizedString(@"Redownloads", nil),
-								 NSLocalizedString(@"Educational Sales", nil),
-								 NSLocalizedString(@"Gift Purchases", nil), 
-								 NSLocalizedString(@"Promo Codes", nil), nil];
+		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil
+													   delegate:self
+											  cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+										 destructiveButtonTitle:nil
+											  otherButtonTitles:
+							NSLocalizedString(@"Revenue", nil),
+							NSLocalizedString(@"Sales", nil),
+							NSLocalizedString(@"Updates", nil),
+							NSLocalizedString(@"Redownloads", nil),
+							NSLocalizedString(@"Educational Sales", nil),
+							NSLocalizedString(@"Gift Purchases", nil),
+							NSLocalizedString(@"Promo Codes", nil),
+							NSLocalizedString(@"Total", nil), nil];
 		self.activeSheet.tag = kSheetTagAdvancedViewMode;
 		[self.activeSheet showInView:self.navigationController.view];
 	}
