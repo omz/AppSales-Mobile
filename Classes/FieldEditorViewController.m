@@ -218,15 +218,16 @@
 	FieldSpecifierType type = field.type;
 	
 	if ((type == FieldSpecifierTypeEmail) || (type == FieldSpecifierTypePassword) || (type == FieldSpecifierTypeURL) || (type == FieldSpecifierTypeText) || (type == FieldSpecifierTypeNumeric)) {
-		CGRect textFieldFrame = CGRectMake(textLabelFrame.origin.x + textLabelFrame.size.width + 10, 
-										   11, 
-										   cell.contentView.frame.size.width - textLabelFrame.size.width - textLabelFrame.origin.x - 20, 
+		CGRect textFieldFrame = CGRectMake(textLabelFrame.origin.x + textLabelFrame.size.width + 10,
+										   11,
+										   cell.contentView.frame.size.width - textLabelFrame.size.width - textLabelFrame.origin.x - 20,
 										   25);
 		NamedTextField *textField = [[NamedTextField alloc] initWithFrame:textFieldFrame];
-		if (self.navigationController.navigationBar.barStyle == UIBarStyleBlack)
+		if (self.navigationController.navigationBar.barStyle == UIBarStyleBlack) {
 			textField.keyboardAppearance = UIKeyboardAppearanceAlert;
-		else
+		} else {
 			textField.keyboardAppearance = UIKeyboardAppearanceDefault;
+		}
 		textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 		textField.textColor = cell.detailTextLabel.textColor;
 		textField.tag = TEXTFIELDTAG;
@@ -240,18 +241,15 @@
 			textField.placeholder = NSLocalizedString(@"example@domain.com",nil);
 			textField.keyboardType = UIKeyboardTypeEmailAddress;
 			textField.secureTextEntry = NO;
-		}
-		else if (type == FieldSpecifierTypePassword) {
+		} else if (type == FieldSpecifierTypePassword) {
 			textField.placeholder = @"";
 			textField.keyboardType = UIKeyboardTypeAlphabet;
 			textField.secureTextEntry = YES;
-		}
-		else if (type == FieldSpecifierTypeURL) {
+		} else if (type == FieldSpecifierTypeURL) {
 			textField.placeholder = NSLocalizedString(@"www.example.com",nil);
 			textField.keyboardType = UIKeyboardTypeURL;
 			textField.secureTextEntry = NO;
-		}
-		else if (type == FieldSpecifierTypeText) {
+		} else if (type == FieldSpecifierTypeText) {
 			textField.keyboardType = UIKeyboardTypeDefault;
 			textField.secureTextEntry = NO;
 		} else if (type == FieldSpecifierTypeNumeric) {
@@ -262,15 +260,11 @@
 			textField.placeholder = field.placeholder;
 		}
 		[cell.contentView addSubview:textField];
-	}
-	else if (type == FieldSpecifierTypeSwitch) {
+	} else if (type == FieldSpecifierTypeSwitch) {
 		NamedSwitch *switchControl = [[NamedSwitch alloc] init];
 		CGSize switchSize = switchControl.frame.size;
 		CGSize contentSize = cell.contentView.bounds.size;
-		CGRect switchFrame = CGRectMake(contentSize.width - switchSize.width - 8,
-										8,
-										switchSize.width,
-										switchSize.height);
+		CGRect switchFrame = CGRectMake(contentSize.width - switchSize.width - 8, 8, switchSize.width, switchSize.height);
 		switchControl.frame = switchFrame;
 		switchControl.tag = SWITCHTAG;
 		switchControl.name = key;
@@ -279,15 +273,14 @@
 		[switchControl setOn:value animated:NO];
 		[switchControl addTarget:self action:@selector(switchValueDidChange:) forControlEvents:UIControlEventValueChanged];
 		[cell.contentView addSubview:switchControl];
-	}
-	else if (type == FieldSpecifierTypeCheck) {
+	} else if (type == FieldSpecifierTypeCheck) {
 		BOOL value = [[self.values objectForKey:key] boolValue];
-		if (value)
+		if (value) {
 			cell.accessoryType = UITableViewCellAccessoryCheckmark;
-		else
+		} else {
 			cell.accessoryType = UITableViewCellAccessoryNone;
-	}
-	else if (type == FieldSpecifierTypeSection) {
+		}
+	} else if (type == FieldSpecifierTypeSection) {
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		if ([field.subsections count] == 1) {
 			FieldSectionSpecifier *subsection = [field.subsections objectAtIndex:0];
@@ -302,9 +295,9 @@
 			}
 		}
 	}
-  if (field.type == FieldSpecifierTypeButton) {
-	cell.detailTextLabel.text = field.defaultValue;
-  }
+	if (field.type == FieldSpecifierTypeButton) {
+		cell.detailTextLabel.text = field.defaultValue;
+	}
 	if (field.type == FieldSpecifierTypeButton && field.shouldDisplayDisclosureIndicator) {
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
@@ -415,6 +408,9 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+	return UIInterfaceOrientationMaskPortrait;
+}
 
 @end
 
@@ -423,7 +419,6 @@
 @implementation NamedTextField
 
 @synthesize name;
-
 
 @end
 
@@ -453,7 +448,6 @@
 	section.exclusiveSelection = NO;
 	return section;
 }
-
 
 @end
 
@@ -535,10 +529,6 @@
 
 + (FieldSpecifier *)subsectionFieldWithSection:(FieldSectionSpecifier *)section key:(NSString *)k {
 	return [self subsectionFieldWithSections:[NSArray arrayWithObject:section] key:k title:section.title];
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
 }
 
 @end
