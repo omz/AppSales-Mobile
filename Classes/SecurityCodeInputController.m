@@ -121,8 +121,12 @@
 
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
-	CGFloat topOffset = self.topLayoutGuide.length;
-	digitViewCenterYConstraint.constant = ((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) || UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)) ? -((topOffset + 216.0f) / 2.0f) : -((topOffset + 162.0f) / 2.0f);
+	
+	CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height ?: 20.0f;
+	CGFloat navigationBarHeight = self.navigationController.navigationBar.frame.size.height ?: 44.0f;
+	CGFloat topInset = self.topLayoutGuide.length ?: (statusBarHeight + navigationBarHeight);
+	
+	digitViewCenterYConstraint.constant = ((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) || UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)) ? -((topInset + 216.0f) / 2.0f) : -((topInset + 162.0f) / 2.0f);
 }
 
 - (void)viewDidLoad {

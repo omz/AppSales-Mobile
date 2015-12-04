@@ -43,9 +43,8 @@
 
 - (void)loadView {
 	[super loadView];
-	self.edgesForExtendedLayout = UIRectEdgeNone;
 	
-	self.view.backgroundColor = [UIColor whiteColor];
+	self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	
 	self.enterPasscodeTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
 	_enterPasscodeTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -72,6 +71,18 @@
 	[self.view addSubview:_confirmPasscodeTableView];
 	
 	[self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)]];
+}
+
+- (void)viewDidLayoutSubviews {
+	[super viewDidLayoutSubviews];
+	
+	CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height ?: 20.0f;
+	CGFloat navigationBarHeight = self.navigationController.navigationBar.frame.size.height ?: 44.0f;
+	CGFloat topInset = self.topLayoutGuide.length ?: (statusBarHeight + navigationBarHeight);
+	
+	_enterPasscodeTableView.contentInset = UIEdgeInsetsMake(topInset, 0.0f, 0.0f, 0.0f);
+	_setPasscodeTableView.contentInset = UIEdgeInsetsMake(topInset, 0.0f, 0.0f, 0.0f);
+	_confirmPasscodeTableView.contentInset = UIEdgeInsetsMake(topInset, 0.0f, 0.0f, 0.0f);
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
