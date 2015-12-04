@@ -81,21 +81,23 @@
 
 - (void)loadView {
 	[super loadView];
+	self.edgesForExtendedLayout = UIRectEdgeNone;
+	
 	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
 	statusVisible = [self shouldShowStatusBar];
 	self.topView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]];
 	topView.userInteractionEnabled = YES;
 	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	topView.frame = CGRectMake(0, 64.0, self.view.bounds.size.width, iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5);
+	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450.0 : self.view.bounds.size.height * 0.5f);
 	[self.view addSubview:topView];
 	
 	UIImageView *graphShadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
-	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds) + 64.0, topView.bounds.size.width, 20);
+	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
 	graphShadowView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	[topView addSubview:graphShadowView];
 	
-	self.productsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - 64.0 - topView.bounds.size.height) style:UITableViewStylePlain];
+	self.productsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain];
 	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	productsTableView.dataSource = self;

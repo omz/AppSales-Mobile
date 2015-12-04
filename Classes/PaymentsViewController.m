@@ -32,6 +32,7 @@
 
 - (void)loadView {
 	[super loadView];
+	self.edgesForExtendedLayout = UIRectEdgeNone;
 	
 	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
 	
@@ -113,7 +114,7 @@
 	
 	CGFloat x = 0.0;
 	for (NSNumber *year in sortedYears) {
-		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 64 - 10)];
+		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)];
 		yearView.year = [year integerValue];
 		yearView.labelsByMonth = [labelsByYear objectForKey:year];
 		if ([allPayments count] > 0) {

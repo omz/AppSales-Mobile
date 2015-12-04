@@ -79,12 +79,13 @@
 
 - (void)loadView {
 	[super loadView];
+	self.edgesForExtendedLayout = UIRectEdgeNone;
 	
 	self.viewMode = [[NSUserDefaults standardUserDefaults] integerForKey:kSettingDashboardViewMode];
 	
 	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
 	
-	CGFloat graphHeight = iPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5;
+	CGFloat graphHeight = iPad ? 450.0 : self.view.bounds.size.height * 0.5;
 	self.graphView = [[GraphView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, graphHeight)];
 	graphView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	graphView.delegate = self;
@@ -179,15 +180,17 @@
 		[self.selectedReportPopover dismissPopoverAnimated:YES];
 	}
 	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-		self.graphView.frame = CGRectMake(0, 32.0, self.view.bounds.size.width, self.view.bounds.size.height - 32.0);
+		self.graphView.frame = self.view.bounds;
 		self.topView.frame = self.view.bounds;
 		self.productsTableView.alpha = 0.0;
 		self.shadowView.hidden = YES;
 		[self.graphView reloadValuesAnimated:NO];
 	} else {
-		CGFloat graphHeight = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 450.0 : (self.view.bounds.size.height - 44.0) * 0.5;
+		CGFloat graphHeight = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 450.0 : self.view.bounds.size.height * 0.5;
 		self.graphView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
-		self.topView.frame = CGRectMake(0, 64.0, self.view.bounds.size.width, graphHeight);
+		self.topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
+		self.productsTableView.frame = CGRectMake(0, CGRectGetMaxY(self.topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - self.topView.bounds.size.height);
+		self.shadowView.frame = CGRectMake(0.0f, CGRectGetMaxY(self.topView.frame), self.view.bounds.size.width, self.shadowView.bounds.size.height);
 		self.shadowView.hidden = NO;
 		self.productsTableView.alpha = 1.0;
 		[self.graphView reloadValuesAnimated:NO];

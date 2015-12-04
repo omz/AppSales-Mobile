@@ -43,6 +43,7 @@
 
 - (void)loadView {
 	[super loadView];
+	self.edgesForExtendedLayout = UIRectEdgeNone;
 	
 	self.view.backgroundColor = [UIColor whiteColor];
 	
