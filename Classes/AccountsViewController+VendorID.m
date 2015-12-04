@@ -19,10 +19,12 @@
 		[vendors removeAllObjects];
 	}
 	
-	LoginManager *loginManager = [[LoginManager alloc] initWithLoginInfo:loginInfo];
-	loginManager.shouldDeleteCookies = NO;
-	loginManager.delegate = self;
-	[loginManager logIn];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+		LoginManager *loginManager = [[LoginManager alloc] initWithLoginInfo:loginInfo];
+		loginManager.shouldDeleteCookies = NO;
+		loginManager.delegate = self;
+		[loginManager logIn];
+	});
 }
 
 - (void)loginSucceeded {

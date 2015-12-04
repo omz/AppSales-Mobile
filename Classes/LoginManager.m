@@ -54,117 +54,109 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 }
 
 - (void)logOut {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSURL *logoutURL = [NSURL URLWithString:kMemberCenterLogoutURL];
-		[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
+	NSURL *logoutURL = [NSURL URLWithString:kMemberCenterLogoutURL];
+	[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
+	
+	if (self.shouldDeleteCookies) {
+		NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 		
-		if (self.shouldDeleteCookies) {
-			NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-			
-			NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://idmsa.apple.com"]];
-			for (NSHTTPCookie *cookie in cookies) {
-				[cookieStorage deleteCookie:cookie];
-			}
-			
-			cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
-			for (NSHTTPCookie *cookie in cookies) {
-				[cookieStorage deleteCookie:cookie];
-			}
-			
-			cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];
-			for (NSHTTPCookie *cookie in cookies) {
-				[cookieStorage deleteCookie:cookie];
-			}
+		NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://idmsa.apple.com"]];
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
 		}
-	});
+		
+		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
+		}
+		
+		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];
+		for (NSHTTPCookie *cookie in cookies) {
+			[cookieStorage deleteCookie:cookie];
+		}
+	}
 }
 
 - (void)logIn {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		[self logOut];
-		
-		if (trustedDevices == nil) {
-			trustedDevices = [[NSMutableArray alloc] init];
-		} else {
-			[trustedDevices removeAllObjects];
+	[self logOut];
+	
+	if (trustedDevices == nil) {
+		trustedDevices = [[NSMutableArray alloc] init];
+	} else {
+		[trustedDevices removeAllObjects];
+	}
+	
+	NSString *bodyString = [NSString stringWithFormat:@"appleId=%@&accountPassword=%@&appIdKey=%@", NSStringPercentEscaped(account.username ?: loginInfo[@"username"]), NSStringPercentEscaped(account.password ?: loginInfo[@"password"]), kMemberCenterAuthAppID];
+	NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+	
+	NSURL *authenticateURL = [NSURL URLWithString:[kMemberCenterBaseURL stringByAppendingString:kMemberCenterAuthenticateAction]];
+	NSMutableURLRequest *authenticateRequest = [NSMutableURLRequest requestWithURL:authenticateURL];
+	[authenticateRequest setHTTPMethod:@"POST"];
+	[authenticateRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+	[authenticateRequest setHTTPBody:bodyData];
+	
+	NSHTTPURLResponse *response = nil;
+	NSData *authenticatePageData = [NSURLConnection sendSynchronousRequest:authenticateRequest returningResponse:&response error:NULL];
+	NSString *authenticatePage = [[NSString alloc] initWithData:authenticatePageData encoding:NSUTF8StringEncoding];
+	NSScanner *authenticatePageScanner = [NSScanner scannerWithString:authenticatePage];
+	[authenticatePageScanner scanUpToString:@"<form id=\"command\" name=\"deviceForm\"" intoString:NULL];
+	[authenticatePageScanner scanString:@"<form id=\"command\" name=\"deviceForm\"" intoString:NULL];
+	if (self.isLoggedIn) {
+		// We're in!
+		if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.delegate loginSucceeded];
+			});
 		}
-		
-		NSString *bodyString = [NSString stringWithFormat:@"appleId=%@&accountPassword=%@&appIdKey=%@", NSStringPercentEscaped(account.username ?: loginInfo[@"username"]), NSStringPercentEscaped(account.password ?: loginInfo[@"password"]), kMemberCenterAuthAppID];
-		NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
-		
-		NSURL *authenticateURL = [NSURL URLWithString:[kMemberCenterBaseURL stringByAppendingString:kMemberCenterAuthenticateAction]];
-		NSMutableURLRequest *authenticateRequest = [NSMutableURLRequest requestWithURL:authenticateURL];
-		[authenticateRequest setHTTPMethod:@"POST"];
-		[authenticateRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-		[authenticateRequest setHTTPBody:bodyData];
-		
-		NSHTTPURLResponse *response = nil;
-		NSData *authenticatePageData = [NSURLConnection sendSynchronousRequest:authenticateRequest returningResponse:&response error:NULL];
-		NSString *authenticatePage = [[NSString alloc] initWithData:authenticatePageData encoding:NSUTF8StringEncoding];
-		NSScanner *authenticatePageScanner = [NSScanner scannerWithString:authenticatePage];
-		[authenticatePageScanner scanUpToString:@"<form id=\"command\" name=\"deviceForm\"" intoString:NULL];
-		[authenticatePageScanner scanString:@"<form id=\"command\" name=\"deviceForm\"" intoString:NULL];
-		if (self.isLoggedIn) {
-			// We're in!
-			if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginSucceeded];
-				});
-			}
-		} else if ([authenticatePageScanner scanString:@"action=\"" intoString:NULL]) {
-			// Looks like this account has Two-Step Verification enabled.
-			NSString *_generateCodeAction = nil;
-			[authenticatePageScanner scanUpToString:@"\"" intoString:&_generateCodeAction];
-			generateCodeAction = _generateCodeAction;
-			[authenticatePageScanner scanUpToString:@"<div id=\"devices\">" intoString:NULL];
-			if ([authenticatePageScanner scanString:@"<div id=\"devices\">" intoString:NULL]) {
-				NSRegularExpression *htmlTagsRegex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:0 error:nil];
-				NSUInteger scanLocation = authenticatePageScanner.scanLocation;
-				[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:NULL];
-				while ([authenticatePageScanner scanString:@"<div class=\"formrow radio hsa\">" intoString:NULL]) {
-					NSString *name = nil;
-					NSString *value = nil;
-					
-					// Parse device index.
-					[authenticatePageScanner scanUpToString:@"value=\"" intoString:NULL];
-					[authenticatePageScanner scanString:@"value=\"" intoString:NULL];
-					[authenticatePageScanner scanUpToString:@"\"" intoString:&value];
-					
-					// Parse device name.
-					[authenticatePageScanner scanUpToString:@"<label" intoString:NULL];
-					[authenticatePageScanner scanString:@">" intoString:NULL];
-					[authenticatePageScanner scanUpToString:@"</label>" intoString:&name];
-					
-					// Clean up device name.
-					name = [htmlTagsRegex stringByReplacingMatchesInString:name options:0 range:NSMakeRange(0, name.length) withTemplate:@""];
-					name = [name stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
-					name = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-					
-					NSMutableDictionary *trustedDevice = [[NSMutableDictionary alloc] init];
-					trustedDevice[@"name"] = name;
-					trustedDevice[@"value"] = value;
-					
-					[trustedDevices addObject:trustedDevice];
-					[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:NULL];
-				}
+	} else if ([authenticatePageScanner scanString:@"action=\"" intoString:NULL]) {
+		// Looks like this account has Two-Step Verification enabled.
+		NSString *_generateCodeAction = nil;
+		[authenticatePageScanner scanUpToString:@"\"" intoString:&_generateCodeAction];
+		generateCodeAction = _generateCodeAction;
+		[authenticatePageScanner scanUpToString:@"<div id=\"devices\">" intoString:NULL];
+		if ([authenticatePageScanner scanString:@"<div id=\"devices\">" intoString:NULL]) {
+			NSRegularExpression *htmlTagsRegex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:0 error:nil];
+			NSUInteger scanLocation = authenticatePageScanner.scanLocation;
+			[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:NULL];
+			while ([authenticatePageScanner scanString:@"<div class=\"formrow radio hsa\">" intoString:NULL]) {
+				NSString *name = nil;
+				NSString *value = nil;
 				
-				if (trustedDevices.count > 0) {
-					NSString *_ctkn = nil;
-					authenticatePageScanner.scanLocation = scanLocation;
-					[authenticatePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-					[authenticatePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-					[authenticatePageScanner scanUpToString:@"value=\"" intoString:NULL];
-					[authenticatePageScanner scanString:@"value=\"" intoString:NULL];
-					[authenticatePageScanner scanUpToString:@"\"" intoString:&_ctkn];
-					ctkn = _ctkn;
-					
-					if (ctkn != nil) {
-						[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
-					} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-						dispatch_async(dispatch_get_main_queue(), ^{
-							[self.delegate loginFailed];
-						});
-					}
+				// Parse device index.
+				[authenticatePageScanner scanUpToString:@"value=\"" intoString:NULL];
+				[authenticatePageScanner scanString:@"value=\"" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"\"" intoString:&value];
+				
+				// Parse device name.
+				[authenticatePageScanner scanUpToString:@"<label" intoString:NULL];
+				[authenticatePageScanner scanString:@">" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"</label>" intoString:&name];
+				
+				// Clean up device name.
+				name = [htmlTagsRegex stringByReplacingMatchesInString:name options:0 range:NSMakeRange(0, name.length) withTemplate:@""];
+				name = [name stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
+				name = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				
+				NSMutableDictionary *trustedDevice = [[NSMutableDictionary alloc] init];
+				trustedDevice[@"name"] = name;
+				trustedDevice[@"value"] = value;
+				
+				[trustedDevices addObject:trustedDevice];
+				[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:NULL];
+			}
+			
+			if (trustedDevices.count > 0) {
+				NSString *_ctkn = nil;
+				authenticatePageScanner.scanLocation = scanLocation;
+				[authenticatePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
+				[authenticatePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"value=\"" intoString:NULL];
+				[authenticatePageScanner scanString:@"value=\"" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"\"" intoString:&_ctkn];
+				ctkn = _ctkn;
+				
+				if (ctkn != nil) {
+					[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
 				} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[self.delegate loginFailed];
@@ -175,15 +167,19 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 					[self.delegate loginFailed];
 				});
 			}
-		} else {
-			// Wrong credentials?
-			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginFailed];
-				});
-			}
+		} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.delegate loginFailed];
+			});
 		}
-	});
+	} else {
+		// Wrong credentials?
+		if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.delegate loginFailed];
+			});
+		}
+	}
 }
 
 - (void)generateCode:(NSString *)_deviceIndex {
