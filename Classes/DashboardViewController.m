@@ -217,7 +217,7 @@
 	
 	NSArray *allProducts;
 	if ([productSortByValue isEqualToString:@"color"]) {
-		// Sort products by color
+		// Sort products by color.
 		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
 			if (product1.color.luminance < product2.color.luminance) {
 				return (NSComparisonResult)NSOrderedAscending;
@@ -227,7 +227,7 @@
 			return (NSComparisonResult)NSOrderedSame;
 		}];
 	} else {
-		// Sort products by ID (this will put the most recently released apps on top):
+		// Sort products by ID (this will put the most recently released apps on top).
 		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
 			NSInteger productID1 = product1.productID.integerValue;
 			NSInteger productID2 = product2.productID.integerValue;
@@ -250,7 +250,7 @@
 
 
 - (void)reloadTableView {
-	//Reload the table view, preserving the current selection:
+	// Reload the table view, preserving the current selection.
 	NSArray *selectedIndexPaths = [self.productsTableView indexPathsForSelectedRows];
 	[self.productsTableView reloadData];
 	if ([selectedIndexPaths count] > 0) {

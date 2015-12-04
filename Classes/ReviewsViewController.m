@@ -102,7 +102,10 @@
 }
 
 - (void)downloadReviews:(id)sender {
-	[[ReviewDownloadManager sharedManager] downloadReviewsForProducts:self.visibleProducts];
+	NSArray *productReviewsToDownload = [self.visibleProducts filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
+		return !product.hidden.boolValue; // Don't bother downloading reviews for hidden apps.
+	}]];
+	[[ReviewDownloadManager sharedManager] downloadReviewsForProducts:productReviewsToDownload];
 }
 
 - (void)stopDownload:(id)sender {

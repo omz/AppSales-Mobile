@@ -1453,7 +1453,6 @@
 				7F709D3D13BC98860008DBAD /* AppSalesAppDelegate.m */,
 				7FDF601C13DD2107005F1E2D /* Helpers */,
 				7FDF601F13DD21BB005F1E2D /* Accounts and Settings */,
-				7F7F1D0913F643F300F18143 /* Promo Codes */,
 				7FDF601D13DD2125005F1E2D /* Dashboard */,
 				7FDF602013DD21D5005F1E2D /* Common UI */,
 				7F7F1D0413F63F7F00F18143 /* Promo Code Download */,
@@ -1802,8 +1801,9 @@
 				7F24E70B13E41EA20056EA97 /* Common */,
 				7F24E70C13E41EB00056EA97 /* Sales */,
 				7FDF601E13DD2193005F1E2D /* Report Details */,
-				7F24E70D13E41EBD0056EA97 /* Reviews */,
 				7F7F4A3C13E50A32006C6651 /* Payments */,
+				7F24E70D13E41EBD0056EA97 /* Reviews */,
+				7F7F1D0913F643F300F18143 /* Promo Codes */,
 			);
 			name = Dashboard;
 			sourceTree = "<group>";

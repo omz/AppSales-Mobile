@@ -69,15 +69,21 @@
 }
 
 - (void)reloadData {
-	NSArray *allApps = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
-	NSMutableArray *filteredApps = [NSMutableArray array];
-	for (Product *app in allApps) {
-		// Don't show In-App Purchases.
-		if (app.parentSKU.length <= 1) {
-			[filteredApps addObject:app];
+	NSArray *allApps = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+		NSInteger productID1 = product1.productID.integerValue;
+		NSInteger productID2 = product2.productID.integerValue;
+		if (productID1 < productID2) {
+			return (NSComparisonResult)NSOrderedDescending;
+		} else if (productID1 > productID2) {
+			return (NSComparisonResult)NSOrderedAscending;
 		}
-	}
-	self.sortedApps = [NSArray arrayWithArray:filteredApps];
+		return (NSComparisonResult)NSOrderedSame;
+	}];
+	
+	self.sortedApps = [allApps filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
+		return !product.hidden.boolValue && !(product.parentSKU.length > 1); // In-App Purchases don't have promo codes, so don't include them.
+	}]];
+	
 	[self.tableView reloadData];
 }
 
