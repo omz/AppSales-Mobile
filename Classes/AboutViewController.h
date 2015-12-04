@@ -9,11 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface AboutViewController : UIViewController <UIWebViewDelegate> {
-	
 	UIWebView *webView;
 }
-
-@property (nonatomic, strong) UIWebView *webView;
-
 
 @end
