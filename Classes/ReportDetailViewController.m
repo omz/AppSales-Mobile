@@ -18,7 +18,7 @@
 #import "ReportDetailEntry.h"
 #import "CountryDictionary.h"
 
-#define kSettingReportDetailMapHidden		@"ReportDetailMapHidden"
+#define kSettingReportDetailMapHidden @"ReportDetailMapHidden"
 
 @implementation ReportDetailViewController
 
@@ -70,7 +70,7 @@
 	mapShadowView.alpha = (mapHidden) ? 0.0 : 1.0;
 	[self.view addSubview:mapShadowView];
 	
-	CGRect headerFrame = (mapHidden) ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 272-20, self.view.bounds.size.width, 20);
+	CGRect headerFrame = (mapHidden) ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 208 - 20, self.view.bounds.size.width, 20);
 	self.headerView = [[UIImageView alloc] initWithFrame:headerFrame];
 	headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	headerView.image = [UIImage imageNamed:@"DetailHeader.png"];
