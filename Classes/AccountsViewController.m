@@ -1,5 +1,5 @@
 //
-//  RootViewController.m
+//  AccountsViewController.m
 //  AppSales
 //
 //  Created by Ole Zorn on 30.06.11.
@@ -7,6 +7,7 @@
 //
 
 #import "AccountsViewController.h"
+#import "AccountsViewController+VendorID.h"
 #import "SalesViewController.h"
 #import "ReviewsViewController.h"
 #import "SSKeychain.h"
@@ -540,12 +541,11 @@
 }
 
 - (void)fieldEditor:(FieldEditorViewController *)editor pressedButtonWithKey:(NSString *)key {
-	
-  if ([key isEqualToString:kPasscodeLockButton]) {
-	KKPasscodeSettingsViewController *vc = [[KKPasscodeSettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-	vc.delegate = self;
-	[settingsNavController pushViewController:vc animated:YES];
-	 } else if ([key isEqualToString:kUpdateExchangeRatesButton]) {
+	if ([key isEqualToString:kPasscodeLockButton]) {
+		KKPasscodeSettingsViewController *vc = [[KKPasscodeSettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+		vc.delegate = self;
+		[settingsNavController pushViewController:vc animated:YES];
+	} else if ([key isEqualToString:kUpdateExchangeRatesButton]) {
 		[[CurrencyManager sharedManager] forceRefresh];
 	} else if ([key isEqualToString:kImportReportsButton]) {
 		ASAccount *account = (ASAccount *)editor.context;
@@ -610,7 +610,7 @@
 		
 		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
 		hud.labelText = NSLocalizedString(@"Fetching Vendor ID...", nil);
-		[hud showWhileExecuting:@selector(findVendorIDsWithLogin:) onTarget:self withObject:loginInfo animated:YES];
+		[self findVendorIDsWithLogin:loginInfo];
 	}
 }
 

@@ -1,5 +1,5 @@
 //
-//  RootViewController.h
+//  AccountsViewController.h
 //  AppSales
 //
 //  Created by Ole Zorn on 30.06.11.

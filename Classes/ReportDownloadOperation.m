@@ -306,122 +306,124 @@
 }
 
 - (void)loginSucceeded {
-	@autoreleasepool {
-		
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
-			_account.downloadProgress = 0.95;
-		});
-		
-		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-		[moc setPersistentStoreCoordinator:psc];
-		[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
-		
-		ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
-		
-		//==== Payments
-		
-		NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
-		NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:NULL error:NULL];
-		
-		if (paymentsPageData) {
-			NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+		@autoreleasepool {
 			
-			NSString *switchVendorAction = nil;
-			NSString *switchVendorSelectName = nil;
-			NSMutableArray *vendorOptions = [NSMutableArray array];
-			NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
-			[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
-			[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:NULL];
-			if ([vendorFormScanner scanUpToString:@"action=\"" intoString:NULL]) {
-				[vendorFormScanner scanString:@"action=\"" intoString:NULL];
-				[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
-				if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
-					[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:NULL];
-					NSString *vendorIDContainer = nil;
-					[vendorFormScanner scanUpToString:@"</div>" intoString:&vendorIDContainer];
-					if (vendorIDContainer) {
-						vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
-						
-						if ([vendorFormScanner scanUpToString:@"name=\"" intoString:NULL]) {
-							[vendorFormScanner scanString:@"name=\"" intoString:NULL];
-							[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorSelectName];
-							[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
-							while ([vendorFormScanner scanString:@"<option" intoString:NULL]) {
-								NSString *value = nil;
-								NSString *vendorID = nil;
-								
-								// Parse vendor index.
-								[vendorFormScanner scanUpToString:@"value=\"" intoString:NULL];
-								[vendorFormScanner scanString:@"value=\"" intoString:NULL];
-								[vendorFormScanner scanUpToString:@"\"" intoString:&value];
-								
-								// Parse vendor ID.
-								[vendorFormScanner scanUpToString:@">" intoString:NULL];
-								[vendorFormScanner scanString:@">" intoString:NULL];
-								[vendorFormScanner scanUpToString:@"- " intoString:NULL];
-								[vendorFormScanner scanString:@"- " intoString:NULL];
-								[vendorFormScanner scanUpToString:@"</option>" intoString:&vendorID];
-								
-								NSMutableDictionary *vendorOption = [[NSMutableDictionary alloc] init];
-								vendorOption[@"id"] = vendorID;
-								vendorOption[@"value"] = value;
-								[vendorOptions addObject:vendorOption];
-								
+			dispatch_async(dispatch_get_main_queue(), ^ {
+				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
+				_account.downloadProgress = 0.95;
+			});
+			
+			NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+			[moc setPersistentStoreCoordinator:psc];
+			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
+			
+			ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
+			
+			//==== Payments
+			
+			NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
+			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:NULL error:NULL];
+			
+			if (paymentsPageData) {
+				NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
+				
+				NSString *switchVendorAction = nil;
+				NSString *switchVendorSelectName = nil;
+				NSMutableArray *vendorOptions = [NSMutableArray array];
+				NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
+				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
+				[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:NULL];
+				if ([vendorFormScanner scanUpToString:@"action=\"" intoString:NULL]) {
+					[vendorFormScanner scanString:@"action=\"" intoString:NULL];
+					[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
+					if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
+						[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:NULL];
+						NSString *vendorIDContainer = nil;
+						[vendorFormScanner scanUpToString:@"</div>" intoString:&vendorIDContainer];
+						if (vendorIDContainer) {
+							vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
+							
+							if ([vendorFormScanner scanUpToString:@"name=\"" intoString:NULL]) {
+								[vendorFormScanner scanString:@"name=\"" intoString:NULL];
+								[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorSelectName];
 								[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
+								while ([vendorFormScanner scanString:@"<option" intoString:NULL]) {
+									NSString *value = nil;
+									NSString *vendorID = nil;
+									
+									// Parse vendor index.
+									[vendorFormScanner scanUpToString:@"value=\"" intoString:NULL];
+									[vendorFormScanner scanString:@"value=\"" intoString:NULL];
+									[vendorFormScanner scanUpToString:@"\"" intoString:&value];
+									
+									// Parse vendor ID.
+									[vendorFormScanner scanUpToString:@">" intoString:NULL];
+									[vendorFormScanner scanString:@">" intoString:NULL];
+									[vendorFormScanner scanUpToString:@"- " intoString:NULL];
+									[vendorFormScanner scanString:@"- " intoString:NULL];
+									[vendorFormScanner scanUpToString:@"</option>" intoString:&vendorID];
+									
+									NSMutableDictionary *vendorOption = [[NSMutableDictionary alloc] init];
+									vendorOption[@"id"] = vendorID;
+									vendorOption[@"value"] = value;
+									[vendorOptions addObject:vendorOption];
+									
+									[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
+								}
 							}
 						}
 					}
 				}
+				
+				[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
+				for (NSDictionary *additionalVendorOption in vendorOptions) {
+					NSString *bodyString = [NSString stringWithFormat:@"%@=%@", switchVendorSelectName, additionalVendorOption[@"value"]];
+					NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+					
+					NSURL *paymentsFormURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:switchVendorAction]];
+					NSMutableURLRequest *paymentsFormRequest = [NSMutableURLRequest requestWithURL:paymentsFormURL];
+					[paymentsFormRequest setHTTPMethod:@"POST"];
+					[paymentsFormRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+					[paymentsFormRequest setHTTPBody:bodyData];
+					
+					NSHTTPURLResponse *response = nil;
+					NSData *additionalPaymentsPageData = [NSURLConnection sendSynchronousRequest:paymentsFormRequest returningResponse:&response error:NULL];
+					NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
+					
+					[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption[@"id"]];
+				}
+				
+				NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
+				NSString *signoutFormAction = nil;
+				[logoutFormScanner scanUpToString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
+				[logoutFormScanner scanString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
+				[logoutFormScanner scanUpToString:@"<a href=\"" intoString:NULL];
+				if ([logoutFormScanner scanString:@"<a href=\"" intoString:NULL]) {
+					[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
+					NSURL *logoutURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:signoutFormAction]];
+					[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
+				}
 			}
 			
-			[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
-			for (NSDictionary *additionalVendorOption in vendorOptions) {
-				NSString *bodyString = [NSString stringWithFormat:@"%@=%@", switchVendorSelectName, additionalVendorOption[@"value"]];
-				NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
-				
-				NSURL *paymentsFormURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:switchVendorAction]];
-				NSMutableURLRequest *paymentsFormRequest = [NSMutableURLRequest requestWithURL:paymentsFormURL];
-				[paymentsFormRequest setHTTPMethod:@"POST"];
-				[paymentsFormRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-				[paymentsFormRequest setHTTPBody:bodyData];
-				
-				NSHTTPURLResponse *response = nil;
-				NSData *additionalPaymentsPageData = [NSURLConnection sendSynchronousRequest:paymentsFormRequest returningResponse:&response error:NULL];
-				NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
-				
-				[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption[@"id"]];
+			//==== /Payments
+			
+			if ([moc hasChanges]) {
+				[psc lock];
+				NSError *saveError = nil;
+				[moc save:&saveError];
+				if (saveError) {
+					NSLog(@"Could not save context: %@", saveError);
+				}
+				[psc unlock];
 			}
 			
-			NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
-			NSString *signoutFormAction = nil;
-			[logoutFormScanner scanUpToString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
-			[logoutFormScanner scanString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
-			[logoutFormScanner scanUpToString:@"<a href=\"" intoString:NULL];
-			if ([logoutFormScanner scanString:@"<a href=\"" intoString:NULL]) {
-				[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
-				NSURL *logoutURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:signoutFormAction]];
-				[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
-			}
+			dispatch_async(dispatch_get_main_queue(), ^ {
+				_account.downloadStatus = NSLocalizedString(@"Finished", nil);
+				_account.downloadProgress = 1.0;
+			});
 		}
-		
-		//==== /Payments
-		
-		if ([moc hasChanges]) {
-			[psc lock];
-			NSError *saveError = nil;
-			[moc save:&saveError];
-			if (saveError) {
-				NSLog(@"Could not save context: %@", saveError);
-			}
-			[psc unlock];
-		}
-		
-		dispatch_async(dispatch_get_main_queue(), ^ {
-			_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-			_account.downloadProgress = 1.0;
-		});
-	}
+	});
 }
 
 - (void)loginFailed {
@@ -432,71 +434,75 @@
 }
 
 - (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID {
-	NSManagedObjectContext *moc = [account managedObjectContext];
-	
-	NSScanner *graphDataScanner = [NSScanner scannerWithString:paymentsPage];
-	NSString *graphDataJSON = nil;
-	[graphDataScanner scanUpToString:@"var graph_data_salesGraph_24_months = " intoString:NULL];
-	[graphDataScanner scanString:@"var graph_data_salesGraph_24_months = " intoString:NULL];
-	[graphDataScanner scanUpToString:@"}" intoString:&graphDataJSON];
-	if (graphDataJSON) {
-		graphDataJSON = [graphDataJSON stringByAppendingString:@"}"];
-		graphDataJSON = [graphDataJSON stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
-		NSError *jsonError = nil;
-		
-		NSDictionary *graphDict = [NSJSONSerialization JSONObjectWithData:[graphDataJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&jsonError];
-		if (graphDict) {
-			NSSet *allExistingPayments = account.payments;
-			NSMutableSet *existingPaymentIdentifiers = [NSMutableSet set];
-			for (NSManagedObject *payment in allExistingPayments) {
-				[existingPaymentIdentifiers addObject:[NSString stringWithFormat:@"%@-%@-%@", [payment valueForKey:@"vendorID"], [payment valueForKey:@"month"], [payment valueForKey:@"year"]]];
-			}
-			NSDateFormatter *paymentMonthFormatter = [[NSDateFormatter alloc] init];
-			[paymentMonthFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"]];
-			[paymentMonthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			[paymentMonthFormatter setDateFormat:@"MMM yy"];
-			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-			[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			NSArray *amounts = ([[graphDict objectForKey:@"data"] count] >= 2) ? [[graphDict objectForKey:@"data"] objectAtIndex:1] : nil;
-			NSArray *labels = [graphDict objectForKey:@"labels"];
-			NSArray *legend = [graphDict objectForKey:@"legend"];
-			if (legend && [legend isKindOfClass:[NSArray class]] && [legend count] == 2) {
-				NSString *currencyLegend = [legend objectAtIndex:1];
-				NSString *currency = [currencyLegend stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
-				NSInteger numberOfPaymentsLoaded = 0;
-				if ([amounts count] == [labels count]) {
-					for (int i=0; i<[labels count]; i++) {
-						NSString *label = [labels objectAtIndex:i];
-						NSNumber *amount = [amounts objectAtIndex:i];
-						if (![amount isKindOfClass:[NSNumber class]] || ![label isKindOfClass:[NSString class]]) {
-							continue;
-						}
-						if ([amount integerValue] == 0) {
-							continue;
-						}
-						NSDate *labelDate = [paymentMonthFormatter dateFromString:label];
-						if (labelDate) {
-							NSDateComponents *dateComponents = [calendar components:NSMonthCalendarUnit | NSYearCalendarUnit fromDate:labelDate];
-							NSInteger month = [dateComponents month];
-							NSInteger year = [dateComponents year];
-							NSString *paymentIdentifier = [NSString stringWithFormat:@"%@-%li-%li", vendorID, (long)month, (long)year];
-							if (![existingPaymentIdentifiers containsObject:paymentIdentifier]) {
-								NSManagedObject *payment = [NSEntityDescription insertNewObjectForEntityForName:@"Payment" inManagedObjectContext:moc];
-								[payment setValue:account forKey:@"account"];
-								[payment setValue:[NSNumber numberWithInteger:month] forKey:@"month"];
-								[payment setValue:[NSNumber numberWithInteger:year] forKey:@"year"];
-								[payment setValue:amount forKey:@"amount"];
-								[payment setValue:currency forKey:@"currency"];
-								[payment setValue:vendorID forKey:@"vendorID"];
-								numberOfPaymentsLoaded++;
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+		@autoreleasepool {
+			NSManagedObjectContext *moc = [account managedObjectContext];
+			
+			NSScanner *graphDataScanner = [NSScanner scannerWithString:paymentsPage];
+			NSString *graphDataJSON = nil;
+			[graphDataScanner scanUpToString:@"var graph_data_salesGraph_24_months = " intoString:NULL];
+			[graphDataScanner scanString:@"var graph_data_salesGraph_24_months = " intoString:NULL];
+			[graphDataScanner scanUpToString:@"}" intoString:&graphDataJSON];
+			if (graphDataJSON) {
+				graphDataJSON = [graphDataJSON stringByAppendingString:@"}"];
+				graphDataJSON = [graphDataJSON stringByReplacingOccurrencesOfString:@"'" withString:@"\""];
+				NSError *jsonError = nil;
+				
+				NSDictionary *graphDict = [NSJSONSerialization JSONObjectWithData:[graphDataJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&jsonError];
+				if (graphDict) {
+					NSSet *allExistingPayments = account.payments;
+					NSMutableSet *existingPaymentIdentifiers = [NSMutableSet set];
+					for (NSManagedObject *payment in allExistingPayments) {
+						[existingPaymentIdentifiers addObject:[NSString stringWithFormat:@"%@-%@-%@", [payment valueForKey:@"vendorID"], [payment valueForKey:@"month"], [payment valueForKey:@"year"]]];
+					}
+					NSDateFormatter *paymentMonthFormatter = [[NSDateFormatter alloc] init];
+					[paymentMonthFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"]];
+					[paymentMonthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+					[paymentMonthFormatter setDateFormat:@"MMM yy"];
+					NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+					[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+					NSArray *amounts = ([[graphDict objectForKey:@"data"] count] >= 2) ? [[graphDict objectForKey:@"data"] objectAtIndex:1] : nil;
+					NSArray *labels = [graphDict objectForKey:@"labels"];
+					NSArray *legend = [graphDict objectForKey:@"legend"];
+					if (legend && [legend isKindOfClass:[NSArray class]] && [legend count] == 2) {
+						NSString *currencyLegend = [legend objectAtIndex:1];
+						NSString *currency = [currencyLegend stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
+						NSInteger numberOfPaymentsLoaded = 0;
+						if ([amounts count] == [labels count]) {
+							for (int i=0; i<[labels count]; i++) {
+								NSString *label = [labels objectAtIndex:i];
+								NSNumber *amount = [amounts objectAtIndex:i];
+								if (![amount isKindOfClass:[NSNumber class]] || ![label isKindOfClass:[NSString class]]) {
+									continue;
+								}
+								if ([amount integerValue] == 0) {
+									continue;
+								}
+								NSDate *labelDate = [paymentMonthFormatter dateFromString:label];
+								if (labelDate) {
+									NSDateComponents *dateComponents = [calendar components:NSMonthCalendarUnit | NSYearCalendarUnit fromDate:labelDate];
+									NSInteger month = [dateComponents month];
+									NSInteger year = [dateComponents year];
+									NSString *paymentIdentifier = [NSString stringWithFormat:@"%@-%li-%li", vendorID, (long)month, (long)year];
+									if (![existingPaymentIdentifiers containsObject:paymentIdentifier]) {
+										NSManagedObject *payment = [NSEntityDescription insertNewObjectForEntityForName:@"Payment" inManagedObjectContext:moc];
+										[payment setValue:account forKey:@"account"];
+										[payment setValue:[NSNumber numberWithInteger:month] forKey:@"month"];
+										[payment setValue:[NSNumber numberWithInteger:year] forKey:@"year"];
+										[payment setValue:amount forKey:@"amount"];
+										[payment setValue:currency forKey:@"currency"];
+										[payment setValue:vendorID forKey:@"vendorID"];
+										numberOfPaymentsLoaded++;
+									}
+								}
 							}
 						}
+						account.paymentsBadge = [NSNumber numberWithInteger:[account.paymentsBadge integerValue] + numberOfPaymentsLoaded];
 					}
 				}
-				account.paymentsBadge = [NSNumber numberWithInteger:[account.paymentsBadge integerValue] + numberOfPaymentsLoaded];
 			}
 		}
-	}
+	});
 }
 
 - (NSData *)dataFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary response:(NSHTTPURLResponse **)response {
