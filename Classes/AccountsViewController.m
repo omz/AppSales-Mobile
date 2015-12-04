@@ -396,6 +396,7 @@
 - (void)showSettings {
 	// main section
 	passcodeLockField = [FieldSpecifier buttonFieldWithKey:kPasscodeLockButton title:NSLocalizedString(@"Passcode Lock", nil)];
+	passcodeLockField.shouldDisplayDisclosureIndicator = YES;
 	if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
 		passcodeLockField.defaultValue = @"On";
 	} else {
