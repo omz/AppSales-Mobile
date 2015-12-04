@@ -53,14 +53,14 @@
 		colorButton.hidden = YES;
 		iconView.productID = nil;
 	} else {
-		nameLabel.text = [product displayName];
+		nameLabel.text = product.displayName;
 		colorButton.hidden = NO;
 		colorButton.color = product.color;
-		if (self.product.parentSKU && self.product.parentSKU.length > 1) {
+		if (product.parentSKU.length > 1) {
 			iconView.productID = nil;
 			iconView.image = [UIImage imageNamed:@"InApp.png"];
 		} else {
-			iconView.productID = self.product.productID;
+			iconView.productID = product.productID;
 		}
 	}
 }

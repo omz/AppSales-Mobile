@@ -72,8 +72,8 @@
 	NSArray *allApps = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
 	NSMutableArray *filteredApps = [NSMutableArray array];
 	for (Product *app in allApps) {
-		//Don't show in-app purchases
-		if (!app.parentSKU) {
+		// Don't show In-App Purchases.
+		if (app.parentSKU.length <= 1) {
 			[filteredApps addObject:app];
 		}
 	}
