@@ -336,53 +336,75 @@
 	titleField.placeholder = NSLocalizedString(@"optional", nil);
 	
 	FieldSpecifier *loginSubsectionField = [FieldSpecifier subsectionFieldWithSections:[self accountSectionsFor:account] key:@"iTunesConnect" title:NSLocalizedString(@"iTunes Connect Login", nil)];
-	FieldSectionSpecifier *titleSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:titleField, loginSubsectionField, nil] title:nil description:nil];
+	FieldSectionSpecifier *titleSection = [FieldSectionSpecifier sectionWithFields:@[titleField, loginSubsectionField] title:nil description:nil];
 	
 	FieldSpecifier *importButtonField = [FieldSpecifier buttonFieldWithKey:kImportReportsButton title:NSLocalizedString(@"Import Reports...", nil)];
 	FieldSpecifier *exportButtonField = [FieldSpecifier buttonFieldWithKey:kExportReportsButton title:NSLocalizedString(@"Export Reports...", nil)];
-	FieldSectionSpecifier *importExportSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:importButtonField, exportButtonField, nil] 
-																					title:nil 
-																			  description:nil /*NSLocalizedString(@"Use iTunes file sharing to import report files from your computer.",nil)*/];
+	FieldSectionSpecifier *importExportSection = [FieldSectionSpecifier sectionWithFields:@[importButtonField, exportButtonField] title:nil description:nil];
 	
-	NSMutableArray *productFields = [NSMutableArray array];
+	NSMutableArray *productFields = [[NSMutableArray alloc] init];
 	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
 		NSInteger productID1 = product1.productID.integerValue;
 		NSInteger productID2 = product2.productID.integerValue;
 		if (productID1 < productID2) {
-			return (NSComparisonResult)NSOrderedDescending;
+			return NSOrderedDescending;
 		} else if (productID1 > productID2) {
-			return (NSComparisonResult)NSOrderedAscending;
+			return NSOrderedAscending;
 		}
-		return (NSComparisonResult)NSOrderedSame;
+		return NSOrderedSame;
 	}];
 	
 	for (Product *product in allProducts) {
-		FieldSpecifier *productNameField = [FieldSpecifier textFieldWithKey:[NSString stringWithFormat:@"product.name.%@", product.productID] title:NSLocalizedString(@"Name", nil) defaultValue:[product displayName]];
-		FieldSpecifier *hideProductField = [FieldSpecifier switchFieldWithKey:[NSString stringWithFormat:@"product.hidden.%@", product.productID] title:NSLocalizedString(@"Hide in Dashboard", nil) defaultValue:[product.hidden boolValue]];
-		FieldSpecifier *reloadProductInfoField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.reload.%@", product.productID] title:NSLocalizedString(@"Reload App Icon...", nil)];
-		FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObjects:productNameField, hideProductField, reloadProductInfoField, nil] title:nil description:nil];
-		FieldSpecifier *showInAppStoreField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.appstore.%@", product.productID] title:NSLocalizedString(@"Show in App Store...", nil)];
-		NSString *productFooter = [NSString stringWithFormat:@"Current version: %@\nApple ID: %@", ((product.currentVersion) ? product.currentVersion : @"N/A"), product.productID];
-		FieldSectionSpecifier *showInAppStoreSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:showInAppStoreField] title:nil description:productFooter];
-		FieldSpecifier *productSectionField = [FieldSpecifier subsectionFieldWithSections:[NSArray arrayWithObjects:productSection, showInAppStoreSection, nil] key:[NSString stringWithFormat:@"product.section.%@", product.productID] title:[product defaultDisplayName]];
+		NSMutableArray *sections = [[NSMutableArray alloc] init];
+		NSMutableArray *fields = [[NSMutableArray alloc] init];
+		
+		FieldSpecifier *productNameField = [FieldSpecifier textFieldWithKey:[NSString stringWithFormat:@"product.name.%@", product.productID] title:NSLocalizedString(@"Name", nil) defaultValue:product.displayName];
+		[fields addObject:productNameField];
+		
+		FieldSpecifier *hideProductField = [FieldSpecifier switchFieldWithKey:[NSString stringWithFormat:@"product.hidden.%@", product.productID] title:NSLocalizedString(@"Hide in Dashboard", nil) defaultValue:product.hidden.boolValue];
+		[fields addObject:hideProductField];
+		
+		NSString *productFooter = nil;
+		if (product.parentSKU.length <= 1) {
+			FieldSpecifier *reloadProductInfoField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.reload.%@", product.productID] title:NSLocalizedString(@"Reload App Icon...", nil)];
+			[fields addObject:reloadProductInfoField];
+		} else {
+			productFooter = [NSString stringWithFormat:@"Apple ID: %@", product.productID];
+		}
+		
+		FieldSectionSpecifier *productSection = [FieldSectionSpecifier sectionWithFields:fields title:nil description:productFooter];
+		[sections addObject:productSection];
+		
+		if (product.parentSKU.length <= 1) {
+			productFooter = [NSString stringWithFormat:@"Current Version: %@\nApple ID: %@", ((product.currentVersion.length > 0) ? product.currentVersion : @"N/A"), product.productID];
+			
+			FieldSpecifier *showInAppStoreField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.appstore.%@", product.productID] title:NSLocalizedString(@"Show in App Store...", nil)];
+			
+			FieldSectionSpecifier *showInAppStoreSection = [FieldSectionSpecifier sectionWithFields:@[showInAppStoreField] title:nil description:productFooter];
+			[sections addObject:showInAppStoreSection];
+		}
+		
+		FieldSpecifier *productSectionField = [FieldSpecifier subsectionFieldWithSections:sections key:[NSString stringWithFormat:@"product.section.%@", product.productID] title:[product defaultDisplayName]];
 		[productFields addObject:productSectionField];
 	}
+	
 	FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:productFields title:NSLocalizedString(@"Manage Apps", nil) description:nil];
 	FieldSpecifier *manageProductsSectionField = [FieldSpecifier subsectionFieldWithSection:productsSection key:@"ManageProducts"];
-	FieldSectionSpecifier *manageProductsSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:manageProductsSectionField] title:nil description:nil];
-	if ([allProducts count] == 0) {
+	FieldSectionSpecifier *manageProductsSection = [FieldSectionSpecifier sectionWithFields:@[manageProductsSectionField] title:nil description:nil];
+	
+	if (allProducts.count == 0) {
 		productsSection.description = NSLocalizedString(@"This account does not contain any apps yet. Import or download reports first.", nil);
 	}
 	
 	FieldSpecifier *deleteAccountButtonField = [FieldSpecifier buttonFieldWithKey:kDeleteAccountButton title:NSLocalizedString(@"Delete Account...", nil)];
-	FieldSectionSpecifier *deleteAccountSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:deleteAccountButtonField] title:nil description:nil];
+	FieldSectionSpecifier *deleteAccountSection = [FieldSectionSpecifier sectionWithFields:@[deleteAccountButtonField] title:nil description:nil];
 	
-	NSArray *sections = [NSArray arrayWithObjects:titleSection, importExportSection, manageProductsSection, deleteAccountSection, nil];
-	FieldEditorViewController *editAccountViewController = [[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Account Details",nil)];
+	FieldEditorViewController *editAccountViewController = [[FieldEditorViewController alloc] initWithFieldSections:@[titleSection, importExportSection, manageProductsSection, deleteAccountSection] title:NSLocalizedString(@"Account Details",nil)];
 	editAccountViewController.doneButtonTitle = nil;
 	editAccountViewController.delegate = self;
 	editAccountViewController.editorIdentifier = kEditAccountEditorIdentifier;
 	editAccountViewController.context = account;
+	
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 		editAccountViewController.hidesBottomBarWhenPushed = YES;
 	}

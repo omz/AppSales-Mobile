@@ -220,11 +220,11 @@
 		// Sort products by color.
 		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
 			if (product1.color.luminance < product2.color.luminance) {
-				return (NSComparisonResult)NSOrderedAscending;
+				return NSOrderedAscending;
 			} else if (product1.color.luminance > product2.color.luminance) {
-				return (NSComparisonResult)NSOrderedDescending;
+				return NSOrderedDescending;
 			}
-			return (NSComparisonResult)NSOrderedSame;
+			return NSOrderedSame;
 		}];
 	} else {
 		// Sort products by ID (this will put the most recently released apps on top).
@@ -232,11 +232,11 @@
 			NSInteger productID1 = product1.productID.integerValue;
 			NSInteger productID2 = product2.productID.integerValue;
 			if (productID1 < productID2) {
-				return (NSComparisonResult)NSOrderedDescending;
+				return NSOrderedDescending;
 			} else if (productID1 > productID2) {
-				return (NSComparisonResult)NSOrderedAscending;
+				return NSOrderedAscending;
 			}
-			return (NSComparisonResult)NSOrderedSame;
+			return NSOrderedSame;
 		}];
 	}
 	
