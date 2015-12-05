@@ -7,7 +7,6 @@
 //
 
 #import "AccountsViewController+VendorID.h"
-#import "NSDictionary+HTTP.h"
 #import "MBProgressHUD.h"
 
 @implementation AccountsViewController (AccountsViewController_VendorID)
@@ -159,24 +158,6 @@
 		vc = self.navigationController.viewControllers.lastObject;
 	}
 	return vc;
-}
-
-- (NSString *)stringFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary {
-	NSData *data = [self dataFromSynchronousPostRequestWithURL:URL bodyDictionary:bodyDictionary response:NULL];
-	if (data) {
-		return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	}
-	return nil;
-}
-
-- (NSData *)dataFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary response:(NSHTTPURLResponse **)response {
-	NSString *postDictString = [bodyDictionary formatForHTTP];
-	NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-	NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:URL];
-	[urlRequest setHTTPMethod:@"POST"];
-	[urlRequest setHTTPBody:httpBody];
-	NSData *data = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:response error:NULL];
-	return data;
 }
 
 @end

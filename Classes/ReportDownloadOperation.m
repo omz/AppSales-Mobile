@@ -11,15 +11,6 @@
 #import "Report.h"
 #import "WeeklyReport.h"
 #import "NSData+Compression.h"
-#import "NSDictionary+HTTP.h"
-
-@interface ReportDownloadOperation ()
-
-- (NSData *)dataFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary response:(NSHTTPURLResponse **)response;
-- (NSString *)stringFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary;
-- (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID;
-
-@end
 
 @implementation ReportDownloadOperation
 
@@ -556,24 +547,6 @@
 			}
 		}
 	});
-}
-
-- (NSData *)dataFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary response:(NSHTTPURLResponse **)response {
-	NSString *postDictString = [bodyDictionary formatForHTTP];
-	NSData *httpBody = [postDictString dataUsingEncoding:NSASCIIStringEncoding];
-	NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:URL];
-	[urlRequest setHTTPMethod:@"POST"];
-	[urlRequest setHTTPBody:httpBody];
-	NSData *data = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:response error:NULL];
-	return data;
-}
-
-- (NSString *)stringFromSynchronousPostRequestWithURL:(NSURL *)URL bodyDictionary:(NSDictionary *)bodyDictionary {
-	NSData *data = [self dataFromSynchronousPostRequestWithURL:URL bodyDictionary:bodyDictionary response:NULL];
-	if (data) {
-		return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	}
-	return nil;
 }
 
 @end

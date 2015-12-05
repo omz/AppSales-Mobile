@@ -9,14 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "MultiOperation.h"
 
-#define ASPromoCodeDownloadFailedNotification		@"ASPromoCodeDownloadFailedNotification"
-#define kASPromoCodeDownloadFailedErrorDescription	@"errorDescription"
+#define ASPromoCodeDownloadFailedNotification      @"ASPromoCodeDownloadFailedNotification"
+#define kASPromoCodeDownloadFailedErrorDescription @"errorDescription"
 
 @class Product;
 
-@interface PromoCodeOperation : MultiOperation {
-	
-}
+@interface PromoCodeOperation : MultiOperation
 
 - (id)initWithProduct:(Product *)aProduct;
 - (id)initWithProduct:(Product *)aProduct numberOfCodes:(NSInteger)numberOfCodes;
