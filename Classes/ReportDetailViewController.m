@@ -28,12 +28,12 @@
 @synthesize selectedCountry, selectedProduct;
 @synthesize headerView, headerLabel, headerIconView;
 
-- (id)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex {
+- (instancetype)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex {
 	self = [super init];
 	if (self) {
 		reports = reportsArray;
 		selectedReportIndex = selectedIndex;
-		self.selectedReport = [reports objectAtIndex:selectedReportIndex];
+		self.selectedReport = reports[selectedReportIndex];
 		revenueFormatter = [[NSNumberFormatter alloc] init];
 		[revenueFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
 		[revenueFormatter setMinimumFractionDigits:2];
@@ -42,7 +42,7 @@
 		self.preferredContentSize = CGSizeMake(320, 500);
 	}
 	
-	[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+	[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:@(0)];
 	
 	return self;
 }
@@ -53,12 +53,12 @@
 	
 	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
 	
-	viewMode = (self.selectedProduct) ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
+	viewMode = self.selectedProduct ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
 	
 	mapHidden = mapHidden || UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation);
 	self.mapView = [[MapView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 208)];
 	mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	mapView.alpha = (mapHidden) ? 0.0 : 1.0;
+	mapView.alpha = !mapHidden;
 	if (!mapHidden) {
 		mapView.report = self.selectedReport;
 	}
@@ -67,10 +67,10 @@
 	self.mapShadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	mapShadowView.frame = CGRectMake(0, CGRectGetMaxY(mapView.frame), self.view.bounds.size.width, 20);
 	mapShadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	mapShadowView.alpha = (mapHidden) ? 0.0 : 1.0;
+	mapShadowView.alpha = !mapHidden;
 	[self.view addSubview:mapShadowView];
 	
-	CGRect headerFrame = (mapHidden) ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 208 - 20, self.view.bounds.size.width, 20);
+	CGRect headerFrame = mapHidden ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 208 - 20, self.view.bounds.size.width, 20);
 	self.headerView = [[UIImageView alloc] initWithFrame:headerFrame];
 	headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	headerView.image = [UIImage imageNamed:@"DetailHeader.png"];
@@ -88,7 +88,7 @@
 	
 	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) ? 32.0 : 44.0;
 	
-	CGRect tableViewFrame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
+	CGRect tableViewFrame = mapHidden ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
 	self.tableView = [[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain];
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -104,13 +104,13 @@
 	[self.view addSubview:tableView];
 	
 	self.shadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
-	shadowView.frame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, 20) : CGRectMake(0, 208, self.view.bounds.size.width, 20);
+	shadowView.frame = mapHidden ? CGRectMake(0, 20, self.view.bounds.size.width, 20) : CGRectMake(0, 208, self.view.bounds.size.width, 20);
 	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	shadowView.alpha = 0.0;
 	[self.view addSubview:shadowView];
 	
 	if (!UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap.png" : @"HideMap.png")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
 	}
 	
 	self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight)];
@@ -118,7 +118,7 @@
 	[self.view addSubview:toolbar];
 	
 	float segmentWidth = 75.0;
-	UISegmentedControl *modeControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil), nil]];
+	UISegmentedControl *modeControl = [[UISegmentedControl alloc] initWithItems:@[NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil)]];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:0];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:1];
 	modeControl.selectedSegmentIndex = (viewMode == ReportDetailViewModeProducts) ? 0 : 1;
@@ -136,9 +136,9 @@
 	
 	[self updateNavigationButtons];
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		toolbar.items = [NSArray arrayWithObjects:spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+		toolbar.items = @[spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
 	} else {
-		toolbar.items = [NSArray arrayWithObjects:prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
+		toolbar.items = @[prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
 		toolbar.translucent = YES;
 	}
 	
@@ -159,7 +159,7 @@
 		self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
 	} completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
 		if (!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-			self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
+			self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap.png" : @"HideMap.png")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
 		} else {
 			self.navigationItem.rightBarButtonItem = nil;
 		}
@@ -263,14 +263,14 @@
 	[sortedEntries addObject:[ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:@"world" product:nil]];
 	
 	for (NSString *country in [sortedCountries reverseObjectEnumerator]) {
-		float revenue = [[revenuesByCountry objectForKey:country] floatValue];
+		float revenue = [revenuesByCountry[country] floatValue];
 		float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
 		
 		NSInteger sales = 0;
 		if (self.selectedProduct) {
-			sales = [[[paidDownloadsByCountryAndProduct objectForKey:[country uppercaseString]] objectForKey:self.selectedProduct.productID] integerValue];
+			sales = [paidDownloadsByCountryAndProduct[country.uppercaseString][self.selectedProduct.productID] integerValue];
 		} else {
-			NSDictionary *salesByProduct = [paidDownloadsByCountryAndProduct objectForKey:[country uppercaseString]];
+			NSDictionary *salesByProduct = paidDownloadsByCountryAndProduct[country.uppercaseString];
 			sales = [[[salesByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
 		}
 		
@@ -287,24 +287,24 @@
 	ReportDetailEntry *allProductsEntry = [ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:nil product:nil];
 	[entries addObject:allProductsEntry];
 	ASAccount *account = [[self.selectedReport firstReport] valueForKey:@"account"];
-	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
+	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
 	for (Product *product in allProducts) {
 		NSString *productID = product.productID;
 		float revenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:productID inCountry:self.selectedCountry];
 		NSInteger sales = 0, nonRefunds = 0, refunds = 0;
 		if (self.selectedCountry) {
-			sales = [[[paidDownloadsByCountryAndProduct objectForKey:[self.selectedCountry uppercaseString]] objectForKey:productID] integerValue];
-			nonRefunds = [[[paidNonRefundDownloadsByCountryAndProduct objectForKey:[self.selectedCountry uppercaseString]] objectForKey:productID] integerValue];
-			refunds = -[[[refundedDownloadsByCountryAndProduct objectForKey:[self.selectedCountry uppercaseString]] objectForKey:productID] integerValue];
+			sales = [paidDownloadsByCountryAndProduct[self.selectedCountry.uppercaseString][productID] integerValue];
+			nonRefunds = [paidNonRefundDownloadsByCountryAndProduct[self.selectedCountry.uppercaseString][productID] integerValue];
+			refunds = -[refundedDownloadsByCountryAndProduct[self.selectedCountry.uppercaseString][productID] integerValue];
 		} else {
 			for (NSDictionary *salesByProduct in [paidDownloadsByCountryAndProduct allValues]) {
-				sales += [[salesByProduct objectForKey:productID] integerValue];
+				sales += [salesByProduct[productID] integerValue];
 			}
 			for (NSDictionary *nonRefundsByProduct in [paidNonRefundDownloadsByCountryAndProduct allValues]) {
-				nonRefunds += [[nonRefundsByProduct objectForKey:productID] integerValue];
+				nonRefunds += [nonRefundsByProduct[productID] integerValue];
 			}
 			for (NSDictionary *refundsByProduct in [refundedDownloadsByCountryAndProduct allValues]) {
-				refunds -= [[refundsByProduct objectForKey:productID] integerValue];
+				refunds -= [refundsByProduct[productID] integerValue];
 			}
 		}
 		
@@ -319,7 +319,7 @@
 			[entries addObject:entry];
 		}
 	}
-	[entries sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO]]];
+	[entries sortUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO]]];
 	
 	self.productEntries = [NSArray arrayWithArray:entries];
 	[self reloadTableView];
@@ -365,7 +365,7 @@
 - (void)selectNextReport:(id)sender {
 	if (selectedReportIndex >= [reports count] - 1) return;
 	self.selectedReportIndex = self.selectedReportIndex + 1;
-	self.selectedReport = [reports objectAtIndex:selectedReportIndex];
+	self.selectedReport = reports[selectedReportIndex];
 }
 
 - (void)updateNavigationButtons {
@@ -399,7 +399,7 @@
 - (void)selectPreviousReport:(id)sender {
 	if (selectedReportIndex <= 0) return;
 	self.selectedReportIndex = self.selectedReportIndex - 1;
-	self.selectedReport = [reports objectAtIndex:selectedReportIndex];
+	self.selectedReport = reports[selectedReportIndex];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -424,7 +424,7 @@
 	if (!cell) {
 		cell = [[ReportDetailEntryCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 	}
-	ReportDetailEntry *entry = [(viewMode == ReportDetailViewModeCountries) ? self.countryEntries : self.productEntries objectAtIndex:indexPath.row];
+	ReportDetailEntry *entry = ((viewMode == ReportDetailViewModeCountries) ? self.countryEntries : self.productEntries)[indexPath.row];
 	cell.entry = entry;
 	return cell;
 }
@@ -432,14 +432,14 @@
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (viewMode == ReportDetailViewModeCountries) {
 		if (indexPath.row > 0) {
-			self.selectedCountry = [[countryEntries objectAtIndex:indexPath.row] country];
+			self.selectedCountry = [countryEntries[indexPath.row] country];
 		} else {
 			self.selectedCountry = nil;
 		}
 		mapView.selectedCountry = self.selectedCountry;
 	} else {
 		if (indexPath.row > 0) {
-			Product *product = [[productEntries objectAtIndex:indexPath.row] product];
+			Product *product = [productEntries[indexPath.row] product];
 			self.selectedProduct = product;
 			mapView.selectedProduct = product;
 		} else {

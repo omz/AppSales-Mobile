@@ -36,10 +36,8 @@
 		currencyCode = @"USD";
 	}
 	
-	NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
-							  [NSNumber numberWithBool:YES], kSettingDownloadPayments,
-							  currencyCode, @"CurrencyManagerBaseCurrency",
-							  nil];
+	NSDictionary *defaults = @{kSettingDownloadPayments: @(YES),
+							   @"CurrencyManagerBaseCurrency": currencyCode};
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
@@ -81,7 +79,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportDownloadFailed:) name:ASReportDownloadFailedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeDownloadFailed:) name:ASPromoCodeDownloadFailedNotification object:nil];
 	
-	if ([launchOptions objectForKey:UIApplicationLaunchOptionsURLKey]) {
+	if (launchOptions[UIApplicationLaunchOptionsURLKey]) {
 		[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
 	}
 	
@@ -133,9 +131,9 @@
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		NSFetchRequest *accountsFetchRequest = [[NSFetchRequest alloc] init];
 		[accountsFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:self.managedObjectContext]];
-		[accountsFetchRequest setSortDescriptors:[NSArray arrayWithObjects:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES], [[NSSortDescriptor alloc] initWithKey:@"username" ascending:YES], nil]];
-		NSArray *accounts = [self.managedObjectContext executeFetchRequest:accountsFetchRequest error:NULL];
-		ASAccount *account = [accounts objectAtIndex:buttonIndex];
+		[accountsFetchRequest setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES], [[NSSortDescriptor alloc] initWithKey:@"username" ascending:YES]]];
+		NSArray *accounts = [self.managedObjectContext executeFetchRequest:accountsFetchRequest error:nil];
+		ASAccount *account = accounts[buttonIndex];
 		[self loadAccount:account];
 	}
 }
@@ -165,7 +163,7 @@
 	promoNavController.toolbar.barStyle = UIBarStyleBlackOpaque;
 	
 	UITabBarController *tabController = [[UITabBarController alloc] init];
-	[tabController setViewControllers:[NSArray arrayWithObjects:salesNavController, reviewsNavController, paymentsNavController, promoNavController, nil]];
+	[tabController setViewControllers:@[salesNavController, reviewsNavController, paymentsNavController, promoNavController]];
 	
 	self.window.rootViewController = tabController;
 }
@@ -183,13 +181,13 @@
 	if (!originalReportsDirectoryFound) {
 		return NO;
 	}	
-	NSArray *originalReportFiles = [fm contentsOfDirectoryAtPath:legacyReportDirectory error:NULL];
+	NSArray *originalReportFiles = [fm contentsOfDirectoryAtPath:legacyReportDirectory error:nil];
 	if ([originalReportFiles count] == 0) {
 		//All files have been migrated, delete all the clutter in the documents directory:
-		NSArray *files = [fm contentsOfDirectoryAtPath:documentsDirectory error:NULL];
+		NSArray *files = [fm contentsOfDirectoryAtPath:documentsDirectory error:nil];
 		for (NSString *file in files) {
 			NSString *fullPath = [documentsDirectory stringByAppendingPathComponent:file];
-			[fm removeItemAtPath:fullPath error:NULL];
+			[fm removeItemAtPath:fullPath error:nil];
 		}
 		return NO;
 	}
@@ -204,9 +202,9 @@
 		[accountFetchRequest setEntity:[NSEntityDescription entityForName:@"Account" inManagedObjectContext:[self managedObjectContext]]];
 		[accountFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"username == %@", oldUsername]];
 		[accountFetchRequest setFetchLimit:1];
-		NSArray *matchingAccounts = [[self managedObjectContext] executeFetchRequest:accountFetchRequest error:NULL];
+		NSArray *matchingAccounts = [[self managedObjectContext] executeFetchRequest:accountFetchRequest error:nil];
 		if ([matchingAccounts count] > 0) {
-			account = [matchingAccounts objectAtIndex:0];
+			account = matchingAccounts[0];
 		}
 	}
 	if (!account) {
@@ -284,7 +282,7 @@
 }
 
 - (void)promoCodeLicenseAgreementLoaded:(NSNotification *)notification {
-	NSString *licenseAgreement = [[notification userInfo] objectForKey:@"licenseAgreement"];
+	NSString *licenseAgreement = notification.userInfo[@"licenseAgreement"];
 	PromoCodesLicenseViewController *vc = [[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]];
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
 	[self.window.rootViewController presentViewController:navController animated:YES completion:nil];
@@ -346,9 +344,8 @@
 	
 	NSError *error = nil;
 	persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-	NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-							 [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption, 
-							 [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+	NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @(YES),
+							  NSInferMappingModelAutomaticallyOption: @(YES)};
 	if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 		abort();
@@ -363,13 +360,13 @@
 
 - (NSURL *)applicationSupportDirectory {
 	NSURL *appSupportDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
-	[[NSFileManager defaultManager] createDirectoryAtPath:[appSupportDirectory path] withIntermediateDirectories:YES attributes:nil error:NULL];
+	[[NSFileManager defaultManager] createDirectoryAtPath:[appSupportDirectory path] withIntermediateDirectories:YES attributes:nil error:nil];
 	return appSupportDirectory;
 }
 
 - (void)reportDownloadFailed:(NSNotification *)notification {
-	NSString *errorMessage = [[notification userInfo] objectForKey:kASReportDownloadErrorDescription];
-	NSString *alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@", nil), (errorMessage) ? errorMessage : @""];
+	NSString *errorMessage = notification.userInfo[kASReportDownloadErrorDescription];
+	NSString *alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@", nil), errorMessage ?: @""];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
 								 message:alertMessage 
 								delegate:nil 
@@ -378,7 +375,7 @@
 }
 
 - (void)promoCodeDownloadFailed:(NSNotification *)notification {
-	NSString *errorDescription = [[notification userInfo] objectForKey:kASPromoCodeDownloadFailedErrorDescription];
+	NSString *errorDescription = notification.userInfo[kASPromoCodeDownloadFailedErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:@"An error occured while downloading the promo codes (%@).", errorDescription];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
 								 message:alertMessage 

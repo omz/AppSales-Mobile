@@ -14,7 +14,7 @@
 
 @synthesize delegate, name, selectedColor, context;
 
-- (id)initWithColors:(NSArray *)colorArray {
+- (instancetype)initWithColors:(NSArray *)colorArray {
 	self = [super init];
 	if (self) {
 		colors = colorArray;

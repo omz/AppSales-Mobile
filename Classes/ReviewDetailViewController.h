@@ -19,6 +19,6 @@
 
 @property (nonatomic, strong) UIWebView *webView;
 
-- (id)initWithReview:(Review *)review;
+- (instancetype)initWithReview:(Review *)review;
 
 @end

@@ -19,6 +19,6 @@
 
 @property (readonly) NSOperationQueue *queue;
 
-- (id)initWithOperations:(NSArray *)partialOperations;
+- (instancetype)initWithOperations:(NSArray *)partialOperations;
 
 @end

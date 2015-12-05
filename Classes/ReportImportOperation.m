@@ -18,7 +18,7 @@
 + (BOOL)filesAvailableToImport {
 	NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 	NSFileManager *fm = [[NSFileManager alloc] init];
-	NSArray *filenames = [fm contentsOfDirectoryAtPath:docPath error:NULL];
+	NSArray *filenames = [fm contentsOfDirectoryAtPath:docPath error:nil];
 	for (NSString *filename in filenames) {
 		if ([[filename pathExtension] isEqualToString:@"txt"]) {
 			return YES;
@@ -27,7 +27,7 @@
 	return NO;
 }
 
-- (id)initWithAccount:(ASAccount *)account {
+- (instancetype)initWithAccount:(ASAccount *)account {
 	self = [super init];
 	if (self) {
 		_account = account;
@@ -56,17 +56,17 @@
 		NSFetchRequest *existingDailyReportsRequest = [[NSFetchRequest alloc] init];
 		[existingDailyReportsRequest setEntity:[NSEntityDescription entityForName:@"DailyReport" inManagedObjectContext:moc]];
 		[existingDailyReportsRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@", account]];
-		[existingDailyReportsRequest setPropertiesToFetch:[NSArray arrayWithObject:@"startDate"]];
+		[existingDailyReportsRequest setPropertiesToFetch:@[@"startDate"]];
 		[existingDailyReportsRequest setResultType:NSDictionaryResultType];
-		NSArray *existingDailyReportDates = [[moc executeFetchRequest:existingDailyReportsRequest error:NULL] valueForKey:@"startDate"];
+		NSArray *existingDailyReportDates = [[moc executeFetchRequest:existingDailyReportsRequest error:nil] valueForKey:@"startDate"];
 		NSMutableSet *existingDailyReportDatesSet = [NSMutableSet setWithArray:existingDailyReportDates];
 		
 		NSFetchRequest *existingWeeklyReportsRequest = [[NSFetchRequest alloc] init];
 		[existingWeeklyReportsRequest setEntity:[NSEntityDescription entityForName:@"WeeklyReport" inManagedObjectContext:moc]];
 		[existingWeeklyReportsRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@", account]];
-		[existingWeeklyReportsRequest setPropertiesToFetch:[NSArray arrayWithObject:@"startDate"]];
+		[existingWeeklyReportsRequest setPropertiesToFetch:@[@"startDate"]];
 		[existingWeeklyReportsRequest setResultType:NSDictionaryResultType];
-		NSArray *existingWeeklyReportDates = [[moc executeFetchRequest:existingWeeklyReportsRequest error:NULL] valueForKey:@"startDate"];
+		NSArray *existingWeeklyReportDates = [[moc executeFetchRequest:existingWeeklyReportsRequest error:nil] valueForKey:@"startDate"];
 		NSMutableSet *existingWeeklyReportDatesSet = [NSMutableSet setWithArray:existingWeeklyReportDates];
 		
 		NSString *docPath = nil;
@@ -76,7 +76,7 @@
 			docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 		}
 		NSFileManager *fm = [[NSFileManager alloc] init];
-		NSArray *fileNames = [fm contentsOfDirectoryAtPath:docPath error:NULL];
+		NSArray *fileNames = [fm contentsOfDirectoryAtPath:docPath error:nil];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (0/%i)...", nil), [fileNames count]];
@@ -96,17 +96,17 @@
 					reportCSV = [[NSString alloc] initWithData:inflatedData encoding:NSUTF8StringEncoding];
 					if (!reportCSV) reportCSV = [[NSString alloc] initWithData:inflatedData encoding:NSISOLatin1StringEncoding];
 				} else {
-					reportCSV = [[NSString alloc] initWithContentsOfFile:fullPath encoding:NSUTF8StringEncoding error:NULL];
-					if (!reportCSV) reportCSV = [[NSString alloc] initWithContentsOfFile:fullPath encoding:NSISOLatin1StringEncoding error:NULL];
+					reportCSV = [[NSString alloc] initWithContentsOfFile:fullPath encoding:NSUTF8StringEncoding error:nil];
+					if (!reportCSV) reportCSV = [[NSString alloc] initWithContentsOfFile:fullPath encoding:NSISOLatin1StringEncoding error:nil];
 				}
 				
 				NSDictionary *reportInfo = [Report infoForReportCSV:reportCSV];
 				if (reportInfo) {
-					NSDate *reportDate = [reportInfo objectForKey:kReportInfoDate];
+					NSDate *reportDate = reportInfo[kReportInfoDate];
 					NSMutableSet *existingDates = nil;
-					if ([[reportInfo objectForKey:kReportInfoClass] isEqualToString:kReportInfoClassDaily]) {
+					if ([reportInfo[kReportInfoClass] isEqualToString:kReportInfoClassDaily]) {
 						existingDates = existingDailyReportDatesSet;
-					} else if ([[reportInfo objectForKey:kReportInfoClass] isEqualToString:kReportInfoClassWeekly]) {
+					} else if ([reportInfo[kReportInfoClass] isEqualToString:kReportInfoClassWeekly]) {
 						existingDates = existingWeeklyReportDatesSet;
 					}
 					if (![existingDates containsObject:reportDate]) {
@@ -134,7 +134,7 @@
 								account = (ASAccount *)[moc objectWithID:accountObjectID];
 							}
 							if (!saveError && deleteOriginalFilesAfterImport) {
-								[fm removeItemAtPath:fullPath error:NULL];
+								[fm removeItemAtPath:fullPath error:nil];
 							}
 						}
 					}

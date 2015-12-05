@@ -16,7 +16,7 @@
 
 @synthesize inputOperation, startBlock, request, connection, data, paused;
 
-- (id)init {
+- (instancetype)init {
 	self = [super init];
 	if (self) {
 		
@@ -28,7 +28,7 @@
 	startBlock = [block copy];
 }
 
-+ (id)operationWithInput:(DownloadStepOperation *)otherOperation {
++ (instancetype)operationWithInput:(DownloadStepOperation *)otherOperation {
 	DownloadStepOperation *operation = [[self alloc] init];
 	operation.inputOperation = otherOperation;
 	return operation;

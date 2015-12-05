@@ -15,7 +15,7 @@
 
 @synthesize scrollView, pageControl;
 
-- (id)initWithAccount:(ASAccount *)paymentAccount {
+- (instancetype)initWithAccount:(ASAccount *)paymentAccount {
 	self = [super init];
 	if (self) {
 		account = paymentAccount;
@@ -66,34 +66,34 @@
 	NSSet *allPayments = account.payments;
 	for (NSManagedObject *payment in allPayments) {
 		NSNumber *year = [payment valueForKey:@"year"];
-		NSMutableDictionary *paymentsForYear = [paymentsByYear objectForKey:year];
+		NSMutableDictionary *paymentsForYear = paymentsByYear[year];
 		if (!paymentsForYear) {
 			paymentsForYear = [NSMutableDictionary dictionary];
 			[paymentsByYear setObject:paymentsForYear forKey:year];
 		}
 		NSNumber *month = [payment valueForKey:@"month"];
-		NSMutableArray *paymentsForMonth = [paymentsForYear objectForKey:month];
+		NSMutableArray *paymentsForMonth = paymentsForYear[month];
 		if (!paymentsForMonth) {
 			paymentsForMonth = [NSMutableArray array];
 			[paymentsForYear setObject:paymentsForMonth forKey:month];
 		}
 		[paymentsForMonth addObject:payment];
 		
-		float currentSum = [[sumsByYear objectForKey:year] floatValue];
-		[sumsByYear setObject:[NSNumber numberWithFloat:currentSum + [[payment valueForKey:@"amount"] floatValue]] forKey:year];
+		float currentSum = [sumsByYear[year] floatValue];
+		[sumsByYear setObject:@(currentSum + [[payment valueForKey:@"amount"] floatValue]) forKey:year];
 	}
 	
 	NSMutableDictionary *labelsByYear = [NSMutableDictionary dictionary];
 	for (NSNumber *year in paymentsByYear) {
-		NSDictionary *paymentsForYear = [paymentsByYear objectForKey:year];
+		NSDictionary *paymentsForYear = paymentsByYear[year];
 		for (NSNumber *month in paymentsForYear) {
-			NSArray *payments = [paymentsForYear objectForKey:month];
+			NSArray *payments = paymentsForYear[month];
 			if ([payments count] > 0) {
 				NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
-				NSString *currency = [[payments objectAtIndex:0] valueForKey:@"currency"];
+				NSString *currency = [payments[0] valueForKey:@"currency"];
 				[numberFormatter setCurrencySymbol:[[CurrencyManager sharedManager] currencySymbolForCurrency:currency]];
 				NSString *label = [numberFormatter stringFromNumber:sum];
-				NSMutableDictionary *labelsForYear = [labelsByYear objectForKey:year];
+				NSMutableDictionary *labelsForYear = labelsByYear[year];
 				if (!labelsForYear) {
 					labelsForYear = [NSMutableDictionary dictionary];
 					[labelsByYear setObject:labelsForYear forKey:year];
@@ -109,18 +109,18 @@
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 		NSDateComponents *currentYearComponents = [calendar components:NSCalendarUnitYear fromDate:[NSDate date]];
 		NSInteger currentYear = [currentYearComponents year];
-		sortedYears = [NSArray arrayWithObject:[NSNumber numberWithInteger:currentYear]];
+		sortedYears = @[@(currentYear)];
 	}
 	
 	CGFloat x = 0.0;
 	for (NSNumber *year in sortedYears) {
 		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)];
 		yearView.year = [year integerValue];
-		yearView.labelsByMonth = [labelsByYear objectForKey:year];
+		yearView.labelsByMonth = labelsByYear[year];
 		if ([allPayments count] > 0) {
 			//We assume that all payments have the same currency:
 			[numberFormatter setCurrencySymbol:[[CurrencyManager sharedManager] currencySymbolForCurrency:[[allPayments anyObject] valueForKey:@"currency"]]];
-			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@", [numberFormatter stringFromNumber:[sumsByYear objectForKey:year]]];
+			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@", [numberFormatter stringFromNumber:sumsByYear[year]]];
 		}
 		yearView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 		[scrollView addSubview:yearView];
@@ -146,7 +146,7 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		account.payments = [NSSet set];
-		[[account managedObjectContext] save:NULL];
+		[[account managedObjectContext] save:nil];
 		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 			[self.navigationController popViewControllerAnimated:YES];
 		}
@@ -155,9 +155,9 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
-	account.paymentsBadge = [NSNumber numberWithInteger:0];
+	account.paymentsBadge = @(0);
 	if ([account.managedObjectContext hasChanges]) {
-		[account.managedObjectContext save:NULL];
+		[account.managedObjectContext save:nil];
 	}
 }
 

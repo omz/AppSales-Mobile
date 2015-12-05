@@ -30,7 +30,7 @@
 @property (nonatomic, strong) PromoCode *selectedPromoCode;
 @property (nonatomic, strong) UIActionSheet *activeSheet;
 
-- (id)initWithProduct:(Product *)aProduct;
+- (instancetype)initWithProduct:(Product *)aProduct;
 - (void)reloadPromoCodes;
 - (void)requestNewCodes:(id)sender;
 

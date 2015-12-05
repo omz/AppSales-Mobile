@@ -16,7 +16,7 @@
 
 @synthesize accountObjectID;
 
-- (id)initWithAccount:(ASAccount *)account {
+- (instancetype)initWithAccount:(ASAccount *)account {
 	self = [super init];
 	if (self) {
 		username = [account.username copy];
@@ -52,7 +52,7 @@
 		NSString *vendorID = account.vendorID;
 		
 		NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
-		for (NSString *dateType in [NSArray arrayWithObjects:@"Daily", @"Weekly", nil]) {
+		for (NSString *dateType in @[@"Daily", @"Weekly"]) {
 			// Determine which reports should be available for download.
 			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 			[dateFormatter setDateFormat:@"yyyyMMdd"];
@@ -102,7 +102,7 @@
 				[existingReportsFetchRequest setEntity:[NSEntityDescription entityForName:@"WeeklyReport" inManagedObjectContext:moc]];
 				[existingReportsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND endDate IN %@", account, availableReportDates]];
 			}
-			NSArray *existingReports = [moc executeFetchRequest:existingReportsFetchRequest error:NULL];
+			NSArray *existingReports = [moc executeFetchRequest:existingReportsFetchRequest error:nil];
 			
 			for (Report *report in existingReports) {
 				if ([dateType isEqualToString:@"Daily"]) {
@@ -169,9 +169,9 @@
 				[reportDownloadRequest setHTTPBody:reportDownloadBodyData];
 				
 				NSHTTPURLResponse *response = nil;
-				NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:NULL];
+				NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:nil];
 				
-				NSString *errorMessage = [[response allHeaderFields] objectForKey:@"Errormsg"];
+				NSString *errorMessage = response.allHeaderFields[@"Errormsg"];
 				// The message "Daily Reports are only available for past 365 days. Please enter a new date."
 				// just means that the report in question has not yet been released.
 				// We can safely ignore this error and move on.
@@ -197,7 +197,7 @@
 					
 					errors[errorMessage] = reportTypes;
 				} else if (reportData) {
-					NSString *originalFilename = [[response allHeaderFields] objectForKey:@"Filename"];
+					NSString *originalFilename = response.allHeaderFields[@"Filename"];
 					NSData *inflatedReportData = [reportData gzipInflate];
 					NSString *reportCSV = [[NSString alloc] initWithData:inflatedReportData encoding:NSUTF8StringEncoding];
 					if (originalFilename && [reportCSV length] > 0) {
@@ -227,7 +227,7 @@
 							[originalReport setValue:originalFilename forKey:@"filename"];
 							[report generateCache];
 							numberOfReportsDownloaded++;
-							account.reportsBadge = [NSNumber numberWithInteger:previousBadge + numberOfReportsDownloaded];
+							account.reportsBadge = @(previousBadge + numberOfReportsDownloaded);
 						} else {
 							NSLog(@"Could not parse report %@", originalFilename);
 						}
@@ -346,7 +346,7 @@
 			//==== Payments
 			
 			NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
-			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:NULL error:NULL];
+			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:nil error:nil];
 			
 			if (self.isCancelled) {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -366,36 +366,36 @@
 				NSString *switchVendorSelectName = nil;
 				NSMutableArray *vendorOptions = [NSMutableArray array];
 				NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
-				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
-				[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:NULL];
-				if ([vendorFormScanner scanUpToString:@"action=\"" intoString:NULL]) {
-					[vendorFormScanner scanString:@"action=\"" intoString:NULL];
+				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:nil];
+				[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:nil];
+				if ([vendorFormScanner scanUpToString:@"action=\"" intoString:nil]) {
+					[vendorFormScanner scanString:@"action=\"" intoString:nil];
 					[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorAction];
-					if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
-						[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:NULL];
+					if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:nil]) {
+						[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:nil];
 						NSString *vendorIDContainer = nil;
 						[vendorFormScanner scanUpToString:@"</div>" intoString:&vendorIDContainer];
 						if (vendorIDContainer) {
 							vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
 							
-							if ([vendorFormScanner scanUpToString:@"name=\"" intoString:NULL]) {
-								[vendorFormScanner scanString:@"name=\"" intoString:NULL];
+							if ([vendorFormScanner scanUpToString:@"name=\"" intoString:nil]) {
+								[vendorFormScanner scanString:@"name=\"" intoString:nil];
 								[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorSelectName];
-								[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
-								while ([vendorFormScanner scanString:@"<option" intoString:NULL]) {
+								[vendorFormScanner scanUpToString:@"<option" intoString:nil];
+								while ([vendorFormScanner scanString:@"<option" intoString:nil]) {
 									NSString *value = nil;
 									NSString *vendorID = nil;
 									
 									// Parse vendor index.
-									[vendorFormScanner scanUpToString:@"value=\"" intoString:NULL];
-									[vendorFormScanner scanString:@"value=\"" intoString:NULL];
+									[vendorFormScanner scanUpToString:@"value=\"" intoString:nil];
+									[vendorFormScanner scanString:@"value=\"" intoString:nil];
 									[vendorFormScanner scanUpToString:@"\"" intoString:&value];
 									
 									// Parse vendor ID.
-									[vendorFormScanner scanUpToString:@">" intoString:NULL];
-									[vendorFormScanner scanString:@">" intoString:NULL];
-									[vendorFormScanner scanUpToString:@"- " intoString:NULL];
-									[vendorFormScanner scanString:@"- " intoString:NULL];
+									[vendorFormScanner scanUpToString:@">" intoString:nil];
+									[vendorFormScanner scanString:@">" intoString:nil];
+									[vendorFormScanner scanUpToString:@"- " intoString:nil];
+									[vendorFormScanner scanString:@"- " intoString:nil];
 									[vendorFormScanner scanUpToString:@"</option>" intoString:&vendorID];
 									
 									NSMutableDictionary *vendorOption = [[NSMutableDictionary alloc] init];
@@ -403,7 +403,7 @@
 									vendorOption[@"value"] = value;
 									[vendorOptions addObject:vendorOption];
 									
-									[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
+									[vendorFormScanner scanUpToString:@"<option" intoString:nil];
 								}
 							}
 						}
@@ -422,7 +422,7 @@
 					[paymentsFormRequest setHTTPBody:bodyData];
 					
 					NSHTTPURLResponse *response = nil;
-					NSData *additionalPaymentsPageData = [NSURLConnection sendSynchronousRequest:paymentsFormRequest returningResponse:&response error:NULL];
+					NSData *additionalPaymentsPageData = [NSURLConnection sendSynchronousRequest:paymentsFormRequest returningResponse:&response error:nil];
 					NSString *additionalPaymentsPage = [[NSString alloc] initWithData:additionalPaymentsPageData encoding:NSUTF8StringEncoding];
 					
 					[self parsePaymentsPage:additionalPaymentsPage inAccount:account vendorID:additionalVendorOption[@"id"]];
@@ -430,10 +430,10 @@
 				
 				NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
 				NSString *signoutFormAction = nil;
-				[logoutFormScanner scanUpToString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
-				[logoutFormScanner scanString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
-				[logoutFormScanner scanUpToString:@"<a href=\"" intoString:NULL];
-				if ([logoutFormScanner scanString:@"<a href=\"" intoString:NULL]) {
+				[logoutFormScanner scanUpToString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:nil];
+				[logoutFormScanner scanString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:nil];
+				[logoutFormScanner scanUpToString:@"<a href=\"" intoString:nil];
+				if ([logoutFormScanner scanString:@"<a href=\"" intoString:nil]) {
 					[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
 					NSURL *logoutURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:signoutFormAction]];
 					[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
@@ -484,8 +484,8 @@
 			
 			NSScanner *graphDataScanner = [NSScanner scannerWithString:paymentsPage];
 			NSString *graphDataJSON = nil;
-			[graphDataScanner scanUpToString:@"var graph_data_salesGraph_24_months = " intoString:NULL];
-			[graphDataScanner scanString:@"var graph_data_salesGraph_24_months = " intoString:NULL];
+			[graphDataScanner scanUpToString:@"var graph_data_salesGraph_24_months = " intoString:nil];
+			[graphDataScanner scanString:@"var graph_data_salesGraph_24_months = " intoString:nil];
 			[graphDataScanner scanUpToString:@"}" intoString:&graphDataJSON];
 			if (graphDataJSON) {
 				graphDataJSON = [graphDataJSON stringByAppendingString:@"}"];
@@ -505,17 +505,17 @@
 					[paymentMonthFormatter setDateFormat:@"MMM yy"];
 					NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 					[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-					NSArray *amounts = ([[graphDict objectForKey:@"data"] count] >= 2) ? [[graphDict objectForKey:@"data"] objectAtIndex:1] : nil;
-					NSArray *labels = [graphDict objectForKey:@"labels"];
-					NSArray *legend = [graphDict objectForKey:@"legend"];
+					NSArray *amounts = ([graphDict[@"data"] count] >= 2) ? graphDict[@"data"][1] : nil;
+					NSArray *labels = graphDict[@"labels"];
+					NSArray *legend = graphDict[@"legend"];
 					if (legend && [legend isKindOfClass:[NSArray class]] && [legend count] == 2) {
-						NSString *currencyLegend = [legend objectAtIndex:1];
+						NSString *currencyLegend = legend[1];
 						NSString *currency = [currencyLegend stringByTrimmingCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
 						NSInteger numberOfPaymentsLoaded = 0;
 						if ([amounts count] == [labels count]) {
 							for (int i=0; i<[labels count]; i++) {
-								NSString *label = [labels objectAtIndex:i];
-								NSNumber *amount = [amounts objectAtIndex:i];
+								NSString *label = labels[i];
+								NSNumber *amount = amounts[i];
 								if (![amount isKindOfClass:[NSNumber class]] || ![label isKindOfClass:[NSString class]]) {
 									continue;
 								}
@@ -531,8 +531,8 @@
 									if (![existingPaymentIdentifiers containsObject:paymentIdentifier]) {
 										NSManagedObject *payment = [NSEntityDescription insertNewObjectForEntityForName:@"Payment" inManagedObjectContext:moc];
 										[payment setValue:account forKey:@"account"];
-										[payment setValue:[NSNumber numberWithInteger:month] forKey:@"month"];
-										[payment setValue:[NSNumber numberWithInteger:year] forKey:@"year"];
+										[payment setValue:@(month) forKey:@"month"];
+										[payment setValue:@(year) forKey:@"year"];
 										[payment setValue:amount forKey:@"amount"];
 										[payment setValue:currency forKey:@"currency"];
 										[payment setValue:vendorID forKey:@"vendorID"];
@@ -541,7 +541,7 @@
 								}
 							}
 						}
-						account.paymentsBadge = [NSNumber numberWithInteger:[account.paymentsBadge integerValue] + numberOfPaymentsLoaded];
+						account.paymentsBadge = @([account.paymentsBadge integerValue] + numberOfPaymentsLoaded);
 					}
 				}
 			}

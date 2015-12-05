@@ -32,6 +32,6 @@ typedef void(^DownloadStepStartBlock)(DownloadStepOperation *operation);
 @property (nonatomic, strong) NSMutableData *data;
 @property (nonatomic, assign) BOOL paused;
 
-+ (id)operationWithInput:(DownloadStepOperation *)otherOperation;
++ (instancetype)operationWithInput:(DownloadStepOperation *)otherOperation;
 
 @end

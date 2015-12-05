@@ -13,7 +13,7 @@
 
 @synthesize badgeCount;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
 		badgeView = [[UIImageView alloc] initWithFrame:CGRectMake(self.contentView.bounds.size.width - 32 - 10, self.contentView.bounds.size.height * 0.5 - 10, 32, 20)];

@@ -51,7 +51,7 @@
 @property (nonatomic, strong) UIProgressView *progressBar;
 @property (nonatomic, strong) UIActionSheet *activeSheet;
 
-- (id)initWithAccount:(ASAccount *)anAccount;
+- (instancetype)initWithAccount:(ASAccount *)anAccount;
 - (void)willShowPasscodeLock:(NSNotification *)notification;
 - (NSSet *)entityNamesTriggeringReload;
 - (void)reloadData;

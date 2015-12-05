@@ -13,7 +13,7 @@
 	NSDictionary *countryNamesByISOCode;
 }
 
-+ (id)sharedDictionary;
++ (instancetype)sharedDictionary;
 - (NSString *)nameForCountryCode:(NSString *)countryCode;
 
 @end

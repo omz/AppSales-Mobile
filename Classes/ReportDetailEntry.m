@@ -13,7 +13,7 @@
 
 @synthesize revenue, percentage, subtitle, country, product;
 
-+ (id)entryWithRevenue:(float)r percentage:(float)p subtitle:(NSString *)aSubtitle country:(NSString *)countryCode product:(Product *)aProduct {
++ (instancetype)entryWithRevenue:(float)r percentage:(float)p subtitle:(NSString *)aSubtitle country:(NSString *)countryCode product:(Product *)aProduct {
 	ReportDetailEntry *entry = [[self alloc] init];
 	entry.revenue = r;
 	entry.percentage = p;

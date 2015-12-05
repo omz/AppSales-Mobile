@@ -23,7 +23,7 @@
 
 @synthesize promoCodes, selectedPromoCode, activeSheet;
 
-- (id)initWithProduct:(Product *)aProduct {
+- (instancetype)initWithProduct:(Product *)aProduct {
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self) {
 		product = aProduct;
@@ -39,7 +39,7 @@
 		UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 		UIBarButtonItem *deleteItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePromoCodes:)];
 		UIBarButtonItem *actionItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareCodes:)];
-		idleToolbarItems = [[NSArray alloc] initWithObjects:deleteItem, flexSpace, actionItem, nil];
+		idleToolbarItems = @[deleteItem, flexSpace, actionItem];
 		
 		UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 		[spinner startAnimating];
@@ -59,9 +59,9 @@
 		UIBarButtonItem *statusItem = [[UIBarButtonItem alloc] initWithCustomView:statusView];
 		
 		UIBarButtonItem *stopItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)];
-		busyToolbarItems = [[NSArray alloc] initWithObjects:spinnerItem, flexSpace, statusItem, flexSpace, stopItem, nil];
+		busyToolbarItems = @[spinnerItem, flexSpace, statusItem, flexSpace, stopItem];
 		
-		self.toolbarItems = (product.isDownloadingPromoCodes) ? busyToolbarItems : idleToolbarItems;
+		self.toolbarItems = product.isDownloadingPromoCodes ? busyToolbarItems : idleToolbarItems;
 	}
 	return self;
 }
@@ -78,12 +78,12 @@
 	if ([keyPath isEqualToString:@"promoCodes"]) {
 		[self reloadPromoCodes];
 	} else if ([keyPath isEqualToString:@"isDownloadingPromoCodes"]) {
-		self.toolbarItems = (product.isDownloadingPromoCodes) ? busyToolbarItems : idleToolbarItems;
+		self.toolbarItems = product.isDownloadingPromoCodes ? busyToolbarItems : idleToolbarItems;
 	}
 }
 
 - (void)reloadPromoCodes {
-	self.promoCodes = [[product.promoCodes allObjects] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"requestDate" ascending:NO]]];
+	self.promoCodes = [[product.promoCodes allObjects] sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"requestDate" ascending:NO]]];
 	
 	[self.tableView reloadData];
 }
@@ -91,10 +91,10 @@
 - (void)requestNewCodes:(id)sender {
 	FieldSpecifier *numberOfCodesField = [FieldSpecifier numericFieldWithKey:@"numberOfCodes" title:NSLocalizedString(@"Number of Codes", nil) defaultValue:@""];
 	
-	FieldSectionSpecifier *numberOfCodesSection = [FieldSectionSpecifier sectionWithFields:[NSArray arrayWithObject:numberOfCodesField] 
+	FieldSectionSpecifier *numberOfCodesSection = [FieldSectionSpecifier sectionWithFields:@[numberOfCodesField]
 																					 title:@"" 
 																			   description:NSLocalizedString(@"AppSales will automatically adjust the number you enter to the number of codes that are available.", nil)];
-	FieldEditorViewController *vc = [[FieldEditorViewController alloc] initWithFieldSections:[NSArray arrayWithObject:numberOfCodesSection] title:NSLocalizedString(@"Promo Codes", nil)];
+	FieldEditorViewController *vc = [[FieldEditorViewController alloc] initWithFieldSections:@[numberOfCodesSection] title:NSLocalizedString(@"Promo Codes", nil)];
 	vc.delegate = self;
 	vc.doneButtonTitle = NSLocalizedString(@"Request", nil);
 	vc.cancelButtonTitle = NSLocalizedString(@"Cancel", nil);
@@ -144,7 +144,7 @@
 }
 
 - (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues {
-	NSInteger numberOfCodes = [[returnValues objectForKey:@"numberOfCodes"] integerValue];
+	NSInteger numberOfCodes = [returnValues[@"numberOfCodes"] integerValue];
 	if (numberOfCodes <= 0) {
 		[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 		return;
@@ -218,14 +218,14 @@
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"RequestPromoCode.png" color:[UIColor whiteColor]];
 		cell.textLabel.textColor = [UIColor blackColor];
 	} else {
-		PromoCode *promoCode = [self.promoCodes objectAtIndex:indexPath.row];
+		PromoCode *promoCode = self.promoCodes[indexPath.row];
 		BOOL used = [promoCode.used boolValue];
 		cell.textLabel.text = promoCode.code;
 		NSString *dateString = [dateFormatter stringFromDate:promoCode.requestDate];
-		cell.detailTextLabel.text = (used) ? [NSString stringWithFormat:@"(used)  %@", dateString] : dateString;
-		cell.imageView.image = (used) ? [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor grayColor]] : [UIImage imageNamed:@"PromoCodes.png"];
+		cell.detailTextLabel.text = used ? [NSString stringWithFormat:@"(used)  %@", dateString] : dateString;
+		cell.imageView.image = used ? [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor grayColor]] : [UIImage imageNamed:@"PromoCodes.png"];
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor whiteColor]];
-		cell.textLabel.textColor = (used) ? [UIColor grayColor] : [UIColor blackColor];
+		cell.textLabel.textColor = used ? [UIColor grayColor] : [UIColor blackColor];
 	}
 	
 	return cell;
@@ -234,16 +234,16 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (indexPath.section == 1) {
-		self.selectedPromoCode = [self.promoCodes objectAtIndex:indexPath.row];
+		self.selectedPromoCode = self.promoCodes[indexPath.row];
 		BOOL used = [selectedPromoCode.used boolValue];
 		UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil
-															delegate:self 
-												   cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-											  destructiveButtonTitle:nil
-												   otherButtonTitles:
-								 NSLocalizedString(@"Email Code", nil), 
-								 NSLocalizedString(@"Copy", nil),
-								 (used) ? NSLocalizedString(@"Mark as Unused", nil) : NSLocalizedString(@"Mark as Used", nil) , nil];
+														   delegate:self
+												  cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+											 destructiveButtonTitle:nil
+												  otherButtonTitles:
+								NSLocalizedString(@"Email Code", nil),
+								NSLocalizedString(@"Copy", nil),
+								used ? NSLocalizedString(@"Mark as Unused", nil) : NSLocalizedString(@"Mark as Used", nil) , nil];
 		sheet.tag = kActionsSheetTag;
 		[sheet showFromToolbar:self.navigationController.toolbar];
 	} else {
@@ -275,7 +275,7 @@
 				[[UIPasteboard generalPasteboard] setString:self.selectedPromoCode.code];
 			} else if (buttonIndex == 2) {
 				//toggle used
-				self.selectedPromoCode.used = [NSNumber numberWithBool:![self.selectedPromoCode.used boolValue]];
+				self.selectedPromoCode.used = @(![self.selectedPromoCode.used boolValue]);
 				[self.tableView reloadData];
 			}
 		}
@@ -314,7 +314,7 @@
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
 	if (self.selectedPromoCode && result == MFMailComposeResultSent) {
-		self.selectedPromoCode.used = [NSNumber numberWithBool:YES];
+		self.selectedPromoCode.used = @(YES);
 		[self.tableView reloadData];
 	}
 	[self dismissViewControllerAnimated:YES completion:nil];

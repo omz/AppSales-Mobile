@@ -16,23 +16,23 @@
 
 @implementation IconManager
 
-- (id)init {
+- (instancetype)init {
 	self = [super init];
 	if (self) {
-		queue = dispatch_queue_create("app icon download", NULL);
+		queue = dispatch_queue_create("app icon download", nil);
 		iconCache = [NSMutableDictionary new];
 		downloadQueue = [NSMutableArray new];
 		
 		BOOL isDir = NO;
 		[[NSFileManager defaultManager] fileExistsAtPath:[self iconDirectory] isDirectory:&isDir];
 		if (!isDir) {
-			[[NSFileManager defaultManager] createDirectoryAtPath:[self iconDirectory] withIntermediateDirectories:YES attributes:nil error:NULL];
+			[[NSFileManager defaultManager] createDirectoryAtPath:[self iconDirectory] withIntermediateDirectories:YES attributes:nil error:nil];
 		}
 	}
 	return self;
 }
 
-+ (id)sharedManager {
++ (instancetype)sharedManager {
 	static id sharedManager = nil;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -52,7 +52,7 @@
 		NSLog(@"Invalid app ID for icon download (%@)", appID);
 		return nil;
 	}
-	UIImage *cachedIcon = [iconCache objectForKey:appID];
+	UIImage *cachedIcon = iconCache[appID];
 	if (cachedIcon) {
 		return cachedIcon;
 	}
@@ -69,7 +69,7 @@
 - (void)dequeueDownload {
 	if ([downloadQueue count] == 0 || isDownloading) return;
 	
-	NSString *nextAppID = [[downloadQueue objectAtIndex:0] copy];
+	NSString *nextAppID = [downloadQueue[0] copy];
 	[downloadQueue removeObjectAtIndex:0];
 	
 	dispatch_async(queue, ^{
@@ -89,14 +89,14 @@
 				NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:nextAppID];
 				[iconData writeToFile:iconPath atomically:YES];
 				[iconCache setObject:icon forKey:nextAppID];
-				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:[NSDictionary dictionaryWithObject:nextAppID forKey:kIconManagerDownloadedIconNotificationAppID]];
+				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:@{kIconManagerDownloadedIconNotificationAppID: nextAppID}];
 			});
 		} else if (response) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				//There was a response, but the download was not successful, write the default icon, so that we won't try again and again...
 				NSString *defaultIconPath = [[NSBundle mainBundle] pathForResource:@"GenericApp" ofType:@"png"];
 				NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:nextAppID];
-				[[NSFileManager defaultManager] copyItemAtPath:defaultIconPath toPath:iconPath error:NULL];
+				[[NSFileManager defaultManager] copyItemAtPath:defaultIconPath toPath:iconPath error:nil];
 			});
 		}
 		dispatch_async(dispatch_get_main_queue(), ^{
@@ -109,9 +109,9 @@
 - (void)clearIconForAppID:(NSString *)appID {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
-		[[NSFileManager defaultManager] removeItemAtPath:iconPath error:NULL];
+		[[NSFileManager defaultManager] removeItemAtPath:iconPath error:nil];
 		[iconCache removeObjectForKey:appID];
-		[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerClearedIconNotification object:self userInfo:[NSDictionary dictionaryWithObject:appID forKey:kIconManagerClearedIconNotificationAppID]];
+		[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerClearedIconNotification object:self userInfo:@{kIconManagerClearedIconNotificationAppID: appID}];
 	});
 }
 

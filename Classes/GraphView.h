@@ -83,7 +83,7 @@
 	UIView *selectedBackgroundView;
 }
 
-- (id)initWithColors:(NSArray *)colorArray;
+- (instancetype)initWithColors:(NSArray *)colorArray;
 - (void)setSegmentValues:(NSArray *)values;
 - (void)setSegmentValues:(NSArray *)values label:(NSString *)labelText;
 - (UIView *)selectedBackgroundView;

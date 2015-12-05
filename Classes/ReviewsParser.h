@@ -22,7 +22,7 @@ extern NSString *const kReviewAuthorNameKey;
 	NSMutableString *currentElementData;
 }
 
-- (id)initWithData:(NSData *)data;
+- (instancetype)initWithData:(NSData *)data;
 - (BOOL)parse;
 - (NSArray *)reviews;
 

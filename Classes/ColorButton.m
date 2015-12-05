@@ -22,7 +22,7 @@
 	if (self.highlighted) {
 		[[color colorByMultiplyingBy:0.5] set];
 	} else {
-		[(showOutline) ? [color colorByMultiplyingBy:0.75] : color set];
+		[(showOutline ? [color colorByMultiplyingBy:0.75] : color) set];
 	}
 	if (displayAsEllipse) {
 		CGContextFillEllipseInRect(UIGraphicsGetCurrentContext(), self.bounds);

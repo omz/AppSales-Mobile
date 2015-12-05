@@ -14,7 +14,7 @@
 
 @synthesize webView;
 
-- (id)initWithLicenseAgreement:(NSString *)licenseAgreement operation:(DownloadStepOperation *)operation {
+- (instancetype)initWithLicenseAgreement:(NSString *)licenseAgreement operation:(DownloadStepOperation *)operation {
 	self = [super init];
 	if (self) {
 		self.title = NSLocalizedString(@"License", nil);

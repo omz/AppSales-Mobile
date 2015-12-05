@@ -16,7 +16,7 @@
 
 @synthesize reviewSummaryView, reviewsPopover;
 
-- (id)initWithAccount:(ASAccount *)anAccount {
+- (instancetype)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithAccount:anAccount];
 	if (self) {
 		self.title = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
@@ -25,7 +25,7 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}
 	
-	[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+	[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:@(0)];
 	
 	return self;
 }
@@ -122,7 +122,7 @@
 
 	NSMutableString *pred = [NSMutableString stringWithString:@"rating == %@"];
 	NSMutableArray *args = [NSMutableArray arrayWithArray:self.selectedProducts];
-	[args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
+	[args insertObject:@(rating) atIndex:0];
 	
 	if (![self.selectedProducts count]) {
 		[pred appendString:@" AND product.account = %@"];
@@ -136,7 +136,7 @@
 		[pred appendString:@")"];
 		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	}
-	NSUInteger numberOfReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:NULL];	
+	NSUInteger numberOfReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:nil];
 	return numberOfReviewsForRating;
 }
 
@@ -148,7 +148,7 @@
 	
 	NSMutableString *pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
 	NSMutableArray *args = [NSMutableArray arrayWithArray:self.selectedProducts];
-	[args insertObject:[NSNumber numberWithInteger:rating] atIndex:0];
+	[args insertObject:@(rating) atIndex:0];
 	
 	if (![self.selectedProducts count]) {
 		[pred appendString:@" AND product.account = %@"];
@@ -162,7 +162,7 @@
 		[pred appendString:@")"];
 		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	}
-	NSUInteger numberOfUnreadReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:NULL];	
+	NSUInteger numberOfUnreadReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:nil];
 	return numberOfUnreadReviewsForRating;
 }
 

@@ -10,7 +10,7 @@
 
 @implementation AppleFiscalCalendar
 
-- (id)init {
+- (instancetype)init {
 	self = [super init];
 	if (self) {
 		
@@ -75,7 +75,7 @@
 - (NSString *)fiscalMonthForDate:(NSDate *)requestedDate {
 	NSUInteger indexOfNextMonth = [self indexOfNextMonthForDate:requestedDate];
 	if (indexOfNextMonth > 0) {
-		return [sortedFiscalMonthNames objectAtIndex:indexOfNextMonth - 1];
+		return sortedFiscalMonthNames[indexOfNextMonth - 1];
 	} else {
 		return nil;
 	}
@@ -84,7 +84,7 @@
 - (NSDate *)representativeDateForFiscalMonthOfDate:(NSDate *)requestedDate {
 	NSUInteger indexOfNextMonth = [self indexOfNextMonthForDate:requestedDate];
 	if (indexOfNextMonth > 0) {
-		NSDate *startOfFiscalMonth = [sortedDates objectAtIndex:indexOfNextMonth - 1];
+		NSDate *startOfFiscalMonth = sortedDates[indexOfNextMonth - 1];
 		NSDate *representativeDate = [startOfFiscalMonth dateByAddingTimeInterval:14 * 24 * 60 * 60];
 		return representativeDate;
 	} else {

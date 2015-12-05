@@ -10,11 +10,11 @@
 
 @implementation SecurityCodeInputController
 
-- (id)init {
+- (instancetype)init {
 	return [self initWithStyle:UITableViewStyleGrouped];
 }
 
-- (id)initWithStyle:(UITableViewStyle)style {
+- (instancetype)initWithStyle:(UITableViewStyle)style {
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self) {
 		// Initialization code

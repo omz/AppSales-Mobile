@@ -31,40 +31,40 @@
 		@autoreleasepool {
 			
 			NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
-			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:NULL error:NULL];
+			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:nil error:nil];
 			
 			if (paymentsPageData) {
 				NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
 				
 				NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
-				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:NULL];
-				[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:NULL];
+				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:nil];
+				[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:nil];
 				
-				if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:NULL]) {
-					[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:NULL];
+				if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:nil]) {
+					[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:nil];
 					NSString *vendorIDContainer = nil;
 					[vendorFormScanner scanUpToString:@"</div>" intoString:&vendorIDContainer];
 					
 					if (vendorIDContainer) {
 						vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
 						
-						[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
-						while ([vendorFormScanner scanString:@"<option" intoString:NULL]) {
+						[vendorFormScanner scanUpToString:@"<option" intoString:nil];
+						while ([vendorFormScanner scanString:@"<option" intoString:nil]) {
 							NSString *vendorName = nil;
 							NSString *vendorID = nil;
 							
 							// Parse vendor name.
-							[vendorFormScanner scanUpToString:@">" intoString:NULL];
-							[vendorFormScanner scanString:@">" intoString:NULL];
+							[vendorFormScanner scanUpToString:@">" intoString:nil];
+							[vendorFormScanner scanString:@">" intoString:nil];
 							[vendorFormScanner scanUpToString:@" - " intoString:&vendorName];
 							
 							// Parse vendor ID.
-							[vendorFormScanner scanString:@"- " intoString:NULL];
+							[vendorFormScanner scanString:@"- " intoString:nil];
 							[vendorFormScanner scanUpToString:@"</option>" intoString:&vendorID];
 							
 							vendors[vendorID] = vendorName;
 							
-							[vendorFormScanner scanUpToString:@"<option" intoString:NULL];
+							[vendorFormScanner scanUpToString:@"<option" intoString:nil];
 						}
 						
 						[self performSelectorOnMainThread:@selector(finishedLoadingVendors) withObject:nil waitUntilDone:YES];
@@ -77,10 +77,10 @@
 				
 				NSScanner *logoutFormScanner = [NSScanner scannerWithString:paymentsPage];
 				NSString *signoutFormAction = nil;
-				[logoutFormScanner scanUpToString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
-				[logoutFormScanner scanString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:NULL];
-				[logoutFormScanner scanUpToString:@"<a href=\"" intoString:NULL];
-				if ([logoutFormScanner scanString:@"<a href=\"" intoString:NULL]) {
+				[logoutFormScanner scanUpToString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:nil];
+				[logoutFormScanner scanString:@"<li role=\"menuitem\" class=\"session-nav-link\">" intoString:nil];
+				[logoutFormScanner scanUpToString:@"<a href=\"" intoString:nil];
+				if ([logoutFormScanner scanString:@"<a href=\"" intoString:nil]) {
 					[logoutFormScanner scanUpToString:@"\"" intoString:&signoutFormAction];
 					NSURL *logoutURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:signoutFormAction]];
 					[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
@@ -152,7 +152,7 @@
 	FieldEditorViewController *vc = nil;
 	if (self.presentedViewController) {
 		// Adding new account.
-		vc = [[(UINavigationController *)self.presentedViewController viewControllers] objectAtIndex:0];
+		vc = ((UINavigationController *)self.presentedViewController).viewControllers[0];
 	} else {
 		// Editing existing account.
 		vc = self.navigationController.viewControllers.lastObject;

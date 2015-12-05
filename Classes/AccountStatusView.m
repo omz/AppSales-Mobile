@@ -11,7 +11,7 @@
 
 @implementation AccountStatusView
 
-- (id)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount {
+- (instancetype)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount {
 	self = [super initWithFrame:frame];
 	if (self) {
 		account = anAccount;

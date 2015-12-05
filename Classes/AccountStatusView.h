@@ -17,7 +17,7 @@
 	UILabel *statusLabel;
 }
 
-- (id)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount;
+- (instancetype)initWithFrame:(CGRect)frame account:(ASAccount *)anAccount;
 - (void)updateStatus;
 
 @end

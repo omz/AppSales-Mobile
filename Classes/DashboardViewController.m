@@ -19,7 +19,7 @@
 @synthesize productsTableView, topView, shadowView, colorPopover, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
 @synthesize activeSheet;
 
-- (id)initWithAccount:(ASAccount *)anAccount {
+- (instancetype)initWithAccount:(ASAccount *)anAccount {
 	self = [super init];
 	if (self) {
 		self.account = anAccount;
@@ -42,9 +42,9 @@
 
 - (void)contextDidChange:(NSNotification *)notification {
 	NSSet *relevantEntityNames = [self entityNamesTriggeringReload];
-	NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
-	NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
-	NSSet *deletedObjects = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
+	NSSet *insertedObjects = notification.userInfo[NSInsertedObjectsKey];
+	NSSet *updatedObjects = notification.userInfo[NSUpdatedObjectsKey];
+	NSSet *deletedObjects = notification.userInfo[NSDeletedObjectsKey];
 	
 	BOOL shouldReload = NO;
 	for (NSManagedObject *insertedObject in insertedObjects) {
@@ -106,8 +106,8 @@
 	
 	productsTableView.tableHeaderView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]];
 	productsTableView.tableFooterView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
-	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
-	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
+	UIEdgeInsets productsTableContentInset = statusVisible ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
+	UIEdgeInsets productsTableScrollIndicatorInset = statusVisible ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
 	productsTableView.contentInset = productsTableContentInset;
 	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
 	productsTableView.allowsMultipleSelection = YES;
@@ -144,12 +144,12 @@
 	UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	self.stopButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)];
 	
-	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - ((statusVisible) ? 44 : 0), self.view.bounds.size.width, 44);
+	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - (statusVisible ? 44 : 0), self.view.bounds.size.width, 44);
 	self.statusToolbar = [[UIToolbar alloc] initWithFrame:statusToolbarFrame];
 	statusToolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	statusToolbar.translucent = YES;
 	statusToolbar.barStyle = UIBarStyleBlackTranslucent;
-	statusToolbar.items = [NSArray arrayWithObjects:activityIndicatorItem, flexSpace, statusItem, flexSpace, stopButtonItem, nil];
+	statusToolbar.items = @[activityIndicatorItem, flexSpace, statusItem, flexSpace, stopButtonItem];
 	
 	[self.view addSubview:statusToolbar];
 }
@@ -190,9 +190,9 @@
 	} else {
 		[self.activityIndicator stopAnimating];
 	}
-	UIEdgeInsets productsTableContentInset = (statusVisible) ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
-	UIEdgeInsets productsTableScrollIndicatorInset = (statusVisible) ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
-	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - ((statusVisible) ? 44 : 0), self.view.bounds.size.width, 44);
+	UIEdgeInsets productsTableContentInset = statusVisible ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
+	UIEdgeInsets productsTableScrollIndicatorInset = statusVisible ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
+	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - (statusVisible ? 44 : 0), self.view.bounds.size.width, 44);
 	if (statusVisible) {
 		self.statusToolbar.frame = statusToolbarFrame;
 		self.productsTableView.contentInset = productsTableContentInset;
@@ -265,7 +265,7 @@
 
 - (void)changeColor:(UIButton *)sender {
 	NSInteger row = sender.tag;
-	Product *product = [self.visibleProducts objectAtIndex:row - 1];
+	Product *product = self.visibleProducts[row - 1];
 	
 	NSArray *palette = [UIColor crayonColorPalette];
 	ColorPickerViewController *vc = [[ColorPickerViewController alloc] initWithColors:palette];
@@ -284,7 +284,7 @@
 - (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(NSInteger)colorIndex {
 	Product *product = (Product *)picker.context;
 	product.color = color;
-	[product.managedObjectContext save:NULL];
+	[product.managedObjectContext save:nil];
 	[self reloadTableView];
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 		[picker dismissViewControllerAnimated:YES completion:nil];
@@ -316,7 +316,7 @@
 	
 	Product *product = nil;
 	if (indexPath.row != 0) {
-		product = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+		product = self.visibleProducts[indexPath.row - 1];
 	}
 	
 	cell.product = product;
@@ -389,7 +389,7 @@
 	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
 	[tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 	if (indexPath.row != 0) {
-		Product *p = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+		Product *p = self.visibleProducts[indexPath.row - 1];
 		self.selectedProducts = [NSMutableArray arrayWithObject:p];
 	} else {
 		self.selectedProducts = nil;
@@ -398,7 +398,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[self deselectAllRowsInTableView:tableView exceptForIndexPath:indexPath];
-	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:[self.visibleProducts objectAtIndex:indexPath.row - 1]];
+	self.selectedProducts = (indexPath.row == 0) ? nil : [NSMutableArray arrayWithObject:self.visibleProducts[indexPath.row - 1]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:DashboardViewControllerSelectedProductsDidChangeNotification object:nil];
 }
 

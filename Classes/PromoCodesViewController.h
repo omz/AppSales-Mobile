@@ -18,7 +18,7 @@
 
 @property (nonatomic, strong) NSArray *sortedApps;
 
-- (id)initWithAccount:(ASAccount *)anAccount;
+- (instancetype)initWithAccount:(ASAccount *)anAccount;
 - (void)reloadData;
 
 @end

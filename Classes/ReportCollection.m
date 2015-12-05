@@ -13,7 +13,7 @@
 
 @synthesize title;
 
-- (id)initWithReports:(NSArray *)reportsArray {
+- (instancetype)initWithReports:(NSArray *)reportsArray {
 	self = [super init];
 	if (self) {
 		reports = reportsArray;
@@ -22,7 +22,7 @@
 }
 
 - (NSDate *)startDate {
-	Report *firstReport = [reports objectAtIndex:0];
+	Report *firstReport = reports[0];
 	return firstReport.startDate;
 }
 
@@ -99,16 +99,16 @@
 	for (Report *report in reports) {
 		NSDictionary *paidDownloadsForReport = [report totalNumberOfPaidDownloadsByCountryAndProduct];
 		for (NSString *country in paidDownloadsForReport) {
-			NSMutableDictionary *paidDownloadsByProductResult = [result objectForKey:country];
+			NSMutableDictionary *paidDownloadsByProductResult = result[country];
 			if (!paidDownloadsByProductResult) {
 				paidDownloadsByProductResult = [NSMutableDictionary dictionary];
 				[result setObject:paidDownloadsByProductResult forKey:country];
 			}
-			NSDictionary *paidDownloadsByProduct = [paidDownloadsForReport objectForKey:country];			
+			NSDictionary *paidDownloadsByProduct = paidDownloadsForReport[country];
 			for (NSString *productID in paidDownloadsByProduct) {
-				NSInteger oldValue = [[paidDownloadsByProductResult objectForKey:productID] integerValue];
-				NSInteger newValue = oldValue + [[paidDownloadsByProduct objectForKey:productID] integerValue];
-				[paidDownloadsByProductResult setObject:[NSNumber numberWithInteger:newValue] forKey:productID];
+				NSInteger oldValue = [paidDownloadsByProductResult[productID] integerValue];
+				NSInteger newValue = oldValue + [paidDownloadsByProduct[productID] integerValue];
+				[paidDownloadsByProductResult setObject:@(newValue) forKey:productID];
 			}
 		}
 	}
@@ -120,16 +120,16 @@
 	for (Report *report in reports) {
 		NSDictionary *paidDownloadsForReport = [report totalNumberOfPaidNonRefundDownloadsByCountryAndProduct];
 		for (NSString *country in paidDownloadsForReport) {
-			NSMutableDictionary *paidDownloadsByProductResult = [result objectForKey:country];
+			NSMutableDictionary *paidDownloadsByProductResult = result[country];
 			if (!paidDownloadsByProductResult) {
 				paidDownloadsByProductResult = [NSMutableDictionary dictionary];
 				[result setObject:paidDownloadsByProductResult forKey:country];
 			}
-			NSDictionary *paidDownloadsByProduct = [paidDownloadsForReport objectForKey:country];
+			NSDictionary *paidDownloadsByProduct = paidDownloadsForReport[country];
 			for (NSString *productID in paidDownloadsByProduct) {
-				NSInteger oldValue = [[paidDownloadsByProductResult objectForKey:productID] integerValue];
-				NSInteger newValue = oldValue + [[paidDownloadsByProduct objectForKey:productID] integerValue];
-				[paidDownloadsByProductResult setObject:[NSNumber numberWithInteger:newValue] forKey:productID];
+				NSInteger oldValue = [paidDownloadsByProductResult[productID] integerValue];
+				NSInteger newValue = oldValue + [paidDownloadsByProduct[productID] integerValue];
+				[paidDownloadsByProductResult setObject:@(newValue) forKey:productID];
 			}
 		}
 	}
@@ -141,16 +141,16 @@
 	for (Report *report in reports) {
 		NSDictionary *paidDownloadsForReport = [report totalNumberOfRefundedDownloadsByCountryAndProduct];
 		for (NSString *country in paidDownloadsForReport) {
-			NSMutableDictionary *paidDownloadsByProductResult = [result objectForKey:country];
+			NSMutableDictionary *paidDownloadsByProductResult = result[country];
 			if (!paidDownloadsByProductResult) {
 				paidDownloadsByProductResult = [NSMutableDictionary dictionary];
 				[result setObject:paidDownloadsByProductResult forKey:country];
 			}
-			NSDictionary *paidDownloadsByProduct = [paidDownloadsForReport objectForKey:country];
+			NSDictionary *paidDownloadsByProduct = paidDownloadsForReport[country];
 			for (NSString *productID in paidDownloadsByProduct) {
-				NSInteger oldValue = [[paidDownloadsByProductResult objectForKey:productID] integerValue];
-				NSInteger newValue = oldValue + [[paidDownloadsByProduct objectForKey:productID] integerValue];
-				[paidDownloadsByProductResult setObject:[NSNumber numberWithInteger:newValue] forKey:productID];
+				NSInteger oldValue = [paidDownloadsByProductResult[productID] integerValue];
+				NSInteger newValue = oldValue + [paidDownloadsByProduct[productID] integerValue];
+				[paidDownloadsByProductResult setObject:@(newValue) forKey:productID];
 			}
 		}
 	}
@@ -162,9 +162,9 @@
 	for (Report *report in reports) {
 		NSDictionary *revenueByCountryForReport = [report revenueInBaseCurrencyByCountry];
 		for (NSString *country in revenueByCountryForReport) {
-			float revenueForCountryInReport = [[revenueByCountryForReport objectForKey:country] floatValue];
-			float totalRevenueForCountry = [[revenueByCountry objectForKey:country] floatValue];
-			[revenueByCountry setObject:[NSNumber numberWithFloat:totalRevenueForCountry + revenueForCountryInReport] forKey:country];
+			float revenueForCountryInReport = [revenueByCountryForReport[country] floatValue];
+			float totalRevenueForCountry = [revenueByCountry[country] floatValue];
+			[revenueByCountry setObject:@(totalRevenueForCountry + revenueForCountryInReport) forKey:country];
 		}
 	}
 	return revenueByCountry;
@@ -178,9 +178,9 @@
 	for (Report *report in reports) {
 		NSDictionary *revenueByCountryForReport = [report revenueInBaseCurrencyByCountryForProductWithID:productID];
 		for (NSString *country in revenueByCountryForReport) {
-			float revenueForCountryInReport = [[revenueByCountryForReport objectForKey:country] floatValue];
-			float totalRevenueForCountry = [[revenueByCountry objectForKey:country] floatValue];
-			[revenueByCountry setObject:[NSNumber numberWithFloat:totalRevenueForCountry + revenueForCountryInReport] forKey:country];
+			float revenueForCountryInReport = [revenueByCountryForReport[country] floatValue];
+			float totalRevenueForCountry = [revenueByCountry[country] floatValue];
+			[revenueByCountry setObject:@(totalRevenueForCountry + revenueForCountryInReport) forKey:country];
 		}
 	}
 	return revenueByCountry;
@@ -195,7 +195,7 @@
 }
 
 - (Report *)firstReport {
-	return [reports objectAtIndex:0];
+	return reports[0];
 }
 
 - (NSArray *)allReports {

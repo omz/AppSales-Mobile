@@ -14,11 +14,11 @@
 
 @implementation PromoCodeOperation
 
-- (id)initWithProduct:(Product *)aProduct {
+- (instancetype)initWithProduct:(Product *)aProduct {
 	return [self initWithProduct:aProduct numberOfCodes:0];
 }
 
-- (id)initWithProduct:(Product *)aProduct numberOfCodes:(NSInteger)numberOfCodes {
+- (instancetype)initWithProduct:(Product *)aProduct numberOfCodes:(NSInteger)numberOfCodes {
 	self = [super init];
 	if (self) {
 		// Initialization code
@@ -29,7 +29,7 @@
 
 + (void)errorNotification:(NSString *)errorDescription {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[[NSNotificationCenter defaultCenter] postNotificationName:ASPromoCodeDownloadFailedNotification object:nil userInfo:[NSDictionary dictionaryWithObject:errorDescription forKey:kASPromoCodeDownloadFailedErrorDescription]];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ASPromoCodeDownloadFailedNotification object:nil userInfo:@{kASPromoCodeDownloadFailedErrorDescription: errorDescription}];
 	});
 }
 

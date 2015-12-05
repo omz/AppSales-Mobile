@@ -19,7 +19,6 @@
 @class ASAccount;
 
 @interface Product : NSManagedObject {
-
 	BOOL isDownloadingPromoCodes;
 }
 
@@ -45,4 +44,3 @@
 - (NSString *)defaultDisplayName;
 
 @end
-

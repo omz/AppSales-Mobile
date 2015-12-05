@@ -21,11 +21,7 @@
 
 static KKPasscodeLock *sharedLock = nil;
 
-
 @implementation KKPasscodeLock
-
-@synthesize eraseOption = _eraseOption;
-@synthesize attemptsAllowed = _attemptsAllowed;
 
 + (KKPasscodeLock *)sharedLock {
 	@synchronized(self) {
@@ -51,6 +47,5 @@ static KKPasscodeLock *sharedLock = nil;
 		[KKKeychain setString:@"NO" forKey:@"erase_data_on"];
 	}
 }
-
 
 @end

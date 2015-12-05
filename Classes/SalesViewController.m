@@ -37,7 +37,7 @@
 @synthesize graphView, downloadReportsButtonItem;
 @synthesize selectedReportPopover;
 
-- (id)initWithAccount:(ASAccount *)anAccount {
+- (instancetype)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithAccount:anAccount];
 	if (self) {
 		self.title = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
@@ -66,7 +66,7 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:ASViewSettingsDidChangeNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 
-		[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:[NSNumber numberWithInteger:0]];
+		[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:@(0)];
 	}
 	return self;
 }
@@ -105,9 +105,9 @@
 	
 	NSArray *segments;
 	if (iPad) {
-		segments = [NSArray arrayWithObjects:NSLocalizedString(@"Daily Reports", nil), NSLocalizedString(@"Weekly Reports", nil), NSLocalizedString(@"Calendar Months", nil), NSLocalizedString(@"Fiscal Months", nil), nil];
+		segments = @[NSLocalizedString(@"Daily Reports", nil), NSLocalizedString(@"Weekly Reports", nil), NSLocalizedString(@"Calendar Months", nil), NSLocalizedString(@"Fiscal Months", nil)];
 	} else {
-		segments = [NSArray arrayWithObjects:NSLocalizedString(@"Reports", nil), NSLocalizedString(@"Months", nil), nil];
+		segments = @[NSLocalizedString(@"Reports", nil), NSLocalizedString(@"Months", nil)];
 	}
 	UISegmentedControl *tabControl = [[UISegmentedControl alloc] initWithItems:segments];
 	[tabControl addTarget:self action:@selector(switchTab:) forControlEvents:UIControlEventValueChanged];
@@ -166,9 +166,9 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
-	self.account.reportsBadge = [NSNumber numberWithInteger:0];
+	self.account.reportsBadge = @(0);
 	if ([self.account.managedObjectContext hasChanges]) {
-		[self.account.managedObjectContext save:NULL];
+		[self.account.managedObjectContext save:nil];
 	}
 }
 
@@ -230,7 +230,7 @@
 	[sortedDailyReports removeAllObjects];
 	[sortedWeeklyReports removeAllObjects];
 	
-	NSArray *sortDescriptors = [NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"startDate" ascending:YES]];
+	NSArray *sortDescriptors = @[[[NSSortDescriptor alloc] initWithKey:@"startDate" ascending:YES]];
 	NSSet *allDailyReports = self.account.dailyReports;
 	[sortedDailyReports addObjectsFromArray:[allDailyReports allObjects]];
 	[sortedDailyReports sortUsingDescriptors:sortDescriptors];
@@ -467,7 +467,7 @@
 
 - (NSUInteger)numberOfBarsInGraphView:(GraphView *)graphView {
 	if (selectedTab == 0) {
-		return [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count];
+		return [(showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports) count];
 	} else if (selectedTab == 1) {
 		if (showFiscalMonths) {
 			return [self.sortedFiscalMonthReports count];
@@ -480,12 +480,12 @@
 
 - (NSArray *)graphView:(GraphView *)graphView valuesForBarAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
-		return [self stackedValuesForReport:[((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index]];
+		return [self stackedValuesForReport:(showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports)[index]];
 	} else if (selectedTab == 1) {
 		if (showFiscalMonths) {
-			return [self stackedValuesForReport:[self.sortedFiscalMonthReports objectAtIndex:index]];
+			return [self stackedValuesForReport:self.sortedFiscalMonthReports[index]];
 		} else {
-			return [self stackedValuesForReport:[self.sortedCalendarMonthReports objectAtIndex:index]];
+			return [self stackedValuesForReport:self.sortedCalendarMonthReports[index]];
 		}
 	}
 	return [NSArray array];
@@ -493,7 +493,7 @@
 
 - (NSString *)graphView:(GraphView *)graphView labelForXAxisAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
-		Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
+		Report *report = (showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports)[index];
 		if (showWeeks) {
 			NSDateComponents *dateComponents = [calendar components:NSCalendarUnitWeekdayOrdinal fromDate:report.startDate];
 			NSInteger weekdayOrdinal = [dateComponents weekdayOrdinal];
@@ -505,11 +505,11 @@
 	} else {
 		NSDate *monthDate = nil;
 		if (showFiscalMonths) {
-			NSDate *date = [[self.sortedFiscalMonthReports objectAtIndex:index] startDate];
+			NSDate *date = [self.sortedFiscalMonthReports[index] startDate];
 			NSDate *representativeDateForFiscalMonth = [[AppleFiscalCalendar sharedFiscalCalendar] representativeDateForFiscalMonthOfDate:date];
 			monthDate = representativeDateForFiscalMonth;
 		} else {
-			id<ReportSummary> report = [self.sortedCalendarMonthReports objectAtIndex:index];
+			id<ReportSummary> report = self.sortedCalendarMonthReports[index];
 			monthDate = report.startDate;
 		}
 		[dateFormatter setDateFormat:@"MMM"];
@@ -519,7 +519,7 @@
 
 - (UIColor *)graphView:(GraphView *)graphView labelColorForXAxisAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
-		id<ReportSummary> report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
+		id<ReportSummary> report = (showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports)[index];
 		NSDateComponents *dateComponents = [calendar components:NSCalendarUnitDay | NSCalendarUnitWeekday fromDate:report.startDate];
 		NSInteger weekday = [dateComponents weekday];
 		if (weekday == 1) {
@@ -532,18 +532,18 @@
 - (NSString *)graphView:(GraphView *)graphView labelForBarAtIndex:(NSUInteger)index {
 	id<ReportSummary> report = nil;
 	if (selectedTab == 0) {
-		report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
+		report = (showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports)[index];
 	} else {
 		if (showFiscalMonths) {
-			report = [self.sortedFiscalMonthReports objectAtIndex:index];
+			report = self.sortedFiscalMonthReports[index];
 		} else {
-			report = [self.sortedCalendarMonthReports objectAtIndex:index];
+			report = self.sortedCalendarMonthReports[index];
 		}
 	}
 	
 	float value = 0;
 	
-	NSArray *tProducts = ((self.selectedProducts) ? self.selectedProducts : self.visibleProducts);
+	NSArray *tProducts = (self.selectedProducts ? self.selectedProducts : self.visibleProducts);
 	
 	for (Product *selectedProduct in tProducts) {
 		if (viewMode == DashboardViewModeRevenue) {
@@ -577,8 +577,8 @@
 
 - (NSString *)graphView:(GraphView *)graphView labelForSectionAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
-		if ([((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) count] > index) {
-			Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
+		if ([(showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports) count] > index) {
+			Report *report = (showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports)[index];
 			[dateFormatter setDateFormat:@"MMM '’'yy"];
 			return [dateFormatter stringFromDate:report.startDate];
 		} else {
@@ -586,7 +586,7 @@
 		}
 	} else {
 		if ([self.sortedCalendarMonthReports count] > index) {
-			id<ReportSummary> report = [self.sortedCalendarMonthReports objectAtIndex:index];
+			id<ReportSummary> report = self.sortedCalendarMonthReports[index];
 			[dateFormatter setDateFormat:@"yyyy"];
 			NSString *yearString = [dateFormatter stringFromDate:report.startDate];
 			if (showFiscalMonths) {
@@ -623,9 +623,9 @@
 					valueForProduct = (float)[report totalNumberOfPromoCodeTransactionsForProductWithID:productID];
 				}
 			}
-			[stackedValues addObject:[NSNumber numberWithFloat:valueForProduct]];
+			[stackedValues addObject:@(valueForProduct)];
 		} else {
-			[stackedValues addObject:[NSNumber numberWithFloat:0.0]];
+			[stackedValues addObject:@(0.0)];
 		}
 	}
 	return stackedValues;
@@ -636,7 +636,7 @@
 - (void)graphView:(GraphView *)view didSelectBarAtIndex:(NSUInteger)index withFrame:(CGRect)barFrame {
 	NSArray *reports = nil;
 	if (selectedTab == 0) {
-		reports = ((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports);
+		reports = (showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports);
 	} else if (selectedTab == 1) {
 		if (showFiscalMonths) {
 			reports = self.sortedFiscalMonthReports;
@@ -650,7 +650,7 @@
 		[self.navigationController pushViewController:vc animated:YES];
 	} else {
 		if (self.selectedReportPopover.isPopoverVisible) {
-			ReportDetailViewController *selectedReportDetailViewController = (ReportDetailViewController *)[[(UINavigationController *)self.selectedReportPopover.contentViewController viewControllers] objectAtIndex:0];
+			ReportDetailViewController *selectedReportDetailViewController = (ReportDetailViewController *)(((UINavigationController *)self.selectedReportPopover.contentViewController).viewControllers[0]);
 			if (selectedReportDetailViewController.selectedReportIndex == index) {
 				[self.selectedReportPopover dismissPopoverAnimated:YES];
 				return;
@@ -660,7 +660,7 @@
 		}
 		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
 		self.selectedReportPopover = [[UIPopoverController alloc] initWithContentViewController:nav];
-		self.selectedReportPopover.passthroughViews = [NSArray arrayWithObjects:self.graphView, nil];
+		self.selectedReportPopover.passthroughViews = @[self.graphView];
 		if (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
 			[self.selectedReportPopover presentPopoverFromRect:barFrame 
 														inView:self.graphView 
@@ -681,16 +681,16 @@
 - (void)graphView:(GraphView *)view deleteBarAtIndex:(NSUInteger)index {
 	Report *report = nil;
 	if (showWeeks) {
-		report = [self.sortedWeeklyReports objectAtIndex:index];
+		report = self.sortedWeeklyReports[index];
 		[self.sortedWeeklyReports removeObject:report];
 	} else {
-		report = [self.sortedDailyReports objectAtIndex:index];
+		report = self.sortedDailyReports[index];
 		[self.sortedDailyReports removeObject:report];
 	}
 	
 	NSManagedObjectContext *moc = [report managedObjectContext];
 	[moc deleteObject:report];
-	[moc save:NULL];
+	[moc save:nil];
 }
 
 #pragma mark - Table view data source
@@ -698,7 +698,7 @@
 - (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath {
 	Product *product = nil;
 	if (indexPath.row != 0) {
-		product = [self.visibleProducts objectAtIndex:indexPath.row - 1];
+		product = self.visibleProducts[indexPath.row - 1];
 	}
 	if (selectedTab == 0 || selectedTab == 1) {
 		UIButton *latestValueButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -714,7 +714,7 @@
 		
 		id<ReportSummary> latestReport = nil;
 		if (selectedTab == 0) {
-			latestReport = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) lastObject];
+			latestReport = [(showWeeks ? self.sortedWeeklyReports : self.sortedDailyReports) lastObject];
 		} else {
 			if (showFiscalMonths) {
 				latestReport = [self.sortedFiscalMonthReports lastObject];

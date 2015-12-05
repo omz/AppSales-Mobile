@@ -10,7 +10,7 @@
 
 @class FieldSpecifier, FieldEditorViewController, FieldSectionSpecifier;
 
-typedef enum FieldSpecifierType { 
+typedef NS_ENUM(NSInteger, FieldSpecifierType) {
 	FieldSpecifierTypeText,
 	FieldSpecifierTypePassword,
 	FieldSpecifierTypeEmail,
@@ -20,7 +20,7 @@ typedef enum FieldSpecifierType {
 	FieldSpecifierTypeButton,
 	FieldSpecifierTypeSection,
 	FieldSpecifierTypeNumeric
-} FieldSpecifierType;
+};
 
 
 @protocol FieldEditorViewControllerDelegate <NSObject>
@@ -60,7 +60,7 @@ typedef enum FieldSpecifierType {
 @property (nonatomic, assign) BOOL showDoneButtonOnLeft;
 @property (nonatomic, strong) UITextField *selectedTextField;
 
-- (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title;
+- (instancetype)initWithFieldSections:(NSArray *)sections title:(NSString *)title;
 - (void)openSubsection:(FieldSpecifier *)subsectionField;
 - (void)done;
 - (void)dismissKeyboard;

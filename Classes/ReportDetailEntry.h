@@ -25,6 +25,6 @@
 @property (nonatomic, strong) NSString *country;
 @property (nonatomic, strong) Product *product;
 
-+ (id)entryWithRevenue:(float)r percentage:(float)p subtitle:(NSString *)aSubtitle country:(NSString *)countryCode product:(Product *)aProduct;
++ (instancetype)entryWithRevenue:(float)r percentage:(float)p subtitle:(NSString *)aSubtitle country:(NSString *)countryCode product:(Product *)aProduct;
 
 @end

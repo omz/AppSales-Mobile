@@ -1414,7 +1414,6 @@
 				7FDF601C13DD2107005F1E2D /* Helpers */,
 				7FDF601F13DD21BB005F1E2D /* Accounts and Settings */,
 				7FDF601D13DD2125005F1E2D /* Dashboard */,
-				7FDF602013DD21D5005F1E2D /* Common UI */,
 				7F88897A14CD4C9A007604D7 /* Passcode Lock */,
 				DA9DB1B71C0FEC4C007B0178 /* Login Manager */,
 				7F1499D113BE312100D89064 /* Report Download */,
@@ -1433,10 +1432,12 @@
 				7F24E70613E40A0D0056EA97 /* DashboardViewController.m */,
 				7F454F8F13D5A56900AE47D1 /* DashboardAppCell.h */,
 				7F454F9013D5A56A00AE47D1 /* DashboardAppCell.m */,
-				7F454F9B13D5C19B00AE47D1 /* ColorPickerViewController.h */,
-				7F454F9C13D5C19C00AE47D1 /* ColorPickerViewController.m */,
+				7FAB532A13DCFA7D0027274F /* AppIconView.h */,
+				7FAB532B13DCFA7D0027274F /* AppIconView.m */,
 				7F454F9213D5B64F00AE47D1 /* ColorButton.h */,
 				7F454F9313D5B64F00AE47D1 /* ColorButton.m */,
+				7F454F9B13D5C19B00AE47D1 /* ColorPickerViewController.h */,
+				7F454F9C13D5C19C00AE47D1 /* ColorPickerViewController.m */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -1760,15 +1761,6 @@
 				7F963B4113E98B8600CA62FD /* AccountStatusView.m */,
 			);
 			name = "Accounts and Settings";
-			sourceTree = "<group>";
-		};
-		7FDF602013DD21D5005F1E2D /* Common UI */ = {
-			isa = PBXGroup;
-			children = (
-				7FAB532A13DCFA7D0027274F /* AppIconView.h */,
-				7FAB532B13DCFA7D0027274F /* AppIconView.m */,
-			);
-			name = "Common UI";
 			sourceTree = "<group>";
 		};
 		7FDF6E9813D8D4AD00B8CC4E /* Flag Images */ = {

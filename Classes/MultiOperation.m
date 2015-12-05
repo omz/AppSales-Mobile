@@ -16,7 +16,7 @@
 
 @synthesize queue;
 
-- (id)initWithOperations:(NSArray *)partialOperations {
+- (instancetype)initWithOperations:(NSArray *)partialOperations {
 	self = [super init];
 	if (self) {
 		queue = [[NSOperationQueue alloc] init];

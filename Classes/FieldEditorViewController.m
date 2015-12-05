@@ -30,7 +30,7 @@
 @synthesize fieldSections, values, doneButtonTitle, cancelButtonTitle, delegate, context, editorIdentifier;
 @synthesize isSubSection, hasChanges, selectedTextField;
 
-- (id)initWithFieldSections:(NSArray *)sections title:(NSString *)title {
+- (instancetype)initWithFieldSections:(NSArray *)sections title:(NSString *)title {
 	if (self = [super initWithStyle:UITableViewStyleGrouped]) {
 		self.title = title;
 		self.values = [NSMutableDictionary dictionary];
@@ -78,8 +78,8 @@
 			UIBarButtonItem *cancelButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.cancelButtonTitle style:UIBarButtonItemStylePlain target:self action:@selector(cancel)];
 			self.navigationItem.leftBarButtonItem = cancelButtonItem;
 		}
-		if ([self.fieldSections count] == 1 && [[[self.fieldSections objectAtIndex:0] fields] count] == 1) {
-			FieldSpecifierType singleFieldType = [(FieldSpecifier *)[[[self.fieldSections objectAtIndex:0] fields] objectAtIndex:0] type];
+		if ([self.fieldSections count] == 1 && [[self.fieldSections[0] fields] count] == 1) {
+			FieldSpecifierType singleFieldType = [(FieldSpecifier *)[self.fieldSections[0] fields][0] type];
 			if (singleFieldType == FieldSpecifierTypeNumeric || singleFieldType == FieldSpecifierTypeEmail || singleFieldType == FieldSpecifierTypePassword || singleFieldType == FieldSpecifierTypeText || singleFieldType == FieldSpecifierTypeURL) {
 				UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
 				UIView *textField = [cell viewWithTag:TEXTFIELDTAG];
@@ -178,7 +178,7 @@
 
 - (void)switchValueDidChange:(NamedSwitch *)switchControl {
 	self.hasChanges = YES;
-	[self.values setObject:[NSNumber numberWithBool:switchControl.on] forKey:switchControl.name];
+	[self.values setObject:@(switchControl.on) forKey:switchControl.name];
 }
 
 #pragma mark Table view methods
@@ -188,17 +188,17 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex {
-	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:sectionIndex];
+	FieldSectionSpecifier *section = self.fieldSections[sectionIndex];
 	return [section.fields count];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)sectionIndex {
-	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:sectionIndex];
+	FieldSectionSpecifier *section = self.fieldSections[sectionIndex];
 	return section.title;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)sectionIndex {
-	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:sectionIndex];
+	FieldSectionSpecifier *section = self.fieldSections[sectionIndex];
 	return section.description;
 }
 
@@ -206,9 +206,9 @@
 	[[cell.contentView viewWithTag:TEXTFIELDTAG] removeFromSuperview];
 	[[cell.contentView viewWithTag:SWITCHTAG] removeFromSuperview];
 	
-	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:indexPath.section];
+	FieldSectionSpecifier *section = self.fieldSections[indexPath.section];
 	NSArray *fields = section.fields;
-	FieldSpecifier *field = [fields objectAtIndex:indexPath.row];
+	FieldSpecifier *field = fields[indexPath.row];
 	cell.textLabel.text = field.title;
 	cell.textLabel.textAlignment = NSTextAlignmentLeft;
 	cell.textLabel.font = [UIFont boldSystemFontOfSize:16.0];
@@ -236,7 +236,7 @@
 		textField.textColor = cell.detailTextLabel.textColor;
 		textField.tag = TEXTFIELDTAG;
 		textField.name = key;
-		textField.text = [self.values objectForKey:key];
+		textField.text = self.values[key];
 		textField.autocorrectionType = UITextAutocorrectionTypeNo;
 		textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
 		textField.clearButtonMode = UITextFieldViewModeWhileEditing;
@@ -273,12 +273,12 @@
 		switchControl.tag = SWITCHTAG;
 		switchControl.name = key;
 		switchControl.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-		BOOL value = [[self.values objectForKey:key] boolValue];
+		BOOL value = [self.values[key] boolValue];
 		[switchControl setOn:value animated:NO];
 		[switchControl addTarget:self action:@selector(switchValueDidChange:) forControlEvents:UIControlEventValueChanged];
 		[cell.contentView addSubview:switchControl];
 	} else if (type == FieldSpecifierTypeCheck) {
-		BOOL value = [[self.values objectForKey:key] boolValue];
+		BOOL value = [self.values[key] boolValue];
 		if (value) {
 			cell.accessoryType = UITableViewCellAccessoryCheckmark;
 		} else {
@@ -287,11 +287,11 @@
 	} else if (type == FieldSpecifierTypeSection) {
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		if ([field.subsections count] == 1) {
-			FieldSectionSpecifier *subsection = [field.subsections objectAtIndex:0];
+			FieldSectionSpecifier *subsection = field.subsections[0];
 			if ([subsection exclusiveSelection]) {
 				NSArray *subSectionFields = subsection.fields;
 				for (FieldSpecifier *f in subSectionFields) {
-					if ([[values objectForKey:f.key] boolValue] == YES) {
+					if ([values[f.key] boolValue] == YES) {
 						cell.detailTextLabel.text = [f title];
 						break;
 					}
@@ -310,10 +310,10 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath  {	
 	UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"];
 	
-	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:indexPath.section];
+	FieldSectionSpecifier *section = self.fieldSections[indexPath.section];
 	NSArray *fields = section.fields;
 	
-	FieldSpecifier *field = [fields objectAtIndex:indexPath.row];
+	FieldSpecifier *field = fields[indexPath.row];
 	if (field.type != FieldSpecifierTypeButton && field.type != FieldSpecifierTypeSection && field.type != FieldSpecifierTypeCheck) {
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 	}
@@ -323,9 +323,9 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath  {
-	FieldSectionSpecifier *section = [self.fieldSections objectAtIndex:indexPath.section];
+	FieldSectionSpecifier *section = self.fieldSections[indexPath.section];
 	NSArray *fields = section.fields;
-	FieldSpecifier *field = [fields objectAtIndex:indexPath.row];
+	FieldSpecifier *field = fields[indexPath.row];
 		
 	UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 	UIView *textField = [cell viewWithTag:TEXTFIELDTAG];
@@ -336,32 +336,30 @@
 	if (field.type == FieldSpecifierTypeCheck) {
 		self.hasChanges = YES;
 		NSString *key = field.key;
-		BOOL value = [[self.values objectForKey:key] boolValue];
+		BOOL value = [self.values[key] boolValue];
 		if (section.exclusiveSelection) {
 			for (FieldSpecifier *f in section.fields) {
-				[self.values setObject:[NSNumber numberWithBool:NO] forKey:f.key];
+				[self.values setObject:@(NO) forKey:f.key];
 			}
-			[self.values setObject:[NSNumber numberWithBool:YES] forKey:key];
+			[self.values setObject:@(YES) forKey:key];
+		} else {
+			[self.values setObject:@(!value) forKey:key];
 		}
-		else {
-			[self.values setObject:[NSNumber numberWithBool:!value] forKey:key];
-		}
-		BOOL newValue = [[self.values objectForKey:key] boolValue];
-		if (newValue)
+		BOOL newValue = [self.values[key] boolValue];
+		if (newValue) {
 			cell.accessoryType = UITableViewCellAccessoryCheckmark;
-		else
+		} else {
 			cell.accessoryType = UITableViewCellAccessoryNone;
+		}
 		[self.tableView reloadData];
 		[self.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
 		[self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-	}
-	else if (field.type == FieldSpecifierTypeButton) {
+	} else if (field.type == FieldSpecifierTypeButton) {
 		[tableView deselectRowAtIndexPath:indexPath animated:YES];
 		if ((self.delegate) && ([delegate respondsToSelector:@selector(fieldEditor:pressedButtonWithKey:)])) {
 			[delegate fieldEditor:self pressedButtonWithKey:field.key];
 		}
-	}
-	else if (field.type == FieldSpecifierTypeSection) {
+	} else if (field.type == FieldSpecifierTypeSection) {
 		[self openSubsection:field];
 	}
 }
@@ -372,8 +370,8 @@
 	NSArray *sections = subsectionField.subsections;
 	for (FieldSectionSpecifier *section in sections) {
 		for (FieldSpecifier *field in section.fields) {
-			if ([values objectForKey:field.key]) {
-				field.defaultValue = [values objectForKey:field.key];
+			if (values[field.key]) {
+				field.defaultValue = values[field.key];
 			}
 		}
 	}
@@ -471,7 +469,7 @@
 + (FieldSpecifier *)switchFieldWithKey:(NSString *)k title:(NSString *)switchTitle defaultValue:(BOOL)flag {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeSwitch key:k];
 	field.title = switchTitle;
-	field.defaultValue = [NSNumber numberWithBool:flag];
+	field.defaultValue = @(flag);
 	return field;
 }
 
@@ -513,7 +511,7 @@
 + (FieldSpecifier *)checkFieldWithKey:(NSString *)k title:(NSString *)checkmarkTitle defaultValue:(BOOL)checked {
 	FieldSpecifier *field = [FieldSpecifier fieldWithType:FieldSpecifierTypeCheck key:k];
 	field.title = checkmarkTitle;
-	field.defaultValue = [NSNumber numberWithBool:checked];
+	field.defaultValue = @(checked);
 	return field;
 }
 
@@ -532,7 +530,7 @@
 }
 
 + (FieldSpecifier *)subsectionFieldWithSection:(FieldSectionSpecifier *)section key:(NSString *)k {
-	return [self subsectionFieldWithSections:[NSArray arrayWithObject:section] key:k title:section.title];
+	return [self subsectionFieldWithSections:@[section] key:k title:section.title];
 }
 
 @end

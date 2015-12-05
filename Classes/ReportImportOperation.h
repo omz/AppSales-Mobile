@@ -24,6 +24,6 @@
 @property (assign) BOOL deleteOriginalFilesAfterImport;
 
 + (BOOL)filesAvailableToImport;
-- (id)initWithAccount:(ASAccount *)account;
+- (instancetype)initWithAccount:(ASAccount *)account;
 
 @end

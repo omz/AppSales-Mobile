@@ -11,7 +11,6 @@
 @class Product, ColorButton, AppIconView;
 
 @interface DashboardAppCell : UITableViewCell {
-
 	ColorButton *colorButton;
 	AppIconView *iconView;
 	UILabel *nameLabel;

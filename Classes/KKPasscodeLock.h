@@ -18,18 +18,14 @@
 #import <Foundation/Foundation.h>
 #import "KKPasscodeViewController.h"
 
-@interface KKPasscodeLock : NSObject {
-	BOOL _eraseOption;
-	NSUInteger _attemptsAllowed;
-}
+@interface KKPasscodeLock : NSObject
+
+@property (nonatomic, assign) BOOL eraseOption;
+@property (nonatomic, assign) NSUInteger attemptsAllowed;
 
 + (KKPasscodeLock *)sharedLock;
 
 - (BOOL)isPasscodeRequired;
-
 - (void)setDefaultSettings;
-
-@property (nonatomic, assign) BOOL eraseOption;
-@property (nonatomic, assign) NSUInteger attemptsAllowed;
 
 @end

@@ -12,7 +12,7 @@
 
 @synthesize labelsByMonth, footerText, year;
 
-- (id)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
 		self.backgroundColor = [UIColor clearColor];
@@ -88,7 +88,7 @@
 		[month drawInRect:monthRect withAttributes:@{NSFontAttributeName: monthFont,
 													 NSParagraphStyleAttributeName: style}];
 		
-		NSString *label = [labelsByMonth objectForKey:[NSNumber numberWithInt:i+1]];
+		NSString *label = labelsByMonth[@(i + 1)];
 		if (label) {
 			CGSize size = CGSizeMake(FLT_MAX, FLT_MAX);
 			float fontSize = maxPaymentFontSize;

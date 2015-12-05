@@ -12,12 +12,11 @@
 #import "Review.h"
 #import "Product.h"
 
-
 @implementation ReviewListViewController
 
 @synthesize fetchedResultsController, managedObjectContext;
 
-- (id)initWithAccount:(ASAccount *)acc products:(NSArray *)reviewProducts rating:(NSUInteger)ratingFilter {
+- (instancetype)initWithAccount:(ASAccount *)acc products:(NSArray *)reviewProducts rating:(NSUInteger)ratingFilter {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
 		account = acc;
@@ -44,7 +43,7 @@
 - (void)markAllAsRead:(id)sender {
 	for (Review *review in self.fetchedResultsController.fetchedObjects) {
 		if ([review.unread boolValue]) {
-			review.unread = [NSNumber numberWithBool:NO];
+			review.unread = @(NO);
 		}
 	}
 	[self.navigationController popViewControllerAnimated:YES];
@@ -57,7 +56,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	return [[[self.fetchedResultsController sections] objectAtIndex:section] numberOfObjects];
+	return [[self.fetchedResultsController sections][section] numberOfObjects];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -121,7 +120,7 @@
 	
 	if (rating != 0) {
 		[pred appendString:@" AND rating = %@"];
-		[args addObject:[NSNumber numberWithInteger:rating]];
+		[args addObject:@(rating)];
 	}
 
 	[fetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
@@ -134,7 +133,7 @@
 	NSSortDescriptor *sortDescriptorDownloadDate = [[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO];
 	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO];
 	
-	NSArray *sortDescriptors = [NSArray arrayWithObjects:sortDescriptorUnread, sortDescriptorReviewDate, sortDescriptorDownloadDate, nil];
+	NSArray *sortDescriptors = @[sortDescriptorUnread, sortDescriptorReviewDate, sortDescriptorDownloadDate];
 	[fetchRequest setSortDescriptors:sortDescriptors];
 	
 	NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest 

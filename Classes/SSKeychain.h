@@ -8,7 +8,7 @@
 
 #import <Security/Security.h>
 
-typedef enum {
+typedef NS_ENUM(NSInteger, SSKeychainErrorCode) {
 	SSKeychainErrorBadArguments = -1001,
 	SSKeychainErrorNoPassword = -1002,
 	SSKeychainErrorInvalidParameter = errSecParam,
@@ -19,7 +19,7 @@ typedef enum {
 	SSKeychainErrorNotFound = errSecItemNotFound,
 	SSKeychainErrorInteractionNotAllowed = errSecInteractionNotAllowed,
 	SSKeychainErrorFailedToDecode = errSecDecode
-} SSKeychainErrorCode;
+};
 
 extern NSString *SSKeychainErrorDomain;
 

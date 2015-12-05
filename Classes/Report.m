@@ -14,13 +14,13 @@
 #import "Transaction.h"
 #import "CurrencyManager.h"
 
-#define kReportColumnDeveloperProceeds		@"royalty price"			//old report format
+#define kReportColumnDeveloperProceeds		@"royalty price"			// old report format
 #define kReportColumnDeveloperProceeds2		@"developer proceeds"
-#define kReportColumnCurrencyOfProceeds		@"royalty currency"			//old report format
+#define kReportColumnCurrencyOfProceeds		@"royalty currency"			// old report format
 #define kReportColumnCurrencyOfProceeds2	@"currency of proceeds"
-#define kReportColumnTitle					@"title / episode / season"	//old report format
+#define kReportColumnTitle					@"title / episode / season"	// old report format
 #define kReportColumnTitle2					@"title"
-#define kReportColumnSKU					@"vendor identifier"		//old report format
+#define kReportColumnSKU					@"vendor identifier"		// old report format
 #define kReportColumnSKU2					@"sku"
 
 #define kReportColumnProductTypeIdentifier	@"product type identifier"
@@ -59,21 +59,21 @@
 		return nil;
 	}
 	
-	NSString *headerLine = [[rows objectAtIndex:0] lowercaseString];
+	NSString *headerLine = [rows[0] lowercaseString];
 	NSArray *columnHeaders = [headerLine componentsSeparatedByString:@"\t"];
 	if (![self validateColumnHeaders:columnHeaders]) {
 		return nil;
 	}
 	
 	[rows removeObjectAtIndex:0];
-	NSString *row = [rows objectAtIndex:0];
+	NSString *row = rows[0];
 	NSArray *rowFields = [row componentsSeparatedByString:@"\t"];
 	if ([rowFields count] > [columnHeaders count]) {
 		return nil;
 	}
 	NSMutableDictionary *rowDictionary = [NSMutableDictionary dictionaryWithObjects:rowFields forKeys:[columnHeaders subarrayWithRange:NSMakeRange(0, [rowFields count])]];
-	NSString *beginDateString = [rowDictionary objectForKey:kReportColumnBeginDate];
-	NSString *endDateString = [rowDictionary objectForKey:kReportColumnEndDate];
+	NSString *beginDateString = rowDictionary[kReportColumnBeginDate];
+	NSString *endDateString = rowDictionary[kReportColumnEndDate];
 	if (!beginDateString || !endDateString) {
 		return nil;
 	}
@@ -83,9 +83,8 @@
 		return nil;
 	}
 	BOOL isWeeklyReport = ![beginDate isEqual:endDate];
-	return [NSDictionary dictionaryWithObjectsAndKeys:
-			((isWeeklyReport) ? kReportInfoClassWeekly : kReportInfoClassDaily), kReportInfoClass,
-			beginDate, kReportInfoDate, nil];
+	return @{kReportInfoClass: (isWeeklyReport ? kReportInfoClassWeekly : kReportInfoClassDaily),
+			 kReportInfoDate: beginDate};
 }
 
 + (Report *)insertNewReportWithCSV:(NSString *)csv inAccount:(ASAccount *)account {
@@ -103,7 +102,7 @@
 		return nil;
 	}
 	
-	NSString *headerLine = [[rows objectAtIndex:0] lowercaseString];
+	NSString *headerLine = [rows[0] lowercaseString];
 	NSArray *columnHeaders = [headerLine componentsSeparatedByString:@"\t"];
 	if (![self validateColumnHeaders:columnHeaders]) {
 		return nil;
@@ -118,8 +117,8 @@
 			continue;
 		}
 		NSMutableDictionary *rowDictionary = [NSMutableDictionary dictionaryWithObjects:rowFields forKeys:[columnHeaders subarrayWithRange:NSMakeRange(0, [rowFields count])]];
-		NSString *beginDateString = [rowDictionary objectForKey:kReportColumnBeginDate];
-		NSString *endDateString = [rowDictionary objectForKey:kReportColumnEndDate];
+		NSString *beginDateString = rowDictionary[kReportColumnBeginDate];
+		NSString *endDateString = rowDictionary[kReportColumnEndDate];
 		if (!beginDateString || !endDateString) continue;
 		NSDate *beginDate = [self dateFromReportDateString:beginDateString];
 		NSDate *endDate = [self dateFromReportDateString:endDateString];
@@ -131,31 +130,31 @@
 			[rowDictionary setObject:endDate forKey:kReportColumnEndDate];
 		}
 		BOOL isWeeklyReport = ![beginDate isEqual:endDate];
-		NSString *productName = [rowDictionary objectForKey:kReportColumnTitle];
-		if (!productName) productName = [rowDictionary objectForKey:kReportColumnTitle2];
+		NSString *productName = rowDictionary[kReportColumnTitle];
+		if (!productName) productName = rowDictionary[kReportColumnTitle2];
 		productName = [productName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		
 		Transaction *transaction = [NSEntityDescription insertNewObjectForEntityForName:@"Transaction" inManagedObjectContext:moc];
-		transaction.units = [NSNumber numberWithInteger:[[rowDictionary objectForKey:kReportColumnUnits] integerValue]];
-		transaction.type = [rowDictionary objectForKey:kReportColumnProductTypeIdentifier];
-		transaction.promoType = [rowDictionary objectForKey:kReportColumnPromoCode];
+		transaction.units = @([rowDictionary[kReportColumnUnits] integerValue]);
+		transaction.type = rowDictionary[kReportColumnProductTypeIdentifier];
+		transaction.promoType = rowDictionary[kReportColumnPromoCode];
 			
-		NSString *developerProceedsColumn = [rowDictionary objectForKey:kReportColumnDeveloperProceeds];
-		if (!developerProceedsColumn) developerProceedsColumn = [rowDictionary objectForKey:kReportColumnDeveloperProceeds2];
-		NSNumber *revenue = [NSNumber numberWithFloat:[developerProceedsColumn floatValue]];
+		NSString *developerProceedsColumn = rowDictionary[kReportColumnDeveloperProceeds];
+		if (!developerProceedsColumn) developerProceedsColumn = rowDictionary[kReportColumnDeveloperProceeds2];
+		NSNumber *revenue = @([developerProceedsColumn floatValue]);
 		transaction.revenue = revenue;
 		
-		NSString *currencyOfProceedsColumn = [rowDictionary objectForKey:kReportColumnCurrencyOfProceeds];
-		if (!currencyOfProceedsColumn) currencyOfProceedsColumn = [rowDictionary objectForKey:kReportColumnCurrencyOfProceeds2];
+		NSString *currencyOfProceedsColumn = rowDictionary[kReportColumnCurrencyOfProceeds];
+		if (!currencyOfProceedsColumn) currencyOfProceedsColumn = rowDictionary[kReportColumnCurrencyOfProceeds2];
 		[transaction setValue:currencyOfProceedsColumn forKey:@"currency"];
 		
-		[transaction setValue:[rowDictionary objectForKey:kReportColumnCountryCode] forKey:@"countryCode"];
-		NSString *productSKU = [rowDictionary objectForKey:kReportColumnSKU];
-		if (!productSKU) productSKU = [rowDictionary objectForKey:kReportColumnSKU2];
+		[transaction setValue:rowDictionary[kReportColumnCountryCode] forKey:@"countryCode"];
+		NSString *productSKU = rowDictionary[kReportColumnSKU];
+		if (!productSKU) productSKU = rowDictionary[kReportColumnSKU2];
 		
 		if ([productSKU hasSuffix:@" "]) { // Bug in October 26th, 2015 reports, where SKU has a trailing space.
 			// First delete 'productSKU plus space' duplicate and clean up the mess.
-			Product *product = [productsBySKU objectForKey:productSKU];
+			Product *product = productsBySKU[productSKU];
 			if (product) {
 				[moc deleteObject:product];
 			}
@@ -165,13 +164,13 @@
 		}
 		productSKU = [productSKU stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		
-		NSString *productVersion = [rowDictionary objectForKey:kReportColumnVersion];
-		Product *product = [productsBySKU objectForKey:productSKU];
+		NSString *productVersion = rowDictionary[kReportColumnVersion];
+		Product *product = productsBySKU[productSKU];
 		if (!product) {
 			product = [NSEntityDescription insertNewObjectForEntityForName:@"Product" inManagedObjectContext:moc];
-			product.parentSKU = [[rowDictionary objectForKey:kReportColumnParentIdentifier] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			product.parentSKU = [rowDictionary[kReportColumnParentIdentifier] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 			product.account = account;
-			product.productID = [rowDictionary objectForKey:kReportColumnAppleIdentifier];
+			product.productID = rowDictionary[kReportColumnAppleIdentifier];
 			product.SKU = productSKU;
 			product.currentVersion = productVersion;
 			product.lastModified = beginDate;
@@ -180,7 +179,7 @@
 		}
 		if ((productName && ![product.name isEqualToString:productName]) || (productVersion && ![product.currentVersion isEqualToString:productVersion])) {
 			if ([beginDate timeIntervalSinceDate:product.lastModified] > 0) {
-				//Only update name and version if the current report is newer than the one the product was created with
+				// Only update name and version if the current report is newer than the one the product was created with.
 				product.name = productName;
 				product.currentVersion = productVersion;
 			}
@@ -189,25 +188,23 @@
 		
 		static NSDictionary *platformsByTransactionType = nil;
 		if (!platformsByTransactionType) {
-			platformsByTransactionType = [[NSDictionary alloc] initWithObjectsAndKeys:
-										  kProductPlatformiPhone, @"1",
-										  kProductPlatformiPhone, @"3",
-										  kProductPlatformiPhone, @"7",
-										  kProductPlatformUniversal, @"1F",
-										  kProductPlatformUniversal, @"3F",
-										  kProductPlatformUniversal, @"7F",
-										  kProductPlatformiPad, @"1T",
-										  kProductPlatformiPad, @"3T",
-										  kProductPlatformiPad, @"7T",
-										  kProductPlatformMac, @"F1",
-										  kProductPlatformMac, @"F3",
-										  kProductPlatformMac, @"F7",
-										  kProductPlatformInApp, @"IA1",
-										  kProductPlatformInApp, @"IA9",
-										  kProductPlatformAppBundle, @"1-B",
-										  nil];
+			platformsByTransactionType = @{@"1": kProductPlatformiPhone,
+										   @"3": kProductPlatformiPhone,
+										   @"7": kProductPlatformiPhone,
+										   @"1F": kProductPlatformUniversal,
+										   @"3F": kProductPlatformUniversal,
+										   @"7F": kProductPlatformUniversal,
+										   @"1T": kProductPlatformiPad,
+										   @"3T": kProductPlatformiPad,
+										   @"7T": kProductPlatformiPad,
+										   @"F1": kProductPlatformMac,
+										   @"F3": kProductPlatformMac,
+										   @"F7": kProductPlatformMac,
+										   @"IA1": kProductPlatformInApp,
+										   @"IA9": kProductPlatformInApp,
+										   @"1-B": kProductPlatformAppBundle};
 		}
-		NSString *platform = [platformsByTransactionType objectForKey:[rowDictionary objectForKey:kReportColumnProductTypeIdentifier]];
+		NSString *platform = platformsByTransactionType[rowDictionary[kReportColumnProductTypeIdentifier]];
 		if (platform) {
 			product.platform = platform;
 		}
@@ -283,31 +280,31 @@
 		NSInteger transactionUnits = [transaction.units integerValue];
 		NSString *transactionType = transaction.type;
 		if (currency) {
-			float revenue = [[[revenueByCurrency objectForKey:productIdentifier] objectForKey:currency] floatValue];
+			float revenue = [revenueByCurrency[productIdentifier][currency] floatValue];
 			revenue += (transactionRevenue * transactionUnits);
-			NSMutableDictionary *revenuesForProduct = [revenueByCurrency objectForKey:productIdentifier];
+			NSMutableDictionary *revenuesForProduct = revenueByCurrency[productIdentifier];
 			if (!revenuesForProduct) {
 				revenuesForProduct = [NSMutableDictionary dictionary];
 				[revenueByCurrency setObject:revenuesForProduct forKey:productIdentifier];
 			}
-			[revenuesForProduct setObject:[NSNumber numberWithFloat:revenue] forKey:currency];
+			[revenuesForProduct setObject:@(revenue) forKey:currency];
 		}
 		if (transactionType) {
 			NSString *promoType = transaction.promoType;
-			//Some old reports have "FREE" as the promo code identifier for updates, in newer reports, the field is empty.
+			// Some old reports have "FREE" as the promo code identifier for updates, in newer reports, the field is empty.
 			if (promoType && ![promoType isEqualToString:@"FREE"]) {
 				if (promoType && ![promoType isEqualToString:@"FREE"] && ![promoType isEqualToString:@" "]) {
 					transactionType = [NSString stringWithFormat:@"%@.%@", transactionType, promoType];
 				}
 			}
-			NSInteger count = [[[transactionsByType objectForKey:productIdentifier] objectForKey:transactionType] integerValue];
+			NSInteger count = [transactionsByType[productIdentifier][transactionType] integerValue];
 			count += transactionUnits;
-			NSMutableDictionary *transactionsForProduct = [transactionsByType objectForKey:productIdentifier];
+			NSMutableDictionary *transactionsForProduct = transactionsByType[productIdentifier];
 			if (!transactionsForProduct) {
 				transactionsForProduct = [NSMutableDictionary dictionary];
 				[transactionsByType setObject:transactionsForProduct forKey:productIdentifier];
 			}
-			[transactionsForProduct setObject:[NSNumber numberWithInteger:count] forKey:transactionType];
+			[transactionsForProduct setObject:@(count) forKey:transactionType];
 		}
 	}
 	self.cache = [NSEntityDescription insertNewObjectForEntityForName:@"ReportCache" inManagedObjectContext:self.managedObjectContext];
@@ -316,11 +313,11 @@
 
 - (float)totalRevenueInBaseCurrency {
 	float total = 0.0;
-	NSDictionary *revenueByProduct = [self.cache.content objectForKey:kReportSummaryRevenue];
+	NSDictionary *revenueByProduct = self.cache.content[kReportSummaryRevenue];
 	for (NSString *productID in [revenueByProduct allKeys]) {
-		NSDictionary *revenueByCurrency = [revenueByProduct objectForKey:productID];
+		NSDictionary *revenueByCurrency = revenueByProduct[productID];
 		for (NSString *currency in [revenueByCurrency allKeys]) {
-			float revenue = [[revenueByCurrency objectForKey:currency] floatValue];
+			float revenue = [revenueByCurrency[currency] floatValue];
 			float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenue fromCurrency:currency];
 			total += revenueInBaseCurrency;
 		}
@@ -338,10 +335,10 @@
 			return [self totalRevenueInBaseCurrency];
 		}
 		float total = 0.0;
-		NSDictionary *revenueByProduct = [self.cache.content objectForKey:kReportSummaryRevenue];
-		NSDictionary *revenueByCurrency = [revenueByProduct objectForKey:productID];
+		NSDictionary *revenueByProduct = self.cache.content[kReportSummaryRevenue];
+		NSDictionary *revenueByCurrency = revenueByProduct[productID];
 		for (NSString *currency in revenueByCurrency) {
-			float revenue = [[revenueByCurrency objectForKey:currency] floatValue];
+			float revenue = [revenueByCurrency[currency] floatValue];
 			float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:revenue fromCurrency:currency];
 			total += revenueInBaseCurrency;
 		}
@@ -383,14 +380,14 @@
 		}
 		NSString *transactionCountry = transaction.countryCode;
 		NSString *transactionProductID = transaction.product.productID;
-		NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+		NSMutableDictionary *paidDownloadsByProduct = result[transactionCountry];
 		if (!paidDownloadsByProduct) {
 			paidDownloadsByProduct = [NSMutableDictionary dictionary];
 			[result setObject:paidDownloadsByProduct forKey:transactionCountry];
 		}
-		NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+		NSInteger oldNumberOfPaidDownloads = [paidDownloadsByProduct[transactionProductID] integerValue];
 		NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
-		[paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+		[paidDownloadsByProduct setObject:@(newNumberOfPaidDownloads) forKey:transactionProductID];
 	}
 	return result;
 }
@@ -414,14 +411,14 @@
 		}
 		NSString *transactionCountry = transaction.countryCode;
 		NSString *transactionProductID = transaction.product.productID;
-		NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+		NSMutableDictionary *paidDownloadsByProduct = result[transactionCountry];
 		if (!paidDownloadsByProduct) {
 			paidDownloadsByProduct = [NSMutableDictionary dictionary];
 			[result setObject:paidDownloadsByProduct forKey:transactionCountry];
 		}
-		NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+		NSInteger oldNumberOfPaidDownloads = [paidDownloadsByProduct[transactionProductID] integerValue];
 		NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
-		[paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+		[paidDownloadsByProduct setObject:@(newNumberOfPaidDownloads) forKey:transactionProductID];
 	}
 	return result;
 }
@@ -445,14 +442,14 @@
 		}
 		NSString *transactionCountry = transaction.countryCode;
 		NSString *transactionProductID = transaction.product.productID;
-		NSMutableDictionary *paidDownloadsByProduct = [result objectForKey:transactionCountry];
+		NSMutableDictionary *paidDownloadsByProduct = result[transactionCountry];
 		if (!paidDownloadsByProduct) {
 			paidDownloadsByProduct = [NSMutableDictionary dictionary];
 			[result setObject:paidDownloadsByProduct forKey:transactionCountry];
 		}
-		NSInteger oldNumberOfPaidDownloads = [[paidDownloadsByProduct objectForKey:transactionProductID] integerValue];
+		NSInteger oldNumberOfPaidDownloads = [paidDownloadsByProduct[transactionProductID] integerValue];
 		NSInteger newNumberOfPaidDownloads = oldNumberOfPaidDownloads + [transaction.units integerValue];
-		[paidDownloadsByProduct setObject:[NSNumber numberWithInteger:newNumberOfPaidDownloads] forKey:transactionProductID];
+		[paidDownloadsByProduct setObject:@(newNumberOfPaidDownloads) forKey:transactionProductID];
 	}
 	return result;
 }
@@ -509,20 +506,20 @@
 
 - (int)totalNumberOfTransactionsInSet:(NSSet *)transactionTypes forProductWithID:(NSString *)productID {
 	int total = 0;
-	NSDictionary *transactionsByProduct = [self.cache.content objectForKey:kReportSummaryTransactions];
+	NSDictionary *transactionsByProduct = self.cache.content[kReportSummaryTransactions];
 	if (productID) {
-		NSDictionary *transactionsByType = [transactionsByProduct objectForKey:productID];
+		NSDictionary *transactionsByType = transactionsByProduct[productID];
 		for (NSString *transactionType in transactionsByType) {
 			if ([transactionTypes containsObject:transactionType]) {
-				total += [[transactionsByType objectForKey:transactionType] intValue];
+				total += [transactionsByType[transactionType] intValue];
 			}
 		}
 	} else {
 		for (NSString *productID in transactionsByProduct) {
-			NSDictionary *transactionsByType = [transactionsByProduct objectForKey:productID];
+			NSDictionary *transactionsByType = transactionsByProduct[productID];
 			for (NSString *transactionType in transactionsByType) {
 				if ([transactionTypes containsObject:transactionType]) {
-					total += [[transactionsByType objectForKey:transactionType] intValue];
+					total += [transactionsByType[transactionType] intValue];
 				}
 			}
 		}
@@ -704,9 +701,9 @@
 		int units = [transaction.units intValue];
 		float revenueInBaseCurrency = [[CurrencyManager sharedManager] convertValue:(revenue * units) fromCurrency:currency];
 		NSString *country = transaction.countryCode;
-		float oldRevenue = [[revenueByCountry objectForKey:country] floatValue];
+		float oldRevenue = [revenueByCountry[country] floatValue];
 		float newRevenue = oldRevenue + revenueInBaseCurrency;
-		[revenueByCountry setObject:[NSNumber numberWithFloat:newRevenue] forKey:country];
+		[revenueByCountry setObject:@(newRevenue) forKey:country];
 	}
 	return revenueByCountry;
 }
@@ -718,7 +715,7 @@
 
 - (NSArray *)allReports {
 	//ReportSummary protocol method, allows us to treat "virtual" reports (like months) the same as actual reports in many situations.
-	return [NSArray arrayWithObject:self];
+	return @[self];
 }
 
 - (NSString *)title {

@@ -27,6 +27,6 @@
 @property (readonly) NSInteger downloadCount;
 @property (copy) NSManagedObjectID *accountObjectID;
 
-- (id)initWithAccount:(ASAccount *)account;
+- (instancetype)initWithAccount:(ASAccount *)account;
 
 @end

@@ -14,7 +14,7 @@
 
 @synthesize webView;
 
-- (id)initWithReport:(Report *)selectedReport {
+- (instancetype)initWithReport:(Report *)selectedReport {
 	self = [super init];
 	if (self) {
 		report = selectedReport;
@@ -46,7 +46,7 @@
 	//For whatever reason, UIWebView doesn't seem to support CSV when loading in-memory data, so we write it out to a temp file.
 	NSString *tempDir = NSTemporaryDirectory();
 	NSString *tempPath = [tempDir stringByAppendingPathComponent:@"temp.csv"];
-	[csv writeToFile:tempPath atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+	[csv writeToFile:tempPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	[self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:tempPath]]];
 }
 
@@ -90,7 +90,7 @@
 
 @implementation ReportCSVSelectionViewController
 
-- (id)initWithReports:(NSArray *)allReports {
+- (instancetype)initWithReports:(NSArray *)allReports {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
 		reports = allReports;
@@ -121,13 +121,13 @@
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
-	Report *report = [reports objectAtIndex:indexPath.row];
+	Report *report = reports[indexPath.row];
 	cell.textLabel.text = [dateFormatter stringFromDate:report.startDate];
 	return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	ReportCSVViewController *vc = [[ReportCSVViewController alloc] initWithReport:[reports objectAtIndex:indexPath.row]];
+	ReportCSVViewController *vc = [[ReportCSVViewController alloc] initWithReport:reports[indexPath.row]];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 

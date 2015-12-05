@@ -21,7 +21,7 @@
 
 @synthesize webView;
 
-- (id)initWithReview:(Review *)aReview {
+- (instancetype)initWithReview:(Review *)aReview {
 	self = [super init];
 	if (self) {
 		review = aReview;
@@ -37,7 +37,7 @@
 }
 
 - (void)viewDidLoad {
-	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:NULL];
+	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:review.title];
 	NSString *ratingString = [@"" stringByPaddingToLength:[review.rating integerValue] withString:@"\u2605" startingAtIndex:0];
 	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -56,7 +56,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
-	review.unread = [NSNumber numberWithBool:NO];
+	review.unread = @(NO);
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {

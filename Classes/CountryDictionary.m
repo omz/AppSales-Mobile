@@ -10,7 +10,7 @@
 
 @implementation CountryDictionary
 
-+ (id)sharedDictionary {
++ (instancetype)sharedDictionary {
 	static id sharedDictionary = nil;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -19,7 +19,7 @@
 	return sharedDictionary;
 }
 
-- (id)init {
+- (instancetype)init {
 	self = [super init];
 	if (self) {
 		countryNamesByISOCode = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"country_names" ofType:@"plist"]];
@@ -28,12 +28,11 @@
 }
 
 - (NSString *)nameForCountryCode:(NSString *)countryCode {
-	NSString *countryName = [countryNamesByISOCode objectForKey:[countryCode uppercaseString]];
+	NSString *countryName = countryNamesByISOCode[[countryCode uppercaseString]];
 	if (countryName) {
 		return countryName;
 	}
 	return countryCode;
 }
-
 
 @end

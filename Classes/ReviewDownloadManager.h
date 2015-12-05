@@ -29,7 +29,7 @@
 	NSInteger completedDownloadsCount;
 }
 
-+ (id)sharedManager;
++ (instancetype)sharedManager;
 - (void)downloadReviewsForProducts:(NSArray *)products;
 - (void)cancelAllDownloads;
 - (BOOL)isDownloading;
@@ -57,7 +57,7 @@
 @property (nonatomic, weak) id<ReviewDownloadDelegate> delegate;
 @property (nonatomic, strong) NSURLConnection *downloadConnection;
 
-- (id)initWithProduct:(Product *)app countryCode:(NSString *)countryCode;
+- (instancetype)initWithProduct:(Product *)app countryCode:(NSString *)countryCode;
 - (void)start;
 - (void)cancel;
 

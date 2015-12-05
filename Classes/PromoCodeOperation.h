@@ -16,7 +16,7 @@
 
 @interface PromoCodeOperation : MultiOperation
 
-- (id)initWithProduct:(Product *)aProduct;
-- (id)initWithProduct:(Product *)aProduct numberOfCodes:(NSInteger)numberOfCodes;
+- (instancetype)initWithProduct:(Product *)aProduct;
+- (instancetype)initWithProduct:(Product *)aProduct numberOfCodes:(NSInteger)numberOfCodes;
 
 @end

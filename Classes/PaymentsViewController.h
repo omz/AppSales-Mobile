@@ -17,7 +17,7 @@
 	UIPageControl *pageControl;
 }
 
-- (id)initWithAccount:(ASAccount *)paymentAccount;
+- (instancetype)initWithAccount:(ASAccount *)paymentAccount;
 - (void)reloadData;
 
 @property (nonatomic, strong) UIScrollView *scrollView;

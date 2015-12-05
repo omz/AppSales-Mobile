@@ -23,15 +23,11 @@
 @protocol KKPasscodeSettingsViewControllerDelegate <NSObject>
 
 @optional
-
 - (void)didSettingsChanged:(KKPasscodeSettingsViewController *)viewController;
 
 @end
 
 @interface KKPasscodeSettingsViewController : UITableViewController <UIActionSheetDelegate, KKPasscodeViewControllerDelegate> {
-	
-	id <KKPasscodeSettingsViewControllerDelegate> __weak _delegate;
-	
 	UISwitch *unlockWithTouchIDSwitch;
 	UISwitch *eraseDataSwitch;
 	

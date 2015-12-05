@@ -20,11 +20,11 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 
 @implementation LoginManager
 
-- (id)init {
+- (instancetype)init {
 	return [self initWithAccount:nil];
 }
 
-- (id)initWithAccount:(ASAccount *)_account {
+- (instancetype)initWithAccount:(ASAccount *)_account {
 	self = [super init];
 	if (self) {
 		// Initialization code
@@ -33,7 +33,7 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 	return self;
 }
 
-- (id)initWithLoginInfo:(NSDictionary *)_loginInfo {
+- (instancetype)initWithLoginInfo:(NSDictionary *)_loginInfo {
 	self = [super init];
 	if (self) {
 		// Initialization code
@@ -96,11 +96,11 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 	[authenticateRequest setHTTPBody:bodyData];
 	
 	NSHTTPURLResponse *response = nil;
-	NSData *authenticatePageData = [NSURLConnection sendSynchronousRequest:authenticateRequest returningResponse:&response error:NULL];
+	NSData *authenticatePageData = [NSURLConnection sendSynchronousRequest:authenticateRequest returningResponse:&response error:nil];
 	NSString *authenticatePage = [[NSString alloc] initWithData:authenticatePageData encoding:NSUTF8StringEncoding];
 	NSScanner *authenticatePageScanner = [NSScanner scannerWithString:authenticatePage];
-	[authenticatePageScanner scanUpToString:@"<form id=\"command\" name=\"deviceForm\"" intoString:NULL];
-	[authenticatePageScanner scanString:@"<form id=\"command\" name=\"deviceForm\"" intoString:NULL];
+	[authenticatePageScanner scanUpToString:@"<form id=\"command\" name=\"deviceForm\"" intoString:nil];
+	[authenticatePageScanner scanString:@"<form id=\"command\" name=\"deviceForm\"" intoString:nil];
 	if (self.isLoggedIn) {
 		// We're in!
 		if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
@@ -108,28 +108,28 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 				[self.delegate loginSucceeded];
 			});
 		}
-	} else if ([authenticatePageScanner scanString:@"action=\"" intoString:NULL]) {
+	} else if ([authenticatePageScanner scanString:@"action=\"" intoString:nil]) {
 		// Looks like this account has Two-Step Verification enabled.
 		NSString *_generateCodeAction = nil;
 		[authenticatePageScanner scanUpToString:@"\"" intoString:&_generateCodeAction];
 		generateCodeAction = _generateCodeAction;
-		[authenticatePageScanner scanUpToString:@"<div id=\"devices\">" intoString:NULL];
-		if ([authenticatePageScanner scanString:@"<div id=\"devices\">" intoString:NULL]) {
+		[authenticatePageScanner scanUpToString:@"<div id=\"devices\">" intoString:nil];
+		if ([authenticatePageScanner scanString:@"<div id=\"devices\">" intoString:nil]) {
 			NSRegularExpression *htmlTagsRegex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:0 error:nil];
 			NSUInteger scanLocation = authenticatePageScanner.scanLocation;
-			[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:NULL];
-			while ([authenticatePageScanner scanString:@"<div class=\"formrow radio hsa\">" intoString:NULL]) {
+			[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:nil];
+			while ([authenticatePageScanner scanString:@"<div class=\"formrow radio hsa\">" intoString:nil]) {
 				NSString *name = nil;
 				NSString *value = nil;
 				
 				// Parse device index.
-				[authenticatePageScanner scanUpToString:@"value=\"" intoString:NULL];
-				[authenticatePageScanner scanString:@"value=\"" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"value=\"" intoString:nil];
+				[authenticatePageScanner scanString:@"value=\"" intoString:nil];
 				[authenticatePageScanner scanUpToString:@"\"" intoString:&value];
 				
 				// Parse device name.
-				[authenticatePageScanner scanUpToString:@"<label" intoString:NULL];
-				[authenticatePageScanner scanString:@">" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"<label" intoString:nil];
+				[authenticatePageScanner scanString:@">" intoString:nil];
 				[authenticatePageScanner scanUpToString:@"</label>" intoString:&name];
 				
 				// Clean up device name.
@@ -142,16 +142,16 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 				trustedDevice[@"value"] = value;
 				
 				[trustedDevices addObject:trustedDevice];
-				[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:nil];
 			}
 			
 			if (trustedDevices.count > 0) {
 				NSString *_ctkn = nil;
 				authenticatePageScanner.scanLocation = scanLocation;
-				[authenticatePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-				[authenticatePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-				[authenticatePageScanner scanUpToString:@"value=\"" intoString:NULL];
-				[authenticatePageScanner scanString:@"value=\"" intoString:NULL];
+				[authenticatePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
+				[authenticatePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
+				[authenticatePageScanner scanUpToString:@"value=\"" intoString:nil];
+				[authenticatePageScanner scanString:@"value=\"" intoString:nil];
 				[authenticatePageScanner scanUpToString:@"\"" intoString:&_ctkn];
 				ctkn = _ctkn;
 				
@@ -196,15 +196,15 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 		[generateCodeRequest setHTTPBody:bodyData];
 		
 		NSHTTPURLResponse *response = nil;
-		NSData *generateCodePageData = [NSURLConnection sendSynchronousRequest:generateCodeRequest returningResponse:&response error:NULL];
+		NSData *generateCodePageData = [NSURLConnection sendSynchronousRequest:generateCodeRequest returningResponse:&response error:nil];
 		NSString *generateCodePage = [[NSString alloc] initWithData:generateCodePageData encoding:NSUTF8StringEncoding];
 		NSScanner *generateCodePageScanner = [NSScanner scannerWithString:generateCodePage];
 		
 		NSString *_ctkn = nil;
-		[generateCodePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-		[generateCodePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-		[generateCodePageScanner scanUpToString:@"value=\"" intoString:NULL];
-		[generateCodePageScanner scanString:@"value=\"" intoString:NULL];
+		[generateCodePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
+		[generateCodePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
+		[generateCodePageScanner scanUpToString:@"value=\"" intoString:nil];
+		[generateCodePageScanner scanString:@"value=\"" intoString:nil];
 		[generateCodePageScanner scanUpToString:@"\"" intoString:&_ctkn];
 		ctkn = _ctkn;
 		
@@ -234,7 +234,7 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 		[validateCodeRequest setHTTPBody:bodyData];
 		
 		NSHTTPURLResponse *response = nil;
-		NSData *validateCodePageData = [NSURLConnection sendSynchronousRequest:validateCodeRequest returningResponse:&response error:NULL];
+		NSData *validateCodePageData = [NSURLConnection sendSynchronousRequest:validateCodeRequest returningResponse:&response error:nil];
 		NSString *validateCodePage = [[NSString alloc] initWithData:validateCodePageData encoding:NSUTF8StringEncoding];
 		NSScanner *validateCodePageScanner = [NSScanner scannerWithString:validateCodePage];
 		
@@ -249,10 +249,10 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 		} else {
 			// Incorrect verification code. Retry?
 			NSString *_ctkn = nil;
-			[validateCodePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-			[validateCodePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:NULL];
-			[validateCodePageScanner scanUpToString:@"value=\"" intoString:NULL];
-			[validateCodePageScanner scanString:@"value=\"" intoString:NULL];
+			[validateCodePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
+			[validateCodePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
+			[validateCodePageScanner scanUpToString:@"value=\"" intoString:nil];
+			[validateCodePageScanner scanString:@"value=\"" intoString:nil];
 			[validateCodePageScanner scanUpToString:@"\"" intoString:&_ctkn];
 			ctkn = _ctkn;
 			

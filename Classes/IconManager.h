@@ -21,7 +21,7 @@
 	BOOL isDownloading;
 }
 
-+ (id)sharedManager;
++ (instancetype)sharedManager;
 - (NSString *)iconDirectory;
 - (UIImage *)iconForAppID:(NSString *)appID;
 - (void)clearIconForAppID:(NSString *)appID;

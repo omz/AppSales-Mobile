@@ -19,10 +19,9 @@ NSString *SSKeychainErrorDomain = @"com.samsoffes.sskeychain";
 #pragma mark Class Methods
 
 + (NSMutableDictionary *)_keychainQueryForService:(NSString *)service account:(NSString *)account {
-	return [NSMutableDictionary dictionaryWithObjectsAndKeys:(id)kSecClassGenericPassword, 
-			(id)kSecClass, account, (id)kSecAttrAccount, 
-			service, (id)kSecAttrService, 
-			nil];
+	return [[NSMutableDictionary alloc] initWithDictionary:@{(id)kSecClass: (id)kSecClassGenericPassword,
+															 (id)kSecAttrAccount: account,
+															 (id)kSecAttrService: service}];
 }
 
 

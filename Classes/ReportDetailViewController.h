@@ -11,10 +11,10 @@
 @class Report, Product, MapView, AppIconView;
 @protocol ReportSummary;
 
-typedef enum ReportDetailViewMode { 
+typedef NS_ENUM(NSInteger, ReportDetailViewMode) {
 	ReportDetailViewModeCountries = 0,
 	ReportDetailViewModeProducts
-} ReportDetailViewMode;
+};
 
 @interface ReportDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
 
@@ -62,7 +62,7 @@ typedef enum ReportDetailViewMode {
 @property (nonatomic, strong) Product *selectedProduct;
 @property (nonatomic, strong) UIToolbar *toolbar;
 
-- (id)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex;
+- (instancetype)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex;
 - (void)updateNavigationButtons;
 - (void)updateHeader;
 - (void)reloadData;

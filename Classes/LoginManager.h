@@ -40,8 +40,8 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 @property (nonatomic, strong) id<LoginManagerDelegate> delegate;
 @property (nonatomic, assign) BOOL shouldDeleteCookies;
 
-- (id)initWithAccount:(ASAccount *)_account;
-- (id)initWithLoginInfo:(NSDictionary *)_loginInfo;
+- (instancetype)initWithAccount:(ASAccount *)_account;
+- (instancetype)initWithLoginInfo:(NSDictionary *)_loginInfo;
 - (void)logIn;
 - (void)logOut;
 

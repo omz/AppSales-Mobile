@@ -31,7 +31,7 @@
 @property (nonatomic, strong) UIColor *selectedColor;
 @property (nonatomic, strong) id context;
 
-- (id)initWithColors:(NSArray *)colorArray;
+- (instancetype)initWithColors:(NSArray *)colorArray;
 
 @end
 

@@ -17,7 +17,7 @@
 
 @synthesize isBusy;
 
-- (id)init {
+- (instancetype)init {
 	self = [super init];
 	if (self) {
 		reportDownloadQueue = [[NSOperationQueue alloc] init];
@@ -27,7 +27,7 @@
 	return self;
 }
 
-+ (id)sharedReportDownloadCoordinator {
++ (instancetype)sharedReportDownloadCoordinator {
 	static id sharedCoordinator = nil;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{

@@ -20,11 +20,7 @@
 #import "KKPasscodeViewController.h"
 #import "KKPasscodeLock.h"
 
-
 @implementation KKPasscodeSettingsViewController
-
-
-@synthesize delegate = _delegate;
 
 #pragma mark -
 #pragma mark UIViewController

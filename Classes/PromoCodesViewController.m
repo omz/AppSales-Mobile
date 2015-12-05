@@ -16,7 +16,7 @@
 
 @synthesize sortedApps;
 
-- (id)initWithAccount:(ASAccount *)anAccount {
+- (instancetype)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self) {
 		account = anAccount;
@@ -35,9 +35,9 @@
 
 - (void)contextDidChange:(NSNotification *)notification {
 	NSSet *relevantEntityNames = [NSSet setWithObject:@"PromoCode"];
-	NSSet *insertedObjects = [[notification userInfo] objectForKey:NSInsertedObjectsKey];
-	NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
-	NSSet *deletedObjects = [[notification userInfo] objectForKey:NSDeletedObjectsKey];
+	NSSet *insertedObjects = notification.userInfo[NSInsertedObjectsKey];
+	NSSet *updatedObjects = notification.userInfo[NSUpdatedObjectsKey];
+	NSSet *deletedObjects = notification.userInfo[NSDeletedObjectsKey];
 	
 	BOOL shouldReload = NO;
 	for (NSManagedObject *insertedObject in insertedObjects) {
@@ -109,12 +109,12 @@
 		cell = [[BadgedCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
 	}
 	
-	Product *app = [sortedApps objectAtIndex:indexPath.row];
+	Product *app = sortedApps[indexPath.row];
 	
 	NSFetchRequest *unusedPromoCodesRequest = [[NSFetchRequest alloc] init];
 	[unusedPromoCodesRequest setEntity:[NSEntityDescription entityForName:@"PromoCode" inManagedObjectContext:[app managedObjectContext]]];
 	[unusedPromoCodesRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND used == FALSE", app]];
-	NSInteger count = [[app managedObjectContext] countForFetchRequest:unusedPromoCodesRequest error:NULL];
+	NSInteger count = [[app managedObjectContext] countForFetchRequest:unusedPromoCodesRequest error:nil];
 	
 	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	cell.badgeCount = count;
@@ -124,7 +124,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	Product *product = [sortedApps objectAtIndex:indexPath.row];
+	Product *product = sortedApps[indexPath.row];
 	PromoCodesAppViewController *vc = [[PromoCodesAppViewController alloc] initWithProduct:product];
 	[self.navigationController pushViewController:vc animated:YES];
 }

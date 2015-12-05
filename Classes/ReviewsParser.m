@@ -20,7 +20,7 @@ NSString *const kReviewAuthorNameKey = @"name";
 
 @implementation ReviewsParser
 
-- (id)initWithData:(NSData *)data {
+- (instancetype)initWithData:(NSData *)data {
 	self = [super init];
 	if (self) {
 		// Initialization code
@@ -83,12 +83,12 @@ NSString *const kReviewAuthorNameKey = @"name";
 - (NSString *)parseContentHTML:(NSString *)contentHTML {
 	NSScanner *scanner = [NSScanner scannerWithString:contentHTML];
 	NSString *text = nil;
-	[scanner scanUpToString:@"</table>" intoString:NULL];
-	[scanner scanString:@"</table>" intoString:NULL];
-	[scanner scanUpToString:@"<font" intoString:NULL];
-	[scanner scanString:@"<font" intoString:NULL];
-	[scanner scanUpToString:@"><br/>" intoString:NULL];
-	[scanner scanString:@"><br/>" intoString:NULL];
+	[scanner scanUpToString:@"</table>" intoString:nil];
+	[scanner scanString:@"</table>" intoString:nil];
+	[scanner scanUpToString:@"<font" intoString:nil];
+	[scanner scanString:@"<font" intoString:nil];
+	[scanner scanUpToString:@"><br/>" intoString:nil];
+	[scanner scanString:@"><br/>" intoString:nil];
 	[scanner scanUpToString:@"</font><br/>" intoString:&text];
 	return text;
 }

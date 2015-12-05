@@ -17,7 +17,7 @@
 
 @property (nonatomic, assign) BOOL isBusy;
 
-+ (id)sharedReportDownloadCoordinator;
++ (instancetype)sharedReportDownloadCoordinator;
 - (void)downloadReportsForAccount:(ASAccount *)account;
 - (void)cancelDownloadForAccount:(ASAccount *)account;
 - (void)cancelAllDownloads;
