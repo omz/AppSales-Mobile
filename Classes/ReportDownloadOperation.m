@@ -38,10 +38,7 @@
 	@autoreleasepool {
 		
 		int numberOfReportsDownloaded = 0;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_account.downloadStatus = NSLocalizedString(@"Starting download", nil);
-			_account.downloadProgress = 0.0;
-		});
+		[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Starting download", nil)];
 		
 		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 		[moc setPersistentStoreCoordinator:psc];
@@ -120,42 +117,24 @@
 			NSUInteger numberOfReportsAvailable = [availableReportDateStrings count];
 			for (NSString *reportDateString in availableReportDateStrings) {
 				if (self.isCancelled) {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-						_account.downloadProgress = 1.0;
-						_account.isDownloadingReports = NO;
-						[UIApplication sharedApplication].idleTimerDisabled = NO;
-						if (backgroundTaskID != UIBackgroundTaskInvalid) {
-							[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-						}
-					});
+					[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 					return;
 				}
 				if (i == 0) {
 					if ([dateType isEqualToString:@"Daily"]) {
-						dispatch_async(dispatch_get_main_queue(), ^{
-							_account.downloadStatus = NSLocalizedString(@"Checking for daily reports...", nil);
-							_account.downloadProgress = 0.1;
-						});
+						[self downloadProgress:0.1f withStatus:NSLocalizedString(@"Checking for daily reports...", nil)];
 					} else {
-						dispatch_async(dispatch_get_main_queue(), ^{
-							_account.downloadStatus = NSLocalizedString(@"Checking for weekly reports...", nil);
-							_account.downloadProgress = 0.5;
-						});
+						[self downloadProgress:0.5f withStatus:NSLocalizedString(@"Checking for weekly reports...", nil)];
 					}
 				} else {
 					if ([dateType isEqualToString:@"Daily"]) {
-						float progress = 0.5 * ((float)i / (float)numberOfReportsAvailable);
-						dispatch_async(dispatch_get_main_queue(), ^{
-							_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %i", nil), i+1, numberOfReportsAvailable];
-							_account.downloadProgress = progress;
-						});
+						CGFloat progress = 0.5f * ((CGFloat)i / (CGFloat)numberOfReportsAvailable);
+						NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %i", nil), i + 1, numberOfReportsAvailable];
+						[self downloadProgress:progress withStatus:status];
 					} else {
-						float progress = 0.5 + 0.4 * ((float)i / (float)numberOfReportsAvailable);
-						dispatch_async(dispatch_get_main_queue(), ^{
-							_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %i", nil), i+1, numberOfReportsAvailable];
-							_account.downloadProgress = progress;
-						});
+						CGFloat progress = 0.5f + 0.4f * ((CGFloat)i / (CGFloat)numberOfReportsAvailable);
+						NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %i", nil), i + 1, numberOfReportsAvailable];
+						[self downloadProgress:progress withStatus:status];
 					}
 				}
 				
@@ -245,48 +224,30 @@
 			}
 		}
 		if (self.isCancelled) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-				_account.downloadProgress = 1.0;
-				_account.isDownloadingReports = NO;
-				[UIApplication sharedApplication].idleTimerDisabled = NO;
-				if (backgroundTaskID != UIBackgroundTaskInvalid) {
-					[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-				}
-			});
+			[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 			return;
 		}
 	
-		dispatch_async(dispatch_get_main_queue(), ^{
-			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-			dateFormatter.timeStyle = NSDateFormatterNoStyle;
-			dateFormatter.dateStyle = NSDateFormatterShortStyle;
-			for (NSString *error in errors.allKeys) {
-				NSString *message = error;
-				
-				NSDictionary *reportTypes = errors[error];
-				for (NSString *reportType in reportTypes.allKeys) {
-					message = [message stringByAppendingFormat:@"\n\n%@ Reports:", reportType];
-					for (NSDate *reportDate in reportTypes[reportType]) {
-						message = [message stringByAppendingFormat:@"\n%@", [dateFormatter stringFromDate:reportDate]];
-					}
+		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.timeStyle = NSDateFormatterNoStyle;
+		dateFormatter.dateStyle = NSDateFormatterShortStyle;
+		for (NSString *error in errors.allKeys) {
+			NSString *message = error;
+			
+			NSDictionary *reportTypes = errors[error];
+			for (NSString *reportType in reportTypes.allKeys) {
+				message = [message stringByAppendingFormat:@"\n\n%@ Reports:", reportType];
+				for (NSDate *reportDate in reportTypes[reportType]) {
+					message = [message stringByAppendingFormat:@"\n%@", [dateFormatter stringFromDate:reportDate]];
 				}
-				
-				UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil)
-																	message:message
-																   delegate:nil
-														  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-														  otherButtonTitles:nil];
-				[alertView show];
 			}
-		});
+			
+			[self showErrorWithMessage:message];
+		}
 		
 		BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
 		if (downloadPayments && ((numberOfReportsDownloaded > 0) || (account.payments.count == 0))) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
-				_account.downloadProgress = 0.9;
-			});
+			[self downloadProgress:0.9f withStatus:NSLocalizedString(@"Loading payments...", nil)];
 			
 			LoginManager *loginManager = [[LoginManager alloc] initWithAccount:_account];
 			loginManager.shouldDeleteCookies = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDeleteCookies];
@@ -294,25 +255,9 @@
 			[loginManager logIn];
 		} else {
 			if (numberOfReportsDownloaded > 0) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-					_account.downloadProgress = 1.0;
-					_account.isDownloadingReports = NO;
-					[UIApplication sharedApplication].idleTimerDisabled = NO;
-					if (backgroundTaskID != UIBackgroundTaskInvalid) {
-						[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-					}
-				});
+				[self completeDownload];
 			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					_account.downloadStatus = NSLocalizedString(@"No new reports found", nil);
-					_account.downloadProgress = 1.0;
-					_account.isDownloadingReports = NO;
-					[UIApplication sharedApplication].idleTimerDisabled = NO;
-					if (backgroundTaskID != UIBackgroundTaskInvalid) {
-						[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-					}
-				});
+				[self completeDownloadWithStatus:NSLocalizedString(@"No new reports found", nil)];
 			}
 		}
 		
@@ -332,10 +277,7 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
 			
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
-				_account.downloadProgress = 0.95;
-			});
+			[self downloadProgress:0.95f withStatus:NSLocalizedString(@"Loading payments...", nil)];
 			
 			NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 			[moc setPersistentStoreCoordinator:psc];
@@ -349,22 +291,17 @@
 			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:nil error:nil];
 			
 			if (self.isCancelled) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-					_account.downloadProgress = 1.0;
-					_account.isDownloadingReports = NO;
-					[UIApplication sharedApplication].idleTimerDisabled = NO;
-					if (backgroundTaskID != UIBackgroundTaskInvalid) {
-						[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-					}
-				});
+				[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 				return;
 			} else if (paymentsPageData) {
 				NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
 				
 				NSString *switchVendorAction = nil;
 				NSString *switchVendorSelectName = nil;
+				
+				NSString *selectedVendor = nil;
 				NSMutableArray *vendorOptions = [NSMutableArray array];
+				
 				NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
 				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:nil];
 				[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:nil];
@@ -383,11 +320,12 @@
 								[vendorFormScanner scanUpToString:@"\"" intoString:&switchVendorSelectName];
 								[vendorFormScanner scanUpToString:@"<option" intoString:nil];
 								while ([vendorFormScanner scanString:@"<option" intoString:nil]) {
+									NSString *selected = nil;
 									NSString *value = nil;
 									NSString *vendorID = nil;
 									
-									// Parse vendor index.
-									[vendorFormScanner scanUpToString:@"value=\"" intoString:nil];
+									// Parse vendor index and whether it's selected.
+									[vendorFormScanner scanUpToString:@"value=\"" intoString:&selected];
 									[vendorFormScanner scanString:@"value=\"" intoString:nil];
 									[vendorFormScanner scanUpToString:@"\"" intoString:&value];
 									
@@ -398,10 +336,17 @@
 									[vendorFormScanner scanString:@"- " intoString:nil];
 									[vendorFormScanner scanUpToString:@"</option>" intoString:&vendorID];
 									
-									NSMutableDictionary *vendorOption = [[NSMutableDictionary alloc] init];
-									vendorOption[@"id"] = vendorID;
-									vendorOption[@"value"] = value;
-									[vendorOptions addObject:vendorOption];
+									// Clean up vendor ID, just in case.
+									vendorID = [vendorID stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+									
+									if ((selected != nil) && ([selected rangeOfString:@"selected"].location != NSNotFound)) {
+										selectedVendor = vendorID;
+									} else {
+										NSMutableDictionary *vendorOption = [[NSMutableDictionary alloc] init];
+										vendorOption[@"id"] = vendorID;
+										vendorOption[@"value"] = value;
+										[vendorOptions addObject:vendorOption];
+									}
 									
 									[vendorFormScanner scanUpToString:@"<option" intoString:nil];
 								}
@@ -410,7 +355,13 @@
 					}
 				}
 				
-				[self parsePaymentsPage:paymentsPage inAccount:account vendorID:@""];
+				if (selectedVendor.integerValue <= 0) {
+					[self completeDownload];
+					[self showErrorWithMessage:NSLocalizedString(@"Downloading payments from iTunes Connect failed because the page could not be parsed.\nSource code changes might need to be made to fix this problem.", nil)];
+					return;
+				}
+				
+				[self parsePaymentsPage:paymentsPage inAccount:account vendorID:selectedVendor];
 				for (NSDictionary *additionalVendorOption in vendorOptions) {
 					NSString *bodyString = [NSString stringWithFormat:@"%@=%@", switchVendorSelectName, additionalVendorOption[@"value"]];
 					NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
@@ -452,29 +403,13 @@
 				}];
 			}
 			
-			dispatch_async(dispatch_get_main_queue(), ^{
-				_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-				_account.downloadProgress = 1.0;
-				_account.isDownloadingReports = NO;
-				[UIApplication sharedApplication].idleTimerDisabled = NO;
-				if (backgroundTaskID != UIBackgroundTaskInvalid) {
-					[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-				}
-			});
+			[self completeDownload];
 		}
 	});
 }
 
 - (void)loginFailed {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		_account.downloadStatus = NSLocalizedString(@"Finished", nil);
-		_account.downloadProgress = 1.0;
-		_account.isDownloadingReports = NO;
-		[UIApplication sharedApplication].idleTimerDisabled = NO;
-		if (backgroundTaskID != UIBackgroundTaskInvalid) {
-			[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-		}
-	});
+	[self completeDownload];
 }
 
 - (void)parsePaymentsPage:(NSString *)paymentsPage inAccount:(ASAccount *)account vendorID:(NSString *)vendorID {
@@ -545,6 +480,43 @@
 					}
 				}
 			}
+		}
+	});
+}
+
+#pragma mark - Helper Methods
+
+- (void)showErrorWithMessage:(NSString *)message {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error", nil)
+																				 message:message
+																		  preferredStyle:UIAlertControllerStyleAlert];
+		[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleCancel handler:nil]];
+		[alertController show];
+	});
+}
+
+- (void)downloadProgress:(CGFloat)progress withStatus:(NSString *)status {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if (status != nil) {
+			_account.downloadStatus = status;
+		}
+		_account.downloadProgress = progress;
+	});
+}
+
+- (void)completeDownload {
+	[self completeDownloadWithStatus:NSLocalizedString(@"Finished", nil)];
+}
+
+- (void)completeDownloadWithStatus:(NSString *)status {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		_account.downloadStatus = status;
+		_account.downloadProgress = 1.0f;
+		_account.isDownloadingReports = NO;
+		[UIApplication sharedApplication].idleTimerDisabled = NO;
+		if (backgroundTaskID != UIBackgroundTaskInvalid) {
+			[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
 		}
 	});
 }

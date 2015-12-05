@@ -14,5 +14,6 @@
 	#import <CoreData/CoreData.h>
 	#import <QuartzCore/QuartzCore.h>
 	#import "GlobalSettings.h"
+	#import "UIAlertController+Window.h"
 	#import "UIViewController+Orientation.h"
 #endif

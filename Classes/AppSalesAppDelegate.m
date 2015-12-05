@@ -76,7 +76,6 @@
 		[[NSUserDefaults standardUserDefaults] setObject:@"productId" forKey:@"ProductSortby"];
 	}
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportDownloadFailed:) name:ASReportDownloadFailedNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeDownloadFailed:) name:ASPromoCodeDownloadFailedNotification object:nil];
 	
 	if (launchOptions[UIApplicationLaunchOptionsURLKey]) {
@@ -362,16 +361,6 @@
 	NSURL *appSupportDirectory = [[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
 	[[NSFileManager defaultManager] createDirectoryAtPath:[appSupportDirectory path] withIntermediateDirectories:YES attributes:nil error:nil];
 	return appSupportDirectory;
-}
-
-- (void)reportDownloadFailed:(NSNotification *)notification {
-	NSString *errorMessage = notification.userInfo[kASReportDownloadErrorDescription];
-	NSString *alertMessage = [NSString stringWithFormat:NSLocalizedString(@"Downloading reports from iTunes Connect failed. Please try again later or check the iTunes Connect website for anything unusual. %@", nil), errorMessage ?: @""];
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
-								 message:alertMessage 
-								delegate:nil 
-					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-					   otherButtonTitles:nil] show];
 }
 
 - (void)promoCodeDownloadFailed:(NSNotification *)notification {

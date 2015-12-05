@@ -9,9 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "LoginManager.h"
 
-#define kASReportDownloadErrorDescription	@"error"
-#define ASReportDownloadFailedNotification	@"ASReportDownloadFailedNotification"
-
 @class ASAccount;
 
 @interface ReportDownloadOperation : NSOperation <LoginManagerDelegate> {

@@ -644,6 +644,7 @@
 		DA7B08C31C1312F500BEAB57 /* SSKeychain.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA7B08BD1C1312F500BEAB57 /* SSKeychain.strings */; };
 		DA7B08C41C1312F500BEAB57 /* SSKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C01C1312F500BEAB57 /* SSKeychain.m */; };
 		DA7B08C51C1312F500BEAB57 /* SSKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C21C1312F500BEAB57 /* SSKeychainQuery.m */; };
+		DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
@@ -1360,6 +1361,8 @@
 		DA7B08C01C1312F500BEAB57 /* SSKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychain.m; sourceTree = "<group>"; };
 		DA7B08C11C1312F500BEAB57 /* SSKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSKeychainQuery.h; sourceTree = "<group>"; };
 		DA7B08C21C1312F500BEAB57 /* SSKeychainQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychainQuery.m; sourceTree = "<group>"; };
+		DA7B08C71C135EA300BEAB57 /* UIAlertController+Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertController+Window.h"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.h"; sourceTree = SOURCE_ROOT; };
+		DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertController+Window.m"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.m"; sourceTree = SOURCE_ROOT; };
 		DA9DB1B11C0FEC48007B0178 /* LoginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginManager.h; sourceTree = "<group>"; };
 		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
@@ -2289,6 +2292,7 @@
 		DA49843E1C129F9E009BFC8F /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
+				DA7B08C61C135E9500BEAB57 /* FFGlobalAlertController */,
 				DA4984421C12A887009BFC8F /* MBProgressHUD */,
 				DA7B08BC1C1312F500BEAB57 /* SSKeychain */,
 				DA49842C1C129F95009BFC8F /* ZIPArchive */,
@@ -2317,6 +2321,15 @@
 			name = SSKeychain;
 			path = Vendor/SSKeychain/SSKeychain;
 			sourceTree = SOURCE_ROOT;
+		};
+		DA7B08C61C135E9500BEAB57 /* FFGlobalAlertController */ = {
+			isa = PBXGroup;
+			children = (
+				DA7B08C71C135EA300BEAB57 /* UIAlertController+Window.h */,
+				DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */,
+			);
+			name = FFGlobalAlertController;
+			sourceTree = "<group>";
 		};
 		DA9DB1B71C0FEC4C007B0178 /* Login Manager */ = {
 			isa = PBXGroup;
@@ -3019,6 +3032,7 @@
 				DA7B08C51C1312F500BEAB57 /* SSKeychainQuery.m in Sources */,
 				6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */,
 				DA4357F81C10E33D0056702C /* ReviewsParser.m in Sources */,
+				DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */,
 				DA49843A1C129F95009BFC8F /* mztools.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

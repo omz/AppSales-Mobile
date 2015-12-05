@@ -7,3 +7,6 @@
 [submodule "Vendor/SSKeychain"]
 	path = Vendor/SSKeychain
 	url = https://github.com/nicolasgomollon/SSKeychain.git
+[submodule "Vendor/FFGlobalAlertController"]
+	path = Vendor/FFGlobalAlertController
+	url = https://github.com/agilityvision/FFGlobalAlertController.git
