@@ -1,3 +1,6 @@
 [submodule "Vendor/ZIPArchive"]
 	path = Vendor/ZIPArchive
 	url = https://github.com/nicolasgomollon/ZIPArchive.git
+[submodule "Vendor/MBProgressHUD"]
+	path = Vendor/MBProgressHUD
+	url = https://github.com/jdg/MBProgressHUD.git

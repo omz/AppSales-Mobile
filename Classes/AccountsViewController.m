@@ -617,7 +617,8 @@
 
 - (void)doExport {
 	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-	hud.labelText = NSLocalizedString(@"Exporting...", nil);
+	hud.mode = MBProgressHUDModeDeterminateHorizontalBar;//MBProgressHUDModeDeterminate;
+	hud.labelText = NSLocalizedString(@"Exporting", nil);
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSURL *documentsURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
@@ -632,6 +633,9 @@
 		reportExportQueue.maxConcurrentOperationCount = NSOperationQueueDefaultMaxConcurrentOperationCount;
 		reportExportQueue.qualityOfService = NSQualityOfServiceUserInitiated;
 		
+		__block NSNumber *exportedReports = @(0);
+		__block NSUInteger totalReports = self.selectedAccount.dailyReports.count + self.selectedAccount.weeklyReports.count;
+		
 		void (^exportBlock)(Report *report) = ^(Report *report) {
 			NSString *csv = [report valueForKeyPath:@"originalReport.content"];
 			NSString *filename = [report valueForKeyPath:@"originalReport.filename"];
@@ -640,6 +644,11 @@
 			}
 			NSURL *reportURL = [exportURL URLByAppendingPathComponent:filename];
 			[csv writeToURL:reportURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
+			
+			@synchronized(exportedReports) {
+				exportedReports = @(exportedReports.unsignedIntegerValue + 1);
+				hud.progress = ((CGFloat)exportedReports.unsignedIntegerValue / (CGFloat)totalReports);
+			}
 		};
 		
 		[reportExportQueue addOperationWithBlock:^{
@@ -659,6 +668,9 @@
 		}];
 		
 		[reportExportQueue waitUntilAllOperationsAreFinished];
+		
+		hud.mode = MBProgressHUDModeIndeterminate;
+		hud.labelText = NSLocalizedString(@"Compressing", nil);
 		
 		ZIPArchive *zipArchive = [[ZIPArchive alloc] initWithFileURL:exportedReportsZipFileURL];
 		[zipArchive addDirectoryToArchive:exportURL];

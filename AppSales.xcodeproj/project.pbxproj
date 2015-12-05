@@ -41,7 +41,6 @@
 		7F2946F113D8806F0023F530 /* MapView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F2946F013D8806E0023F530 /* MapView.m */; };
 		7F3796CC13F8245800FA6E49 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F3796C913F8244000FA6E49 /* MessageUI.framework */; };
 		7F3796CD13F8246200FA6E49 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F1499CC13BE172300D89064 /* libz.dylib */; };
-		7F398EBD13DE1F2D004BEC44 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */; };
 		7F398EC313DE75B2004BEC44 /* Lock.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F398EC213DE75B2004BEC44 /* Lock.png */; };
 		7F398EC913DE7E3A004BEC44 /* Unlock.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F398EC813DE7E3A004BEC44 /* Unlock.png */; };
 		7F398ECB13DE7F14004BEC44 /* LockIndicator.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F398ECA13DE7F14004BEC44 /* LockIndicator.png */; };
@@ -642,6 +641,7 @@
 		DA49843B1C129F95009BFC8F /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = DA4984331C129F95009BFC8F /* unzip.c */; };
 		DA49843C1C129F95009BFC8F /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = DA4984351C129F95009BFC8F /* zip.c */; };
 		DA49843D1C129F95009BFC8F /* ZIPArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA4984381C129F95009BFC8F /* ZIPArchive.mm */; };
+		DA4984411C12A884009BFC8F /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4984401C12A884009BFC8F /* MBProgressHUD.m */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
@@ -704,8 +704,6 @@
 		7F2946EF13D8806E0023F530 /* MapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapView.h; sourceTree = "<group>"; };
 		7F2946F013D8806E0023F530 /* MapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapView.m; sourceTree = "<group>"; };
 		7F3796C913F8244000FA6E49 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
-		7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
-		7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		7F398EC213DE75B2004BEC44 /* Lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Lock.png; sourceTree = "<group>"; };
 		7F398EC813DE7E3A004BEC44 /* Unlock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Unlock.png; sourceTree = "<group>"; };
 		7F398ECA13DE7F14004BEC44 /* LockIndicator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LockIndicator.png; sourceTree = "<group>"; };
@@ -1355,6 +1353,8 @@
 		DA4984361C129F95009BFC8F /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
 		DA4984371C129F95009BFC8F /* ZIPArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZIPArchive.h; sourceTree = "<group>"; };
 		DA4984381C129F95009BFC8F /* ZIPArchive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZIPArchive.mm; sourceTree = "<group>"; };
+		DA49843F1C12A884009BFC8F /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBProgressHUD.h; path = Vendor/MBProgressHUD/MBProgressHUD.h; sourceTree = SOURCE_ROOT; };
+		DA4984401C12A884009BFC8F /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = Vendor/MBProgressHUD/MBProgressHUD.m; sourceTree = SOURCE_ROOT; };
 		DA9DB1B11C0FEC48007B0178 /* LoginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginManager.h; sourceTree = "<group>"; };
 		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
@@ -1705,8 +1705,6 @@
 				7F1499C913BE15F500D89064 /* NSData+Compression.m */,
 				7FFE4BB313BD4B9700D9D078 /* NSDictionary+HTTP.h */,
 				7FFE4BB413BD4B9700D9D078 /* NSDictionary+HTTP.m */,
-				7F398EBB13DE1F2D004BEC44 /* MBProgressHUD.h */,
-				7F398EBC13DE1F2D004BEC44 /* MBProgressHUD.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -2304,9 +2302,19 @@
 		DA49843E1C129F9E009BFC8F /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
+				DA4984421C12A887009BFC8F /* MBProgressHUD */,
 				DA49842C1C129F95009BFC8F /* ZIPArchive */,
 			);
 			name = Vendor;
+			sourceTree = "<group>";
+		};
+		DA4984421C12A887009BFC8F /* MBProgressHUD */ = {
+			isa = PBXGroup;
+			children = (
+				DA49843F1C12A884009BFC8F /* MBProgressHUD.h */,
+				DA4984401C12A884009BFC8F /* MBProgressHUD.m */,
+			);
+			name = MBProgressHUD;
 			sourceTree = "<group>";
 		};
 		DA9DB1B71C0FEC4C007B0178 /* Login Manager */ = {
@@ -2948,6 +2956,7 @@
 				7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */,
 				7F709D6C13BCC3C80008DBAD /* SSKeychain.m in Sources */,
 				7F709D8C13BD03D40008DBAD /* SalesViewController.m in Sources */,
+				DA4984411C12A884009BFC8F /* MBProgressHUD.m in Sources */,
 				7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */,
 				7FFE4BB513BD4B9700D9D078 /* NSDictionary+HTTP.m in Sources */,
 				7F1499CA13BE15F500D89064 /* NSData+Compression.m in Sources */,
@@ -2975,7 +2984,6 @@
 				7FAB532C13DCFA7E0027274F /* AppIconView.m in Sources */,
 				7F4065CA13DD379B006148AA /* ReportDetailEntryCell.m in Sources */,
 				7F137EB313DDDABF004655D8 /* CountryDictionary.m in Sources */,
-				7F398EBD13DE1F2D004BEC44 /* MBProgressHUD.m in Sources */,
 				7F398ED213DF21F2004BEC44 /* Transaction.m in Sources */,
 				7F398ED513DF570E004BEC44 /* ReportDetailEntry.m in Sources */,
 				7F89BCDE13DFA45F001C607F /* ReviewDownloadManager.m in Sources */,
