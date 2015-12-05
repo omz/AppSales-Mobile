@@ -26,7 +26,7 @@
 		products = reviewProducts;
 		self.title = NSLocalizedString(@"Reviews", nil);
 		
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Check.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(markAllAsRead:)];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Check.png"] style:UIBarButtonItemStylePlain target:self action:@selector(markAllAsRead:)];
 	}
 	return self;
 }

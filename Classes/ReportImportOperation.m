@@ -40,7 +40,7 @@
 - (void)main {
 	@autoreleasepool {
 	
-		dispatch_async(dispatch_get_main_queue(), ^ {
+		dispatch_async(dispatch_get_main_queue(), ^{
 			_account.downloadStatus = NSLocalizedString(@"Starting import", nil);
 			_account.downloadProgress = 0.0;
 		});
@@ -78,7 +78,7 @@
 		NSFileManager *fm = [[NSFileManager alloc] init];
 		NSArray *fileNames = [fm contentsOfDirectoryAtPath:docPath error:NULL];
 		
-		dispatch_async(dispatch_get_main_queue(), ^ {
+		dispatch_async(dispatch_get_main_queue(), ^{
 			_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (0/%i)...", nil), [fileNames count]];
 			_account.downloadProgress = 0.0;
 		});
@@ -121,15 +121,15 @@
 							[report generateCache];
 							
 							numberOfReportsImported++;
-							[psc lock];
-							NSError *saveError = nil;
-							[moc save:&saveError];
-							if (saveError) {
-								NSLog(@"Could not save context: %@", saveError);
-							}
-							[psc unlock];
+							__block NSError *saveError = nil;
+							[psc performBlockAndWait:^{
+								[moc save:&saveError];
+								if (saveError) {
+									NSLog(@"Could not save context: %@", saveError);
+								}
+							}];
 							if (i % 10 == 0) {
-								//Reset the context periodically to avoid excessive memory growth:
+								// Reset the context periodically to avoid excessive memory growth:
 								[moc reset];
 								account = (ASAccount *)[moc objectWithID:accountObjectID];
 							}
@@ -140,7 +140,7 @@
 					}
 				}
 				
-				dispatch_async(dispatch_get_main_queue(), ^ {
+				dispatch_async(dispatch_get_main_queue(), ^{
 					float progress = (float)i / (float)[fileNames count];
 					_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (%i/%i)...", nil), i, [fileNames count]];
 					_account.downloadProgress = progress;
@@ -150,12 +150,11 @@
 			i++;
 		}
 		
-		dispatch_async(dispatch_get_main_queue(), ^ {
+		dispatch_async(dispatch_get_main_queue(), ^{
 			_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Finished (%i imported)", nil), numberOfReportsImported];
 			_account.downloadProgress = 1.0;
 		});
 	}
 }
-
 
 @end

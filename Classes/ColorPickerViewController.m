@@ -15,8 +15,10 @@
 @synthesize delegate, name, selectedColor, context;
 
 - (id)initWithColors:(NSArray *)colorArray {
-	if (!(self = [super initWithNibName:nil bundle:nil])) return nil;
-	colors = colorArray;
+	self = [super init];
+	if (self) {
+		colors = colorArray;
+	}
 	return self;
 }
 

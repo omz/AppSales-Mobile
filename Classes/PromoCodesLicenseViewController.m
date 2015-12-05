@@ -15,7 +15,7 @@
 @synthesize webView;
 
 - (id)initWithLicenseAgreement:(NSString *)licenseAgreement operation:(DownloadStepOperation *)operation {
-	self = [super initWithNibName:nil bundle:nil];
+	self = [super init];
 	if (self) {
 		self.title = NSLocalizedString(@"License", nil);
 		licenseAgreementHTML = licenseAgreement;
@@ -52,7 +52,7 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);

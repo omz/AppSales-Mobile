@@ -170,7 +170,7 @@
 				NSInteger day = [[temp1 substringFromIndex:3] intValue];
 				
 				// Combine date and time into components.
-				NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+				NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 				NSDateComponents *components = [[NSDateComponents alloc] init];
 				[components setYear:year];
 				[components setMonth:month];
@@ -216,21 +216,21 @@
 				}
 			}
 			
-			[psc lock];
-			NSError *saveError = nil;
-			[moc save:&saveError];
-			if (saveError) {
-				NSLog(@"Could not save context: %@", saveError);
-			}
-			[psc unlock];
+			[psc performBlockAndWait:^{
+				NSError *saveError = nil;
+				[moc save:&saveError];
+				if (saveError) {
+					NSLog(@"Could not save context: %@", saveError);
+				}
+			}];
 			
 			if (changesMade && (parser.reviews.count >= 20)) {
-				dispatch_async(dispatch_get_main_queue(), ^ {
+				dispatch_async(dispatch_get_main_queue(), ^{
 					page++;
 					[self start];
 				});
 			} else {
-				dispatch_async(dispatch_get_main_queue(), ^ {
+				dispatch_async(dispatch_get_main_queue(), ^{
 					if (!canceled) {
 						[self.delegate reviewDownloadDidFinish:self];
 					}

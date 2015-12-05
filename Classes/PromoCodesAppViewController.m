@@ -99,7 +99,7 @@
 	vc.doneButtonTitle = NSLocalizedString(@"Request", nil);
 	vc.cancelButtonTitle = NSLocalizedString(@"Cancel", nil);
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		navController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
 	[self presentViewController:navController animated:YES completion:nil];
@@ -115,7 +115,7 @@
 	}
 	UIActionSheet *deleteSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Promo Codes", nil) otherButtonTitles:nil];
 	deleteSheet.tag = kDeleteCodesSheetTag;
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		self.activeSheet = deleteSheet;
 		[deleteSheet showFromBarButtonItem:sender animated:YES];
 	} else {
@@ -135,7 +135,7 @@
 							 NSLocalizedString(@"Email All Codes", nil), 
 							 NSLocalizedString(@"Copy All Codes", nil), nil];
 	sheet.tag = kActionsAllCodesSheetTag;
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		[sheet showFromBarButtonItem:sender animated:YES];
 		self.activeSheet = sheet;
 	} else {
@@ -166,7 +166,7 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);

@@ -16,14 +16,14 @@
 @synthesize scrollView, pageControl;
 
 - (id)initWithAccount:(ASAccount *)paymentAccount {
-	self = [super initWithNibName:nil bundle:nil];
+	self = [super init];
 	if (self) {
 		account = paymentAccount;
 		self.title = NSLocalizedString(@"Payments", nil);
 		self.tabBarItem.image = [UIImage imageNamed:@"Payments.png"];
-		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
+		self.hidesBottomBarWhenPushed = [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
 		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePayments:)];
-		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 			[account addObserver:self forKeyPath:@"payments" options:NSKeyValueObservingOptionNew context:nil];
 		}
 	}
@@ -106,8 +106,8 @@
 	
 	NSArray *sortedYears = [[paymentsByYear allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	if ([sortedYears count] == 0) {
-		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-		NSDateComponents *currentYearComponents = [calendar components:NSYearCalendarUnit fromDate:[NSDate date]];
+		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+		NSDateComponents *currentYearComponents = [calendar components:NSCalendarUnitYear fromDate:[NSDate date]];
 		NSInteger currentYear = [currentYearComponents year];
 		sortedYears = [NSArray arrayWithObject:[NSNumber numberWithInteger:currentYear]];
 	}
@@ -138,23 +138,6 @@
 	[self reloadData];
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-	[self reloadData];
-	CATransition *fadeTransition = [CATransition animation];
-	fadeTransition.duration = duration;
-	fadeTransition.type = kCATransitionFade;
-	fadeTransition.removedOnCompletion = YES;
-	fadeTransition.fillMode = kCAFillModeForwards;
-	
-	
-	//for (CALayer *aLayer in self.scrollView.layer.sublayers)
-	  //  [aLayer removeAllAnimations];
-	
-	
-	[self.scrollView.layer addAnimation:fadeTransition forKey:@"transition"];
-}
-
-
 - (void)deletePayments:(id)sender {
 	UIActionSheet *deletePaymentsSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all payments for this account? Payments will be reloaded from iTunes Connect when sales reports are downloaded.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Payments", nil) otherButtonTitles:nil];
 	[deletePaymentsSheet showInView:self.view];
@@ -164,7 +147,7 @@
 	if (buttonIndex != actionSheet.cancelButtonIndex) {
 		account.payments = [NSSet set];
 		[[account managedObjectContext] save:NULL];
-		if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 			[self.navigationController popViewControllerAnimated:YES];
 		}
 	}
@@ -183,14 +166,14 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (void)dealloc {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		[account removeObserver:self forKeyPath:@"payments"];
 	}
 }

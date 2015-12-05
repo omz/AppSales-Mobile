@@ -746,7 +746,7 @@
 		return nil;
 	}
 	
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 	[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 	NSDateComponents *components = [[NSDateComponents alloc] init];
 	[components setYear:year];

@@ -22,7 +22,7 @@
 @synthesize webView;
 
 - (id)initWithReview:(Review *)aReview {
-	self = [super initWithNibName:nil bundle:nil];
+	self = [super init];
 	if (self) {
 		review = aReview;
 	}
@@ -75,7 +75,7 @@
 	NSString *subject = [NSString stringWithFormat:@"Review from %@", review.user];
 	[mailComposeViewController setMessageBody:body isHTML:YES];
 	[mailComposeViewController setSubject:subject];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		mailComposeViewController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
 	[self presentViewController:mailComposeViewController animated:YES completion:nil];

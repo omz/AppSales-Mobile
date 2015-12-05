@@ -75,7 +75,7 @@
 			}
 		}
 		if (self.cancelButtonTitle) {
-			UIBarButtonItem *cancelButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.cancelButtonTitle style:UIBarButtonItemStyleBordered target:self action:@selector(cancel)];
+			UIBarButtonItem *cancelButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.cancelButtonTitle style:UIBarButtonItemStylePlain target:self action:@selector(cancel)];
 			self.navigationItem.leftBarButtonItem = cancelButtonItem;
 		}
 		if ([self.fieldSections count] == 1 && [[[self.fieldSections objectAtIndex:0] fields] count] == 1) {
@@ -106,7 +106,7 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return toInterfaceOrientation == UIInterfaceOrientationPortrait;

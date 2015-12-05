@@ -51,11 +51,11 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	
-	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStyleBordered target:self action:nil];
+	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStylePlain target:self action:nil];
 	self.navigationItem.backBarButtonItem = backButton;
 	
 	self.refreshButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReports:)];
-	UIBarButtonItem *settingsButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Settings", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(showSettings)];
+	UIBarButtonItem *settingsButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Settings", nil) style:UIBarButtonItemStylePlain target:self action:@selector(showSettings)];
 	UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
 	[infoButton addTarget:self action:@selector(showInfo:) forControlEvents:UIControlEventTouchUpInside];
@@ -79,7 +79,7 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"isBusy"]) {
-		dispatch_async(dispatch_get_main_queue(), ^ {
+		dispatch_async(dispatch_get_main_queue(), ^{
 			self.refreshButtonItem.enabled = ![[ReportDownloadCoordinator sharedReportDownloadCoordinator] isBusy];
 		});
 	}
@@ -125,7 +125,7 @@
 - (void)showInfo:(id)sender {
 	AboutViewController *aboutViewController = [[AboutViewController alloc] init];
 	UINavigationController *aboutNavController = [[UINavigationController alloc] initWithRootViewController:aboutViewController];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		aboutNavController.modalPresentationStyle = UIModalPresentationFormSheet;
 	} else {
 		aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
@@ -142,7 +142,7 @@
 #pragma mark - Table view
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return nil;
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) return nil;
 	
 	if ([self.accounts count] == 0) {
 		return nil;
@@ -156,7 +156,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return 1;
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) return 1;
 	
 	if ([self.accounts count] == 0) {
 		return 1;
@@ -165,7 +165,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return self.accounts.count;
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) return self.accounts.count;
 	
 	if ([self.accounts count] == 0) {
 		return 0;
@@ -179,7 +179,7 @@
 	if (cell == nil) {
 		cell = [[BadgedCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
 	}
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		cell.textLabel.text = [[self.accounts objectAtIndex:indexPath.row] displayName];
 		cell.accessoryType = UITableViewCellAccessoryDetailDisclosureButton;
 		return cell;
@@ -228,7 +228,7 @@
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) return nil;
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) return nil;
 	
 	if ([self.accounts count] == 0) {
 		return nil;
@@ -247,7 +247,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		if (self.delegate) {
 			ASAccount *account = [self.accounts objectAtIndex:indexPath.row];
 			[self.delegate accountsViewController:self didSelectAccount:account];
@@ -322,7 +322,7 @@
 	addAccountViewController.editorIdentifier = kAddNewAccountEditorIdentifier;
 	UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:addAccountViewController];
 	
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		navigationController.modalPresentationStyle = UIModalPresentationFormSheet;
 		
 	}
@@ -383,7 +383,7 @@
 	editAccountViewController.delegate = self;
 	editAccountViewController.editorIdentifier = kEditAccountEditorIdentifier;
 	editAccountViewController.context = account;
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 		editAccountViewController.hidesBottomBarWhenPushed = YES;
 	}
 	
@@ -452,7 +452,7 @@
 	settingsViewController.editorIdentifier = kSettingsEditorIdentifier;
 	
 	settingsNavController = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		settingsNavController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
 	[self presentViewController:settingsNavController animated:YES completion:nil];

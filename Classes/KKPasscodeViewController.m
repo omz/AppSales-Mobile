@@ -86,7 +86,7 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-	return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) || (toInterfaceOrientation == UIInterfaceOrientationPortrait);
+	return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || (toInterfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (void)viewDidLoad {
@@ -171,7 +171,7 @@
 	[[_tableViews objectAtIndex:0] reloadData];
 	[[_textFields objectAtIndex:[_tableViews count] - 1] setReturnKeyType:UIReturnKeyDone];
 	
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		if ([_tableViews count] > 1) {
 			[self moveToNextTableView];
 			[self moveToPreviousTableView];
@@ -277,7 +277,7 @@
 		_enterPasscodeTextField.delegate = nil;
 		
 		if (_eraseData) {
-			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 				[UIView beginAnimations:@"fadeIn" context:nil];
 				[UIView setAnimationDelay:0.25];
 				[UIView setAnimationDuration:0.5];
@@ -410,7 +410,7 @@
 	if (self.mode == KKPasscodeModeEnter) {
 		NSString *passcode = [KKKeychain getStringForKey:@"passcode"];
 		if ([_enterPasscodeTextField.text isEqualToString:passcode]) {
-			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 				[UIView beginAnimations:@"fadeIn" context:nil];
 				[UIView setAnimationDelay:0.25];
 				[UIView setAnimationDuration:0.5];
@@ -700,7 +700,7 @@
 			} else if (self.mode == KKPasscodeModeEnter) {
 				NSString *passcode = [KKKeychain getStringForKey:@"passcode"];
 				if ([_enterPasscodeTextField.text isEqualToString:passcode]) {
-					if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+					if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 						[UIView beginAnimations:@"fadeIn" context:nil];
 						[UIView setAnimationDelay:0.25];
 						[UIView setAnimationDuration:0.5];

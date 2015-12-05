@@ -21,7 +21,7 @@
 }
 
 - (void)drawRect:(CGRect)rect {
-	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
+	BOOL iPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad;
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	CGContextSaveGState(c);
 	
@@ -60,9 +60,9 @@
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM"];
 	[monthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 	[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-	NSDateComponents *currentDateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:[NSDate date]];
+	NSDateComponents *currentDateComponents = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth fromDate:[NSDate date]];
 	NSInteger currentYear = [currentDateComponents year];
 	NSInteger currentMonth = [currentDateComponents month];
 	

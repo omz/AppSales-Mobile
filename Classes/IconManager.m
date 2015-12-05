@@ -72,7 +72,7 @@
 	NSString *nextAppID = [[downloadQueue objectAtIndex:0] copy];
 	[downloadQueue removeObjectAtIndex:0];
 	
-	dispatch_async(queue, ^ {
+	dispatch_async(queue, ^{
 		NSString *iconURLStringPNG = [NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.png", [nextAppID substringToIndex:3], [nextAppID substringFromIndex:3]];
 		NSHTTPURLResponse *response = nil;
 		NSError *error = nil;
@@ -84,7 +84,7 @@
 		}
 		UIImage *icon = [UIImage imageWithData:iconData];
 		if (iconData && icon) {
-			dispatch_async(dispatch_get_main_queue(), ^ {
+			dispatch_async(dispatch_get_main_queue(), ^{
 				//Download was successful, write icon to file
 				NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:nextAppID];
 				[iconData writeToFile:iconPath atomically:YES];
@@ -92,14 +92,14 @@
 				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:[NSDictionary dictionaryWithObject:nextAppID forKey:kIconManagerDownloadedIconNotificationAppID]];
 			});
 		} else if (response) {
-			dispatch_async(dispatch_get_main_queue(), ^ {
+			dispatch_async(dispatch_get_main_queue(), ^{
 				//There was a response, but the download was not successful, write the default icon, so that we won't try again and again...
 				NSString *defaultIconPath = [[NSBundle mainBundle] pathForResource:@"GenericApp" ofType:@"png"];
 				NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:nextAppID];
 				[[NSFileManager defaultManager] copyItemAtPath:defaultIconPath toPath:iconPath error:NULL];
 			});
 		}
-		dispatch_async(dispatch_get_main_queue(), ^ {
+		dispatch_async(dispatch_get_main_queue(), ^{
 			isDownloading = NO;
 			[self dequeueDownload];
 		});
@@ -107,7 +107,7 @@
 }
 
 - (void)clearIconForAppID:(NSString *)appID {
-	dispatch_async(dispatch_get_main_queue(), ^ {
+	dispatch_async(dispatch_get_main_queue(), ^{
 		NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
 		[[NSFileManager defaultManager] removeItemAtPath:iconPath error:NULL];
 		[iconCache removeObjectForKey:appID];

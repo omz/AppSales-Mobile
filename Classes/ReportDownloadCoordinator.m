@@ -67,7 +67,7 @@
 	if (product.isDownloadingPromoCodes) return;
 	product.isDownloadingPromoCodes = YES;
 	PromoCodeOperation *operation = [[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes];
-	operation.completionBlock = ^ {
+	operation.completionBlock = ^{
 		dispatch_async(dispatch_get_main_queue(), ^{
 			product.isDownloadingPromoCodes = NO;
 		});
@@ -92,8 +92,8 @@
 	UIBackgroundTaskIdentifier backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
 		NSLog(@"Background task for importing has expired!");
 	}];
-	[operation setCompletionBlock:^ {
-		dispatch_async(dispatch_get_main_queue(), ^ {
+	[operation setCompletionBlock:^{
+		dispatch_async(dispatch_get_main_queue(), ^{
 			account.isDownloadingReports = NO;
 			[[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 			if (backgroundTaskID != UIBackgroundTaskInvalid) {

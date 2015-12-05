@@ -40,7 +40,7 @@
 - (id)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithAccount:anAccount];
 	if (self) {
-		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
+		self.title = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
 		self.tabBarItem.image = [UIImage imageNamed:@"Sales.png"];
 		
 		sortedDailyReports = [NSMutableArray new];
@@ -48,7 +48,7 @@
 		sortedCalendarMonthReports = [NSMutableArray new];
 		sortedFiscalMonthReports = [NSMutableArray new];
 		
-		calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+		calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 		[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		
 		dateFormatter = [[NSDateFormatter alloc] init];
@@ -87,7 +87,7 @@
 		self.viewMode = DashboardViewModeRevenue;
 	}
 	
-	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
+	BOOL iPad = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
 	
 	CGFloat graphHeight = iPad ? 450.0 : self.view.bounds.size.height * 0.5;
 	self.graphView = [[GraphView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, graphHeight)];
@@ -145,10 +145,10 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	previousOrientation = self.interfaceOrientation;
+	previousOrientation = [UIApplication sharedApplication].statusBarOrientation;
 	[self reloadData];
 	
-	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStyleBordered target:self action:nil];
+	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStylePlain target:self action:nil];
 	self.navigationItem.backBarButtonItem = backButton;
 }
 
@@ -159,8 +159,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
-	if (self.interfaceOrientation != previousOrientation) {
-		[self willAnimateRotationToInterfaceOrientation:self.interfaceOrientation duration:0.0];
+	if ([UIApplication sharedApplication].statusBarOrientation != previousOrientation) {
+		[self adjustInterfaceForOrientation:[UIApplication sharedApplication].statusBarOrientation];
 	}
 }
 
@@ -173,24 +173,32 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return UIInterfaceOrientationIsLandscape(interfaceOrientation) || interfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+	UIInterfaceOrientation toInterfaceOrientation = [self relativeOrientationFromTransform:coordinator.targetTransform];
+	[coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+		[self adjustInterfaceForOrientation:toInterfaceOrientation];
+	} completion:nil];
+}
+
+- (void)adjustInterfaceForOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if (self.selectedReportPopover.popoverVisible) {
 		[self.selectedReportPopover dismissPopoverAnimated:YES];
 	}
-	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+	
+	if (UIInterfaceOrientationIsLandscape(interfaceOrientation)) {
 		self.graphView.frame = self.view.bounds;
 		self.topView.frame = self.view.bounds;
 		self.productsTableView.alpha = 0.0;
 		self.shadowView.hidden = YES;
 		[self.graphView reloadValuesAnimated:NO];
 	} else {
-		CGFloat graphHeight = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad ? 450.0 : self.view.bounds.size.height * 0.5;
+		CGFloat graphHeight = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad ? 450.0 : self.view.bounds.size.height * 0.5;
 		self.graphView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
 		self.topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, graphHeight);
 		self.productsTableView.frame = CGRectMake(0, CGRectGetMaxY(self.topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - self.topView.bounds.size.height);
@@ -199,7 +207,8 @@
 		self.productsTableView.alpha = 1.0;
 		[self.graphView reloadValuesAnimated:NO];
 	}
-	previousOrientation = toInterfaceOrientation;
+	
+	previousOrientation = interfaceOrientation;
 }
 
 - (NSSet *)entityNamesTriggeringReload {
@@ -235,7 +244,7 @@
 	NSDateComponents *prevDateComponents = nil;
 	NSMutableArray *reportsInCurrentMonth = nil;
 	for (Report *dailyReport in sortedDailyReports) {
-		NSDateComponents *dateComponents = [calendar components:NSYearCalendarUnit | NSMonthCalendarUnit fromDate:dailyReport.startDate];
+		NSDateComponents *dateComponents = [calendar components:NSCalendarUnitYear | NSCalendarUnitMonth fromDate:dailyReport.startDate];
 		if (!prevDateComponents || (dateComponents.month != prevDateComponents.month || dateComponents.year != prevDateComponents.year)) {
 			// New month discovered. Make a new ReportCollection to gather all the daily reports in this month.
 			reportsInCurrentMonth = [NSMutableArray array];
@@ -326,7 +335,7 @@
 
 - (void)switchTab:(UISegmentedControl *)modeControl {
 	selectedTab = modeControl.selectedSegmentIndex;
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		if (selectedTab == 0) {
 			showWeeks = NO;
 		} else if (selectedTab == 1) {
@@ -486,7 +495,7 @@
 	if (selectedTab == 0) {
 		Report *report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
 		if (showWeeks) {
-			NSDateComponents *dateComponents = [calendar components:NSWeekdayOrdinalCalendarUnit fromDate:report.startDate];
+			NSDateComponents *dateComponents = [calendar components:NSCalendarUnitWeekdayOrdinal fromDate:report.startDate];
 			NSInteger weekdayOrdinal = [dateComponents weekdayOrdinal];
 			return [NSString stringWithFormat:@"W%li", (long)weekdayOrdinal];
 		} else {
@@ -511,7 +520,7 @@
 - (UIColor *)graphView:(GraphView *)graphView labelColorForXAxisAtIndex:(NSUInteger)index {
 	if (selectedTab == 0) {
 		id<ReportSummary> report = [((showWeeks) ? self.sortedWeeklyReports : self.sortedDailyReports) objectAtIndex:index];
-		NSDateComponents *dateComponents = [calendar components:NSDayCalendarUnit | NSWeekdayCalendarUnit fromDate:report.startDate];
+		NSDateComponents *dateComponents = [calendar components:NSCalendarUnitDay | NSCalendarUnitWeekday fromDate:report.startDate];
 		NSInteger weekday = [dateComponents weekday];
 		if (weekday == 1) {
 			return [UIColor colorWithRed:0.843 green:0.278 blue:0.282 alpha:1.0];
@@ -637,7 +646,7 @@
 	}
 	ReportDetailViewController *vc = [[ReportDetailViewController alloc] initWithReports:reports selectedIndex:index];
 	vc.selectedProduct = [self.selectedProducts lastObject];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 		[self.navigationController pushViewController:vc animated:YES];
 	} else {
 		if (self.selectedReportPopover.isPopoverVisible) {
@@ -652,7 +661,7 @@
 		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
 		self.selectedReportPopover = [[UIPopoverController alloc] initWithContentViewController:nav];
 		self.selectedReportPopover.passthroughViews = [NSArray arrayWithObjects:self.graphView, nil];
-		if (UIInterfaceOrientationIsPortrait(self.interfaceOrientation)) {
+		if (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
 			[self.selectedReportPopover presentPopoverFromRect:barFrame 
 														inView:self.graphView 
 									  permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];

@@ -15,7 +15,7 @@
 - (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
-		BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
+		BOOL iPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad;
 		barViews = [NSMutableArray new];
 		barLabels = [NSMutableArray new];
 		
@@ -165,7 +165,7 @@
 }
 
 - (CGRect)barFrameForRating:(NSInteger)rating {
-	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
+	BOOL iPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad;
 	if (!iPad) {
 		CGRect barFrame = CGRectMake(110, 12 + (5-rating) * 30, 145, 24);
 		return barFrame;

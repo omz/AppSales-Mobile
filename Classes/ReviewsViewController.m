@@ -19,7 +19,7 @@
 - (id)initWithAccount:(ASAccount *)anAccount {
 	self = [super initWithAccount:anAccount];
 	if (self) {
-		self.title = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
+		self.title = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
 		self.tabBarItem.image = [UIImage imageNamed:@"Reviews.png"];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reviewDownloadProgressDidChange:) name:ReviewDownloadManagerDidUpdateProgressNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
@@ -40,7 +40,7 @@
 - (void)loadView {
 	[super loadView];
 	
-	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStyleBordered target:self action:nil];
+	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStylePlain target:self action:nil];
 	self.navigationItem.backBarButtonItem = backButton;
 	
 	self.reviewSummaryView = [[ReviewSummaryView alloc] initWithFrame:self.topView.frame];
@@ -65,7 +65,7 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
@@ -170,7 +170,7 @@
 	if (!self.account) return;
 	
 	ReviewListViewController *vc = [[ReviewListViewController alloc] initWithAccount:self.account products:self.selectedProducts rating:rating];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 		[self.navigationController pushViewController:vc animated:YES];
 	} else {
 		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];

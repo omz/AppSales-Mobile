@@ -20,11 +20,11 @@
 @synthesize activeSheet;
 
 - (id)initWithAccount:(ASAccount *)anAccount {
-	self = [super initWithNibName:nil bundle:nil];
+	self = [super init];
 	if (self) {
 		self.account = anAccount;
 		self.selectedProducts = nil;
-		self.hidesBottomBarWhenPushed = [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
+		self.hidesBottomBarWhenPushed = [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}
@@ -83,7 +83,7 @@
 	[super loadView];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
 	
-	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
+	BOOL iPad = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
 	
 	statusVisible = [self shouldShowStatusBar];
 	self.topView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]];
@@ -271,7 +271,7 @@
 	ColorPickerViewController *vc = [[ColorPickerViewController alloc] initWithColors:palette];
 	vc.delegate = self;
 	vc.context = product;
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 		vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
 		[self presentViewController:vc animated:YES completion:nil];
 	} else {
@@ -286,7 +286,7 @@
 	product.color = color;
 	[product.managedObjectContext save:NULL];
 	[self reloadTableView];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
 		[picker dismissViewControllerAnimated:YES completion:nil];
 	} else {
 		[self.colorPopover dismissPopoverAnimated:YES];

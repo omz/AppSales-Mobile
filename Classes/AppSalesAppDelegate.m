@@ -29,7 +29,7 @@
 	[[KKPasscodeLock sharedLock] setEraseOption:NO];
 	
 	srandom((unsigned)time(NULL));
-	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 	
 	NSString *currencyCode = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
 	if (![[CurrencyManager sharedManager].availableCurrencies containsObject:currencyCode]) {
@@ -44,7 +44,7 @@
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(promoCodeLicenseAgreementLoaded:) name:@"PromoCodeOperationLoadedLicenseAgreementNotification" object:nil];
 	
-	BOOL iPad = [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad;
+	BOOL iPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad;
 	if (!iPad) {
 		AccountsViewController *rootViewController = [[AccountsViewController alloc] initWithStyle:UITableViewStyleGrouped];
 		rootViewController.managedObjectContext = self.managedObjectContext;
@@ -104,7 +104,7 @@
 }
 
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
-	BOOL iPad = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad);
+	BOOL iPad = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
 	NSUInteger orientations = iPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskAllButUpsideDown;
 	
 	if (self.window.rootViewController) {
@@ -141,10 +141,10 @@
 }
 
 - (void)loadAccount:(ASAccount *)account {
-	UIBarButtonItem *selectAccountButtonItem1 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)];
-	UIBarButtonItem *selectAccountButtonItem2 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)];
-	UIBarButtonItem *selectAccountButtonItem3 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)];
-	UIBarButtonItem *selectAccountButtonItem4 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStyleBordered target:self action:@selector(selectAccount:)];
+	UIBarButtonItem *selectAccountButtonItem1 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectAccount:)];
+	UIBarButtonItem *selectAccountButtonItem2 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectAccount:)];
+	UIBarButtonItem *selectAccountButtonItem3 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectAccount:)];
+	UIBarButtonItem *selectAccountButtonItem4 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Account", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectAccount:)];
 	
 	SalesViewController *salesVC = [[SalesViewController alloc] initWithAccount:account];
 	salesVC.navigationItem.leftBarButtonItem = selectAccountButtonItem1;
@@ -258,7 +258,7 @@
 		passcodeVC.delegate = self;
 		
 		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:passcodeVC];
-		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 			nav.modalPresentationStyle = UIModalPresentationFullScreen;
 			nav.navigationBar.barStyle = UIBarStyleBlack;
 			nav.navigationBar.opaque = NO;
@@ -293,14 +293,14 @@
 #pragma mark - Core Data
 
 - (void)saveContext {
-	[self.persistentStoreCoordinator lock];
-	NSError *error = nil;
-	NSManagedObjectContext *moc = self.managedObjectContext;
-	if ([moc hasChanges] && ![moc save:&error]) {
-		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		abort();
-	}
-	[self.persistentStoreCoordinator unlock];
+	[self.persistentStoreCoordinator performBlockAndWait:^{
+		NSError *error = nil;
+		NSManagedObjectContext *moc = self.managedObjectContext;
+		if ([moc hasChanges] && ![moc save:&error]) {
+			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+			abort();
+		}
+	}];
 }
 
 #pragma mark - Core Data stack
@@ -321,7 +321,7 @@
 
 - (void)mergeChanges:(NSNotification *)notification {
 	NSManagedObjectContext *moc = [notification object];
-	dispatch_async(dispatch_get_main_queue(), ^ {
+	dispatch_async(dispatch_get_main_queue(), ^{
 		if (moc != self.managedObjectContext && moc.persistentStoreCoordinator == self.persistentStoreCoordinator) {
 			[self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
 		};

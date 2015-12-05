@@ -126,7 +126,7 @@
 	CGFloat navigationBarHeight = self.navigationController.navigationBar.frame.size.height ?: 44.0f;
 	CGFloat topInset = self.topLayoutGuide.length ?: (statusBarHeight + navigationBarHeight);
 	
-	digitViewCenterYConstraint.constant = ((UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) || UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)) ? -((topInset + 216.0f) / 2.0f) : -((topInset + 162.0f) / 2.0f);
+	digitViewCenterYConstraint.constant = (([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || UIDeviceOrientationIsPortrait([UIDevice currentDevice].orientation)) ? -((topInset + 216.0f) / 2.0f) : -((topInset + 162.0f) / 2.0f);
 }
 
 - (void)viewDidLoad {

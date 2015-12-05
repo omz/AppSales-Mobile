@@ -50,7 +50,7 @@
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-	return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) || (toInterfaceOrientation == UIInterfaceOrientationPortrait);
+	return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || (toInterfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 #pragma mark -
@@ -184,7 +184,7 @@
 			
 			UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
 		 
-			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 				nav.modalPresentationStyle = UIModalPresentationFormSheet;
 				nav.navigationBar.barStyle = UIBarStyleBlack;
 				nav.navigationBar.opaque = NO;
@@ -205,7 +205,7 @@
 			UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
 			
 			
-			if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 				nav.modalPresentationStyle = UIModalPresentationFormSheet;
 				nav.navigationBar.barStyle = UIBarStyleBlack;
 				nav.navigationBar.opaque = NO;

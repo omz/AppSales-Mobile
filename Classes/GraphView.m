@@ -117,7 +117,6 @@
 	return NO;
 }
 
-
 - (void)setTitle:(NSString *)title {
 	titleLabel.text = title;
 }
@@ -201,7 +200,6 @@
 	
 	[scrollView flashScrollIndicators];
 }
-
 
 - (void)reloadValuesAnimated:(BOOL)animated {
 	[cachedValues removeAllObjects];
@@ -301,7 +299,7 @@
 	NSString *sectionLabelText = [self.dataSource graphView:self labelForSectionAtIndex:visibleRange.location];
 	[self.sectionLabelButton setTitle:sectionLabelText forState:UIControlStateNormal];
 	
-	//Remove views that are no longer visible:
+	// Remove views that are no longer visible.
 	for (NSNumber *visibleBarIndex in [visibleBarViews allKeys]) {
 		if (!NSLocationInRange([visibleBarIndex intValue], visibleRange)) {
 			UIView *barView = [visibleBarViews objectForKey:visibleBarIndex];
@@ -310,7 +308,7 @@
 		}
 	}
 	
-	//Add views that are visible now:
+	// Add views that are visible now.
 	for (NSInteger i = visibleRange.location; i < (visibleRange.location + visibleRange.length); i++) {
 		StackedBarView *barView = [visibleBarViews objectForKey:[NSNumber numberWithInteger:i]];
 		CGRect frameForBar = [self frameForBarAtIndex:i];
@@ -336,7 +334,7 @@
 			
 			NSString *xAxisLabelText = [self.dataSource graphView:self labelForXAxisAtIndex:i];
 			dateLabel.text = xAxisLabelText;
-			CGFloat separatorWidth = 1; //TODO: Ask datasource for separator size (larger for start of week/month)
+			CGFloat separatorWidth = 1; // TODO: Ask datasource for separator size (larger for start of week/month).
 			CGFloat separatorHeight = 4;
 			
 			dateLabel.textColor = [self.dataSource graphView:self labelColorForXAxisAtIndex:i];
@@ -379,7 +377,6 @@
 	}
 }
 
-
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
 	if (!maxLocked) {
 		float oldMax = max;
@@ -400,9 +397,7 @@
 	}
 }
 
-
 @end
-
 
 
 @implementation StackedBarView
@@ -430,7 +425,6 @@
 	}
 	return self;
 }
-
 
 - (void)setSegmentValues:(NSArray *)values {
 	[self setSegmentValues:values label:@""];
@@ -494,7 +488,6 @@
 	return selectedBackgroundView;
 }
 
-
 @end
 
 
@@ -536,17 +529,16 @@
 		LineView *lineView = [lineViews objectForKey:step];
 		[lineView setLabelText:[NSString stringWithFormat:@"%@%@", unit, step]];
 	}
-	
 }
 
 - (void)setMax:(float)newMax animated:(BOOL)animated {
 	float animationDuration = (animated) ? ANIMATION_DURATION : 0.0;
 	
-	[UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations: ^ {
-		//Don't attempt to do a transition animation if there were no lines visible before:
+	[UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
+		// Don't attempt to do a transition animation if there were no lines visible before.
 		BOOL wasEmpty = [lineViews count] == 0;
 		
-		//Calculate which lines should be visible:
+		// Calculate which lines should be visible.
 		float totalHeight = self.bounds.size.height;
 		int pickedUnit = 0;
 		for (NSNumber *possibleUnit in possibleUnits) {
@@ -611,7 +603,6 @@
 	max = newMax;
 }
 
-
 @end
 
 
@@ -637,7 +628,6 @@
 - (void)setLabelText:(NSString *)labelText {
 	label.text = labelText;
 }
-
 
 @end
 

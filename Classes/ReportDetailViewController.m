@@ -29,7 +29,7 @@
 @synthesize headerView, headerLabel, headerIconView;
 
 - (id)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex {
-	self = [super initWithNibName:nil bundle:nil];
+	self = [super init];
 	if (self) {
 		reports = reportsArray;
 		selectedReportIndex = selectedIndex;
@@ -55,7 +55,7 @@
 	
 	viewMode = (self.selectedProduct) ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
 	
-	mapHidden = mapHidden || UIInterfaceOrientationIsLandscape(self.interfaceOrientation);
+	mapHidden = mapHidden || UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation);
 	self.mapView = [[MapView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 208)];
 	mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	mapView.alpha = (mapHidden) ? 0.0 : 1.0;
@@ -86,7 +86,7 @@
 	[headerView addSubview:headerIconView];
 	[self.view addSubview:headerView];
 	
-	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(self.interfaceOrientation) ? 32.0 : 44.0;
+	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) ? 32.0 : 44.0;
 	
 	CGRect tableViewFrame = (mapHidden) ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
 	self.tableView = [[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain];
@@ -109,8 +109,8 @@
 	shadowView.alpha = 0.0;
 	[self.view addSubview:shadowView];
 	
-	if (!UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)];
+	if (!UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
 	}
 	
 	self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight)];
@@ -126,7 +126,7 @@
 	UIBarButtonItem *modeItem = [[UIBarButtonItem alloc] initWithCustomView:modeControl];
 	modeItem.width = 2 * segmentWidth;
 	
-	UIBarButtonItem *csvItem = [[UIBarButtonItem alloc] initWithTitle:@"CSV" style:UIBarButtonItemStyleBordered target:self action:@selector(showCSV:)];
+	UIBarButtonItem *csvItem = [[UIBarButtonItem alloc] initWithTitle:@"CSV" style:UIBarButtonItemStylePlain target:self action:@selector(showCSV:)];
 	csvItem.width = 40.0;
 	self.prevItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectPreviousReport:)];
 	self.nextItem  = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectNextReport:)];
@@ -135,7 +135,7 @@
 	spaceItem.width = 21.0;
 	
 	[self updateNavigationButtons];
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		toolbar.items = [NSArray arrayWithObjects:spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
 	} else {
 		toolbar.items = [NSArray arrayWithObjects:prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem, nil];
@@ -146,22 +146,24 @@
 	[self updateHeader];
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && !mapHidden) {
-		[self toggleMap:nil];
-	}
-	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(toInterfaceOrientation) ? 32.0 : 44.0;
-	self.toolbar.frame = CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight);
-	self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
-	self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-	if (!UIInterfaceOrientationIsLandscape(self.interfaceOrientation)) {
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStyleBordered target:self action:@selector(toggleMap:)];
-	} else {
-		self.navigationItem.rightBarButtonItem = nil;
-	}
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+	UIInterfaceOrientation toInterfaceOrientation = [self relativeOrientationFromTransform:coordinator.targetTransform];
+	[coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+		if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && !mapHidden) {
+			[self toggleMap:nil];
+		}
+		
+		CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(toInterfaceOrientation) ? 32.0 : 44.0;
+		self.toolbar.frame = CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight);
+		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
+		self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
+	} completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+		if (!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+			self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden) ? @"ShowMap.png" : @"HideMap.png"] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
+		} else {
+			self.navigationItem.rightBarButtonItem = nil;
+		}
+	}];
 }
 
 - (void)switchMode:(UISegmentedControl *)sender {
@@ -452,7 +454,4 @@
 	self.shadowView.alpha = MAX(0.0, MIN(1.0, (scrollView.contentOffset.y - 20) / 20.0));
 }
 
-
 @end
-
-

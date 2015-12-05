@@ -38,7 +38,7 @@
 	@autoreleasepool {
 		
 		int numberOfReportsDownloaded = 0;
-		dispatch_async(dispatch_get_main_queue(), ^ {
+		dispatch_async(dispatch_get_main_queue(), ^{
 			_account.downloadStatus = NSLocalizedString(@"Starting download", nil);
 			_account.downloadProgress = 0.0;
 		});
@@ -57,7 +57,7 @@
 			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 			[dateFormatter setDateFormat:@"yyyyMMdd"];
 			[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 			[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]]; 
 			
 			NSDate *today = [NSDate date];
@@ -65,7 +65,7 @@
 				// Find the next Sunday.
 				NSInteger weekday = -1;
 				while (YES) {
-					NSDateComponents *weekdayComponents = [calendar components:NSWeekdayCalendarUnit fromDate:today];
+					NSDateComponents *weekdayComponents = [calendar components:NSCalendarUnitWeekday fromDate:today];
 					weekday = [weekdayComponents weekday];
 					if (weekday == 1) {
 						break;
@@ -86,7 +86,7 @@
 				} else { // Weekly
 					date = [today dateByAddingTimeInterval:i * -7 * 24 * 60 * 60];
 				}
-				NSDateComponents *components = [calendar components:NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit fromDate:date];
+				NSDateComponents *components = [calendar components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:date];
 				NSDate *normalizedDate = [calendar dateFromComponents:components];
 				NSString *dateString = [dateFormatter stringFromDate:normalizedDate];
 				[availableReportDateStrings insertObject:dateString atIndex:0];
@@ -133,12 +133,12 @@
 				}
 				if (i == 0) {
 					if ([dateType isEqualToString:@"Daily"]) {
-						dispatch_async(dispatch_get_main_queue(), ^ {
+						dispatch_async(dispatch_get_main_queue(), ^{
 							_account.downloadStatus = NSLocalizedString(@"Checking for daily reports...", nil);
 							_account.downloadProgress = 0.1;
 						});
 					} else {
-						dispatch_async(dispatch_get_main_queue(), ^ {
+						dispatch_async(dispatch_get_main_queue(), ^{
 							_account.downloadStatus = NSLocalizedString(@"Checking for weekly reports...", nil);
 							_account.downloadProgress = 0.5;
 						});
@@ -146,13 +146,13 @@
 				} else {
 					if ([dateType isEqualToString:@"Daily"]) {
 						float progress = 0.5 * ((float)i / (float)numberOfReportsAvailable);
-						dispatch_async(dispatch_get_main_queue(), ^ {
+						dispatch_async(dispatch_get_main_queue(), ^{
 							_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %i", nil), i+1, numberOfReportsAvailable];
 							_account.downloadProgress = progress;
 						});
 					} else {
 						float progress = 0.5 + 0.4 * ((float)i / (float)numberOfReportsAvailable);
-						dispatch_async(dispatch_get_main_queue(), ^ {
+						dispatch_async(dispatch_get_main_queue(), ^{
 							_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %i", nil), i+1, numberOfReportsAvailable];
 							_account.downloadProgress = progress;
 						});
@@ -232,13 +232,13 @@
 							NSLog(@"Could not parse report %@", originalFilename);
 						}
 						// Save data.
-						[psc lock];
-						NSError *saveError = nil;
-						[moc save:&saveError];
-						if (saveError) {
-							NSLog(@"Could not save context: %@", saveError);
-						}
-						[psc unlock];
+						[psc performBlockAndWait:^{
+							NSError *saveError = nil;
+							[moc save:&saveError];
+							if (saveError) {
+								NSLog(@"Could not save context: %@", saveError);
+							}
+						}];
 					}
 				}
 				i++;
@@ -283,7 +283,7 @@
 		
 		BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
 		if (downloadPayments && ((numberOfReportsDownloaded > 0) || (account.payments.count == 0))) {
-			dispatch_async(dispatch_get_main_queue(), ^ {
+			dispatch_async(dispatch_get_main_queue(), ^{
 				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
 				_account.downloadProgress = 0.9;
 			});
@@ -317,13 +317,13 @@
 		}
 		
 		if ([moc hasChanges]) {
-			[psc lock];
-			NSError *saveError = nil;
-			[moc save:&saveError];
-			if (saveError) {
-				NSLog(@"Could not save context: %@", saveError);
-			}
-			[psc unlock];
+			[psc performBlockAndWait:^{
+				NSError *saveError = nil;
+				[moc save:&saveError];
+				if (saveError) {
+					NSLog(@"Could not save context: %@", saveError);
+				}
+			}];
 		}
 	}
 }
@@ -332,7 +332,7 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
 			
-			dispatch_async(dispatch_get_main_queue(), ^ {
+			dispatch_async(dispatch_get_main_queue(), ^{
 				_account.downloadStatus = NSLocalizedString(@"Loading payments...", nil);
 				_account.downloadProgress = 0.95;
 			});
@@ -443,13 +443,13 @@
 			//==== /Payments
 			
 			if ([moc hasChanges]) {
-				[psc lock];
-				NSError *saveError = nil;
-				[moc save:&saveError];
-				if (saveError) {
-					NSLog(@"Could not save context: %@", saveError);
-				}
-				[psc unlock];
+				[psc performBlockAndWait:^{
+					NSError *saveError = nil;
+					[moc save:&saveError];
+					if (saveError) {
+						NSLog(@"Could not save context: %@", saveError);
+					}
+				}];
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -503,7 +503,7 @@
 					[paymentMonthFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en-us"]];
 					[paymentMonthFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 					[paymentMonthFormatter setDateFormat:@"MMM yy"];
-					NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+					NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 					[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 					NSArray *amounts = ([[graphDict objectForKey:@"data"] count] >= 2) ? [[graphDict objectForKey:@"data"] objectAtIndex:1] : nil;
 					NSArray *labels = [graphDict objectForKey:@"labels"];
@@ -524,7 +524,7 @@
 								}
 								NSDate *labelDate = [paymentMonthFormatter dateFromString:label];
 								if (labelDate) {
-									NSDateComponents *dateComponents = [calendar components:NSMonthCalendarUnit | NSYearCalendarUnit fromDate:labelDate];
+									NSDateComponents *dateComponents = [calendar components:NSCalendarUnitMonth | NSCalendarUnitYear fromDate:labelDate];
 									NSInteger month = [dateComponents month];
 									NSInteger year = [dateComponents year];
 									NSString *paymentIdentifier = [NSString stringWithFormat:@"%@-%li-%li", vendorID, (long)month, (long)year];
