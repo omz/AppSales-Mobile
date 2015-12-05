@@ -19,7 +19,7 @@
 @class ASAccount;
 @protocol AccountsViewControllerDelegate;
 
-@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIAlertViewDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate> {
+@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate> {
 	id<AccountsViewControllerDelegate> __weak delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;
@@ -28,7 +28,6 @@
 	FieldSpecifier *passcodeLockField;
 	FieldEditorViewController *settingsViewController;
 	UINavigationController *settingsNavController;
-	NSString *exportedReportsZipPath;
 	UIDocumentInteractionController *documentInteractionController;
 	NSMutableDictionary *vendors;
 }
@@ -38,7 +37,6 @@
 @property (nonatomic, strong) NSArray *accounts;
 @property (nonatomic, strong) ASAccount *selectedAccount;
 @property (nonatomic, strong) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, strong) NSString *exportedReportsZipPath;
 @property (nonatomic, strong) UIDocumentInteractionController *documentInteractionController;
 
 - (void)reloadAccounts;

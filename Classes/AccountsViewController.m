@@ -26,9 +26,8 @@
 #import "PromoCodesViewController.h"
 #import "PromoCodesLicenseViewController.h"
 #import "KKPasscodeLock.h"
-#import "ZipFile.h"
-#import "ZipWriteStream.h"
 #import "IconManager.h"
+#import "ZIPArchive.h"
 
 #define kAddNewAccountEditorIdentifier		@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier		@"EditAccountEditorIdentifier"
@@ -47,7 +46,7 @@
 
 @implementation AccountsViewController
 
-@synthesize managedObjectContext, accounts, selectedAccount, refreshButtonItem, delegate, exportedReportsZipPath, documentInteractionController;
+@synthesize managedObjectContext, accounts, selectedAccount, refreshButtonItem, delegate, documentInteractionController;
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
@@ -617,58 +616,63 @@
 }
 
 - (void)doExport {
-	NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-	NSString *exportFolder = [self folderNameForExportingReportsOfAccount:self.selectedAccount];
-	NSString *exportPath = [docPath stringByAppendingPathComponent:exportFolder];
-	
 	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
 	hud.labelText = NSLocalizedString(@"Exporting...", nil);
-	double delayInSeconds = 0.25;
-	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-		[[NSFileManager defaultManager] createDirectoryAtPath:exportPath withIntermediateDirectories:YES attributes:nil error:NULL];
+	
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+		NSURL *documentsURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+		NSString *exportFolder = [self folderNameForExportingReportsOfAccount:self.selectedAccount];
+		NSURL *exportURL = [documentsURL URLByAppendingPathComponent:exportFolder];
+		NSURL *exportedReportsZipFileURL = [exportURL URLByAppendingPathExtension:@"zip"];
 		
-		void (^exportBlock)(Report *report) = ^ (Report *report) { 
+		[[NSFileManager defaultManager] removeItemAtURL:exportedReportsZipFileURL error:nil];
+		[[NSFileManager defaultManager] createDirectoryAtURL:exportURL withIntermediateDirectories:YES attributes:nil error:nil];
+		
+		NSOperationQueue *reportExportQueue = [[NSOperationQueue alloc] init];
+		reportExportQueue.maxConcurrentOperationCount = NSOperationQueueDefaultMaxConcurrentOperationCount;
+		reportExportQueue.qualityOfService = NSQualityOfServiceUserInitiated;
+		
+		void (^exportBlock)(Report *report) = ^(Report *report) {
 			NSString *csv = [report valueForKeyPath:@"originalReport.content"];
 			NSString *filename = [report valueForKeyPath:@"originalReport.filename"];
 			if ([filename hasSuffix:@".gz"]) {
 				filename = [filename substringToIndex:filename.length - 3];
 			}
-			NSString *reportPath = [exportPath stringByAppendingPathComponent:filename];
-			[csv writeToFile:reportPath atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+			NSURL *reportURL = [exportURL URLByAppendingPathComponent:filename];
+			[csv writeToURL:reportURL atomically:YES encoding:NSUTF8StringEncoding error:nil];
 		};
-		for (Report *dailyReport in self.selectedAccount.dailyReports) {
-			exportBlock(dailyReport);
-		}
-		for (Report *weeklyReport in self.selectedAccount.weeklyReports) {
-			exportBlock(weeklyReport);
-		}
 		
-		self.exportedReportsZipPath = [exportPath stringByAppendingPathExtension:@"zip"];
-		ZipFile *zipFile = [[ZipFile alloc] initWithFileName:self.exportedReportsZipPath mode:ZipFileModeCreate];
-		NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:exportPath error:NULL];
-		for (NSString *filename in files) {
-			NSString *path = [exportPath stringByAppendingPathComponent:filename];
-			NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
-			NSDate *date = [attributes fileCreationDate];
-			ZipWriteStream *stream = [zipFile writeFileInZipWithName:filename fileDate:date compressionLevel:ZipCompressionLevelBest];
-			NSData *data = [NSData dataWithContentsOfFile:path];
-			[stream writeData:data];
-			[stream finishedWriting];
-		}
-		[zipFile close];
+		[reportExportQueue addOperationWithBlock:^{
+			for (Report *dailyReport in self.selectedAccount.dailyReports) {
+				[reportExportQueue addOperationWithBlock:^{
+					exportBlock(dailyReport);
+				}];
+			}
+		}];
 		
-		[[NSFileManager defaultManager] removeItemAtPath:exportPath error:NULL];
+		[reportExportQueue addOperationWithBlock:^{
+			for (Report *weeklyReport in self.selectedAccount.weeklyReports) {
+				[reportExportQueue addOperationWithBlock:^{
+					exportBlock(weeklyReport);
+				}];
+			}
+		}];
 		
-		[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+		[reportExportQueue waitUntilAllOperationsAreFinished];
 		
-		UIAlertView *exportCompletedAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Export Completed", nil) 
-																		message:NSLocalizedString(@"The report files of this account have been exported as a Zip archive. You can now access the archive via iTunes file sharing or open it in a suitable app.", nil) 
-																	   delegate:self 
-															  cancelButtonTitle:NSLocalizedString(@"Done", nil) 
-															  otherButtonTitles:NSLocalizedString(@"Open in...", nil), nil];
-		exportCompletedAlert.tag = kAlertTagExportCompleted;
-		[exportCompletedAlert show];
+		ZIPArchive *zipArchive = [[ZIPArchive alloc] initWithFileURL:exportedReportsZipFileURL];
+		[zipArchive addDirectoryToArchive:exportURL];
+		[zipArchive writeToFile];
+		
+		[[NSFileManager defaultManager] removeItemAtURL:exportURL error:nil];
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+			
+			self.documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:exportedReportsZipFileURL];
+			self.documentInteractionController.delegate = self;
+			[self.documentInteractionController presentOptionsMenuFromRect:self.navigationController.view.bounds inView:self.navigationController.view animated:YES];
+		});
 	});
 }
 
@@ -707,19 +711,6 @@
 	}
 }
 
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
-	if (alertView.tag == kAlertTagExportCompleted) {
-		if (buttonIndex != alertView.cancelButtonIndex) {
-			self.documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:[NSURL fileURLWithPath:self.exportedReportsZipPath]];
-			self.documentInteractionController.delegate = self;
-			BOOL couldPresentAppSelection = [self.documentInteractionController presentOpenInMenuFromRect:self.navigationController.view.bounds inView:self.navigationController.view animated:YES];
-			if (!couldPresentAppSelection) {
-				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"You don't seem to have any app installed that can open Zip files.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			}
-		}
-	}
-}
-
 - (void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller {
 	self.documentInteractionController = nil;
 }
@@ -742,7 +733,7 @@
 - (void)iconCleared:(NSNotification *)notification {
 	NSString *productID = [[notification userInfo] objectForKey:kIconManagerClearedIconNotificationAppID];
 	if (productID) {
-		// reload Icon
+		// Reload icon.
 		[[IconManager sharedManager] iconForAppID:productID];
 	}
 }

@@ -1,14 +1,4 @@
-build
-*.xcodeproj/*.pbxuser
-*.xcodeproj/*.perspectivev3
-*.xcodeproj/xcuserdata
 .DS_Store
-.swp
-~.nib
-.pbxuser
-.perspective
-*.perspectivev3
-*.mode1v3
-*.xcworkspacedata
+*.xcworkspace
 *.xcuserstate
 *xcuserdata*

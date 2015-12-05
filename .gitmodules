@@ -1,0 +1,3 @@
+[submodule "Vendor/ZIPArchive"]
+	path = Vendor/ZIPArchive
+	url = https://github.com/nicolasgomollon/ZIPArchive.git
