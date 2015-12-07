@@ -10,21 +10,16 @@
 
 @class Product;
 
-@interface ReportDetailEntry : NSObject {
-	
-	float revenue;
-	float percentage;
-	NSString *subtitle;
-	NSString *country;
-	Product *product;
-}
+@interface ReportDetailEntry : NSObject
 
-@property (nonatomic, assign) float revenue;
-@property (nonatomic, assign) float percentage;
+@property (nonatomic, assign) CGFloat revenue;
+@property (nonatomic, assign) NSInteger sales;
+@property (nonatomic, assign) CGFloat percentage;
 @property (nonatomic, strong) NSString *subtitle;
-@property (nonatomic, strong) NSString *country;
+@property (nonatomic, strong) NSString *countryCode;
+@property (nonatomic, strong) NSString *countryName;
 @property (nonatomic, strong) Product *product;
 
-+ (instancetype)entryWithRevenue:(float)r percentage:(float)p subtitle:(NSString *)aSubtitle country:(NSString *)countryCode product:(Product *)aProduct;
++ (instancetype)entryWithRevenue:(CGFloat)revenue sales:(NSInteger)sales percentage:(CGFloat)percentage subtitle:(NSString *)subtitle countryCode:(NSString *)countryCode countryName:(NSString *)countryName product:(Product *)product;
 
 @end

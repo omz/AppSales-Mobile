@@ -259,32 +259,58 @@
 	} else {
 		totalRevenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:nil inCountry:self.selectedCountry];
 	}
-	
-	[sortedEntries addObject:[ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:@"world" product:nil]];
+	[sortedEntries addObject:[ReportDetailEntry entryWithRevenue:totalRevenue sales:0 percentage:0 subtitle:nil countryCode:@"world" countryName:nil product:nil]];
 	
 	for (NSString *country in [sortedCountries reverseObjectEnumerator]) {
 		float revenue = [revenuesByCountry[country] floatValue];
 		float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
 		
-		NSInteger sales = 0;
+		NSInteger sales = 0, nonRefunds = 0, refunds = 0;
 		if (self.selectedProduct) {
 			sales = [paidDownloadsByCountryAndProduct[country.uppercaseString][self.selectedProduct.productID] integerValue];
+			nonRefunds = [paidNonRefundDownloadsByCountryAndProduct[country.uppercaseString][self.selectedProduct.productID] integerValue];
+			refunds = -[refundedDownloadsByCountryAndProduct[country.uppercaseString][self.selectedProduct.productID] integerValue];
 		} else {
 			NSDictionary *salesByProduct = paidDownloadsByCountryAndProduct[country.uppercaseString];
 			sales = [[[salesByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
+			
+			NSDictionary *nonRefundsByProduct = paidNonRefundDownloadsByCountryAndProduct[country.uppercaseString];
+			nonRefunds = [[[nonRefundsByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
+			
+			NSDictionary *refundsByProduct = refundedDownloadsByCountryAndProduct[country.uppercaseString];
+			refunds = -[[[refundsByProduct allValues] valueForKeyPath:@"@sum.self"] integerValue];
 		}
 		
-		// Only display if we have something to show
+		// Only display if we have something to show.
 		if (sales != 0) {
-			NSString *subtitle = [NSString stringWithFormat:@"%@: %li %@", [[CountryDictionary sharedDictionary] nameForCountryCode:country], (long)sales, sales == 1 ? @"sale" : @"sales"];
-			ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:country product:nil];
+			NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, [[CountryDictionary sharedDictionary] nameForCountryCode:country]];
+			if (sales != nonRefunds) {
+				subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, [[CountryDictionary sharedDictionary] nameForCountryCode:country]];
+			}
+			ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue sales:sales percentage:percentage subtitle:subtitle countryCode:country countryName:[[CountryDictionary sharedDictionary] nameForCountryCode:country] product:nil];
 			[sortedEntries addObject:entry];
 		}
 	}
+	[sortedEntries sortUsingComparator:^NSComparisonResult(ReportDetailEntry *entry1, ReportDetailEntry *entry2) {
+		if ([entry1.countryCode isEqualToString:@"world"]) {
+			return NSOrderedAscending;
+		} else if ([entry2.countryCode isEqualToString:@"world"]) {
+			return NSOrderedDescending;
+		} else if (entry1.revenue > entry2.revenue) {
+			return NSOrderedAscending;
+		} else if (entry1.revenue < entry2.revenue) {
+			return NSOrderedDescending;
+		} else if (entry1.sales > entry2.sales) {
+			return NSOrderedAscending;
+		} else if (entry1.sales < entry2.sales) {
+			return NSOrderedDescending;
+		}
+		return [entry1.countryName.uppercaseString compare:entry2.countryName.uppercaseString];
+	}];
 	self.countryEntries = [NSArray arrayWithArray:sortedEntries];
 	
 	NSMutableArray *entries = [NSMutableArray array];
-	ReportDetailEntry *allProductsEntry = [ReportDetailEntry entryWithRevenue:totalRevenue percentage:0 subtitle:nil country:nil product:nil];
+	ReportDetailEntry *allProductsEntry = [ReportDetailEntry entryWithRevenue:totalRevenue sales:0 percentage:0 subtitle:nil countryCode:nil countryName:nil product:nil];
 	[entries addObject:allProductsEntry];
 	ASAccount *account = [[self.selectedReport firstReport] valueForKey:@"account"];
 	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
@@ -308,20 +334,35 @@
 			}
 		}
 		
-		// Only display if we have something to show
+		// Only display if we have something to show.
 		if (sales != 0) {
 			float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
-			NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, [product displayName]];
+			NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, product.displayName];
 			if (sales != nonRefunds) {
-				subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, [product displayName]];
+				subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, product.displayName];
 			}
-			ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue percentage:percentage subtitle:subtitle country:nil product:product];
+			ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue sales:sales percentage:percentage subtitle:subtitle countryCode:nil countryName:nil product:product];
 			[entries addObject:entry];
 		}
 	}
-	[entries sortUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"revenue" ascending:NO]]];
-	
+	[entries sortUsingComparator:^NSComparisonResult(ReportDetailEntry *entry1, ReportDetailEntry *entry2) {
+		if (entry1.product == nil) {
+			return NSOrderedAscending;
+		} else if (entry2.product == nil) {
+			return NSOrderedDescending;
+		} else if (entry1.revenue > entry2.revenue) {
+			return NSOrderedAscending;
+		} else if (entry1.revenue < entry2.revenue) {
+			return NSOrderedDescending;
+		} else if (entry1.sales > entry2.sales) {
+			return NSOrderedAscending;
+		} else if (entry1.sales < entry2.sales) {
+			return NSOrderedDescending;
+		}
+		return [entry1.product.displayName.uppercaseString compare:entry2.product.displayName.uppercaseString];
+	}];
 	self.productEntries = [NSArray arrayWithArray:entries];
+	
 	[self reloadTableView];
 }
 
@@ -341,7 +382,7 @@
 	if (self.selectedCountry) {
 		NSInteger i = 0;
 		for (ReportDetailEntry *countryEntry in self.countryEntries) {
-			if ([countryEntry.country isEqual:self.selectedCountry]) {
+			if ([countryEntry.countryCode isEqual:self.selectedCountry]) {
 				selectedCountryIndex = i;
 				break;
 			}
@@ -432,7 +473,7 @@
 - (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (viewMode == ReportDetailViewModeCountries) {
 		if (indexPath.row > 0) {
-			self.selectedCountry = [countryEntries[indexPath.row] country];
+			self.selectedCountry = [countryEntries[indexPath.row] countryCode];
 		} else {
 			self.selectedCountry = nil;
 		}

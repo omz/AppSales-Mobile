@@ -11,17 +11,16 @@
 
 @implementation ReportDetailEntry
 
-@synthesize revenue, percentage, subtitle, country, product;
-
-+ (instancetype)entryWithRevenue:(float)r percentage:(float)p subtitle:(NSString *)aSubtitle country:(NSString *)countryCode product:(Product *)aProduct {
++ (instancetype)entryWithRevenue:(CGFloat)revenue sales:(NSInteger)sales percentage:(CGFloat)percentage subtitle:(NSString *)subtitle countryCode:(NSString *)countryCode countryName:(NSString *)countryName product:(Product *)product {
 	ReportDetailEntry *entry = [[self alloc] init];
-	entry.revenue = r;
-	entry.percentage = p;
-	entry.subtitle = aSubtitle;
-	entry.country = countryCode;
-	entry.product = aProduct;
+	entry.revenue = revenue;
+	entry.sales = sales;
+	entry.percentage = percentage;
+	entry.subtitle = subtitle;
+	entry.countryCode = countryCode;
+	entry.countryName = countryName;
+	entry.product = product;
 	return entry;
 }
-
 
 @end

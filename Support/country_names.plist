@@ -4,6 +4,8 @@
 <dict>
 	<key>AD</key>
 	<string>Andorra</string>
+	<key>AE</key>
+	<string>United Arab Emirates</string>
 	<key>AF</key>
 	<string>Afghanistan</string>
 	<key>AG</key>
@@ -63,7 +65,7 @@
 	<key>BT</key>
 	<string>Bhutan</string>
 	<key>BV</key>
-	<string>Bouvet I.</string>
+	<string>Bouvet Island</string>
 	<key>BW</key>
 	<string>Botswana</string>
 	<key>BY</key>
@@ -73,7 +75,7 @@
 	<key>CA</key>
 	<string>Canada</string>
 	<key>CC</key>
-	<string>Cocos Is.</string>
+	<string>Cocos (Keeling) Islands</string>
 	<key>CD</key>
 	<string>Congo, DRC</string>
 	<key>CF</key>
@@ -83,9 +85,9 @@
 	<key>CH</key>
 	<string>Switzerland</string>
 	<key>CI</key>
-	<string>Cote d</string>
+	<string>Côte d’Ivoire</string>
 	<key>CK</key>
-	<string>Cook Is.</string>
+	<string>Cook Islands</string>
 	<key>CL</key>
 	<string>Chile</string>
 	<key>CM</key>
@@ -103,7 +105,7 @@
 	<key>CV</key>
 	<string>Cape Verde</string>
 	<key>CX</key>
-	<string>Christmas I.</string>
+	<string>Christmas Island</string>
 	<key>CY</key>
 	<string>Cyprus</string>
 	<key>CZ</key>
@@ -139,11 +141,11 @@
 	<key>FJ</key>
 	<string>Fiji</string>
 	<key>FK</key>
-	<string>Falkland Is.</string>
+	<string>Falkland Islands (Islas Malvinas)</string>
 	<key>FM</key>
 	<string>Micronesia</string>
 	<key>FO</key>
-	<string>Faroe Is.</string>
+	<string>Faroe Islands</string>
 	<key>FR</key>
 	<string>France</string>
 	<key>GA</key>
@@ -182,8 +184,10 @@
 	<string>Guinea-Bissau</string>
 	<key>GY</key>
 	<string>Guyana</string>
+	<key>HK</key>
+	<string>Hong Kong</string>
 	<key>HM</key>
-	<string>Heard I. </string>
+	<string>Heard &amp; McDonald Islands</string>
 	<key>HN</key>
 	<string>Honduras</string>
 	<key>HR</key>
@@ -235,7 +239,7 @@
 	<key>KW</key>
 	<string>Kuwait</string>
 	<key>KY</key>
-	<string>Cayman Is.</string>
+	<string>Cayman Islands</string>
 	<key>KZ</key>
 	<string>Kazakhstan</string>
 	<key>LA</key>
@@ -269,7 +273,7 @@
 	<key>MG</key>
 	<string>Madagascar</string>
 	<key>MH</key>
-	<string>Marshall Is.</string>
+	<string>Marshall Islands</string>
 	<key>MK</key>
 	<string>Macedonia</string>
 	<key>ML</key>
@@ -279,7 +283,7 @@
 	<key>MN</key>
 	<string>Mongolia</string>
 	<key>MP</key>
-	<string>Northern Mariana Is.</string>
+	<string>Northern Mariana Islands</string>
 	<key>MQ</key>
 	<string>Martinique</string>
 	<key>MR</key>
@@ -307,7 +311,7 @@
 	<key>NE</key>
 	<string>Niger</string>
 	<key>NF</key>
-	<string>Norfolk I.</string>
+	<string>Norfolk Island</string>
 	<key>NG</key>
 	<string>Nigeria</string>
 	<key>NI</key>
@@ -343,7 +347,7 @@
 	<key>PM</key>
 	<string>St. Pierre </string>
 	<key>PN</key>
-	<string>Pitcairn Is.</string>
+	<string>Pitcairn Islands</string>
 	<key>PR</key>
 	<string>Puerto Rico</string>
 	<key>PS</key>
@@ -367,7 +371,7 @@
 	<key>SA</key>
 	<string>Saudi Arabia</string>
 	<key>SB</key>
-	<string>Solomon Is.</string>
+	<string>Solomon Islands</string>
 	<key>SC</key>
 	<string>Seychelles</string>
 	<key>SD</key>
@@ -430,6 +434,8 @@
 	<string>Trinidad </string>
 	<key>TV</key>
 	<string>Tuvalu</string>
+	<key>TW</key>
+	<string>Taiwan</string>
 	<key>TZ</key>
 	<string>Tanzania</string>
 	<key>UA</key>
@@ -437,7 +443,7 @@
 	<key>UG</key>
 	<string>Uganda</string>
 	<key>UM</key>
-	<string>Midway Is.</string>
+	<string>United States Minor Outlying Islands</string>
 	<key>US</key>
 	<string>United States</string>
 	<key>UY</key>
@@ -449,9 +455,9 @@
 	<key>VE</key>
 	<string>Venezuela</string>
 	<key>VG</key>
-	<string>British Virgin Is.</string>
+	<string>British Virgin Islands</string>
 	<key>VI</key>
-	<string>Virgin Is.</string>
+	<string>United States Virgin Islands</string>
 	<key>VN</key>
 	<string>Vietnam</string>
 	<key>VU</key>

@@ -82,8 +82,8 @@
 	
 	float percentage = entry.percentage;
 	Product *product = entry.product;
-	NSString *country = entry.country;
 	BOOL hideBar = (!product && (!country || [country isEqualToString:@"world"]));
+	NSString *country = entry.countryCode;
 	barBackgroundView.hidden = hideBar;
 	barView.hidden = hideBar;
 	percentageLabel.hidden = hideBar;
