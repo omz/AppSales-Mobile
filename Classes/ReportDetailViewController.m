@@ -26,7 +26,6 @@
 @synthesize prevItem, nextItem, toolbar;
 @synthesize countryEntries, productEntries;
 @synthesize selectedCountry, selectedProduct;
-@synthesize headerView, headerLabel, headerIconView;
 
 - (instancetype)initWithReports:(NSArray *)reportsArray selectedIndex:(NSInteger)selectedIndex {
 	self = [super init];
@@ -34,16 +33,9 @@
 		reports = reportsArray;
 		selectedReportIndex = selectedIndex;
 		self.selectedReport = reports[selectedReportIndex];
-		revenueFormatter = [[NSNumberFormatter alloc] init];
-		[revenueFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
-		[revenueFormatter setMinimumFractionDigits:2];
-		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
-		self.preferredContentSize = CGSizeMake(320, 500);
+		self.preferredContentSize = CGSizeMake(320.0f, 500.0f);
 	}
-	
-	[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:@(0)];
-	
 	return self;
 }
 
@@ -53,10 +45,17 @@
 	
 	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
 	
+	numberFormatter = [[NSNumberFormatter alloc] init];
+	numberFormatter.locale = [NSLocale currentLocale];
+	numberFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
+	numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+	numberFormatter.maximumFractionDigits = 0;
+	numberFormatter.minimumFractionDigits = 0;
+	
 	viewMode = self.selectedProduct ? ReportDetailViewModeCountries : ReportDetailViewModeProducts;
 	
 	mapHidden = mapHidden || UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation);
-	self.mapView = [[MapView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 208)];
+	self.mapView = [[MapView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 208.0f)];
 	mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	mapView.alpha = !mapHidden;
 	if (!mapHidden) {
@@ -65,74 +64,73 @@
 	[self.view addSubview:mapView];
 	
 	self.mapShadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
-	mapShadowView.frame = CGRectMake(0, CGRectGetMaxY(mapView.frame), self.view.bounds.size.width, 20);
+	mapShadowView.frame = CGRectMake(0.0f, CGRectGetMaxY(mapView.frame), self.view.bounds.size.width, 20.0f);
 	mapShadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	mapShadowView.alpha = !mapHidden;
 	[self.view addSubview:mapShadowView];
 	
-	CGRect headerFrame = mapHidden ? CGRectMake(0, 0, self.view.bounds.size.width, 20) : CGRectMake(0, 208 - 20, self.view.bounds.size.width, 20);
-	self.headerView = [[UIImageView alloc] initWithFrame:headerFrame];
+	UIVisualEffect *visualEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+	headerView = [[UIVisualEffectView alloc] initWithEffect:visualEffect];
+	headerView.frame = mapHidden ? CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 20.0f) : CGRectMake(0.0f, 208.0f - 20.0f, self.view.bounds.size.width, 20.0f);
 	headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	headerView.image = [UIImage imageNamed:@"DetailHeader.png"];
-	self.headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 0, headerView.bounds.size.width - 40, 20)];
-	headerLabel.textColor = [UIColor darkGrayColor];
-	headerLabel.shadowColor = [UIColor whiteColor];
-	headerLabel.shadowOffset = CGSizeMake(0, 1);
-	headerLabel.backgroundColor = [UIColor clearColor];
-	headerLabel.font = [UIFont boldSystemFontOfSize:13.0];
-	[headerView addSubview:headerLabel];
-	self.headerIconView = [[AppIconView alloc] initWithFrame:CGRectMake(7, 2, 16, 16)];
-	headerIconView.image = [UIImage imageNamed:@"AllApps.png"];
-	[headerView addSubview:headerIconView];
 	[self.view addSubview:headerView];
 	
-	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) ? 32.0 : 44.0;
+	headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(30.0f, 0.0f, headerView.bounds.size.width - 40.0f, 20.0f)];
+	headerLabel.backgroundColor = [UIColor clearColor];
+	headerLabel.font = [UIFont boldSystemFontOfSize:13.0f];
+	headerLabel.textColor = [UIColor whiteColor];
+	[headerView.contentView addSubview:headerLabel];
 	
-	CGRect tableViewFrame = mapHidden ? CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20) : CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
+	headerIconView = [[AppIconView alloc] initWithFrame:CGRectMake(7.0f, 2.0f, 16.0f, 16.0f)];
+	headerIconView.image = [UIImage imageNamed:@"AllApps"];
+	[headerView.contentView addSubview:headerIconView];
+	
+	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) ? 32.0f : 44.0f;
+	
+	CGRect tableViewFrame = mapHidden ? CGRectMake(0.0f, 20.0f, self.view.bounds.size.width, self.view.bounds.size.height - 20.0f) : CGRectMake(0.0f, 208.0f, self.view.bounds.size.width, self.view.bounds.size.height - 208.0f);
 	self.tableView = [[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain];
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	tableView.backgroundColor = [UIColor clearColor];
-	tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
+	tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, toolbarHeight, 0.0f);
 	tableView.dataSource = self;
 	tableView.delegate = self;
 	
 	self.tableView.tableHeaderView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]];
 	self.tableView.tableFooterView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
-	self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
+	self.tableView.contentInset = UIEdgeInsetsMake(-20.0f, 0.0f, toolbarHeight - 20.0f, 0.0f);
 	
 	[self.view addSubview:tableView];
 	
 	self.shadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
-	shadowView.frame = mapHidden ? CGRectMake(0, 20, self.view.bounds.size.width, 20) : CGRectMake(0, 208, self.view.bounds.size.width, 20);
+	shadowView.frame = mapHidden ? CGRectMake(0.0f, 20.0f, self.view.bounds.size.width, 20.0f) : CGRectMake(0.0f, 208.0f, self.view.bounds.size.width, 20.0f);
 	shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	shadowView.alpha = 0.0;
 	[self.view addSubview:shadowView];
 	
 	if (!UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap.png" : @"HideMap.png")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap" : @"HideMap")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
 	}
 	
-	self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight)];
+	self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight)];
 	toolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	[self.view addSubview:toolbar];
 	
-	float segmentWidth = 75.0;
+	CGFloat segmentWidth = 75.0f;
 	UISegmentedControl *modeControl = [[UISegmentedControl alloc] initWithItems:@[NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil)]];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:0];
 	[modeControl setWidth:segmentWidth forSegmentAtIndex:1];
 	modeControl.selectedSegmentIndex = (viewMode == ReportDetailViewModeProducts) ? 0 : 1;
 	[modeControl addTarget:self action:@selector(switchMode:) forControlEvents:UIControlEventValueChanged];
 	UIBarButtonItem *modeItem = [[UIBarButtonItem alloc] initWithCustomView:modeControl];
-	modeItem.width = 2 * segmentWidth;
+	modeItem.width = segmentWidth * 2.0f;
 	
 	UIBarButtonItem *csvItem = [[UIBarButtonItem alloc] initWithTitle:@"CSV" style:UIBarButtonItemStylePlain target:self action:@selector(showCSV:)];
-	csvItem.width = 40.0;
-	self.prevItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectPreviousReport:)];
-	self.nextItem  = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward.png"] style:UIBarButtonItemStylePlain target:self action:@selector(selectNextReport:)];
+	csvItem.width = 40.0f;
+	self.prevItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(selectPreviousReport:)];
+	self.nextItem  = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward"] style:UIBarButtonItemStylePlain target:self action:@selector(selectNextReport:)];
 	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-	spaceItem.width = 21.0;
+	spaceItem.width = 21.0f;
 	
 	[self updateNavigationButtons];
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
@@ -153,13 +151,13 @@
 			[self toggleMap:nil];
 		}
 		
-		CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(toInterfaceOrientation) ? 32.0 : 44.0;
+		CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(toInterfaceOrientation) ? 32.0f : 44.0f;
 		self.toolbar.frame = CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight);
-		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, toolbarHeight, 0);
-		self.tableView.contentInset = UIEdgeInsetsMake(-20, 0, toolbarHeight - 20, 0);
+		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, toolbarHeight, 0.0f);
+		self.tableView.contentInset = UIEdgeInsetsMake(-20.0f, 0.0f, toolbarHeight - 20.0f, 0.0f);
 	} completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
 		if (!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-			self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap.png" : @"HideMap.png")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
+			self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap" : @"HideMap")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
 		} else {
 			self.navigationItem.rightBarButtonItem = nil;
 		}
@@ -198,20 +196,20 @@
 	[UIView setAnimationDuration:0.4];
 	[UIView setAnimationBeginsFromCurrentState:YES];
 	if (!mapHidden) {
-		tableView.frame = CGRectMake(0, 20, self.view.bounds.size.width, self.view.bounds.size.height - 20);
-		headerView.frame = CGRectMake(0, 0, self.view.bounds.size.width, 20);
-		shadowView.frame = CGRectMake(0, 20, self.view.bounds.size.width, 20);
-		mapView.alpha = 0.0;
-		mapShadowView.alpha = 0.0;
-		self.navigationItem.rightBarButtonItem.image = [UIImage imageNamed:@"ShowMap.png"];
+		tableView.frame = CGRectMake(0.0f, 20.0f, self.view.bounds.size.width, self.view.bounds.size.height - 20.0f);
+		headerView.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, 20.0f);
+		shadowView.frame = CGRectMake(0.0f, 20.0f, self.view.bounds.size.width, 20.0f);
+		mapView.alpha = 0.0f;
+		mapShadowView.alpha = 0.0f;
+		self.navigationItem.rightBarButtonItem.image = [UIImage imageNamed:@"ShowMap"];
 	} else {
-		tableView.frame = CGRectMake(0, 208, self.view.bounds.size.width, self.view.bounds.size.height - 208);
-		headerView.frame = CGRectMake(0, 208-20, self.view.bounds.size.width, 20);
-		shadowView.frame = CGRectMake(0, 208, self.view.bounds.size.width, 20);
-		shadowView.alpha = 0.0;
-		mapView.alpha = 1.0;
-		mapShadowView.alpha = 1.0;
-		self.navigationItem.rightBarButtonItem.image = [UIImage imageNamed:@"HideMap.png"];
+		tableView.frame = CGRectMake(0.0f, 208.0f, self.view.bounds.size.width, self.view.bounds.size.height - 208.0f);
+		headerView.frame = CGRectMake(0.0f, 208.0f - 20.0f, self.view.bounds.size.width, 20.0f);
+		shadowView.frame = CGRectMake(0.0f, 208.0f, self.view.bounds.size.width, 20.0f);
+		shadowView.alpha = 0.0f;
+		mapView.alpha = 1.0f;
+		mapShadowView.alpha = 1.0f;
+		self.navigationItem.rightBarButtonItem.image = [UIImage imageNamed:@"HideMap"];
 		[self performSelector:@selector(scrollViewDidScroll:) withObject:tableView afterDelay:0.0];
 	}
 	[UIView commitAnimations];
@@ -253,17 +251,17 @@
 	NSDictionary *paidNonRefundDownloadsByCountryAndProduct = [self.selectedReport totalNumberOfPaidNonRefundDownloadsByCountryAndProduct];
 	NSDictionary *refundedDownloadsByCountryAndProduct = [self.selectedReport totalNumberOfRefundedDownloadsByCountryAndProduct];
 	
-	float totalRevenue;
+	CGFloat totalRevenue = 0.0f;
 	if (viewMode == ReportDetailViewModeCountries) {
 		totalRevenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:self.selectedProduct.productID inCountry:nil];
 	} else {
 		totalRevenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:nil inCountry:self.selectedCountry];
 	}
-	[sortedEntries addObject:[ReportDetailEntry entryWithRevenue:totalRevenue sales:0 percentage:0 subtitle:nil countryCode:@"world" countryName:nil product:nil]];
+	[sortedEntries addObject:[ReportDetailEntry entryWithRevenue:totalRevenue sales:0 percentage:0 subtitle:nil countryCode:@"WW" countryName:nil product:nil]];
 	
 	for (NSString *country in [sortedCountries reverseObjectEnumerator]) {
-		float revenue = [revenuesByCountry[country] floatValue];
-		float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
+		CGFloat revenue = [revenuesByCountry[country] floatValue];
+		CGFloat percentage = (totalRevenue > 0.0f) ? revenue / totalRevenue : 0.0f;
 		
 		NSInteger sales = 0, nonRefunds = 0, refunds = 0;
 		if (self.selectedProduct) {
@@ -283,18 +281,18 @@
 		
 		// Only display if we have something to show.
 		if (sales != 0) {
-			NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, [[CountryDictionary sharedDictionary] nameForCountryCode:country]];
+			NSString *subtitle = [NSString stringWithFormat:@"%@ × %@", [numberFormatter stringFromNumber:@(sales)], [[CountryDictionary sharedDictionary] nameForCountryCode:country]];
 			if (sales != nonRefunds) {
-				subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, [[CountryDictionary sharedDictionary] nameForCountryCode:country]];
+				subtitle = [NSString stringWithFormat:@"%@ (%@ - %@) × %@", [numberFormatter stringFromNumber:@(sales)], [numberFormatter stringFromNumber:@(nonRefunds)], [numberFormatter stringFromNumber:@(refunds)], [[CountryDictionary sharedDictionary] nameForCountryCode:country]];
 			}
 			ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue sales:sales percentage:percentage subtitle:subtitle countryCode:country countryName:[[CountryDictionary sharedDictionary] nameForCountryCode:country] product:nil];
 			[sortedEntries addObject:entry];
 		}
 	}
 	[sortedEntries sortUsingComparator:^NSComparisonResult(ReportDetailEntry *entry1, ReportDetailEntry *entry2) {
-		if ([entry1.countryCode isEqualToString:@"world"]) {
+		if ([entry1.countryCode isEqualToString:@"WW"]) {
 			return NSOrderedAscending;
-		} else if ([entry2.countryCode isEqualToString:@"world"]) {
+		} else if ([entry2.countryCode isEqualToString:@"WW"]) {
 			return NSOrderedDescending;
 		} else if (entry1.revenue > entry2.revenue) {
 			return NSOrderedAscending;
@@ -316,7 +314,7 @@
 	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"productID" ascending:NO]]];
 	for (Product *product in allProducts) {
 		NSString *productID = product.productID;
-		float revenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:productID inCountry:self.selectedCountry];
+		CGFloat revenue = [self.selectedReport totalRevenueInBaseCurrencyForProductWithID:productID inCountry:self.selectedCountry];
 		NSInteger sales = 0, nonRefunds = 0, refunds = 0;
 		if (self.selectedCountry) {
 			sales = [paidDownloadsByCountryAndProduct[self.selectedCountry.uppercaseString][productID] integerValue];
@@ -336,10 +334,10 @@
 		
 		// Only display if we have something to show.
 		if (sales != 0) {
-			float percentage = (totalRevenue > 0) ? revenue / totalRevenue : 0.0;
-			NSString *subtitle = [NSString stringWithFormat:@"%li × %@", (long)sales, product.displayName];
+			CGFloat percentage = (totalRevenue > 0.0f) ? revenue / totalRevenue : 0.0f;
+			NSString *subtitle = [NSString stringWithFormat:@"%@ × %@", [numberFormatter stringFromNumber:@(sales)], product.displayName];
 			if (sales != nonRefunds) {
-				subtitle = [NSString stringWithFormat:@"%li (%li - %li) × %@", (long)sales, (long)nonRefunds, (long)refunds, product.displayName];
+				subtitle = [NSString stringWithFormat:@"%@ (%@ - %@) × %@", [numberFormatter stringFromNumber:@(sales)], [numberFormatter stringFromNumber:@(nonRefunds)], [numberFormatter stringFromNumber:@(refunds)], product.displayName];
 			}
 			ReportDetailEntry *entry = [ReportDetailEntry entryWithRevenue:revenue sales:sales percentage:percentage subtitle:subtitle countryCode:nil countryName:nil product:product];
 			[entries addObject:entry];
@@ -415,24 +413,24 @@
 }
 
 - (void)updateHeader {
+	headerIconView.product = nil;
+	headerIconView.maskEnabled = (viewMode == ReportDetailViewModeCountries);
 	if (viewMode == ReportDetailViewModeCountries) {
 		if (self.selectedProduct) {
-			self.headerIconView.productID = self.selectedProduct.productID;
-			self.headerLabel.text = [self.selectedProduct displayName];
+			headerIconView.product = self.selectedProduct;
+			headerLabel.text = self.selectedProduct.displayName;
 		} else {
-			self.headerIconView.productID = nil;
-			self.headerIconView.image = [UIImage imageNamed:@"AllApps.png"];
-			self.headerLabel.text = NSLocalizedString(@"All Apps", nil);
+			headerIconView.image = [UIImage imageNamed:@"AllApps"];
+			headerLabel.text = NSLocalizedString(@"All Apps", nil);
 		}
 	} else {
-		self.headerIconView.productID = nil;
 		if (self.selectedCountry) {
-			self.headerIconView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", [self.selectedCountry lowercaseString]]];
+			headerIconView.image = [UIImage imageNamed:self.selectedCountry];
 			NSString *countryName = [[CountryDictionary sharedDictionary] nameForCountryCode:self.selectedCountry];
-			self.headerLabel.text = countryName;
+			headerLabel.text = countryName;
 		} else {
-			self.headerIconView.image = [UIImage imageNamed:@"world.png"];
-			self.headerLabel.text = NSLocalizedString(@"All Countries", nil);
+			headerIconView.image = [UIImage imageNamed:@"WW"];
+			headerLabel.text = NSLocalizedString(@"All Countries", nil);
 		}
 	}
 }
@@ -456,7 +454,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-	return 40.0;
+	return 44.0f;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -492,7 +490,7 @@
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-	self.shadowView.alpha = MAX(0.0, MIN(1.0, (scrollView.contentOffset.y - 20) / 20.0));
+	self.shadowView.alpha = MAX(0.0f, MIN(1.0f, (scrollView.contentOffset.y - 20.0f) / 20.0f));
 }
 
 @end

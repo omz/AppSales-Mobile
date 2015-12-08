@@ -7,24 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ColorPickerViewController.h"
+#import "CrayonColorPickerViewController.h"
 
 #define DashboardViewControllerSelectedProductsDidChangeNotification @"DashboardViewControllerSelectedProductsDidChangeNotification"
 
 @class ASAccount, Product;
 
-@interface DashboardViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, ColorPickerViewControllerDelegate> {
-
+@interface DashboardViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, CrayonColorPickerViewControllerDelegate> {
 	NSMutableArray *selectedProducts;
 	ASAccount *account;
 	UITableView *productsTableView;
 	UIView *topView;
+	UIImageView *shadowView;
 	
 	NSArray *products;
 	NSArray *visibleProducts;
-	
-	UIImageView *shadowView;
-	UIPopoverController *colorPopover;
 	
 	BOOL statusVisible;
 	UIToolbar *statusToolbar;
@@ -43,7 +40,6 @@
 @property (nonatomic, strong) UITableView *productsTableView;
 @property (nonatomic, strong) UIView *topView;
 @property (nonatomic, strong) UIImageView *shadowView;
-@property (nonatomic, strong) UIPopoverController *colorPopover;
 @property (nonatomic, strong) UIToolbar *statusToolbar;
 @property (nonatomic, strong) UIBarButtonItem *stopButtonItem;
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;

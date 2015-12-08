@@ -24,21 +24,21 @@
 		
 		cachedValues = [NSMutableDictionary new];
 		
-		UIView *scaleBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 46, self.bounds.size.height - 30)];
-		scaleBackgroundView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+		UIView *scaleBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 46.0f, self.bounds.size.height - 30.0f)];
+		scaleBackgroundView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
 		[self addSubview:scaleBackgroundView];
 		
-		UIView *bottomLineView = [[UIView alloc] initWithFrame:CGRectMake(46, self.bounds.size.height - 30, self.bounds.size.width - 46, 1)];
+		UIView *bottomLineView = [[UIView alloc] initWithFrame:CGRectMake(46.0f, self.bounds.size.height - 30.0f, self.bounds.size.width - 46.0f, 1.0f)];
 		bottomLineView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 		bottomLineView.backgroundColor = [UIColor lightGrayColor];
 		[self addSubview:bottomLineView];
 		
-		scaleView = [[ScaleView alloc] initWithFrame:CGRectMake(0, 30, 46, self.bounds.size.height - 60)];
+		scaleView = [[ScaleView alloc] initWithFrame:CGRectMake(0.0f, 30.0f, 46.0f, self.bounds.size.height - 60.0f)];
 		scaleView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 		[self addSubview:scaleView];
 		
-		lockIndicatorView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"LockIndicator.png"]];
-		lockIndicatorView.frame = CGRectMake(15, 7, 16, 16);
+		lockIndicatorView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"LockIndicator"]];
+		lockIndicatorView.frame = CGRectMake(15.0f, 7.0f, 16.0f, 16.0f);
 		lockIndicatorView.hidden = YES;
 		[self addSubview:lockIndicatorView];
 		
@@ -49,27 +49,27 @@
 		longPressRecognizer.minimumPressDuration = 1.0;
 		[self addGestureRecognizer:longPressRecognizer];
 		
-		scrollView = [[TouchCancellingScrollView alloc] initWithFrame:CGRectMake(46, 0, self.bounds.size.width - 46, self.bounds.size.height)];
+		scrollView = [[TouchCancellingScrollView alloc] initWithFrame:CGRectMake(46.0f, 0.0f, self.bounds.size.width - 46.0f, self.bounds.size.height)];
 		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		scrollView.delegate = self;
 		scrollView.alwaysBounceHorizontal = YES;
 		scrollView.showsVerticalScrollIndicator = NO;
 		[self addSubview:scrollView];
 		
-		titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 4, self.bounds.size.width, 12)];
-		titleLabel.font = [UIFont boldSystemFontOfSize:11.0];
+		titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 4.0f, self.bounds.size.width, 12.0f)];
+		titleLabel.font = [UIFont systemFontOfSize:11.0f weight:UIFontWeightSemibold];
 		titleLabel.textAlignment = NSTextAlignmentCenter;
 		titleLabel.textColor = [UIColor grayColor];
 		titleLabel.backgroundColor = [UIColor clearColor];
 		titleLabel.shadowColor = [UIColor whiteColor];
-		titleLabel.shadowOffset = CGSizeMake(0, 1);
+		titleLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
 		[self addSubview:titleLabel];
 		
 		self.sectionLabelButton = [UIButton buttonWithType:UIButtonTypeCustom];
 		sectionLabelButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-		[self.sectionLabelButton setBackgroundImage:[UIImage imageNamed:@"DateButton.png"] forState:UIControlStateNormal];
-		self.sectionLabelButton.frame = CGRectMake(0, self.bounds.size.height - 30 - 16, 46, 32);
-		self.sectionLabelButton.titleLabel.font = [UIFont boldSystemFontOfSize:10.0];
+		[self.sectionLabelButton setBackgroundImage:[UIImage imageNamed:@"DateButton"] forState:UIControlStateNormal];
+		self.sectionLabelButton.frame = CGRectMake(0.0f, self.bounds.size.height - 30.0f - 16.0f, 46.0f, 32.0f);
+		self.sectionLabelButton.titleLabel.font = [UIFont systemFontOfSize:10.0f weight:UIFontWeightSemibold];
 		self.sectionLabelButton.titleLabel.adjustsFontSizeToFitWidth = YES;
 		[self.sectionLabelButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
 		[self addSubview:self.sectionLabelButton];
@@ -77,7 +77,7 @@
 		visibleRange = NSMakeRange(NSNotFound, 0);
 		barsPerPage = 7;
 		visibleBarViews = [NSMutableDictionary new];
-		max = -1.0;
+		max = -1.0f;
 	}
 	return self;
 }
@@ -87,8 +87,8 @@
 		for (NSNumber *index in visibleBarViews) {
 			StackedBarView *barView = visibleBarViews[index];
 			if (CGRectContainsPoint(barView.bounds, [recognizer locationInView:barView])) {
-				if ([self.delegate respondsToSelector:@selector(graphView:canDeleteBarAtIndex:)] && [self.delegate graphView:self canDeleteBarAtIndex:[index unsignedIntegerValue]]) {
-					selectedBarIndexForMenu = [index unsignedIntegerValue];
+				if ([self.delegate respondsToSelector:@selector(graphView:canDeleteBarAtIndex:)] && [self.delegate graphView:self canDeleteBarAtIndex:index.unsignedIntegerValue]) {
+					selectedBarIndexForMenu = index.unsignedIntegerValue;
 					[self becomeFirstResponder];
 					NSArray *menuItems = @[[[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Delete", nil) action:@selector(deleteBar:)]];
 					[[UIMenuController sharedMenuController] setMenuItems:menuItems];
@@ -132,7 +132,7 @@
 		
 		MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self];
 		hud.animationType = MBProgressHUDAnimationZoom;
-		hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(maxLocked ? @"Lock.png" : @"Unlock.png")]];
+		hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(maxLocked ? @"Lock" : @"Unlock")]];
 		hud.mode = MBProgressHUDModeCustomView;
 		if (maxLocked) {
 			hud.labelText = NSLocalizedString(@"Scale locked", nil);
@@ -158,13 +158,13 @@
 }
 
 - (void)barSelected:(StackedBarView *)barView {
-	if ([[UIMenuController sharedMenuController] isMenuVisible]) return;
+	if ([UIMenuController sharedMenuController].isMenuVisible) return;
 	for (NSNumber *barIndex in visibleBarViews) {
 		StackedBarView *view = visibleBarViews[barIndex];
 		if (view == barView) {
-			CGFloat stackHeight = [view stackHeight];
+			CGFloat stackHeight = view.stackHeight;
 			CGRect stackRect = CGRectMake(barView.frame.origin.x, barView.frame.origin.y + (barView.frame.size.height - stackHeight), barView.frame.size.width, stackHeight);
-			[self.delegate graphView:self didSelectBarAtIndex:[barIndex unsignedIntegerValue] withFrame:[self convertRect:stackRect fromView:view.superview]];
+			[self.delegate graphView:self didSelectBarAtIndex:barIndex.unsignedIntegerValue withFrame:[self convertRect:stackRect fromView:view.superview]];
 			break;
 		}
 	}
@@ -178,24 +178,23 @@
 	[scaleView setUnit:unit];
 }
 
-
 - (void)reloadData {
 	[cachedValues removeAllObjects];
 	
 	NSUInteger numberOfBars = [self.dataSource numberOfBarsInGraphView:self];
 	
 	CGFloat contentWidth = numberOfBars * barWidth;
-	scrollView.contentSize = CGSizeMake(contentWidth, 0);
+	scrollView.contentSize = CGSizeMake(contentWidth, 0.0f);
 	
-	for (UIView *barView in [visibleBarViews allValues]) {
+	for (UIView *barView in visibleBarViews.allValues) {
 		[barView removeFromSuperview];
 	}
 	[visibleBarViews removeAllObjects];
 	
 	visibleRange = NSMakeRange(NSNotFound, 0);
-	max = -1.0;
+	max = -1.0f;
 	
-	scrollView.contentOffset = CGPointMake(MAX(0, scrollView.contentSize.width - scrollView.bounds.size.width), 0);
+	scrollView.contentOffset = CGPointMake(MAX(0.0f, scrollView.contentSize.width - scrollView.bounds.size.width), 0.0f);
 	[self scrollViewDidScroll:scrollView];
 	
 	[scrollView flashScrollIndicators];
@@ -205,10 +204,10 @@
 	[cachedValues removeAllObjects];
 	
 	if (!maxLocked) {
-		max = 0.0;
+		max = 0.0f;
 		for (NSNumber *barIndex in visibleBarViews) {
-			NSArray *stackedValues = [self.dataSource graphView:self valuesForBarAtIndex:[barIndex unsignedIntegerValue]];
-			float sum = [[stackedValues valueForKeyPath:@"@sum.self"] floatValue];
+			NSArray *stackedValues = [self.dataSource graphView:self valuesForBarAtIndex:barIndex.unsignedIntegerValue];
+			CGFloat sum = [[stackedValues valueForKeyPath:@"@sum.self"] floatValue];
 			if (sum > max) max = sum;
 		}
 	}
@@ -220,8 +219,8 @@
 	}
 	for (NSNumber *barIndex in visibleBarViews) {
 		StackedBarView *barView = visibleBarViews[barIndex];
-		NSArray *stackedValues = [self stackedValuesForBarAtIndex:[barIndex unsignedIntegerValue]];
-		[barView setSegmentValues:stackedValues label:[self labelTextForIndex:[barIndex unsignedIntegerValue]]];
+		NSArray *stackedValues = [self stackedValuesForBarAtIndex:barIndex.unsignedIntegerValue];
+		[barView setSegmentValues:stackedValues label:[self labelTextForIndex:barIndex.unsignedIntegerValue]];
 	}
 	[scaleView setMax:max animated:YES];
 	if (animated) {
@@ -243,7 +242,7 @@
 - (NSRange)visibleBarRange {
 	NSUInteger numberOfBars = [self.dataSource numberOfBarsInGraphView:self];
 	barsPerPage = scrollView.bounds.size.width / barWidth;
-	int firstVisibleBarIndex = MIN(numberOfBars, MAX(0, scrollView.contentOffset.x / barWidth));
+	NSInteger firstVisibleBarIndex = MIN(numberOfBars, MAX(0, scrollView.contentOffset.x / barWidth));
 	NSRange newVisibleRange = NSMakeRange(firstVisibleBarIndex, barsPerPage + 2);
 	if (newVisibleRange.location + newVisibleRange.length >= numberOfBars) {
 		newVisibleRange.length = numberOfBars - newVisibleRange.location;
@@ -251,30 +250,30 @@
 	return newVisibleRange;
 }
 
-- (float)maxVisibleValue {
-	float maxValue = 0.0;
+- (CGFloat)maxVisibleValue {
+	CGFloat maxValue = 0.0f;
 	for (NSInteger i = visibleRange.location; i < visibleRange.location + visibleRange.length; i++) {
 		NSArray *stackedValues = [self.dataSource graphView:self valuesForBarAtIndex:i];
-		float sum = [[stackedValues valueForKeyPath:@"@sum.self"] floatValue];
+		CGFloat sum = [[stackedValues valueForKeyPath:@"@sum.self"] floatValue];
 		if (sum > maxValue) maxValue = sum;
 	}
 	return maxValue;
 }
 
 - (CGRect)frameForBarAtIndex:(NSInteger)index {
-	float marginBottom = 30.0;
-	CGRect barFrame =  CGRectMake(barWidth * index, 0, barWidth, self.bounds.size.height - marginBottom);
+	CGFloat marginBottom = 30.0f;
+	CGRect barFrame =  CGRectMake(barWidth * index, 0.0f, barWidth, self.bounds.size.height - marginBottom);
 	return CGRectIntegral(barFrame);
 }
 
 - (NSString *)labelTextForIndex:(NSUInteger)index {
-	if (barWidth < 20) return nil;
+	if (barWidth < 20.0f) return nil;
 	NSString *labelText = [self.dataSource graphView:self labelForBarAtIndex:index];
 	return labelText;
 }
 
 - (void)reloadColors {
-	for (UIView *barView in [visibleBarViews allValues]) {
+	for (UIView *barView in visibleBarViews.allValues) {
 		[barView removeFromSuperview];
 	}
 	[visibleBarViews removeAllObjects];
@@ -285,13 +284,13 @@
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)aScrollView {
-	NSRange newVisibleRange = [self visibleBarRange];
+	NSRange newVisibleRange = self.visibleBarRange;
 	if (NSEqualRanges(newVisibleRange, visibleRange)) {
 		return;
 	}
 	visibleRange = newVisibleRange;
 	
-	if (max < 0.0) {
+	if (max < 0.0f) {
 		max = [self maxVisibleValue];
 		[scaleView setMax:max animated:NO];
 	}
@@ -300,8 +299,8 @@
 	[self.sectionLabelButton setTitle:sectionLabelText forState:UIControlStateNormal];
 	
 	// Remove views that are no longer visible.
-	for (NSNumber *visibleBarIndex in [visibleBarViews allKeys]) {
-		if (!NSLocationInRange([visibleBarIndex intValue], visibleRange)) {
+	for (NSNumber *visibleBarIndex in visibleBarViews.allKeys) {
+		if (!NSLocationInRange(visibleBarIndex.integerValue, visibleRange)) {
 			UIView *barView = visibleBarViews[visibleBarIndex];
 			[barView removeFromSuperview];
 			[visibleBarViews removeObjectForKey:visibleBarIndex];
@@ -320,22 +319,22 @@
 			barView.frame = frameForBar;
 			barView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 			
-			UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, frameForBar.size.height, frameForBar.size.width, 30)];
+			UILabel *dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, frameForBar.size.height, frameForBar.size.width, 30.0f)];
 			dateLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 			dateLabel.backgroundColor = [UIColor clearColor];
 			dateLabel.textColor = [UIColor darkGrayColor];
 			dateLabel.shadowColor = [UIColor whiteColor];
-			dateLabel.shadowOffset = CGSizeMake(0, 1);
+			dateLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
 			dateLabel.textAlignment = NSTextAlignmentCenter;
-			dateLabel.font = [UIFont boldSystemFontOfSize:12.0];
+			dateLabel.font = [UIFont systemFontOfSize:12.0f weight:UIFontWeightSemibold];
 			dateLabel.adjustsFontSizeToFitWidth = YES;
 			dateLabel.numberOfLines = 0;
 			[barView addSubview:dateLabel];
 			
 			NSString *xAxisLabelText = [self.dataSource graphView:self labelForXAxisAtIndex:i];
 			dateLabel.text = xAxisLabelText;
-			CGFloat separatorWidth = 1; // TODO: Ask datasource for separator size (larger for start of week/month).
-			CGFloat separatorHeight = 4;
+			CGFloat separatorWidth = 1.0f; // TODO: Ask datasource for separator size (larger for start of week/month).
+			CGFloat separatorHeight = 4.0f;
 			
 			dateLabel.textColor = [self.dataSource graphView:self labelColorForXAxisAtIndex:i];
 			CGRect separatorFrame = CGRectMake(-(int)separatorWidth/2, frameForBar.size.height, separatorWidth, separatorHeight);
@@ -348,7 +347,7 @@
 			[barView setSegmentValues:stackedValues label:[self labelTextForIndex:i]];
 			
 			[scrollView addSubview:barView];
-			[visibleBarViews setObject:barView forKey:@(i)];
+			visibleBarViews[@(i)] = barView;
 		}
 	}
 }
@@ -357,15 +356,15 @@
 	NSArray *stackedAbsoluteValues = cachedValues[@(index)];
 	if (!stackedAbsoluteValues) {
 		stackedAbsoluteValues = [self.dataSource graphView:self valuesForBarAtIndex:index];
-		[cachedValues setObject:stackedAbsoluteValues forKey:@(index)];
+		cachedValues[@(index)] = stackedAbsoluteValues;
 	}
-	float totalValue = [[stackedAbsoluteValues valueForKeyPath:@"@sum.self"] floatValue];
-	float maxHeight = self.bounds.size.height - 60;
-	float totalHeight = (max > 0) ? maxHeight * (totalValue / max) : maxHeight + 80;
+	CGFloat totalValue = [[stackedAbsoluteValues valueForKeyPath:@"@sum.self"] floatValue];
+	CGFloat maxHeight = self.bounds.size.height - 60.0f;
+	CGFloat totalHeight = (max > 0.0f) ? maxHeight * (totalValue / max) : maxHeight + 80.0f;
 	NSMutableArray *stackedValues = [NSMutableArray array];
 	for (NSNumber *absoluteValue in stackedAbsoluteValues) {
-		float percentage = (totalValue > 0) ? [absoluteValue floatValue] / totalValue : 0.0;
-		float height = percentage * totalHeight;
+		CGFloat percentage = (totalValue > 0.0f) ? absoluteValue.floatValue / totalValue : 0.0f;
+		CGFloat height = percentage * totalHeight;
 		[stackedValues addObject:@(height)];
 	}
 	return stackedValues;
@@ -379,16 +378,16 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
 	if (!maxLocked) {
-		float oldMax = max;
-		max = [self maxVisibleValue];
+		CGFloat oldMax = max;
+		max = self.maxVisibleValue;
 		
 		if (max != oldMax) {
 			[UIView beginAnimations:nil context:nil];
 			[UIView setAnimationDuration:ANIMATION_DURATION];
 			for (NSNumber *barIndex in visibleBarViews) {
 				StackedBarView *barView = visibleBarViews[barIndex];
-				NSArray *stackedValues = [self stackedValuesForBarAtIndex:[barIndex unsignedIntegerValue]];
-				[barView setSegmentValues:stackedValues label:[self labelTextForIndex:[barIndex unsignedIntegerValue]]];
+				NSArray *stackedValues = [self stackedValuesForBarAtIndex:barIndex.unsignedIntegerValue];
+				[barView setSegmentValues:stackedValues label:[self labelTextForIndex:barIndex.unsignedIntegerValue]];
 			}
 			[UIView commitAnimations];
 			
@@ -415,7 +414,7 @@
 		}
 		label = [[UILabel alloc] initWithFrame:CGRectZero];
 		label.backgroundColor = [UIColor clearColor];
-		label.font = [UIFont boldSystemFontOfSize:12.0];
+		label.font = [UIFont systemFontOfSize:12.0f weight:UIFontWeightSemibold];
 		label.adjustsFontSizeToFitWidth = YES;
 		label.textAlignment = NSTextAlignmentCenter;
 		label.textColor = [UIColor darkGrayColor];
@@ -517,8 +516,25 @@
 						  @(1000000),
 						  @(10000000)];
 		unit = @"";
+		numberFormatter = [[NSNumberFormatter alloc] init];
+		numberFormatter.locale = [NSLocale currentLocale];
+		numberFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
+		numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+		numberFormatter.maximumFractionDigits = 2;
+		numberFormatter.minimumFractionDigits = 0;
 	}
 	return self;
+}
+
+- (NSString *)descriptionForStep:(NSNumber *)step {
+	if (unit.length == 0) {
+		if (step.integerValue >= 1000000) {
+			return [NSString stringWithFormat:@"%@M", [numberFormatter stringFromNumber:@(step.floatValue / 1000000.0f)]];
+		} else if (step.integerValue >= 1000) {
+			return [NSString stringWithFormat:@"%@K", [numberFormatter stringFromNumber:@(step.floatValue / 1000.0f)]];
+		}
+	}
+	return [NSString stringWithFormat:@"%@%@", unit, [numberFormatter stringFromNumber:step]];
 }
 
 - (void)setUnit:(NSString *)newUnit {
@@ -526,11 +542,11 @@
 	unit = newUnit;
 	for (NSNumber *step in lineViews) {
 		LineView *lineView = lineViews[step];
-		[lineView setLabelText:[NSString stringWithFormat:@"%@%@", unit, step]];
+		lineView.labelText = [self descriptionForStep:step];
 	}
 }
 
-- (void)setMax:(float)newMax animated:(BOOL)animated {
+- (void)setMax:(CGFloat)newMax animated:(BOOL)animated {
 	float animationDuration = animated ? ANIMATION_DURATION : 0.0;
 	
 	[UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
@@ -538,63 +554,63 @@
 		BOOL wasEmpty = [lineViews count] == 0;
 		
 		// Calculate which lines should be visible.
-		float totalHeight = self.bounds.size.height;
-		int pickedUnit = 0;
+		CGFloat totalHeight = self.bounds.size.height;
+		NSInteger pickedUnit = 0;
 		for (NSNumber *possibleUnit in possibleUnits) {
-			int unitCount = (int)newMax / [possibleUnit intValue];
-			float unitHeight = totalHeight / unitCount;
-			if (unitHeight >= 25.0) {
-				pickedUnit = [possibleUnit intValue];
+			NSInteger unitCount = (NSInteger)newMax / possibleUnit.integerValue;
+			CGFloat unitHeight = totalHeight / unitCount;
+			if (unitHeight >= 25.0f) {
+				pickedUnit = possibleUnit.integerValue;
 				break;
 			}
 		}
 		NSMutableSet *steps = [NSMutableSet set];
-		int step = pickedUnit;
-		while (step <= newMax && pickedUnit != 0) {
+		NSInteger step = pickedUnit;
+		while ((step <= newMax) && (pickedUnit != 0)) {
 			[steps addObject:@(step)];
 			step += pickedUnit;
 		}
 		
-		//Remove lines that should not be visible anymore and animate the others to their new position:
+		// Remove lines that should not be visible anymore and animate the others to their new position.
 		for (NSNumber *existingStep in [lineViews allKeys]) {
 			LineView *lineView = lineViews[existingStep];
 			if (![steps containsObject:existingStep]) {
-				float y = totalHeight - (totalHeight * ([existingStep floatValue] / newMax));
-				CGRect lineFrame = CGRectMake(40, (int)y, self.superview.bounds.size.width, 1);
-				if ([steps count] > 0) {
+				CGFloat y = totalHeight - (totalHeight * (existingStep.floatValue / newMax));
+				CGRect lineFrame = CGRectMake(40.0f, (NSInteger)y, self.superview.bounds.size.width, 1.0f);
+				if (steps.count > 0) {
 					lineView.frame = lineFrame;
 				}
-				lineView.alpha = 0.0;
+				lineView.alpha = 0.0f;
 				[lineViews removeObjectForKey:existingStep];
 			} else {
-				float y = totalHeight - (totalHeight * ([existingStep floatValue] / newMax));
-				CGRect lineFrame = CGRectMake(40, (int)y, self.superview.bounds.size.width, 1);
+				CGFloat y = totalHeight - (totalHeight * (existingStep.floatValue / newMax));
+				CGRect lineFrame = CGRectMake(40.0f, (NSInteger)y, self.superview.bounds.size.width, 1.0f);
 				lineView.frame = lineFrame;
 			}
 		}
 		
-		//Add new lines, animating them from their hypothetical previous position (relative to the previous max value):
+		// Add new lines, animating them from their hypothetical previous position (relative to the previous max value).
 		for (NSNumber *step in steps) {
 			LineView *lineView = lineViews[step];
 			if (!lineView) {
-				float oldY = totalHeight - (totalHeight * ([step floatValue] / max));
-				float newY = totalHeight - (totalHeight * ([step floatValue] / newMax));
-				CGRect toLineFrame = CGRectMake(40, (int)newY, self.superview.bounds.size.width, 1);
-				CGRect fromLineFrame = CGRectMake(40, (int)oldY, self.superview.bounds.size.width, 1);
+				CGFloat oldY = totalHeight - (totalHeight * (step.floatValue / max));
+				CGFloat newY = totalHeight - (totalHeight * (step.floatValue / newMax));
+				CGRect toLineFrame = CGRectMake(40.0f, (NSInteger)newY, self.superview.bounds.size.width, 1.0f);
+				CGRect fromLineFrame = CGRectMake(40.0f, (NSInteger)oldY, self.superview.bounds.size.width, 1.0f);
 				LineView *lineView = [[LineView alloc] initWithFrame:(wasEmpty ? toLineFrame : fromLineFrame)];
-				lineView.alpha = 0.0;
-				[lineView setLabelText:[NSString stringWithFormat:@"%@%@", unit, step]];
+				lineView.alpha = 0.0f;
+				lineView.labelText = [self descriptionForStep:step];
 				[self addSubview:lineView];
 				lineView.frame = toLineFrame;
-				lineView.alpha = 1.0;
-				[lineViews setObject:lineView forKey:step];
+				lineView.alpha = 1.0f;
+				lineViews[step] = lineView;
 			}
 		}
 	
-	} completion:^ (BOOL finished) {
+	} completion:^(BOOL finished) {
 		for (UIView *v in self.subviews) {
-			//Clean up, remove lines that have faded out:
-			if (v.alpha <= 0.0) {
+			// Clean up, remove lines that have faded out.
+			if (v.alpha <= 0.0f) {
 				[v removeFromSuperview];
 			}
 		}
@@ -610,13 +626,13 @@
 - (instancetype)initWithFrame:(CGRect)frameRect {
 	self = [super initWithFrame:frameRect];
 	if (self) {
-		self.backgroundColor = [UIColor colorWithWhite:0.75 alpha:1.0];
-		label = [[UILabel alloc] initWithFrame:CGRectMake(-40, -8, 40, 16)];
+		self.backgroundColor = [UIColor colorWithWhite:0.75f alpha:1.0f];
+		label = [[UILabel alloc] initWithFrame:CGRectMake(-40.0f, -8.0f, 40.0f, 16.0f)];
 		label.backgroundColor = [UIColor clearColor];
-		label.font = [UIFont boldSystemFontOfSize:12.0];
+		label.font = [UIFont systemFontOfSize:12.0f weight:UIFontWeightSemibold];
 		label.textColor = [UIColor darkGrayColor];
 		label.shadowColor = [UIColor whiteColor];
-		label.shadowOffset = CGSizeMake(0, 1);
+		label.shadowOffset = CGSizeMake(0.0f, 1.0f);
 		label.textAlignment = NSTextAlignmentRight;
 		label.adjustsFontSizeToFitWidth = YES;
 		[self addSubview:label];

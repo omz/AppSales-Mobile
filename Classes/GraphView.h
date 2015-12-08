@@ -34,7 +34,6 @@
 
 
 @interface GraphView : UIView <UIScrollViewDelegate> {
-
 	id<GraphViewDataSource> __weak dataSource;
 	id<GraphViewDelegate> __weak delegate;
 	
@@ -43,7 +42,7 @@
 	CGFloat barWidth;
 	
 	NSRange visibleRange;
-	float max;
+	CGFloat max;
 	BOOL maxLocked;
 	UIImageView *lockIndicatorView;
 	UILabel *titleLabel;
@@ -70,14 +69,13 @@
 - (void)reloadColors;
 - (void)reloadData;
 - (void)reloadValuesAnimated:(BOOL)animated;
-- (float)maxVisibleValue;
+- (CGFloat)maxVisibleValue;
 
 
 @end
 
 
 @interface StackedBarView : UIControl {
-	
 	NSMutableArray *segmentViews;
 	UILabel *label;
 	UIView *selectedBackgroundView;
@@ -95,22 +93,21 @@
 #define kScaleViewLineLabelTag	1
 
 @interface ScaleView : UIView {
-	
 	NSString *unit;
-	float max;
+	NSNumberFormatter *numberFormatter;
+	CGFloat max;
 	NSArray *possibleUnits;
 	NSMutableDictionary *lineViews;
 }
 
 @property (nonatomic, strong) NSString *unit;
 
-- (void)setMax:(float)newMax animated:(BOOL)animated;
+- (void)setMax:(CGFloat)newMax animated:(BOOL)animated;
 
 @end
 
 
 @interface LineView : UIView {
-	
 	UILabel *label;
 }
 

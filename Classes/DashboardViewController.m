@@ -8,7 +8,6 @@
 
 #import "DashboardViewController.h"
 #import "DashboardAppCell.h"
-#import "ColorButton.h"
 #import "UIColor+Extensions.h"
 #import "ASAccount.h"
 #import "Product.h"
@@ -16,7 +15,7 @@
 @implementation DashboardViewController
 
 @synthesize account, products, visibleProducts, selectedProducts;
-@synthesize productsTableView, topView, shadowView, colorPopover, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
+@synthesize productsTableView, topView, shadowView, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
 @synthesize activeSheet;
 
 - (instancetype)initWithAccount:(ASAccount *)anAccount {
@@ -32,9 +31,6 @@
 }
 
 - (void)willShowPasscodeLock:(NSNotification *)notification {
-	if (self.colorPopover.popoverVisible) {
-		[self.colorPopover dismissPopoverAnimated:NO];
-	}
 	if (self.activeSheet.visible) {
 		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
 	}
@@ -99,7 +95,6 @@
 	
 	self.productsTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(topView.frame), self.view.bounds.size.width, self.view.bounds.size.height - topView.bounds.size.height) style:UITableViewStylePlain];
 	productsTableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-	productsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	productsTableView.dataSource = self;
 	productsTableView.delegate = self;
 	productsTableView.backgroundColor = [UIColor clearColor];
@@ -155,7 +150,7 @@
 }
 
 - (void)stopDownload:(id)sender {
-	//subclasses should override this
+	// Subclasses should override this.
 }
 
 - (void)viewDidLoad {
@@ -263,34 +258,26 @@
   	}
 }
 
-- (void)changeColor:(UIButton *)sender {
-	NSInteger row = sender.tag;
-	Product *product = self.visibleProducts[row - 1];
+- (void)changeColorAtIndexPath:(NSIndexPath *)indexPath {
+	UITableViewCell *cell = [self.productsTableView cellForRowAtIndexPath:indexPath];
+	Product *product = self.visibleProducts[indexPath.row - 1];
 	
-	NSArray *palette = [UIColor crayonColorPalette];
-	ColorPickerViewController *vc = [[ColorPickerViewController alloc] initWithColors:palette];
-	vc.delegate = self;
-	vc.context = product;
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-		vc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
-		[self presentViewController:vc animated:YES completion:nil];
-	} else {
-		vc.preferredContentSize = CGSizeMake(320, 210);
-		self.colorPopover = [[UIPopoverController alloc] initWithContentViewController:vc];
-		[self.colorPopover presentPopoverFromRect:sender.bounds inView:sender permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-	}
+	CrayonColorPickerViewController *colorPicker = [[CrayonColorPickerViewController alloc] initWithSelectedColor:product.color];
+	colorPicker.context = product;
+	colorPicker.delegate = self;
+	
+	colorPicker.popoverPresentationController.sourceView = cell;
+	colorPicker.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMaxX(cell.bounds), 0.0f, 62.0f, 44.0f);
+	[self presentViewController:colorPicker animated:YES completion:nil];
 }
 
-- (void)colorPicker:(ColorPickerViewController *)picker didPickColor:(UIColor *)color atIndex:(NSInteger)colorIndex {
+- (void)colorPicker:(CrayonColorPickerViewController *)picker didPickColor:(UIColor *)color {
 	Product *product = (Product *)picker.context;
 	product.color = color;
 	[product.managedObjectContext save:nil];
 	[self reloadTableView];
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-		[picker dismissViewControllerAnimated:YES completion:nil];
-	} else {
-		[self.colorPopover dismissPopoverAnimated:YES];
-	}
+	picker.context = nil;
+	picker.delegate = nil;
 }
 
 #pragma mark - Tableview data source
@@ -304,7 +291,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-	return 40.0;
+	return 44.0f;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -320,8 +307,6 @@
 	}
 	
 	cell.product = product;
-	cell.colorButton.tag = indexPath.row;
-	[cell.colorButton addTarget:self action:@selector(changeColor:) forControlEvents:UIControlEventTouchUpInside];
 	
 	cell.accessoryView = [self accessoryViewForRowAtIndexPath:indexPath];
 	
@@ -376,6 +361,31 @@
 	return nil;
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+	return (indexPath.row > 0);
+}
+
+- (void)tableView:(UITableView *)tableView didEndEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (self.selectedProducts.count > 0) {
+		for (Product *product in self.selectedProducts) {
+			NSUInteger row = [self.visibleProducts indexOfObject:product] + 1;
+			[tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
+		}
+	} else {
+		[tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
+	}
+}
+
+- (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if ((indexPath.row <= 0) || (indexPath.row > self.visibleProducts.count)) { return nil; }
+	UITableViewRowAction *changeColorAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:NSLocalizedString(@"Edit", nil) handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+		[self changeColorAtIndexPath:indexPath];
+	}];
+	Product *product = self.visibleProducts[indexPath.row - 1];
+	changeColorAction.backgroundColor = product.color;
+	return @[changeColorAction];
+}
+
 #pragma mark - Table view delegate
 
 - (void)deselectAllRowsInTableView:(UITableView *)tableView exceptForIndexPath:(NSIndexPath *)indexPath  {
@@ -409,7 +419,6 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];

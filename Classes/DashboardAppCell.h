@@ -8,16 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+extern CGFloat const kIconSize;
+extern CGFloat const kIconPadding;
+extern CGFloat const kLabelPadding;
+
 @class Product, ColorButton, AppIconView;
 
 @interface DashboardAppCell : UITableViewCell {
-	ColorButton *colorButton;
+	UIView *colorView;
 	AppIconView *iconView;
 	UILabel *nameLabel;
-	Product *product;
 }
 
 @property (nonatomic, strong) Product *product;
-@property (nonatomic, readonly) ColorButton *colorButton;
 
 @end

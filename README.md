@@ -17,7 +17,7 @@ Please see the screenshot below for a visual guide to AppSales' main interface a
 
 ## Requirements
 
-AppSales requires the iOS 8.0 SDK or later.
+AppSales requires the iOS 8.2 SDK or later.
 
 Because there is no API to access some parts of iTunes Connect, AppSales scrapes [itunesconnect.apple.com](https://itunesconnect.apple.com). This means that even small changes on this website can break some functionality. In most cases, this is easy to fix and I'll try to make a new version available here. The report download itself uses Apple's auto-ingestion interface to iTunes Connect and should generally be unaffected by changes to the website.
 

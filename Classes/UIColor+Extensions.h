@@ -8,14 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-
 @interface UIColor (ASExtensions)
 
-//Returns an array of the crayon colors in the Mac color picker, intended to be used in a grid of 6 rows with 8 colors each.
+// Returns an array of the crayon colors in the Mac color picker, intended to be used in a grid of 6 rows with 7 colors each.
 + (NSArray *)crayonColorPalette;
 
-//Adapted from http://arstechnica.com/apple/guides/2009/02/iphone-development-accessing-uicolor-components.ars
+// Adapted from http://arstechnica.com/apple/guides/2009/02/iphone-development-accessing-uicolor-components.ars
 + (UIColor *)randomColor;
++ (UIColor *)randomCrayonColor;
+- (CGFloat)distanceTo:(UIColor *)color;
 - (BOOL)red:(CGFloat *)red green:(CGFloat *)green blue:(CGFloat *)blue alpha:(CGFloat *)alpha;
 - (UIColor *)colorByMultiplyingBy:(CGFloat)f;
 - (CGFloat)luminance;

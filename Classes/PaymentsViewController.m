@@ -20,7 +20,7 @@
 	if (self) {
 		account = paymentAccount;
 		self.title = NSLocalizedString(@"Payments", nil);
-		self.tabBarItem.image = [UIImage imageNamed:@"Payments.png"];
+		self.tabBarItem.image = [UIImage imageNamed:@"Payments"];
 		self.hidesBottomBarWhenPushed = [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
 		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePayments:)];
 		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
@@ -59,7 +59,7 @@
 	for (UIView *v in [NSArray arrayWithArray:self.scrollView.subviews]) [v removeFromSuperview];
 	
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-	[numberFormatter setNumberStyle:NSNumberFormatterCurrencyStyle];
+	numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
 	
 	NSMutableDictionary *paymentsByYear = [NSMutableDictionary dictionary];
 	NSMutableDictionary *sumsByYear = [NSMutableDictionary dictionary];
@@ -69,18 +69,18 @@
 		NSMutableDictionary *paymentsForYear = paymentsByYear[year];
 		if (!paymentsForYear) {
 			paymentsForYear = [NSMutableDictionary dictionary];
-			[paymentsByYear setObject:paymentsForYear forKey:year];
+			paymentsByYear[year] = paymentsForYear;
 		}
 		NSNumber *month = [payment valueForKey:@"month"];
 		NSMutableArray *paymentsForMonth = paymentsForYear[month];
 		if (!paymentsForMonth) {
 			paymentsForMonth = [NSMutableArray array];
-			[paymentsForYear setObject:paymentsForMonth forKey:month];
+			paymentsForYear[month] = paymentsForMonth;
 		}
 		[paymentsForMonth addObject:payment];
 		
-		float currentSum = [sumsByYear[year] floatValue];
-		[sumsByYear setObject:@(currentSum + [[payment valueForKey:@"amount"] floatValue]) forKey:year];
+		CGFloat currentSum = [sumsByYear[year] floatValue];
+		sumsByYear[year] = @(currentSum + [[payment valueForKey:@"amount"] floatValue]);
 	}
 	
 	NSMutableDictionary *labelsByYear = [NSMutableDictionary dictionary];
@@ -90,15 +90,15 @@
 			NSArray *payments = paymentsForYear[month];
 			if ([payments count] > 0) {
 				NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
-				NSString *currency = [payments[0] valueForKey:@"currency"];
-				[numberFormatter setCurrencySymbol:[[CurrencyManager sharedManager] currencySymbolForCurrency:currency]];
+				NSString *currencyCode = [payments[0] valueForKey:@"currency"];
+				numberFormatter.currencyCode = currencyCode;
 				NSString *label = [numberFormatter stringFromNumber:sum];
 				NSMutableDictionary *labelsForYear = labelsByYear[year];
 				if (!labelsForYear) {
 					labelsForYear = [NSMutableDictionary dictionary];
-					[labelsByYear setObject:labelsForYear forKey:year];
+					labelsByYear[year] = labelsForYear;
 				}
-				[labelsForYear setObject:label forKey:month];
+				labelsForYear[month] = label;
 			}
 		}
 	}
@@ -118,8 +118,8 @@
 		yearView.year = [year integerValue];
 		yearView.labelsByMonth = labelsByYear[year];
 		if ([allPayments count] > 0) {
-			//We assume that all payments have the same currency:
-			[numberFormatter setCurrencySymbol:[[CurrencyManager sharedManager] currencySymbolForCurrency:[[allPayments anyObject] valueForKey:@"currency"]]];
+			// We assume that all payments have the same currency.
+			numberFormatter.currencyCode = [[allPayments anyObject] valueForKey:@"currency"];
 			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@", [numberFormatter stringFromNumber:sumsByYear[year]]];
 		}
 		yearView.autoresizingMask = UIViewAutoresizingFlexibleHeight;

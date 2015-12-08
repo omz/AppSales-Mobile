@@ -11,9 +11,8 @@
 
 @class Product;
 
-@interface Review : NSManagedObject {
-@private
-}
+@interface Review : NSManagedObject
+
 @property (nonatomic, strong) NSString *text;
 @property (nonatomic, strong) NSString *countryCode;
 @property (nonatomic, strong) NSNumber *rating;

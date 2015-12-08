@@ -17,7 +17,6 @@ typedef NS_ENUM(NSInteger, ReportDetailViewMode) {
 };
 
 @interface ReportDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
-
 	NSArray *reports;
 	id<ReportSummary> selectedReport;
 	NSUInteger selectedReportIndex;
@@ -25,6 +24,7 @@ typedef NS_ENUM(NSInteger, ReportDetailViewMode) {
 	ReportDetailViewMode viewMode;
 	NSArray *countryEntries;
 	NSArray *productEntries;
+	NSNumberFormatter *numberFormatter;
 	
 	NSString *selectedCountry;
 	Product *selectedProduct;
@@ -37,12 +37,10 @@ typedef NS_ENUM(NSInteger, ReportDetailViewMode) {
 	UIBarButtonItem *prevItem;
 	UIBarButtonItem *nextItem;
 	
-	UIImageView *headerView;
+	UIVisualEffectView *headerView;
 	UILabel *headerLabel;
 	AppIconView *headerIconView;
 	UIToolbar *toolbar;
-	
-	NSNumberFormatter *revenueFormatter;
 }
 
 @property (nonatomic, strong) NSArray *countryEntries;
@@ -55,9 +53,6 @@ typedef NS_ENUM(NSInteger, ReportDetailViewMode) {
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIBarButtonItem *prevItem;
 @property (nonatomic, strong) UIBarButtonItem *nextItem;
-@property (nonatomic, strong) UIImageView *headerView;
-@property (nonatomic, strong) UILabel *headerLabel;
-@property (nonatomic, strong) AppIconView *headerIconView;
 @property (nonatomic, strong) NSString *selectedCountry;
 @property (nonatomic, strong) Product *selectedProduct;
 @property (nonatomic, strong) UIToolbar *toolbar;
@@ -70,5 +65,3 @@ typedef NS_ENUM(NSInteger, ReportDetailViewMode) {
 - (void)toggleMap:(id)sender;
 
 @end
-
-

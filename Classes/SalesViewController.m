@@ -41,7 +41,7 @@
 	self = [super initWithAccount:anAccount];
 	if (self) {
 		self.title = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Sales", nil) : [account displayName];
-		self.tabBarItem.image = [UIImage imageNamed:@"Sales.png"];
+		self.tabBarItem.image = [UIImage imageNamed:@"Sales"];
 		
 		sortedDailyReports = [NSMutableArray new];
 		sortedWeeklyReports = [NSMutableArray new];
@@ -53,6 +53,13 @@
 		
 		dateFormatter = [[NSDateFormatter alloc] init];
 		[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+		
+		numberFormatter = [[NSNumberFormatter alloc] init];
+		numberFormatter.locale = [NSLocale currentLocale];
+		numberFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
+		numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+		numberFormatter.maximumFractionDigits = 0;
+		numberFormatter.minimumFractionDigits = 0;
 		
 		[account addObserver:self forKeyPath:@"isDownloadingReports" options:NSKeyValueObservingOptionNew context:nil];
 		[account addObserver:self forKeyPath:@"downloadStatus" options:NSKeyValueObservingOptionNew context:nil];
@@ -94,7 +101,7 @@
 	graphView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	graphView.delegate = self;
 	graphView.dataSource = self;
-	[graphView setUnit:(viewMode != DashboardViewModeRevenue) ? @"" : [[CurrencyManager sharedManager] baseCurrencyDescription]];
+	[graphView setUnit:((viewMode == DashboardViewModeRevenue) || (viewMode == DashboardViewModeTotalRevenue)) ? [CurrencyManager sharedManager].baseCurrencyDescription : @""];
 	if (!iPad) {
 		[graphView.sectionLabelButton addTarget:self action:@selector(showGraphOptions:) forControlEvents:UIControlEventTouchUpInside];	
 	} else {
@@ -308,7 +315,7 @@
 #pragma mark - Actions
 
 - (void)downloadReports:(id)sender {
-	if (self.account.password && self.account.password.length > 0) { //Only download reports for accounts with login
+	if (self.account.password && self.account.password.length > 0) { // Only download reports for accounts with login.
 		if (!account.vendorID || account.vendorID.length == 0) {
 			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
 										 message:NSLocalizedString(@"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.", nil) 
@@ -541,7 +548,7 @@
 		}
 	}
 	
-	float value = 0;
+	CGFloat value = 0;
 	
 	NSArray *tProducts = (self.selectedProducts ? self.selectedProducts : self.visibleProducts);
 	
@@ -567,9 +574,9 @@
 	
 	NSString *labelText = @"";
 	if (viewMode == DashboardViewModeRevenue) {
-		labelText = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf(value)];
+		labelText = [NSString stringWithFormat:@"%@%@", [[CurrencyManager sharedManager] baseCurrencyDescription], [numberFormatter stringFromNumber:@(roundf(value))]];
 	} else {
-		labelText = [NSString stringWithFormat:@"%i", (int)value];
+		labelText = [numberFormatter stringFromNumber:@(value)];
 	}
 	
 	return labelText;
@@ -674,8 +681,8 @@
 }
 
 - (BOOL)graphView:(GraphView *)view canDeleteBarAtIndex:(NSUInteger)index {
-	//Only allow deletion of actual reports, not monthly summaries:
-	return selectedTab == 0;
+	// Only allow deletion of actual reports, not monthly summaries.
+	return (selectedTab == 0);
 }
 
 - (void)graphView:(GraphView *)view deleteBarAtIndex:(NSUInteger)index {
@@ -695,22 +702,47 @@
 
 #pragma mark - Table view data source
 
+- (UIButton *)latestValueButtonWithTitle:(NSString *)title {
+	UIColor *topColor = [UIColor colorWithRed:112.0f/255.0f green:167.0f/255.0f blue:223.0f/255.0f alpha:1.0f];
+	UIColor *bottomColor = [UIColor colorWithRed:72.0f/255.0f green:126.0f/255.0f blue:165.0f/255.0f alpha:1.0f];
+	UIColor *borderColor = [UIColor colorWithRed:38.0f/255.0f green:70.0f/255.0f blue:97.0f/255.0f alpha:0.25f];
+	
+	UIButton *latestValueButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	latestValueButton.frame = CGRectMake(0.0f, 0.0f, 64.0f, 28.0f);
+	
+	latestValueButton.titleLabel.font = [UIFont systemFontOfSize:16.0f weight:UIFontWeightSemibold];
+	latestValueButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+	latestValueButton.titleLabel.shadowOffset = CGSizeMake(0.0f, -1.0f);
+	[latestValueButton setTitleShadowColor:borderColor forState:UIControlStateNormal];
+	[latestValueButton setTitle:title forState:UIControlStateNormal];
+	
+	latestValueButton.backgroundColor = topColor;
+	CAGradientLayer *gradientLayer = [CAGradientLayer layer];
+	gradientLayer.frame = latestValueButton.bounds;
+	gradientLayer.colors = @[(id)topColor.CGColor,
+							 (id)bottomColor.CGColor];
+	[latestValueButton.layer insertSublayer:gradientLayer atIndex:0];
+	
+	latestValueButton.layer.borderColor = borderColor.CGColor;
+	latestValueButton.layer.borderWidth = 1.0f;
+	latestValueButton.layer.cornerRadius = 5.0f;
+	latestValueButton.clipsToBounds = YES;
+	
+	[latestValueButton addTarget:self action:@selector(switchGraphMode:) forControlEvents:UIControlEventTouchUpInside];
+	
+	UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(selectAdvancedViewMode:)];
+	[latestValueButton addGestureRecognizer:longPressRecognizer];
+	
+	return latestValueButton;
+}
+
 - (UIView *)accessoryViewForRowAtIndexPath:(NSIndexPath *)indexPath {
 	Product *product = nil;
 	if (indexPath.row != 0) {
 		product = self.visibleProducts[indexPath.row - 1];
 	}
 	if (selectedTab == 0 || selectedTab == 1) {
-		UIButton *latestValueButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		latestValueButton.frame = CGRectMake(0, 0, 64, 28);
-		latestValueButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
-		latestValueButton.titleLabel.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
-		latestValueButton.titleLabel.shadowOffset = CGSizeMake(0, -1);
-		[latestValueButton setBackgroundImage:[UIImage imageNamed:@"LatestValueButton.png"] forState:UIControlStateNormal];
-		[latestValueButton setBackgroundImage:[UIImage imageNamed:@"LatestValueButton.png"] forState:UIControlStateHighlighted];
-		
-		UILongPressGestureRecognizer *longPressRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(selectAdvancedViewMode:)];
-		[latestValueButton addGestureRecognizer:longPressRecognizer];
+		NSString *title = nil;
 		
 		id<ReportSummary> latestReport = nil;
 		if (selectedTab == 0) {
@@ -724,7 +756,7 @@
 		}
 		
 		if ((viewMode == DashboardViewModeTotalRevenue) || (viewMode == DashboardViewModeTotalSales)) {
-			float value = 0;
+			CGFloat value = 0;
 			
 			for (id<ReportSummary> dailyReport in self.sortedDailyReports) {
 				if (!product.productID) {
@@ -745,17 +777,13 @@
 				}
 			}
 			
-			NSString *buttonText = @"";
 			if (viewMode == DashboardViewModeTotalRevenue) {
-				buttonText = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf(value)];
+				title = [NSString stringWithFormat:@"%@%@", [[CurrencyManager sharedManager] baseCurrencyDescription], [numberFormatter stringFromNumber:@(roundf(value))]];
 			} else {
-				buttonText = [NSString stringWithFormat:@"%i", (int)value];
+				title = [numberFormatter stringFromNumber:@(value)];
 			}
-			
-			[latestValueButton setTitle:buttonText forState:UIControlStateNormal];
 		} else if (viewMode == DashboardViewModeRevenue) {
-			NSString *label = [NSString stringWithFormat:@"%@%i", [[CurrencyManager sharedManager] baseCurrencyDescription], (int)roundf([latestReport totalRevenueInBaseCurrencyForProductWithID:product.productID])];
-			[latestValueButton setTitle:label forState:UIControlStateNormal];
+			title = [NSString stringWithFormat:@"%@%@", [[CurrencyManager sharedManager] baseCurrencyDescription], [numberFormatter stringFromNumber:@(roundf([latestReport totalRevenueInBaseCurrencyForProductWithID:product.productID]))]];
 		} else {
 			NSInteger latestNumber = 0;
 			if (viewMode == DashboardViewModeSales) {
@@ -771,11 +799,10 @@
 			} else if (viewMode == DashboardViewModePromoCodes) {
 				latestNumber = [latestReport totalNumberOfPromoCodeTransactionsForProductWithID:product.productID];
 			}
-			NSString *label = [NSString stringWithFormat:@"%li", (long)latestNumber];
-			[latestValueButton setTitle:label forState:UIControlStateNormal];
+			title = [numberFormatter stringFromNumber:@(latestNumber)];
 		}
-		[latestValueButton addTarget:self action:@selector(switchGraphMode:) forControlEvents:UIControlEventTouchUpInside];
-		return latestValueButton;
+		
+		return [self latestValueButtonWithTitle:title];
 	}
 	return nil;
 }

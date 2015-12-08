@@ -214,8 +214,8 @@
 	
 	if (indexPath.section == 0) {
 		cell.textLabel.text = NSLocalizedString(@"Request New Codes...", nil);
-		cell.imageView.image = [UIImage imageNamed:@"RequestPromoCode.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"RequestPromoCode.png" color:[UIColor whiteColor]];
+		cell.imageView.image = [UIImage imageNamed:@"RequestPromoCode"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"RequestPromoCode" color:[UIColor whiteColor]];
 		cell.textLabel.textColor = [UIColor blackColor];
 	} else {
 		PromoCode *promoCode = self.promoCodes[indexPath.row];
@@ -223,8 +223,8 @@
 		cell.textLabel.text = promoCode.code;
 		NSString *dateString = [dateFormatter stringFromDate:promoCode.requestDate];
 		cell.detailTextLabel.text = used ? [NSString stringWithFormat:@"(used)  %@", dateString] : dateString;
-		cell.imageView.image = used ? [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor grayColor]] : [UIImage imageNamed:@"PromoCodes.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor whiteColor]];
+		cell.imageView.image = used ? [UIImage as_tintedImageNamed:@"PromoCodes" color:[UIColor grayColor]] : [UIImage imageNamed:@"PromoCodes"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes" color:[UIColor whiteColor]];
 		cell.textLabel.textColor = used ? [UIColor grayColor] : [UIColor blackColor];
 	}
 	

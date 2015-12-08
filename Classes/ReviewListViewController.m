@@ -25,16 +25,14 @@
 		products = reviewProducts;
 		self.title = NSLocalizedString(@"Reviews", nil);
 		
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Check.png"] style:UIBarButtonItemStylePlain target:self action:@selector(markAllAsRead:)];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark All Read", nil) style:UIBarButtonItemStyleDone target:self action:@selector(markAllAsRead:)];
 	}
 	return self;
 }
 
-
 - (void)viewDidLoad {
 	[super viewDidLoad];
 }
-
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
@@ -69,7 +67,7 @@
 	
 	Review *review = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	cell.textLabel.font = [UIFont boldSystemFontOfSize:14.0];
-	cell.imageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", review.countryCode]];
+	cell.imageView.image = [UIImage imageNamed:review.countryCode.uppercaseString];
 	NSString *ratingString = [@"" stringByPaddingToLength:[review.rating integerValue] withString:@"\u2605" startingAtIndex:0];
 	cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ - %@", ratingString, [review.product displayName]];
 	cell.textLabel.text = review.title;
@@ -93,7 +91,6 @@
 	ReviewDetailViewController *vc = [[ReviewDetailViewController alloc] initWithReview:selectedReview];
 	[self.navigationController pushViewController:vc animated:YES];
 }
-
 
 #pragma mark - Fetched results controller
 
@@ -128,7 +125,7 @@
 	[fetchRequest setEntity:entity];
 	[fetchRequest setFetchBatchSize:20];
 	
-	//Show latest unread reviews first:
+	// Show latest unread reviews first.
 	NSSortDescriptor *sortDescriptorUnread = [[NSSortDescriptor alloc] initWithKey:@"unread" ascending:NO];
 	NSSortDescriptor *sortDescriptorDownloadDate = [[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO];
 	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO];

@@ -12,71 +12,64 @@
 #import "IconManager.h"
 #import "AppIconView.h"
 
+CGFloat const kColorWidth = 4.0f;
+CGFloat const kIconSize = 30.0f;
+CGFloat const kIconPadding = 12.0f;
+CGFloat const kLabelPadding = 10.0f;
+
 @implementation DashboardAppCell
 
-@synthesize product, colorButton;
+@synthesize product;
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
 		CGSize contentSize = self.contentView.bounds.size;
 		
-		nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(44, 10, contentSize.width - 49, 20)];
-		nameLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-		nameLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
-		nameLabel.font = [UIFont boldSystemFontOfSize:16.0];
-		nameLabel.backgroundColor = [UIColor clearColor];
-		nameLabel.shadowColor = [UIColor whiteColor];
-		nameLabel.highlightedTextColor = [UIColor whiteColor];
-		nameLabel.shadowOffset = CGSizeMake(0, 1);
+		colorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, kColorWidth, contentSize.height)];
+		colorView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+		colorView.backgroundColor = [UIColor grayColor];
+		[self.contentView addSubview:colorView];
 		
-		colorButton = [[ColorButton alloc] initWithFrame:CGRectMake(5, 5, 30, 30)];
-		colorButton.showOutline = NO;
-		colorButton.color = [UIColor grayColor];
-		[self.contentView addSubview:colorButton];
-		
-		iconView = [[AppIconView alloc] initWithFrame:CGRectInset(colorButton.frame, 3, 3)];
+		CGFloat iconOriginY = (contentSize.height - kIconSize) / 2.0f;
+		iconView = [[AppIconView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(colorView.frame) + kIconPadding, iconOriginY, kIconSize, kIconSize)];
 		[self.contentView addSubview:iconView];
+		
+		CGFloat labelOriginX = CGRectGetMaxX(iconView.frame) + kIconPadding + 1.0f;
+		nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelOriginX, 0.0f, contentSize.width - labelOriginX - kLabelPadding, contentSize.height)];
+		nameLabel.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+		nameLabel.backgroundColor = [UIColor clearColor];
+		nameLabel.font = [UIFont systemFontOfSize:17.0f];
+		nameLabel.textAlignment = NSTextAlignmentLeft;
+		nameLabel.textColor = [UIColor blackColor];
 		[self.contentView addSubview:nameLabel];
 		
-		self.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackground.png"]];
-		self.selectedBackgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CellBackgroundSelected.png"]];
+		self.separatorInset = UIEdgeInsetsMake(0.0f, labelOriginX, 0.0f, 0.0f);
 	}
 	return self;
 }
 
-- (void)setProduct:(Product *)newProduct {
-	product = newProduct;
+- (void)setProduct:(Product *)_product {
+	product = _product;
 	
-	if (!product) {
-		nameLabel.text = NSLocalizedString(@"All Apps", nil);
-		colorButton.hidden = YES;
-		iconView.productID = nil;
-	} else {
-		nameLabel.text = product.displayName;
-		colorButton.hidden = NO;
-		colorButton.color = product.color;
-		if (product.parentSKU.length > 1) {
-			iconView.productID = nil;
-			iconView.image = [UIImage imageNamed:@"InApp.png"];
-		} else {
-			iconView.productID = product.productID;
-		}
-	}
+	CGSize contentSize = self.contentView.bounds.size;
+	CGFloat labelOriginX = (product != nil) ? (CGRectGetMaxX(iconView.frame) + kIconPadding + 1.0f) : 15.0f;
+	nameLabel.frame = CGRectMake(labelOriginX, 0.0f, contentSize.width - labelOriginX - kLabelPadding, contentSize.height);
+	
+	nameLabel.text = product.displayName ?: NSLocalizedString(@"All Apps", nil);
+	colorView.hidden = (product == nil);
+	colorView.backgroundColor = product.color;
+	iconView.product = product;
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated  {
 	[super setHighlighted:highlighted animated:animated];
-	colorButton.selected = NO;
-	colorButton.highlighted = NO;
-	nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
+	colorView.backgroundColor = product.color;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated  {
 	[super setSelected:selected animated:animated];
-	colorButton.selected = NO;
-	colorButton.highlighted = NO;
-	nameLabel.shadowColor = (self.highlighted || self.selected) ? [UIColor blackColor] : [UIColor whiteColor];
+	colorView.backgroundColor = product.color;
 }
 
 @end

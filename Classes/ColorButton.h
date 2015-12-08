@@ -8,16 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@interface ColorButton : UIButton
 
-@interface ColorButton : UIButton {
-
-	UIColor *color;
-	BOOL displayAsEllipse;
-	BOOL showOutline;
-}
-
-@property (nonatomic, strong) UIColor *color;
-@property (nonatomic, assign) BOOL displayAsEllipse;
-@property (nonatomic, assign) BOOL showOutline;
+@property (nonatomic, assign) BOOL showCheckmark;
 
 @end

@@ -8,11 +8,9 @@
 
 #import "IconManager.h"
 
-@interface IconManager ()
-
-- (void)dequeueDownload;
-
-@end
+NSString *const kITunesStorePageURLFormat             = @"https://itunes.apple.com/app/id%@";
+NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-ssl\\.mzstatic\\.com\\/image\\/thumb\\/[a-zA-Z0-9\\/\\.-]+\\/source(?:\\.icns)?\\/)1024x1024sr.\\w{3,4}";
+NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.com/icons/%@/%@_larger.png";
 
 @implementation IconManager
 
@@ -63,7 +61,7 @@
 	}
 	[downloadQueue addObject:appID];
 	[self dequeueDownload];
-	return [UIImage imageNamed:@"GenericApp.png"];
+	return [UIImage imageNamed:@"GenericApp"];
 }
 
 - (void)dequeueDownload {
@@ -73,32 +71,69 @@
 	[downloadQueue removeObjectAtIndex:0];
 	
 	dispatch_async(queue, ^{
-		NSString *iconURLStringPNG = [NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.png", [nextAppID substringToIndex:3], [nextAppID substringFromIndex:3]];
+		NSURL *iTunesStorePageURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStorePageURLFormat, nextAppID]];
+		NSURLRequest *iTunesStorePageRequest = [NSURLRequest requestWithURL:iTunesStorePageURL];
+		
 		NSHTTPURLResponse *response = nil;
-		NSError *error = nil;
-		NSData *iconData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:iconURLStringPNG]] returningResponse:&response error:&error];
-		if (!iconData) {
-			response = nil; error = nil;
-			NSString *iconURLStringJPG = [NSString stringWithFormat:@"http://images.appshopper.com/icons/%@/%@.jpg", [nextAppID substringToIndex:3], [nextAppID substringFromIndex:3]];
-			iconData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:iconURLStringJPG]] returningResponse:&response error:&error];
-		}
-		UIImage *icon = [UIImage imageWithData:iconData];
-		if (iconData && icon) {
+		NSData *iTunesStorePageData = [NSURLConnection sendSynchronousRequest:iTunesStorePageRequest returningResponse:&response error:nil];
+		NSString *iTunesStorePage = [[NSString alloc] initWithData:iTunesStorePageData encoding:NSUTF8StringEncoding];
+		
+		void (^failureBlock)(NSString *) = ^void(NSString *appID) {
 			dispatch_async(dispatch_get_main_queue(), ^{
-				//Download was successful, write icon to file
-				NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:nextAppID];
+				// There was a response, but the download was not successful, write the default icon, so that we won't try again and again...
+				NSString *iconPath = [self.iconDirectory stringByAppendingPathComponent:appID];
+				[UIImagePNGRepresentation([UIImage imageNamed:@"GenericApp"]) writeToFile:iconPath atomically:YES];
+			});
+		};
+		
+		void (^successBlock)(UIImage *, NSData *, NSString *) = ^void(UIImage *icon, NSData *iconData, NSString *appID) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				// Download was successful, write icon to file.
+				NSString *iconPath = [self.iconDirectory stringByAppendingPathComponent:appID];
 				[iconData writeToFile:iconPath atomically:YES];
-				[iconCache setObject:icon forKey:nextAppID];
-				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:@{kIconManagerDownloadedIconNotificationAppID: nextAppID}];
+				[iconCache setObject:icon forKey:appID];
+				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:@{kIconManagerDownloadedIconNotificationAppID: appID}];
 			});
-		} else if (response) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				//There was a response, but the download was not successful, write the default icon, so that we won't try again and again...
-				NSString *defaultIconPath = [[NSBundle mainBundle] pathForResource:@"GenericApp" ofType:@"png"];
-				NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:nextAppID];
-				[[NSFileManager defaultManager] copyItemAtPath:defaultIconPath toPath:iconPath error:nil];
-			});
+		};
+		
+		void (^retryAlternativePNG)(NSString *) = ^void(NSString *appID) {
+			NSString *iconThumbnailPath = [NSString stringWithFormat:kAppShopperThumbnailPathFormat, [appID substringToIndex:3], [appID substringFromIndex:3]];
+			NSURL *iconThumbnailURL = [NSURL URLWithString:iconThumbnailPath];
+			NSData *iconData = [[NSData alloc] initWithContentsOfURL:iconThumbnailURL];
+			UIImage *icon = [UIImage imageWithData:iconData];
+			if (icon != nil) {
+				successBlock(icon, iconData, appID);
+			} else {
+				failureBlock(appID);
+			}
+		};
+		
+		if (iTunesStorePage != nil) {
+			NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
+			NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, 3500)];
+			if (match.numberOfRanges > 0) {
+				CGFloat iconSize = 30.0f * [UIScreen mainScreen].scale;
+				NSString *iconFile = [NSString stringWithFormat:@"%.0fx%.0f.png", iconSize, iconSize];
+				
+				NSRange matchRange = [match rangeAtIndex:1];
+				NSString *iTunesStoreThumbnailPath = [iTunesStorePage substringWithRange:matchRange];
+				iTunesStoreThumbnailPath = [iTunesStoreThumbnailPath stringByAppendingPathComponent:iconFile];
+				
+				NSURL *iTunesStoreThumbnailURL = [NSURL URLWithString:iTunesStoreThumbnailPath];
+				NSData *iconData = [[NSData alloc] initWithContentsOfURL:iTunesStoreThumbnailURL];
+				UIImage *icon = [UIImage imageWithData:iconData];
+				if (icon != nil) {
+					successBlock(icon, iconData, nextAppID);
+				} else {
+					retryAlternativePNG(nextAppID);
+				}
+			} else {
+				retryAlternativePNG(nextAppID);
+			}
+		} else if (response != nil) {
+			retryAlternativePNG(nextAppID);
 		}
+		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			isDownloading = NO;
 			[self dequeueDownload];
@@ -114,6 +149,5 @@
 		[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerClearedIconNotification object:self userInfo:@{kIconManagerClearedIconNotificationAppID: appID}];
 	});
 }
-
 
 @end

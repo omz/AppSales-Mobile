@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "GraphView.h"
 #import "DashboardViewController.h"
-#import "ColorPickerViewController.h"
 
 @class ASAccount, Report, Product;
 @protocol ReportSummary;
@@ -27,9 +26,9 @@ typedef NS_ENUM(NSInteger, DashboardViewMode) {
 };
 
 @interface SalesViewController : DashboardViewController <UIActionSheetDelegate, GraphViewDelegate, GraphViewDataSource> {
-	
 	NSCalendar *calendar;
 	NSDateFormatter *dateFormatter;
+	NSNumberFormatter *numberFormatter;
 	
 	UIInterfaceOrientation previousOrientation;
 	DashboardViewMode viewMode;

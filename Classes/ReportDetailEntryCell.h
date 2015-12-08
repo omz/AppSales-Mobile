@@ -11,7 +11,6 @@
 @class AppIconView, ReportDetailEntry;
 
 @interface ReportDetailEntryCell : UITableViewCell {
-
 	ReportDetailEntry *entry;
 	
 	NSNumberFormatter *revenueFormatter;

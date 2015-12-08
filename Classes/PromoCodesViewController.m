@@ -24,7 +24,7 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
 				
 		self.title = NSLocalizedString(@"Promo Codes", nil);
-		self.tabBarItem.image = [UIImage imageNamed:@"PromoCodes.png"];
+		self.tabBarItem.image = [UIImage imageNamed:@"PromoCodes"];
 	}
 	return self;
 }

@@ -9,7 +9,6 @@
 #import "Review.h"
 #import "Product.h"
 
-
 @implementation Review
 
 @dynamic text;

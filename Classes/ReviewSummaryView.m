@@ -45,7 +45,7 @@
 			
 			UIButton *showReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
 			CGRect showReviewsButtonFrame = CGRectMake(10, barBackgroundView.frame.origin.y - 2, self.bounds.size.width - 20, CGRectGetHeight(barFrame) + 4);
-			[showReviewsButton setBackgroundImage:[[UIImage imageNamed:@"ReviewBarButton.png"] stretchableImageWithLeftCapWidth:8 topCapHeight:0] forState:UIControlStateHighlighted];
+			[showReviewsButton setBackgroundImage:[[UIImage imageNamed:@"ReviewBarButton"] stretchableImageWithLeftCapWidth:8 topCapHeight:0] forState:UIControlStateHighlighted];
 			showReviewsButton.frame = showReviewsButtonFrame;
 			showReviewsButton.tag = rating;
 			[self insertSubview:showReviewsButton atIndex:0];
@@ -76,8 +76,8 @@
 		} else {
 			allReviewsButton.frame = CGRectMake(110, self.bounds.size.height - 37, 145, 28);
 		}
-		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButton.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateNormal];
-		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButtonHighlighted.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateHighlighted];
+		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButton"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateNormal];
+		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButtonHighlighted"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateHighlighted];
 		[allReviewsButton setTitle:NSLocalizedString(@"Show All Reviews", nil) forState:UIControlStateNormal];
 		[allReviewsButton setTitleEdgeInsets:UIEdgeInsetsMake(0, -10, 0, 0)];
 		allReviewsButton.titleLabel.font = [UIFont boldSystemFontOfSize:13.0];

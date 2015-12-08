@@ -10,3 +10,6 @@
 [submodule "Vendor/FFGlobalAlertController"]
 	path = Vendor/FFGlobalAlertController
 	url = https://github.com/agilityvision/FFGlobalAlertController.git
+[submodule "Vendor/FlagKit"]
+	path = Vendor/FlagKit
+	url = https://github.com/nicolasgomollon/FlagKit.git

@@ -20,7 +20,7 @@
 	self = [super initWithAccount:anAccount];
 	if (self) {
 		self.title = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
-		self.tabBarItem.image = [UIImage imageNamed:@"Reviews.png"];
+		self.tabBarItem.image = [UIImage imageNamed:@"Reviews"];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reviewDownloadProgressDidChange:) name:ReviewDownloadManagerDidUpdateProgressNotification object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
 	}

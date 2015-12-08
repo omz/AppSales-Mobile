@@ -189,18 +189,18 @@
 		NSInteger badge = [[self.accounts[indexPath.section] reportsBadge] integerValue];
 		cell.textLabel.text = NSLocalizedString(@"Sales and Trends", nil);
 		cell.badgeCount = badge;
-		cell.imageView.image = [UIImage imageNamed:@"Sales.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Sales.png" color:[UIColor whiteColor]];
+		cell.imageView.image = [UIImage imageNamed:@"Sales"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Sales" color:[UIColor whiteColor]];
 	} else if (indexPath.row == 1) {
 		NSInteger badge = [[self.accounts[indexPath.section] paymentsBadge] integerValue];
 		cell.textLabel.text = NSLocalizedString(@"Payments", nil);
 		cell.badgeCount = badge;
-		cell.imageView.image = [UIImage imageNamed:@"Payments.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Payments.png" color:[UIColor whiteColor]];
+		cell.imageView.image = [UIImage imageNamed:@"Payments"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Payments" color:[UIColor whiteColor]];
 	} else if (indexPath.row == 2) {
 		cell.textLabel.text = NSLocalizedString(@"Customer Reviews", nil);
-		cell.imageView.image = [UIImage imageNamed:@"Reviews.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Reviews.png" color:[UIColor whiteColor]];
+		cell.imageView.image = [UIImage imageNamed:@"Reviews"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Reviews" color:[UIColor whiteColor]];
 		
 		ASAccount *account = self.accounts[indexPath.section];
 		NSFetchRequest *unreadReviewsRequest = [[NSFetchRequest alloc] init];
@@ -209,13 +209,13 @@
 		cell.badgeCount = [[self managedObjectContext] countForFetchRequest:unreadReviewsRequest error:nil];
 	} else if (indexPath.row == 3) {
 		cell.textLabel.text = NSLocalizedString(@"Promo Codes", nil);
-		cell.imageView.image = [UIImage imageNamed:@"PromoCodes.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes.png" color:[UIColor whiteColor]];
+		cell.imageView.image = [UIImage imageNamed:@"PromoCodes"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes" color:[UIColor whiteColor]];
 		cell.badgeCount = 0;
 	} else if (indexPath.row == 4) {
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
-		cell.imageView.image = [UIImage imageNamed:@"Account.png"];
-		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Account.png" color:[UIColor whiteColor]];
+		cell.imageView.image = [UIImage imageNamed:@"Account"];
+		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"Account" color:[UIColor whiteColor]];
 		cell.badgeCount = 0;
 	}	
 	return cell;
@@ -639,7 +639,7 @@
 
 - (void)doExport {
 	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-	hud.mode = MBProgressHUDModeDeterminateHorizontalBar;//MBProgressHUDModeDeterminate;
+	hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
 	hud.labelText = NSLocalizedString(@"Exporting", nil);
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{

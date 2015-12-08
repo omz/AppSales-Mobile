@@ -32,7 +32,7 @@
 
 - (void)awakeFromInsert {
 	[super awakeFromInsert];
-	self.color = [UIColor randomColor];
+	self.color = [UIColor randomCrayonColor];
 }
 
 - (NSString *)displayName {

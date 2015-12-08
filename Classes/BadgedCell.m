@@ -17,8 +17,8 @@
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
 		badgeView = [[UIImageView alloc] initWithFrame:CGRectMake(self.contentView.bounds.size.width - 32 - 10, self.contentView.bounds.size.height * 0.5 - 10, 32, 20)];
-		badgeView.image = [UIImage imageNamed:@"Badge.png"];
-		badgeView.highlightedImage = [UIImage as_tintedImageNamed:@"Badge.png" color:[UIColor whiteColor]];
+		badgeView.image = [UIImage imageNamed:@"Badge"];
+		badgeView.highlightedImage = [UIImage as_tintedImageNamed:@"Badge" color:[UIColor whiteColor]];
 		badgeView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
 		badgeLabel = [[UILabel alloc] initWithFrame:CGRectInset(badgeView.bounds, 4, 0)];
 		badgeLabel.adjustsFontSizeToFitWidth = YES;
