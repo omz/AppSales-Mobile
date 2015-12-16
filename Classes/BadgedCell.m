@@ -16,6 +16,7 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
+		self.textLabel.backgroundColor = [UIColor clearColor];
 		badgeView = [[UIImageView alloc] initWithFrame:CGRectMake(self.contentView.bounds.size.width - 32 - 10, self.contentView.bounds.size.height * 0.5 - 10, 32, 20)];
 		badgeView.image = [UIImage imageNamed:@"Badge"];
 		badgeView.highlightedImage = [UIImage as_tintedImageNamed:@"Badge" color:[UIColor whiteColor]];
@@ -36,6 +37,7 @@
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
 	[super setSelected:selected animated:animated];
+	self.textLabel.backgroundColor = [UIColor clearColor];
 }
 
 - (void)setBadgeCount:(NSInteger)count {
@@ -46,6 +48,7 @@
 		badgeLabel.text = [NSString stringWithFormat:@"%li", (long)badgeCount];
 		badgeView.hidden = NO;
 	}
+	self.textLabel.backgroundColor = [UIColor clearColor];
 }
 
 

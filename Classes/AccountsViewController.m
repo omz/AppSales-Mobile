@@ -108,7 +108,7 @@
 
 - (void)downloadReports:(id)sender {
 	for (ASAccount *account in self.accounts) {
-		if (account.password && account.password.length > 0) { //Only download reports for accounts with login
+		if (account.password && account.password.length > 0) { // Only download reports for accounts with a login.
 			if (!account.vendorID || account.vendorID.length == 0) {
 				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
 											 message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), [account displayName]] 
@@ -376,7 +376,7 @@
 		[sections addObject:productSection];
 		
 		if (product.parentSKU.length <= 1) {
-			productFooter = [NSString stringWithFormat:@"Current Version: %@\nApple ID: %@", ((product.currentVersion.length > 0) ? product.currentVersion : @"N/A"), product.productID];
+			productFooter = [NSString stringWithFormat:@"Apple ID: %@", product.productID];
 			
 			FieldSpecifier *showInAppStoreField = [FieldSpecifier buttonFieldWithKey:[NSString stringWithFormat:@"product.appstore.%@", product.productID] title:NSLocalizedString(@"Show in App Store...", nil)];
 			
