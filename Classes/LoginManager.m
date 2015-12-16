@@ -18,6 +18,8 @@ NSString *const kITCBaseURL            = @"https://itunesconnect.apple.com";
 NSString *const kITCLoginPageAction    = @"/WebObjects/iTunesConnect.woa";
 NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jumpTo?page=paymentsAndFinancialReports";
 
+NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/reports";
+
 @implementation LoginManager
 
 - (instancetype)init {
@@ -57,20 +59,25 @@ NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jump
 	NSURL *logoutURL = [NSURL URLWithString:kMemberCenterLogoutURL];
 	[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
 	
+	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+	
+	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
+	for (NSHTTPCookie *cookie in cookies) {
+		[cookieStorage deleteCookie:cookie];
+	}
+	
+	cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];
+	for (NSHTTPCookie *cookie in cookies) {
+		[cookieStorage deleteCookie:cookie];
+	}
+	
+	cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc2.apple.com"]];
+	for (NSHTTPCookie *cookie in cookies) {
+		[cookieStorage deleteCookie:cookie];
+	}
+	
 	if (self.shouldDeleteCookies) {
-		NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-		
-		NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://idmsa.apple.com"]];
-		for (NSHTTPCookie *cookie in cookies) {
-			[cookieStorage deleteCookie:cookie];
-		}
-		
-		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
-		for (NSHTTPCookie *cookie in cookies) {
-			[cookieStorage deleteCookie:cookie];
-		}
-		
-		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc.apple.com"]];
+		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://idmsa.apple.com"]];
 		for (NSHTTPCookie *cookie in cookies) {
 			[cookieStorage deleteCookie:cookie];
 		}

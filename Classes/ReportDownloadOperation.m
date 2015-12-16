@@ -356,9 +356,8 @@
 				}
 				
 				if (selectedVendor.integerValue <= 0) {
-					[self completeDownload];
-					[self showErrorWithMessage:NSLocalizedString(@"Downloading payments from iTunes Connect failed because the page could not be parsed.\nSource code changes might need to be made to fix this problem.", nil)];
-					return;
+					// Just because no vendor ID was found, does not mean the page has changed.
+					selectedVendor = _account.vendorID;
 				}
 				
 				[self parsePaymentsPage:paymentsPage inAccount:account vendorID:selectedVendor];
@@ -479,6 +478,9 @@
 						account.paymentsBadge = @([account.paymentsBadge integerValue] + numberOfPaymentsLoaded);
 					}
 				}
+			} else {
+				[self completeDownload];
+				[self showErrorWithMessage:NSLocalizedString(@"Downloading payments from iTunes Connect failed because the page could not be parsed.\nSource code changes might need to be made to fix this problem.", nil)];
 			}
 		}
 	});
