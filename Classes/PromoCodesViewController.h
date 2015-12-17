@@ -11,7 +11,6 @@
 @class ASAccount;
 
 @interface PromoCodesViewController : UITableViewController {
-
 	ASAccount *account;
 	NSArray *sortedApps;
 }

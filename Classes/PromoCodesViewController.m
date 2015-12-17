@@ -21,8 +21,8 @@
 	if (self) {
 		account = anAccount;
 		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:[account managedObjectContext]];
-				
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidChange:) name:NSManagedObjectContextObjectsDidChangeNotification object:account.managedObjectContext];
+		
 		self.title = NSLocalizedString(@"Promo Codes", nil);
 		self.tabBarItem.image = [UIImage imageNamed:@"PromoCodes"];
 	}
@@ -30,7 +30,19 @@
 }
 
 - (void)viewDidLoad {
+	[super viewDidLoad];
 	[self reloadData];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	self.toolbarItems = nil;
+	self.navigationController.toolbarHidden = YES;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	self.navigationController.toolbarHidden = NO;
 }
 
 - (void)contextDidChange:(NSNotification *)notification {

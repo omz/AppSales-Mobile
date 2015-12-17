@@ -15,9 +15,9 @@
 #import "PromoCode.h"
 #import "ReportDownloadCoordinator.h"
 
-#define kActionsSheetTag			1
-#define kDeleteCodesSheetTag		2
-#define kActionsAllCodesSheetTag	3
+#define kActionsSheetTag         1
+#define kDeleteCodesSheetTag     2
+#define kActionsAllCodesSheetTag 3
 
 @implementation PromoCodesAppViewController
 

@@ -13,7 +13,6 @@
 @class Product, PromoCode;
 
 @interface PromoCodesAppViewController : UITableViewController <UIActionSheetDelegate, FieldEditorViewControllerDelegate, MFMailComposeViewControllerDelegate> {
-
 	Product *product;
 	NSOperationQueue *queue;
 	NSArray *promoCodes;

@@ -11,7 +11,6 @@
 @class DownloadStepOperation;
 
 @interface PromoCodesLicenseViewController : UIViewController <UIWebViewDelegate> {
-	
 	NSString *licenseAgreementHTML;
 	DownloadStepOperation *downloadOperation;
 	UIWebView *webView;
