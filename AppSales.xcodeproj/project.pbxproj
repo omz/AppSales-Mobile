@@ -30,7 +30,6 @@
 		7F1B14F313C51ACA00243AA3 /* CurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1B14F213C51AC900243AA3 /* CurrencyManager.m */; };
 		7F1B153713C8029700243AA3 /* ReportImportOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1B153613C8029600243AA3 /* ReportImportOperation.m */; };
 		7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F24E70613E40A0D0056EA97 /* DashboardViewController.m */; };
-		7F24E70A13E4187A0056EA97 /* ReviewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F24E70913E4187A0056EA97 /* ReviewsViewController.m */; };
 		7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F26689614055D2200FD2CC5 /* AccountsViewController+VendorID.m */; };
 		7F26DF9113E13319001D0F33 /* ReviewDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F26DF9013E13319001D0F33 /* ReviewDetailViewController.m */; };
 		7F26DF9413E1358B001D0F33 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F26DF9313E1358B001D0F33 /* ReviewTemplate.html */; };
@@ -64,9 +63,7 @@
 		7F7F1D0F13F6455A00F18143 /* PromoCodesAppViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F1D0E13F6455900F18143 /* PromoCodesAppViewController.m */; };
 		7F7F4A3F13E50A52006C6651 /* PaymentsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F4A3E13E50A52006C6651 /* PaymentsViewController.m */; };
 		7F7F4A4213E51A99006C6651 /* YearView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F7F4A4113E51A99006C6651 /* YearView.m */; };
-		7F89BCDE13DFA45F001C607F /* ReviewDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F89BCDD13DFA45F001C607F /* ReviewDownloadManager.m */; };
 		7F89BCE313DFB4F1001C607F /* stores.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F89BCE213DFB4F1001C607F /* stores.plist */; };
-		7F89BCE613DFC193001C607F /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F89BCE513DFC193001C607F /* Review.m */; };
 		7F89BCE913DFD925001C607F /* ReviewSummaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F89BCE813DFD925001C607F /* ReviewSummaryView.m */; };
 		7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F963B4113E98B8600CA62FD /* AccountStatusView.m */; };
 		7FA2C58413E0370B00BA9875 /* ReviewListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FA2C58313E0370B00BA9875 /* ReviewListViewController.m */; };
@@ -87,7 +84,6 @@
 		7FDF727513D8E64D00B8CC4E /* ReportCSVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727413D8E64D00B8CC4E /* ReportCSVViewController.m */; };
 		7FDF727D13DAAF2900B8CC4E /* ReportCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */; };
 		DA2995CD1C120E4C0009D4F1 /* Icon216.png in Resources */ = {isa = PBXBuildFile; fileRef = DA2995CC1C120E4C0009D4F1 /* Icon216.png */; };
-		DA4357F81C10E33D0056702C /* ReviewsParser.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4357F71C10E33D0056702C /* ReviewsParser.m */; };
 		DA4357FC1C113B670056702C /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4357FB1C113B670056702C /* LocalAuthentication.framework */; };
 		DA4984391C129F95009BFC8F /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = DA49842F1C129F95009BFC8F /* ioapi.c */; };
 		DA49843A1C129F95009BFC8F /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = DA4984311C129F95009BFC8F /* mztools.c */; };
@@ -101,9 +97,15 @@
 		DA7B08C51C1312F500BEAB57 /* SSKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C21C1312F500BEAB57 /* SSKeychainQuery.m */; };
 		DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */; };
 		DA7B08E11C154CFB00BEAB57 /* FlagKit.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */; };
+		DA7D58F41C234D9700A3EA12 /* ReviewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7D58F31C234D9700A3EA12 /* ReviewCell.m */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
+		DAFC5F801C16B29D00261B16 /* ReviewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */; };
+		DAFC5F831C16B5F400261B16 /* ReviewsByVersionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F821C16B5F400261B16 /* ReviewsByVersionViewController.m */; };
+		DAFC5F931C16BFAD00261B16 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F921C16BFAD00261B16 /* Review.m */; };
+		DAFC5F961C16C07100261B16 /* Version.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F951C16C07100261B16 /* Version.m */; };
+		DAFC5F991C16C2C400261B16 /* ReviewDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F981C16C2C400261B16 /* ReviewDownloader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -147,8 +149,6 @@
 		7F1B153613C8029600243AA3 /* ReportImportOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportImportOperation.m; sourceTree = "<group>"; };
 		7F24E70513E40A0D0056EA97 /* DashboardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardViewController.h; sourceTree = "<group>"; };
 		7F24E70613E40A0D0056EA97 /* DashboardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = DashboardViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		7F24E70813E4187A0056EA97 /* ReviewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsViewController.h; sourceTree = "<group>"; };
-		7F24E70913E4187A0056EA97 /* ReviewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsViewController.m; sourceTree = "<group>"; };
 		7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 3.xcdatamodel"; sourceTree = "<group>"; };
 		7F26689514055D2200FD2CC5 /* AccountsViewController+VendorID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AccountsViewController+VendorID.h"; sourceTree = "<group>"; };
 		7F26689614055D2200FD2CC5 /* AccountsViewController+VendorID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AccountsViewController+VendorID.m"; sourceTree = "<group>"; };
@@ -208,11 +208,7 @@
 		7F7F4A3E13E50A52006C6651 /* PaymentsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaymentsViewController.m; sourceTree = "<group>"; };
 		7F7F4A4013E51A99006C6651 /* YearView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YearView.h; sourceTree = "<group>"; };
 		7F7F4A4113E51A99006C6651 /* YearView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YearView.m; sourceTree = "<group>"; };
-		7F89BCDC13DFA45F001C607F /* ReviewDownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewDownloadManager.h; path = Classes/ReviewDownloadManager.h; sourceTree = "<group>"; };
-		7F89BCDD13DFA45F001C607F /* ReviewDownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewDownloadManager.m; path = Classes/ReviewDownloadManager.m; sourceTree = "<group>"; };
 		7F89BCE213DFB4F1001C607F /* stores.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = stores.plist; sourceTree = "<group>"; };
-		7F89BCE413DFC193001C607F /* Review.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Review.h; sourceTree = "<group>"; };
-		7F89BCE513DFC193001C607F /* Review.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Review.m; sourceTree = "<group>"; };
 		7F89BCE713DFD925001C607F /* ReviewSummaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewSummaryView.h; sourceTree = "<group>"; };
 		7F89BCE813DFD925001C607F /* ReviewSummaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewSummaryView.m; sourceTree = "<group>"; };
 		7F963B4013E98B8600CA62FD /* AccountStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountStatusView.h; sourceTree = "<group>"; };
@@ -249,8 +245,6 @@
 		7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportCollection.m; sourceTree = "<group>"; };
 		7FED633913DB69EA00DF33B1 /* GlobalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalSettings.h; sourceTree = "<group>"; };
 		DA2995CC1C120E4C0009D4F1 /* Icon216.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon216.png; sourceTree = "<group>"; };
-		DA4357F61C10E33D0056702C /* ReviewsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewsParser.h; path = Classes/ReviewsParser.h; sourceTree = "<group>"; };
-		DA4357F71C10E33D0056702C /* ReviewsParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewsParser.m; path = Classes/ReviewsParser.m; sourceTree = "<group>"; };
 		DA4357FB1C113B670056702C /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
 		DA49842E1C129F95009BFC8F /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		DA49842F1C129F95009BFC8F /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
@@ -275,11 +269,24 @@
 		DA7B08C71C135EA300BEAB57 /* UIAlertController+Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertController+Window.h"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.h"; sourceTree = SOURCE_ROOT; };
 		DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertController+Window.m"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.m"; sourceTree = SOURCE_ROOT; };
 		DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = FlagKit.xcassets; path = Vendor/FlagKit/FlagKit.xcassets; sourceTree = "<group>"; };
+		DA7D58F21C234D9700A3EA12 /* ReviewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewCell.h; sourceTree = "<group>"; };
+		DA7D58F31C234D9700A3EA12 /* ReviewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewCell.m; sourceTree = "<group>"; };
 		DA9DB1B11C0FEC48007B0178 /* LoginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginManager.h; sourceTree = "<group>"; };
 		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
 		DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurityCodeInputController.m; sourceTree = "<group>"; };
 		DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = AppSales/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DAFC5F7E1C16B29D00261B16 /* ReviewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsViewController.h; sourceTree = "<group>"; };
+		DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsViewController.m; sourceTree = "<group>"; };
+		DAFC5F811C16B5F400261B16 /* ReviewsByVersionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsByVersionViewController.h; sourceTree = "<group>"; };
+		DAFC5F821C16B5F400261B16 /* ReviewsByVersionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsByVersionViewController.m; sourceTree = "<group>"; };
+		DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 4.xcdatamodel"; sourceTree = "<group>"; };
+		DAFC5F911C16BFAD00261B16 /* Review.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Review.h; sourceTree = "<group>"; };
+		DAFC5F921C16BFAD00261B16 /* Review.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Review.m; sourceTree = "<group>"; };
+		DAFC5F941C16C07100261B16 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Version.h; sourceTree = "<group>"; };
+		DAFC5F951C16C07100261B16 /* Version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Version.m; sourceTree = "<group>"; };
+		DAFC5F971C16C2C400261B16 /* ReviewDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewDownloader.h; sourceTree = "<group>"; };
+		DAFC5F981C16C2C400261B16 /* ReviewDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewDownloader.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -367,12 +374,16 @@
 		7F24E70D13E41EBD0056EA97 /* Reviews */ = {
 			isa = PBXGroup;
 			children = (
-				7F24E70813E4187A0056EA97 /* ReviewsViewController.h */,
-				7F24E70913E4187A0056EA97 /* ReviewsViewController.m */,
+				DAFC5F7E1C16B29D00261B16 /* ReviewsViewController.h */,
+				DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */,
+				DAFC5F811C16B5F400261B16 /* ReviewsByVersionViewController.h */,
+				DAFC5F821C16B5F400261B16 /* ReviewsByVersionViewController.m */,
 				7F89BCE713DFD925001C607F /* ReviewSummaryView.h */,
 				7F89BCE813DFD925001C607F /* ReviewSummaryView.m */,
 				7FA2C58213E0370B00BA9875 /* ReviewListViewController.h */,
 				7FA2C58313E0370B00BA9875 /* ReviewListViewController.m */,
+				DA7D58F21C234D9700A3EA12 /* ReviewCell.h */,
+				DA7D58F31C234D9700A3EA12 /* ReviewCell.m */,
 				7F26DF8F13E13319001D0F33 /* ReviewDetailViewController.h */,
 				7F26DF9013E13319001D0F33 /* ReviewDetailViewController.m */,
 			);
@@ -466,14 +477,16 @@
 				7FD2C1E013CDCB3C002868C7 /* WeeklyReport.m */,
 				7F454F9813D5B97100AE47D1 /* Product.h */,
 				7F454F9913D5B97100AE47D1 /* Product.m */,
+				DAFC5F941C16C07100261B16 /* Version.h */,
+				DAFC5F951C16C07100261B16 /* Version.m */,
+				DAFC5F911C16BFAD00261B16 /* Review.h */,
+				DAFC5F921C16BFAD00261B16 /* Review.m */,
 				7FD4ECDA13DAFF120054FE6D /* AppleFiscalCalendar.h */,
 				7FD4ECDB13DAFF120054FE6D /* AppleFiscalCalendar.m */,
 				7F1B14F113C51AC900243AA3 /* CurrencyManager.h */,
 				7F1B14F213C51AC900243AA3 /* CurrencyManager.m */,
 				7F398ED013DF21F1004BEC44 /* Transaction.h */,
 				7F398ED113DF21F2004BEC44 /* Transaction.m */,
-				7F89BCE413DFC193001C607F /* Review.h */,
-				7F89BCE513DFC193001C607F /* Review.m */,
 				7F0B8A6C13F7B941006E9151 /* PromoCode.h */,
 				7F0B8A6D13F7B941006E9151 /* PromoCode.m */,
 			);
@@ -535,10 +548,8 @@
 		7F89BCDA13DFA43E001C607F /* Review Download */ = {
 			isa = PBXGroup;
 			children = (
-				7F89BCDC13DFA45F001C607F /* ReviewDownloadManager.h */,
-				7F89BCDD13DFA45F001C607F /* ReviewDownloadManager.m */,
-				DA4357F61C10E33D0056702C /* ReviewsParser.h */,
-				DA4357F71C10E33D0056702C /* ReviewsParser.m */,
+				DAFC5F971C16C2C400261B16 /* ReviewDownloader.h */,
+				DAFC5F981C16C2C400261B16 /* ReviewDownloader.m */,
 			);
 			name = "Review Download";
 			path = ..;
@@ -781,6 +792,8 @@
 			files = (
 				7F709D3A13BC98860008DBAD /* main.m in Sources */,
 				7F709D3E13BC98860008DBAD /* AppSalesAppDelegate.m in Sources */,
+				DAFC5F961C16C07100261B16 /* Version.m in Sources */,
+				DAFC5F991C16C2C400261B16 /* ReviewDownloader.m in Sources */,
 				7F709D4113BC98860008DBAD /* AppSales.xcdatamodeld in Sources */,
 				7F709D4713BC98860008DBAD /* AccountsViewController.m in Sources */,
 				7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */,
@@ -815,15 +828,15 @@
 				7F137EB313DDDABF004655D8 /* CountryDictionary.m in Sources */,
 				7F398ED213DF21F2004BEC44 /* Transaction.m in Sources */,
 				7F398ED513DF570E004BEC44 /* ReportDetailEntry.m in Sources */,
-				7F89BCDE13DFA45F001C607F /* ReviewDownloadManager.m in Sources */,
-				7F89BCE613DFC193001C607F /* Review.m in Sources */,
 				7F89BCE913DFD925001C607F /* ReviewSummaryView.m in Sources */,
 				7FA2C58413E0370B00BA9875 /* ReviewListViewController.m in Sources */,
 				7F26DF9113E13319001D0F33 /* ReviewDetailViewController.m in Sources */,
+				DAFC5F831C16B5F400261B16 /* ReviewsByVersionViewController.m in Sources */,
 				7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */,
 				DA4984391C129F95009BFC8F /* ioapi.c in Sources */,
+				DAFC5F931C16BFAD00261B16 /* Review.m in Sources */,
 				DA7B08C41C1312F500BEAB57 /* SSKeychain.m in Sources */,
-				7F24E70A13E4187A0056EA97 /* ReviewsViewController.m in Sources */,
+				DA7D58F41C234D9700A3EA12 /* ReviewCell.m in Sources */,
 				7F7F4A3F13E50A52006C6651 /* PaymentsViewController.m in Sources */,
 				7F7F4A4213E51A99006C6651 /* YearView.m in Sources */,
 				7FAEB66613E6D0EE00750788 /* BadgedCell.m in Sources */,
@@ -838,6 +851,7 @@
 				7F0B8A6913F77F95006E9151 /* PromoCodeOperation.m in Sources */,
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
 				DA49843D1C129F95009BFC8F /* ZIPArchive.mm in Sources */,
+				DAFC5F801C16B29D00261B16 /* ReviewsViewController.m in Sources */,
 				7F0B8A7313F7E647006E9151 /* PromoCodesLicenseViewController.m in Sources */,
 				7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */,
 				DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */,
@@ -846,7 +860,6 @@
 				6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */,
 				DA7B08C51C1312F500BEAB57 /* SSKeychainQuery.m in Sources */,
 				6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */,
-				DA4357F81C10E33D0056702C /* ReviewsParser.m in Sources */,
 				DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */,
 				DA49843A1C129F95009BFC8F /* mztools.c in Sources */,
 			);
@@ -981,11 +994,12 @@
 		7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */,
 				7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */,
 				7F0B8A6B13F7B776006E9151 /* AppSales 2.xcdatamodel */,
 				7F709D4013BC98860008DBAD /* AppSales.xcdatamodel */,
 			);
-			currentVersion = 7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */;
+			currentVersion = DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */;
 			path = AppSales.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

@@ -11,7 +11,6 @@
 @class ASAccount;
 
 @interface PaymentsViewController : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate> {
-	
 	ASAccount *account;
 	UIScrollView *scrollView;
 	UIPageControl *pageControl;

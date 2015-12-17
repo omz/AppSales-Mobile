@@ -2,66 +2,107 @@
 //  ReviewsViewController.m
 //  AppSales
 //
-//  Created by Ole Zorn on 30.07.11.
-//  Copyright 2011 omz:software. All rights reserved.
+//  Created by Nicolas Gomollon on 12/7/15.
+//
 //
 
 #import "ReviewsViewController.h"
-#import "ReviewDownloadManager.h"
-#import "ReviewListViewController.h"
 #import "ASAccount.h"
 #import "Product.h"
+#import "BadgedCell.h"
+#import "ReviewsByVersionViewController.h"
 
 @implementation ReviewsViewController
 
-@synthesize reviewSummaryView, reviewsPopover;
-
-- (instancetype)initWithAccount:(ASAccount *)anAccount {
-	self = [super initWithAccount:anAccount];
+- (instancetype)initWithAccount:(ASAccount *)_account {
+	account = _account;
+	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self) {
-		self.title = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? NSLocalizedString(@"Reviews", nil) : [account displayName];
+		self.title = NSLocalizedString(@"Reviews", nil);
 		self.tabBarItem.image = [UIImage imageNamed:@"Reviews"];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reviewDownloadProgressDidChange:) name:ReviewDownloadManagerDidUpdateProgressNotification object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willShowPasscodeLock:) name:ASWillShowPasscodeLockNotification object:nil];
+		self.hidesBottomBarWhenPushed = [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
 	}
-	
-	[self performSelector:@selector(setEdgesForExtendedLayout:) withObject:@(0)];
-	
 	return self;
-}
-
-- (void)willShowPasscodeLock:(NSNotification *)notification {
-	[super willShowPasscodeLock:notification];
-	if (self.reviewsPopover.popoverVisible) {
-		[self.reviewsPopover dismissPopoverAnimated:NO];
-	}
 }
 
 - (void)loadView {
 	[super loadView];
 	
-	UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", nil) style:UIBarButtonItemStylePlain target:self action:nil];
-	self.navigationItem.backBarButtonItem = backButton;
+	[self.tableView registerClass:[BadgedCell class] forCellReuseIdentifier:@"Cell"];
 	
-	self.reviewSummaryView = [[ReviewSummaryView alloc] initWithFrame:self.topView.frame];
-	reviewSummaryView.dataSource = self;
-	reviewSummaryView.delegate = self;
-	reviewSummaryView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-	[self.view addSubview:reviewSummaryView];
+	sortedApps = [[[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+		NSInteger productID1 = product1.productID.integerValue;
+		NSInteger productID2 = product2.productID.integerValue;
+		if (productID1 < productID2) {
+			return NSOrderedDescending;
+		} else if (productID1 > productID2) {
+			return NSOrderedAscending;
+		}
+		return NSOrderedSame;
+	}] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
+		return !product.hidden.boolValue && !(product.parentSKU.length > 1); // In-App Purchases don't have reviews, so don't include them.
+	}]];
 	
-	downloadReviewsButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(downloadReviews:)];
-	downloadReviewsButtonItem.enabled = ![[ReviewDownloadManager sharedManager] isDownloading];
-	self.navigationItem.rightBarButtonItem = downloadReviewsButtonItem;
-	
-	if ([self shouldShowStatusBar]) {
-		self.progressBar.progress = [[ReviewDownloadManager sharedManager] downloadProgress];
-		self.statusLabel.text = NSLocalizedString(@"Downloading Reviews...", nil);
-	}
+	[self.tableView reloadData];
 }
 
-- (void)viewDidUnload {
-	[super viewDidUnload];
-	self.reviewSummaryView = nil;
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	[self.tableView reloadData];
+	[[NSNotificationCenter defaultCenter] addObserver:self.tableView selector:@selector(reloadData) name:NSManagedObjectContextObjectsDidChangeNotification object:account.managedObjectContext];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	[[NSNotificationCenter defaultCenter] removeObserver:self.tableView];
+}
+
+- (void)didReceiveMemoryWarning {
+	[super didReceiveMemoryWarning];
+	// Dispose of any resources that can be recreated.
+}
+
+- (NSInteger)unreadCount:(Product *)product {
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	fetchRequest.entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:product.managedObjectContext];
+	fetchRequest.predicate = [NSPredicate predicateWithFormat:@"product == %@ AND unread == TRUE", product];
+	return [product.managedObjectContext countForFetchRequest:fetchRequest error:nil];
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+	return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	return sortedApps.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	BadgedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+	
+	// Configure the cell...
+	Product *product = sortedApps[indexPath.row];
+	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+	cell.textLabel.text = product.displayName;
+	cell.badgeCount = [self unreadCount:product];
+	
+	return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];
+	Product *product = sortedApps[indexPath.row];
+	ReviewsByVersionViewController *reviewsByVersionVC = [[ReviewsByVersionViewController alloc] initWithProduct:product];
+	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+		[self.navigationController pushViewController:reviewsByVersionVC animated:YES];
+	} else {
+		UINavigationController *reviewsByVersionNC = [[UINavigationController alloc] initWithRootViewController:reviewsByVersionVC];
+		reviewsByVersionNC.modalPresentationStyle = UIModalPresentationFormSheet;
+		reviewsByVersionNC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+		[self presentViewController:reviewsByVersionNC animated:YES completion:nil];
+	}
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -69,129 +110,6 @@
 		return YES;
 	}
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
-- (BOOL)shouldShowStatusBar {
-	return [[ReviewDownloadManager sharedManager] isDownloading];
-}
-
-- (void)reviewDownloadProgressDidChange:(NSNotification *)notification {
-	downloadReviewsButtonItem.enabled = ![[ReviewDownloadManager sharedManager] isDownloading];
-	[self showOrHideStatusBar];
-	if (!self.account.isDownloadingReports) {
-		self.progressBar.progress = [[ReviewDownloadManager sharedManager] downloadProgress];
-		if ([[ReviewDownloadManager sharedManager] isDownloading]) {
-			self.statusLabel.text = NSLocalizedString(@"Downloading Reviews...", nil);
-		} else {
-			self.statusLabel.text = NSLocalizedString(@"Finished", nil);
-		}
-	}
-}
-
-- (NSSet *)entityNamesTriggeringReload {
-	return [NSSet setWithObjects:@"Review", @"Product", nil];
-}
-
-- (void)reloadData {
-	[super reloadData];
-	self.visibleProducts = [self.products filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
-		return !(product.parentSKU.length > 1); // In-App Purchases can't have reviews, so don't include them.
-	}]];
-	[self reloadTableView];
-	[self.reviewSummaryView reloadDataAnimated:NO];
-}
-
-- (void)downloadReviews:(id)sender {
-	NSArray *productReviewsToDownload = [self.visibleProducts filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
-		return !product.hidden.boolValue; // Don't bother downloading reviews for hidden apps.
-	}]];
-	[[ReviewDownloadManager sharedManager] downloadReviewsForProducts:productReviewsToDownload];
-}
-
-- (void)stopDownload:(id)sender {
-	self.stopButtonItem.enabled = NO;
-	[[ReviewDownloadManager sharedManager] cancelAllDownloads];
-	self.statusLabel.text = NSLocalizedString(@"Cancelled", nil);
-}
-
-- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfReviewsForRating:(NSInteger)rating {
-	if (!self.account) return 0;
-	
-	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
-	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
-
-	NSMutableString *pred = [NSMutableString stringWithString:@"rating == %@"];
-	NSMutableArray *args = [NSMutableArray arrayWithArray:self.selectedProducts];
-	[args insertObject:@(rating) atIndex:0];
-	
-	if (![self.selectedProducts count]) {
-		[pred appendString:@" AND product.account = %@"];
-		[args addObject:self.account];
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
-	} else {
-		[pred appendString:@" AND (product == nil"];
-		for (Product *p __attribute__((unused)) in self.selectedProducts) {
-			[pred appendString:@" OR product == %@"];
-		}
-		[pred appendString:@")"];
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
-	}
-	NSUInteger numberOfReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:nil];
-	return numberOfReviewsForRating;
-}
-
-- (NSUInteger)reviewSummaryView:(ReviewSummaryView *)view numberOfUnreadReviewsForRating:(NSInteger)rating {
-	if (!self.account) return 0;
-	
-	NSFetchRequest *reviewsCountFetchRequest = [[NSFetchRequest alloc] init];
-	[reviewsCountFetchRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.account.managedObjectContext]];
-	
-	NSMutableString *pred = [NSMutableString stringWithString:@"rating == %@ AND unread = TRUE"];
-	NSMutableArray *args = [NSMutableArray arrayWithArray:self.selectedProducts];
-	[args insertObject:@(rating) atIndex:0];
-	
-	if (![self.selectedProducts count]) {
-		[pred appendString:@" AND product.account = %@"];
-		[args addObject:self.account];
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
-	} else {
-		[pred appendString:@" AND (product == nil"];
-		for (Product *p __attribute__((unused)) in self.selectedProducts) {
-			[pred appendString:@" OR product == %@"];
-		}
-		[pred appendString:@")"];
-		[reviewsCountFetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
-	}
-	NSUInteger numberOfUnreadReviewsForRating = [self.account.managedObjectContext countForFetchRequest:reviewsCountFetchRequest error:nil];
-	return numberOfUnreadReviewsForRating;
-}
-
-- (void)reviewSummaryView:(ReviewSummaryView *)view didSelectRating:(NSInteger)rating {
-	if (!self.account) return;
-	
-	ReviewListViewController *vc = [[ReviewListViewController alloc] initWithAccount:self.account products:self.selectedProducts rating:rating];
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-		[self.navigationController pushViewController:vc animated:YES];
-	} else {
-		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
-		self.reviewsPopover = [[UIPopoverController alloc] initWithContentViewController:nav];
-		[reviewsPopover presentPopoverFromRect:[reviewSummaryView barFrameForRating:rating]	inView:reviewSummaryView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
-	}
-}
-
-- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-	[super tableView:tableView didDeselectRowAtIndexPath:indexPath];
-	[self.reviewSummaryView reloadDataAnimated:YES];
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	[super tableView:tableView didSelectRowAtIndexPath:indexPath];
-	[self.reviewSummaryView reloadDataAnimated:YES];
-}
-
-- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-	[super handleLongPress:gestureRecognizer];
-	[self.reviewSummaryView reloadDataAnimated:YES];
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {

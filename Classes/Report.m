@@ -164,7 +164,6 @@
 		}
 		productSKU = [productSKU stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		
-		NSString *productVersion = rowDictionary[kReportColumnVersion];
 		Product *product = productsBySKU[productSKU];
 		if (!product) {
 			product = [NSEntityDescription insertNewObjectForEntityForName:@"Product" inManagedObjectContext:moc];
@@ -172,16 +171,14 @@
 			product.account = account;
 			product.productID = rowDictionary[kReportColumnAppleIdentifier];
 			product.SKU = productSKU;
-			product.currentVersion = productVersion;
 			product.lastModified = beginDate;
 			product.name = productName;
 			[productsBySKU setObject:product forKey:productSKU];
 		}
-		if ((productName && ![product.name isEqualToString:productName]) || (productVersion && ![product.currentVersion isEqualToString:productVersion])) {
+		if (![product.name isEqualToString:productName]) {
 			if ([beginDate timeIntervalSinceDate:product.lastModified] > 0) {
-				// Only update name and version if the current report is newer than the one the product was created with.
+				// Only update name if the current report is newer than the one the product was created with.
 				product.name = productName;
-				product.currentVersion = productVersion;
 			}
 		}
 		[transaction setValue:product forKey:@"product"];

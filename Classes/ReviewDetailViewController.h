@@ -12,13 +12,15 @@
 @class Review;
 
 @interface ReviewDetailViewController : UIViewController <MFMailComposeViewControllerDelegate> {
-
-	Review *review;
+	NSArray<Review *> *reviews;
+	NSInteger index;
 	UIWebView *webView;
+	UIToolbar *toolbar;
+	UIBarButtonItem *previousItem;
+	UIBarButtonItem *nextItem;
+	NSDateFormatter *dateFormatter;
 }
 
-@property (nonatomic, strong) UIWebView *webView;
-
-- (instancetype)initWithReview:(Review *)review;
+- (instancetype)initWithReviews:(NSArray<Review *> *)_reviews selectedIndex:(NSInteger)_index;
 
 @end

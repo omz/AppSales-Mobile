@@ -24,7 +24,6 @@
 @end
 
 @interface ReviewSummaryView : UIView {
-
 	id<ReviewSummaryViewDataSource> __weak dataSource;
 	id<ReviewSummaryViewDelegate> __weak delegate;
 	NSMutableArray *barViews;
@@ -37,6 +36,5 @@
 @property (nonatomic, weak) id<ReviewSummaryViewDelegate> delegate;
 
 - (void)reloadDataAnimated:(BOOL)animated;
-- (CGRect)barFrameForRating:(NSInteger)rating;
 
 @end

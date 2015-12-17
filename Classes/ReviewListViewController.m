@@ -8,30 +8,40 @@
 
 #import "ReviewListViewController.h"
 #import "ReviewDetailViewController.h"
+#import "ReviewCell.h"
 #import "ASAccount.h"
 #import "Review.h"
 #import "Product.h"
+#import "Version.h"
 
 @implementation ReviewListViewController
 
 @synthesize fetchedResultsController, managedObjectContext;
 
-- (instancetype)initWithAccount:(ASAccount *)acc products:(NSArray *)reviewProducts rating:(NSUInteger)ratingFilter {
+- (instancetype)initWithProduct:(Product *)_product versions:(NSArray<Version *> *)_versions rating:(NSUInteger)ratingFilter {
 	self = [super initWithStyle:UITableViewStylePlain];
 	if (self) {
-		account = acc;
-		managedObjectContext = [account managedObjectContext];
+		product = _product;
+		versions = _versions;
 		rating = ratingFilter;
-		products = reviewProducts;
-		self.title = NSLocalizedString(@"Reviews", nil);
-		
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark All Read", nil) style:UIBarButtonItemStyleDone target:self action:@selector(markAllAsRead:)];
+		managedObjectContext = [product managedObjectContext];
+		self.title = product.displayName;
 	}
 	return self;
 }
 
+- (void)loadView {
+	[super loadView];
+	self.edgesForExtendedLayout = UIRectEdgeNone;
+	self.tableView.tableFooterView = [UIView new];
+	[self.tableView registerClass:[ReviewCell class] forCellReuseIdentifier:@"Cell"];
+}
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
+	
+	// Do any additional setup after loading the view.
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark All Read", nil) style:UIBarButtonItemStyleDone target:self action:@selector(markAllAsRead:)];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -39,56 +49,59 @@
 }
 
 - (void)markAllAsRead:(id)sender {
+	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+	moc.persistentStoreCoordinator = self.fetchedResultsController.managedObjectContext.persistentStoreCoordinator;
+	moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+	
 	for (Review *review in self.fetchedResultsController.fetchedObjects) {
 		if ([review.unread boolValue]) {
 			review.unread = @(NO);
 		}
 	}
+	
+	[moc.persistentStoreCoordinator performBlockAndWait:^{
+		NSError *saveError = nil;
+		[moc save:&saveError];
+		if (saveError) {
+			NSLog(@"Could not save context: %@", saveError);
+		}
+	}];
+	
 	[self.navigationController popViewControllerAnimated:YES];
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return [[self.fetchedResultsController sections] count];
+	return self.fetchedResultsController.sections.count;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+	return self.fetchedResultsController.sections[section].name;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	return [[self.fetchedResultsController sections][section] numberOfObjects];
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	static NSString *CellIdentifier = @"Cell";
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-	if (cell == nil) {
-		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-	}
-	
-	Review *review = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	cell.textLabel.font = [UIFont boldSystemFontOfSize:14.0];
-	cell.imageView.image = [UIImage imageNamed:review.countryCode.uppercaseString];
-	NSString *ratingString = [@"" stringByPaddingToLength:[review.rating integerValue] withString:@"\u2605" startingAtIndex:0];
-	cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ - %@", ratingString, [review.product displayName]];
-	cell.textLabel.text = review.title;
-	if ([review.unread boolValue]) {
-		cell.textLabel.textColor = [UIColor blackColor];
-	} else {
-		cell.textLabel.textColor = [UIColor grayColor];
-	}
-	
-	return cell;
+	return self.fetchedResultsController.sections[section].numberOfObjects;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-	return 50.0;
+	return 50.0f;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	ReviewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+	
+	// Configure the cell...
+	Review *review = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	cell.review = review;
+	
+	return cell;
 }
 
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	Review *selectedReview = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	ReviewDetailViewController *vc = [[ReviewDetailViewController alloc] initWithReview:selectedReview];
+	ReviewDetailViewController *vc = [[ReviewDetailViewController alloc] initWithReviews:self.fetchedResultsController.sections[indexPath.section].objects selectedIndex:indexPath.row];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -98,44 +111,39 @@
 	if (fetchedResultsController != nil) {
 		return fetchedResultsController;
 	}
+	
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	NSEntityDescription *entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.managedObjectContext];
+	fetchRequest.entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:product.managedObjectContext];
 	
-	NSMutableArray *args = [NSMutableArray arrayWithArray:products];
-	NSMutableString *pred = [NSMutableString stringWithString:@""];
-
-	if (products) {
-		[pred appendString:@"(product == nil"];
-		for (Product *p __attribute__((unused)) in products) {
-			[pred appendString:@" OR product == %@"];
-		}
-		[pred appendString:@")"];
-	} else {
-		[pred appendString:@"product.account == %@"];
-		[args addObject:account];
-	}
+	NSMutableString *pred = [NSMutableString stringWithString:@"product == %@"];
+	NSMutableArray *args = [NSMutableArray arrayWithObject:product];
 	
-	if (rating != 0) {
+	if (rating > 0) {
 		[pred appendString:@" AND rating = %@"];
 		[args addObject:@(rating)];
 	}
-
-	[fetchRequest setPredicate:[NSPredicate predicateWithFormat:pred argumentArray:args]];
 	
-	[fetchRequest setEntity:entity];
-	[fetchRequest setFetchBatchSize:20];
+	if (versions.count > 0) {
+		[pred appendString:@" AND (version == nil"];
+		for (Version *version in versions) {
+			[pred appendString:@" OR version == %@"];
+			[args addObject:version];
+		}
+		[pred appendString:@")"];
+	}
+	
+	fetchRequest.predicate = [NSPredicate predicateWithFormat:pred argumentArray:args];
+	fetchRequest.fetchBatchSize = 20;
 	
 	// Show latest unread reviews first.
-	NSSortDescriptor *sortDescriptorUnread = [[NSSortDescriptor alloc] initWithKey:@"unread" ascending:NO];
-	NSSortDescriptor *sortDescriptorDownloadDate = [[NSSortDescriptor alloc] initWithKey:@"downloadDate" ascending:NO];
-	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"reviewDate" ascending:NO];
+	NSSortDescriptor *sortDescriptorVersion = [NSSortDescriptor sortDescriptorWithKey:@"version.number" ascending:NO];
+	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"created" ascending:NO];
 	
-	NSArray *sortDescriptors = @[sortDescriptorUnread, sortDescriptorReviewDate, sortDescriptorDownloadDate];
-	[fetchRequest setSortDescriptors:sortDescriptors];
+	fetchRequest.sortDescriptors = @[sortDescriptorVersion, sortDescriptorReviewDate];
 	
 	NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
 																								 managedObjectContext:self.managedObjectContext 
-																								   sectionNameKeyPath:nil 
+																								   sectionNameKeyPath:@"version.number"
 																											cacheName:nil];
 	aFetchedResultsController.delegate = self;
 	self.fetchedResultsController = aFetchedResultsController;
@@ -153,10 +161,6 @@
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
 	[self.tableView reloadData];
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

@@ -2,24 +2,33 @@
 //  Review.m
 //  AppSales
 //
-//  Created by Ole Zorn on 27.07.11.
-//  Copyright (c) 2011 omz:software. All rights reserved.
+//  Created by Nicolas Gomollon on 12/7/15.
+//
 //
 
 #import "Review.h"
 #import "Product.h"
+#import "Version.h"
 
 @implementation Review
 
-@dynamic text;
+@dynamic identifier;
+@dynamic created;
+@dynamic version;
+@dynamic product;
 @dynamic countryCode;
+@dynamic nickname;
 @dynamic rating;
 @dynamic title;
-@dynamic user;
-@dynamic downloadDate;
-@dynamic reviewDate;
+@dynamic text;
 @dynamic unread;
-@dynamic product;
-@dynamic productVersion;
+@dynamic sectionName;
+
+- (NSString *)sectionName {
+	[self willAccessValueForKey:@"sectionName"];
+	NSString *sectionName = self.version.number;
+	[self didAccessValueForKey:@"sectionName"];
+	return sectionName;
+}
 
 @end

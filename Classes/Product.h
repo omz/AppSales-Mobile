@@ -16,7 +16,7 @@
 #define kProductPlatformInApp		@"In-App"
 #define kProductPlatformAppBundle   @"App Bundle"
 
-@class ASAccount;
+@class ASAccount, Version, Review;
 
 @interface Product : NSManagedObject {
 	BOOL isDownloadingPromoCodes;
@@ -30,13 +30,13 @@
 @property (nonatomic, strong) NSDictionary *reviewSummary;
 @property (nonatomic, strong) UIColor *color;
 @property (nonatomic, strong) ASAccount *account;
-@property (nonatomic, strong) NSSet *reviews;
+@property (nonatomic, strong) NSSet<Version *> *versions;
+@property (nonatomic, strong) NSSet<Review *> *reviews;
 @property (nonatomic, strong) NSSet *transactions;
 @property (nonatomic, strong) NSNumber *hidden;
 @property (nonatomic, strong) NSString *customName;
 @property (nonatomic, strong) NSString *SKU;
 @property (nonatomic, strong) NSString *parentSKU;
-@property (nonatomic, strong) NSString *currentVersion;
 @property (nonatomic, strong) NSDate *lastModified;
 @property (nonatomic, strong) NSSet *promoCodes;
 

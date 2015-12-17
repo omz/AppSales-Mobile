@@ -2,21 +2,19 @@
 //  ReviewsViewController.h
 //  AppSales
 //
-//  Created by Ole Zorn on 30.07.11.
-//  Copyright 2011 omz:software. All rights reserved.
+//  Created by Nicolas Gomollon on 12/7/15.
+//
 //
 
-#import "DashboardViewController.h"
-#import "ReviewSummaryView.h"
+#import <UIKit/UIKit.h>
 
-@interface ReviewsViewController : DashboardViewController <ReviewSummaryViewDataSource, ReviewSummaryViewDelegate> {
+@class ASAccount;
 
-	ReviewSummaryView *reviewSummaryView;
-	UIBarButtonItem *downloadReviewsButtonItem;
-	UIPopoverController *reviewsPopover;
+@interface ReviewsViewController : UITableViewController {
+	ASAccount *account;
+	NSArray *sortedApps;
 }
 
-@property (nonatomic, strong) ReviewSummaryView *reviewSummaryView;
-@property (nonatomic, strong) UIPopoverController *reviewsPopover;
+- (instancetype)initWithAccount:(ASAccount *)_account;
 
 @end

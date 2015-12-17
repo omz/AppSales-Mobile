@@ -20,13 +20,13 @@
 @dynamic reviewSummary;
 @dynamic color;
 @dynamic account;
+@dynamic versions;
 @dynamic reviews;
 @dynamic transactions;
 @dynamic hidden;
 @dynamic customName;
 @dynamic SKU;
 @dynamic parentSKU;
-@dynamic currentVersion;
 @dynamic lastModified;
 @dynamic promoCodes;
 

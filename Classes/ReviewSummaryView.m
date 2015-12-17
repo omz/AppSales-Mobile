@@ -8,6 +8,14 @@
 
 #import "ReviewSummaryView.h"
 
+CGFloat const barWidth = 130.0f;
+CGFloat const barHeight = 24.0f;
+CGFloat const labelWidth = 75.0f;
+CGFloat const contentViewHeight = 44.0f;
+CGFloat const buttonWidth = 145.0f;
+CGFloat const buttonHeight = 28.0f;
+CGFloat const padding = 10.0f;
+
 @implementation ReviewSummaryView
 
 @synthesize dataSource, delegate;
@@ -15,100 +23,278 @@
 - (instancetype)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
-		BOOL iPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad;
 		barViews = [NSMutableArray new];
 		barLabels = [NSMutableArray new];
 		
-		for (int rating = 5; rating >= 1; rating--) {
-			CGRect barFrame = [self barFrameForRating:rating];
+		for (NSInteger rating = 5; rating >= 1; rating--) {
 			
-			UILabel *starLabel = [[UILabel alloc] initWithFrame:CGRectIntegral(CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, CGRectGetMidY(barFrame) - 15, 90, 29))];
+			UIButton *showReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
+			[showReviewsButton setBackgroundImage:[[UIImage imageNamed:@"ReviewBarButton"] resizableImageWithCapInsets:UIEdgeInsetsMake(7.0f, 7.0f, 7.0f, 7.0f) resizingMode:UIImageResizingModeTile] forState:UIControlStateHighlighted];
+			[showReviewsButton addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
+			showReviewsButton.translatesAutoresizingMaskIntoConstraints = NO;
+			showReviewsButton.tag = rating;
+			[self addSubview:showReviewsButton];
+			
+			[self addConstraint:[NSLayoutConstraint constraintWithItem:showReviewsButton
+															 attribute:NSLayoutAttributeTop
+															 relatedBy:NSLayoutRelationEqual
+																toItem:self
+															 attribute:NSLayoutAttributeTop
+															multiplier:1.0f
+															  constant:(14.0f + ((CGFloat)(5 - rating) * 30.0f) + padding)]];
+			
+			[self addConstraint:[NSLayoutConstraint constraintWithItem:showReviewsButton
+															 attribute:NSLayoutAttributeCenterX
+															 relatedBy:NSLayoutRelationEqual
+																toItem:self
+															 attribute:NSLayoutAttributeCenterX
+															multiplier:1.0f
+															  constant:0.0f]];
+			
+			[self addConstraint:[NSLayoutConstraint constraintWithItem:showReviewsButton
+															 attribute:NSLayoutAttributeWidth
+															 relatedBy:NSLayoutRelationEqual
+																toItem:nil
+															 attribute:NSLayoutAttributeNotAnAttribute
+															multiplier:1.0f
+															  constant:(padding + labelWidth + padding + barWidth + padding + labelWidth + padding)]];
+			
+			[self addConstraint:[NSLayoutConstraint constraintWithItem:showReviewsButton
+															 attribute:NSLayoutAttributeHeight
+															 relatedBy:NSLayoutRelationEqual
+																toItem:nil
+															 attribute:NSLayoutAttributeNotAnAttribute
+															multiplier:1.0f
+															  constant:(2.0f + barHeight + 2.0f)]];
+			
+			UIView *barBackgroundView = [[UIView alloc] init];
+			barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
+			barBackgroundView.userInteractionEnabled = NO;
+			barBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+			[showReviewsButton addSubview:barBackgroundView];
+			
+			[showReviewsButton addConstraint:[NSLayoutConstraint constraintWithItem:barBackgroundView
+																		  attribute:NSLayoutAttributeCenterX
+																		  relatedBy:NSLayoutRelationEqual
+																			 toItem:showReviewsButton
+																		  attribute:NSLayoutAttributeCenterX
+																		 multiplier:1.0f
+																		   constant:0.0f]];
+			
+			[showReviewsButton addConstraint:[NSLayoutConstraint constraintWithItem:barBackgroundView
+																		  attribute:NSLayoutAttributeCenterY
+																		  relatedBy:NSLayoutRelationEqual
+																			 toItem:showReviewsButton
+																		  attribute:NSLayoutAttributeCenterY
+																		 multiplier:1.0f
+																		   constant:0.0f]];
+			
+			[showReviewsButton addConstraint:[NSLayoutConstraint constraintWithItem:barBackgroundView
+																		  attribute:NSLayoutAttributeHeight
+																		  relatedBy:NSLayoutRelationEqual
+																			 toItem:nil
+																		  attribute:NSLayoutAttributeNotAnAttribute
+																		 multiplier:1.0f
+																		   constant:barHeight]];
+			
+			UIView *barView = [[UIView alloc] initWithFrame:CGRectMake(padding + labelWidth + padding, 2.0f, 0.0f, barHeight)];
+			barView.backgroundColor = [UIColor colorWithRed:138.0f/255.0f green:156.0f/255.0f blue:171.0f/255.0f alpha:1.0f];
+			barView.userInteractionEnabled = NO;
+			barView.translatesAutoresizingMaskIntoConstraints = NO;
+			[showReviewsButton addSubview:barView];
+			[barViews addObject:barView];
+			
+			UILabel *starLabel = [[UILabel alloc] init];
 			starLabel.backgroundColor = [UIColor clearColor];
 			starLabel.textAlignment = NSTextAlignmentRight;
 			starLabel.textColor = [UIColor darkGrayColor];
 			starLabel.shadowColor = [UIColor whiteColor];
-			starLabel.shadowOffset = CGSizeMake(0, 1);
-			starLabel.font = [UIFont systemFontOfSize:15.0];
+			starLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
+			starLabel.font = [UIFont systemFontOfSize:15.0f];
 			starLabel.text = [@"" stringByPaddingToLength:rating withString:@"\u2605" startingAtIndex:0];
-			[self addSubview:starLabel];
+			starLabel.translatesAutoresizingMaskIntoConstraints = NO;
+			[showReviewsButton addSubview:starLabel];
 			
-			UIView *barBackgroundView = [[UIView alloc] initWithFrame:barFrame];
-			barBackgroundView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
-			barBackgroundView.userInteractionEnabled = NO;
-			[self addSubview:barBackgroundView];
+			[showReviewsButton addConstraint:[NSLayoutConstraint constraintWithItem:starLabel
+																		  attribute:NSLayoutAttributeCenterY
+																		  relatedBy:NSLayoutRelationEqual
+																			 toItem:barBackgroundView
+																		  attribute:NSLayoutAttributeCenterY
+																		 multiplier:1.0f
+																		   constant:0.0f]];
 			
-			UIView *barView = [[UIView alloc] initWithFrame:barBackgroundView.frame];
-			barView.backgroundColor = [UIColor colorWithRed:0.541 green:0.612 blue:0.671 alpha:1.0];
-			barView.userInteractionEnabled = NO;
-			[self addSubview:barView];
-			[barViews addObject:barView];
+			[showReviewsButton addConstraint:[NSLayoutConstraint constraintWithItem:starLabel
+																		  attribute:NSLayoutAttributeHeight
+																		  relatedBy:NSLayoutRelationEqual
+																			 toItem:barBackgroundView
+																		  attribute:NSLayoutAttributeHeight
+																		 multiplier:1.0f
+																		   constant:0.0f]];
 			
-			UIButton *showReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-			CGRect showReviewsButtonFrame = CGRectMake(10, barBackgroundView.frame.origin.y - 2, self.bounds.size.width - 20, CGRectGetHeight(barFrame) + 4);
-			[showReviewsButton setBackgroundImage:[[UIImage imageNamed:@"ReviewBarButton"] stretchableImageWithLeftCapWidth:8 topCapHeight:0] forState:UIControlStateHighlighted];
-			showReviewsButton.frame = showReviewsButtonFrame;
-			showReviewsButton.tag = rating;
-			[self insertSubview:showReviewsButton atIndex:0];
-			[showReviewsButton addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
-			
-			UILabel *barLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(barFrame) + 5, barFrame.origin.y, 30, barFrame.size.height)];
+			UILabel *barLabel = [[UILabel alloc] init];
 			barLabel.backgroundColor = [UIColor clearColor];
+			barLabel.textAlignment = NSTextAlignmentLeft;
 			barLabel.textColor = [UIColor darkGrayColor];
-			barLabel.font = [UIFont systemFontOfSize:13.0];
-			barLabel.adjustsFontSizeToFitWidth = YES;
 			barLabel.shadowColor = [UIColor whiteColor];
-			barLabel.shadowOffset = CGSizeMake(0, 1);
-			
-			[self addSubview:barLabel];
+			barLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
+			barLabel.font = [UIFont systemFontOfSize:13.0f];
+			barLabel.adjustsFontSizeToFitWidth = YES;
+			barLabel.translatesAutoresizingMaskIntoConstraints = NO;
+			[showReviewsButton addSubview:barLabel];
 			[barLabels addObject:barLabel];
+			
+			[showReviewsButton addConstraint:[NSLayoutConstraint constraintWithItem:barLabel
+																		  attribute:NSLayoutAttributeCenterY
+																		  relatedBy:NSLayoutRelationEqual
+																			 toItem:barBackgroundView
+																		  attribute:NSLayoutAttributeCenterY
+																		 multiplier:1.0f
+																		   constant:0.0f]];
+			
+			[showReviewsButton addConstraint:[NSLayoutConstraint constraintWithItem:barLabel
+																		  attribute:NSLayoutAttributeHeight
+																		  relatedBy:NSLayoutRelationEqual
+																			 toItem:barBackgroundView
+																		  attribute:NSLayoutAttributeHeight
+																		 multiplier:1.0f
+																		   constant:0.0f]];
+			
+			[showReviewsButton addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[starLabel(l)]-p-[barBackgroundView(b)]-p-[barLabel(l)]"
+																					  options:0
+																					  metrics:@{@"b": @(barWidth), @"l": @(labelWidth), @"p": @(padding)}
+																						views:@{@"starLabel": starLabel, @"barBackgroundView": barBackgroundView, @"barLabel": barLabel}]];
 		}
 		
-		if (!iPad) {
-			UIView *separator = [[UIView alloc] initWithFrame:CGRectMake(10, self.bounds.size.height - 44, self.bounds.size.width - 20, 1)];
-			separator.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
-			[self addSubview:separator];
-		}
+		UIView *separator = [[UIView alloc] init];
+		separator.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
+		separator.translatesAutoresizingMaskIntoConstraints = NO;
+		[self addSubview:separator];
+		
+		UIView *contentView = [[UIView alloc] init];
+		contentView.backgroundColor = [UIColor clearColor];
+		contentView.translatesAutoresizingMaskIntoConstraints = NO;
+		[self addSubview:contentView];
+		
+		[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-p-[contentView]-p-|"
+																	 options:0
+																	 metrics:@{@"p": @(padding)}
+																	   views:@{@"contentView": contentView}]];
+		
+		[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[separator(1)][contentView(h)]|"
+																	 options:0
+																	 metrics:@{@"h": @(contentViewHeight)}
+																	   views:@{@"contentView": contentView, @"separator": separator}]];
+		
+		[self addConstraint:[NSLayoutConstraint constraintWithItem:separator
+														 attribute:NSLayoutAttributeCenterX
+														 relatedBy:NSLayoutRelationEqual
+															toItem:contentView
+														 attribute:NSLayoutAttributeCenterX
+														multiplier:1.0f
+														  constant:0.0f]];
+		
+		[self addConstraint:[NSLayoutConstraint constraintWithItem:separator
+														 attribute:NSLayoutAttributeWidth
+														 relatedBy:NSLayoutRelationEqual
+															toItem:contentView
+														 attribute:NSLayoutAttributeWidth
+														multiplier:1.0f
+														  constant:0.0f]];
 		
 		UIButton *allReviewsButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		if (iPad) {
-			CGRect barFrame = [self barFrameForRating:0];
-			allReviewsButton.frame = CGRectMake(CGRectGetMaxX(barFrame) - 145 - 5, CGRectGetMinY(barFrame), 145, 28);
-		} else {
-			allReviewsButton.frame = CGRectMake(110, self.bounds.size.height - 37, 145, 28);
-		}
-		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButton"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateNormal];
-		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButtonHighlighted"] stretchableImageWithLeftCapWidth:18 topCapHeight:0] forState:UIControlStateHighlighted];
-		[allReviewsButton setTitle:NSLocalizedString(@"Show All Reviews", nil) forState:UIControlStateNormal];
-		[allReviewsButton setTitleEdgeInsets:UIEdgeInsetsMake(0, -10, 0, 0)];
-		allReviewsButton.titleLabel.font = [UIFont boldSystemFontOfSize:13.0];
-		[allReviewsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
-		allReviewsButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
-		[allReviewsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-		allReviewsButton.tag = 0;
-		[self addSubview:allReviewsButton];
+		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButton"] resizableImageWithCapInsets:UIEdgeInsetsMake(6.0f, 18.0f, 6.0f, 18.0f) resizingMode:UIImageResizingModeStretch] forState:UIControlStateNormal];
+		[allReviewsButton setBackgroundImage:[[UIImage imageNamed:@"AllReviewsButtonHighlighted"] resizableImageWithCapInsets:UIEdgeInsetsMake(6.0f, 18.0f, 6.0f, 18.0f) resizingMode:UIImageResizingModeStretch] forState:UIControlStateHighlighted];
 		[allReviewsButton addTarget:self action:@selector(showReviews:) forControlEvents:UIControlEventTouchUpInside];
-		if (iPad) {
-			CGRect barFrame = [self barFrameForRating:0];
-			averageLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(barFrame) - 90 - 10, allReviewsButton.frame.origin.y, 90, 29)];
-		} else {
-			averageLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, allReviewsButton.frame.origin.y, 90, 29)];
-		}
-		averageLabel.font = [UIFont boldSystemFontOfSize:15.0];
-		averageLabel.backgroundColor = [UIColor clearColor];
-		averageLabel.textColor = [UIColor darkGrayColor];
-		averageLabel.textAlignment = NSTextAlignmentRight;
-		[self addSubview:averageLabel];
+		[allReviewsButton setTitle:NSLocalizedString(@"Show All Reviews", nil) forState:UIControlStateNormal];
+		allReviewsButton.titleLabel.font = [UIFont boldSystemFontOfSize:13.0f];
+		[allReviewsButton setTitleEdgeInsets:UIEdgeInsetsMake(0.0f, -10.0f, 0.0f, 0.0f)];
+		[allReviewsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+		[allReviewsButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+		allReviewsButton.titleLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
+		allReviewsButton.translatesAutoresizingMaskIntoConstraints = NO;
+		allReviewsButton.tag = 0;
+		[contentView addSubview:allReviewsButton];
 		
-		if (iPad) {
-			CGRect barFrame = [self barFrameForRating:0];
-			sumLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(barFrame) + 5, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)];
-		} else {
-			sumLabel = [[UILabel alloc] initWithFrame:CGRectMake(260, allReviewsButton.frame.origin.y, 30, allReviewsButton.frame.size.height)];
-		}
-		sumLabel.font = [UIFont systemFontOfSize:13.0];
+		[contentView addConstraint:[NSLayoutConstraint constraintWithItem:allReviewsButton
+																attribute:NSLayoutAttributeCenterX
+																relatedBy:NSLayoutRelationEqual
+																   toItem:contentView
+																attribute:NSLayoutAttributeCenterX
+															   multiplier:1.0f
+																 constant:0.0f]];
+		
+		[contentView addConstraint:[NSLayoutConstraint constraintWithItem:allReviewsButton
+																attribute:NSLayoutAttributeCenterY
+																relatedBy:NSLayoutRelationEqual
+																   toItem:contentView
+																attribute:NSLayoutAttributeCenterY
+															   multiplier:1.0f
+																 constant:0.0f]];
+		
+		[contentView addConstraint:[NSLayoutConstraint constraintWithItem:allReviewsButton
+																attribute:NSLayoutAttributeHeight
+																relatedBy:NSLayoutRelationEqual
+																   toItem:nil
+																attribute:NSLayoutAttributeNotAnAttribute
+															   multiplier:1.0f
+																 constant:buttonHeight]];
+		
+		averageLabel = [[UILabel alloc] init];
+		averageLabel.backgroundColor = [UIColor clearColor];
+		averageLabel.textAlignment = NSTextAlignmentRight;
+		averageLabel.textColor = [UIColor darkGrayColor];
+		averageLabel.shadowColor = [UIColor whiteColor];
+		averageLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
+		averageLabel.font = [UIFont boldSystemFontOfSize:15.0f];
+		averageLabel.translatesAutoresizingMaskIntoConstraints = NO;
+		[contentView addSubview:averageLabel];
+		
+		[contentView addConstraint:[NSLayoutConstraint constraintWithItem:averageLabel
+																attribute:NSLayoutAttributeCenterY
+																relatedBy:NSLayoutRelationEqual
+																   toItem:allReviewsButton
+																attribute:NSLayoutAttributeCenterY
+															   multiplier:1.0f
+																 constant:0.0f]];
+		
+		[contentView addConstraint:[NSLayoutConstraint constraintWithItem:averageLabel
+																attribute:NSLayoutAttributeHeight
+																relatedBy:NSLayoutRelationEqual
+																   toItem:allReviewsButton
+																attribute:NSLayoutAttributeHeight
+															   multiplier:1.0f
+																 constant:0.0f]];
+		
+		sumLabel = [[UILabel alloc] init];
 		sumLabel.backgroundColor = [UIColor clearColor];
+		sumLabel.textAlignment = NSTextAlignmentLeft;
 		sumLabel.textColor = [UIColor darkGrayColor];
-		[self addSubview:sumLabel];
+		sumLabel.shadowColor = [UIColor whiteColor];
+		sumLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
+		sumLabel.font = [UIFont systemFontOfSize:13.0f];
+		sumLabel.translatesAutoresizingMaskIntoConstraints = NO;
+		[contentView addSubview:sumLabel];
+		
+		[contentView addConstraint:[NSLayoutConstraint constraintWithItem:sumLabel
+																attribute:NSLayoutAttributeCenterY
+																relatedBy:NSLayoutRelationEqual
+																   toItem:allReviewsButton
+																attribute:NSLayoutAttributeCenterY
+															   multiplier:1.0f
+																 constant:0.0f]];
+		
+		[contentView addConstraint:[NSLayoutConstraint constraintWithItem:sumLabel
+																attribute:NSLayoutAttributeHeight
+																relatedBy:NSLayoutRelationEqual
+																   toItem:allReviewsButton
+																attribute:NSLayoutAttributeHeight
+															   multiplier:1.0f
+																 constant:0.0f]];
+		
+		[contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[averageLabel]-p-[allReviewsButton(w)]-p-[sumLabel]|"
+																			options:0
+																			metrics:@{@"w": @(buttonWidth), @"p": @(padding)}
+																			  views:@{@"averageLabel": averageLabel, @"allReviewsButton": allReviewsButton, @"sumLabel": sumLabel}]];
 	}
 	return self;
 }
@@ -136,10 +322,11 @@
 	
 	for (NSInteger rating = 5; rating >= 1; rating--) {
 		NSInteger numberOfReviews = [ratings[@(rating)] integerValue];
-		float percentage = (total == 0) ? 0 : (float)numberOfReviews / (float)max;
-		CGRect barFrame = [self barFrameForRating:rating];
-		barFrame.size.width = barFrame.size.width * percentage;
-		[barViews[5 - rating] setFrame:barFrame];
+		CGFloat percentage = (total == 0) ? 0 : (CGFloat)numberOfReviews / (CGFloat)max;
+		UIView *barView = barViews[5 - rating];
+		CGRect barFrame = barView.frame;
+		barFrame.size.width = barWidth * percentage;
+		barView.frame = barFrame;
 		
 		UILabel *barLabel = barLabels[5 - rating];
 		barLabel.text = [NSString stringWithFormat:@"%li", (long)numberOfReviews];
@@ -164,22 +351,10 @@
 	}
 }
 
-- (CGRect)barFrameForRating:(NSInteger)rating {
-	BOOL iPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad;
-	if (!iPad) {
-		CGRect barFrame = CGRectMake(110, 12 + (5-rating) * 30, 145, 24);
-		return barFrame;
-	} else {
-		CGRect barFrame = CGRectMake(150, 105 + (5 - rating) * 45, 467, 35);
-		return barFrame;
-	}
-}
-
 - (void)showReviews:(UIButton *)button {
 	if (self.delegate && [self.delegate respondsToSelector:@selector(reviewSummaryView:didSelectRating:)]) {
 		[self.delegate reviewSummaryView:self didSelectRating:button.tag];
 	}
 }
-
 
 @end
