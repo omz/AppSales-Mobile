@@ -7,14 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreText/CoreText.h>
+#import "DashboardAppCell.h"
 
-@interface BadgedCell : UITableViewCell {
-
+@interface BadgedCell : DashboardAppCell {
+	NSLayoutConstraint *textLabelLeftConstraint;
+	NSLayoutConstraint *textLabelLeftMarginConstraint;
+	NSLayoutConstraint *badgeViewWidthConstraint;
+	NSLayoutConstraint *badgeViewRightConstraint;
+	NSLayoutConstraint *badgeViewRightMarginConstraint;
 	UIImageView *badgeView;
 	UILabel *badgeLabel;
-	NSInteger badgeCount;
+	NSNumberFormatter *numberFormatter;
 }
 
+@property (nonatomic, strong) NSString *imageName;
 @property (nonatomic, assign) NSInteger badgeCount;
 
 @end

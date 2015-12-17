@@ -29,6 +29,11 @@
 	return self;
 }
 
+- (void)loadView {
+	[super loadView];
+	[self.tableView registerClass:[BadgedCell class] forCellReuseIdentifier:@"Cell"];
+}
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	[self reloadData];
@@ -106,6 +111,13 @@
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (NSInteger)unusedCount:(Product *)product {
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	fetchRequest.entity = [NSEntityDescription entityForName:@"PromoCode" inManagedObjectContext:product.managedObjectContext];
+	fetchRequest.predicate = [NSPredicate predicateWithFormat:@"product == %@ AND used == FALSE", product];
+	return [product.managedObjectContext countForFetchRequest:fetchRequest error:nil];
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return 1;
 }
@@ -114,23 +126,18 @@
 	return [sortedApps count];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	return 44.0f;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	static NSString *CellIdentifier = @"Cell";
-	BadgedCell *cell = (BadgedCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-	if (cell == nil) {
-		cell = [[BadgedCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-	}
+	BadgedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 	
-	Product *app = sortedApps[indexPath.row];
-	
-	NSFetchRequest *unusedPromoCodesRequest = [[NSFetchRequest alloc] init];
-	[unusedPromoCodesRequest setEntity:[NSEntityDescription entityForName:@"PromoCode" inManagedObjectContext:[app managedObjectContext]]];
-	[unusedPromoCodesRequest setPredicate:[NSPredicate predicateWithFormat:@"product == %@ AND used == FALSE", app]];
-	NSInteger count = [[app managedObjectContext] countForFetchRequest:unusedPromoCodesRequest error:nil];
-	
+	// Configure the cell...
+	Product *product = sortedApps[indexPath.row];
 	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-	cell.badgeCount = count;
-	cell.textLabel.text = [app displayName];
+	cell.badgeCount = [self unusedCount:product];
+	cell.product = product;
 	
 	return cell;
 }

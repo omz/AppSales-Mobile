@@ -79,14 +79,18 @@
 	return sortedApps.count;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	return 44.0f;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	BadgedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 	
 	// Configure the cell...
 	Product *product = sortedApps[indexPath.row];
 	cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-	cell.textLabel.text = product.displayName;
 	cell.badgeCount = [self unreadCount:product];
+	cell.product = product;
 	
 	return cell;
 }
