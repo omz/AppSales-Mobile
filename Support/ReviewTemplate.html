@@ -23,7 +23,8 @@
 		
 		#content-pane {
 			margin: 0;
-			padding: 10px;
+			padding-top: 6px;
+			padding-bottom: 10px;
 			padding-left: 12px;
 			padding-right: 12px;
 			overflow: visible;
@@ -56,13 +57,41 @@
 			background-color: #e0e4e7;
 			color: #8999a5;
 			font-size: 11pt;
-			border:solid #8999a5;
+			border: solid #aec2d1;
 			border-width: 0 0 1px 0;
 		}
 		
 		.rating-text {
 			color: #ff9600;
 			padding-right: 6pt;
+		}
+		
+		.review-country {
+			margin: 0;
+			padding: 6px;
+			padding-left: 12px;
+			padding-right: 12px;
+			display: block;
+			background-color: #edf2f5;
+			color: #8999a5;
+			font-size: 11pt;
+			border: solid #aec2d1;
+			border-width: 0 0 1px 0;
+			line-height: 1em;
+			text-align: center;
+		}
+		
+		.flag-icon {
+			width: 24px; height: 18px;
+			padding-right: 4px;
+			margin: auto;
+			top: 0; bottom: 0;
+			left: 0; right: 0;
+			vertical-align: middle;
+		}
+		
+		.country-name {
+			vertical-align: middle;
 		}
 		
 		a, a:visited {
@@ -74,6 +103,7 @@
 <body>
 	<h2 class="review-title">[[[TITLE]]]</h2>
 	<div class="review-subtitle"><span class="rating-text">[[[RATING]]]</span>[[[NICKNAME]]] - [[[DATE]]]</div>
+	<div class="review-country"><img class="flag-icon" src="data:image/png;base64,[[[COUNTRY_FLAG]]]" /><span class="country-name">[[[COUNTRY_NAME]]]</span></div>
 	<div id="content-pane">
 		[[[CONTENT]]]
 	</div>

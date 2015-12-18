@@ -8,6 +8,7 @@
 
 #import "ReviewDetailViewController.h"
 #import "LoginManager.h"
+#import "CountryDictionary.h"
 #import "Review.h"
 #import "Version.h"
 #import "Product.h"
@@ -128,11 +129,21 @@
 	NSString *ratingString = [@"" stringByPaddingToLength:review.rating.integerValue withString:@"\u2605" startingAtIndex:0];
 	ratingString = [ratingString stringByPaddingToLength:5 withString:@"\u2606" startingAtIndex:0];
 	
+	UIImage *flagImage = [UIImage imageNamed:review.countryCode.uppercaseString];
+	if (flagImage == nil) {
+		flagImage = [UIImage imageNamed:@"WW"];
+	}
+	NSData *flagData = UIImagePNGRepresentation(flagImage);
+	NSString *flagBase64 = [flagData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+	NSString *countryName = [[CountryDictionary sharedDictionary] nameForCountryCode:review.countryCode.uppercaseString];
+	
 	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:reviewTitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[RATING]]]" withString:ratingString];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[NICKNAME]]]" withString:review.nickname];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[DATE]]]" withString:[dateFormatter stringFromDate:review.created]];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_FLAG]]]" withString:flagBase64];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_NAME]]]" withString:countryName];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:reviewText];
 	
 	[webView loadHTMLString:template baseURL:nil];
