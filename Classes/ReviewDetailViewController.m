@@ -29,14 +29,18 @@
 - (void)loadView {
 	[super loadView];
 	
+	UIEdgeInsets contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 44.0f, 0.0f);
+	
 	webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.backgroundColor = [UIColor whiteColor];
 	webView.opaque = NO;
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
+	webView.scrollView.contentInset = contentInset;
+	webView.scrollView.scrollIndicatorInsets = contentInset;
 	self.view = webView;
 	
-	toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.bounds.size.height - 44.0f, self.view.bounds.size.width, 44.0f)];
+	toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.bounds.size.height - contentInset.bottom, self.view.bounds.size.width, contentInset.bottom)];
 	toolbar.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth);
 	[self.view addSubview:toolbar];
 	
