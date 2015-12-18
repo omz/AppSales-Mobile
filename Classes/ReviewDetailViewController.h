@@ -18,6 +18,7 @@
 	UIToolbar *toolbar;
 	UIBarButtonItem *previousItem;
 	UIBarButtonItem *nextItem;
+	UIBarButtonItem *markItem;
 	NSDateFormatter *dateFormatter;
 }
 

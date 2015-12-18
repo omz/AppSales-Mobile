@@ -41,22 +41,20 @@
 	[super viewDidLoad];
 	
 	// Do any additional setup after loading the view.
-	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark All Read", nil) style:UIBarButtonItemStyleDone target:self action:@selector(markAllAsRead:)];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark All…", nil) style:UIBarButtonItemStyleDone target:self action:@selector(markAllReviews)];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)markAllAsRead:(id)sender {
+- (void)markAllReviewsUnread:(BOOL)unread {
 	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 	moc.persistentStoreCoordinator = self.fetchedResultsController.managedObjectContext.persistentStoreCoordinator;
 	moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 	
 	for (Review *review in self.fetchedResultsController.fetchedObjects) {
-		if ([review.unread boolValue]) {
-			review.unread = @(NO);
-		}
+		review.unread = @(unread);
 	}
 	
 	[moc.persistentStoreCoordinator performBlockAndWait:^{
@@ -66,8 +64,24 @@
 			NSLog(@"Could not save context: %@", saveError);
 		}
 	}];
+}
+
+- (void)markAllReviews {
+	UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil
+																			 message:nil
+																	  preferredStyle:UIAlertControllerStyleActionSheet];
 	
-	[self.navigationController popViewControllerAnimated:YES];
+	[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Mark All Unread", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+		[self markAllReviewsUnread:YES];
+	}]];
+	
+	[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Mark All Read", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+		[self markAllReviewsUnread:NO];
+	}]];
+	
+	[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+	
+	[self presentViewController:alertController animated:YES completion:nil];
 }
 
 #pragma mark - Table view data source

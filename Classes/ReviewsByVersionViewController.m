@@ -199,13 +199,7 @@
 	}
 	
 	ReviewListViewController *vc = [[ReviewListViewController alloc] initWithProduct:product versions:selectedVersions rating:rating];
-//	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-		[self.navigationController pushViewController:vc animated:YES];
-//	} else {
-//		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
-//		self.reviewsPopover = [[UIPopoverController alloc] initWithContentViewController:nav];
-//		[reviewsPopover presentPopoverFromRect:[reviewSummaryView barFrameForRating:rating]	inView:reviewSummaryView permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
-//	}
+	[self.navigationController pushViewController:vc animated:YES];
 }
 
 #pragma mark - UITableViewDataSource

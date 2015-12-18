@@ -43,8 +43,9 @@
 	previousItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(previousReview)];
 	nextItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward"] style:UIBarButtonItemStylePlain target:self action:@selector(nextReview)];
 	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+	markItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark Unread", nil) style:UIBarButtonItemStylePlain target:self action:@selector(markReview)];
 	
-	toolbar.items = @[previousItem, nextItem, flexSpaceItem];
+	toolbar.items = @[previousItem, nextItem, flexSpaceItem, markItem];
 	toolbar.translucent = YES;
 }
 
@@ -59,6 +60,37 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+- (void)updateToolbarButtons {
+	previousItem.enabled = (0 < index);
+	nextItem.enabled = (index < (reviews.count - 1));
+	markItem.title = reviews[index].unread.boolValue ? NSLocalizedString(@"Mark Read", nil) : NSLocalizedString(@"Mark Unread", nil);
+	markItem.style = reviews[index].unread.boolValue ? UIBarButtonItemStyleDone : UIBarButtonItemStylePlain;
+}
+
+- (void)markUnread:(BOOL)unread {
+	Review *review = reviews[index];
+	review.unread = @(unread);
+	
+	markItem.title = review.unread.boolValue ? NSLocalizedString(@"Mark Read", nil) : NSLocalizedString(@"Mark Unread", nil);
+	markItem.style = reviews[index].unread.boolValue ? UIBarButtonItemStyleDone : UIBarButtonItemStylePlain;
+	
+	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+	moc.persistentStoreCoordinator = review.managedObjectContext.persistentStoreCoordinator;
+	moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+	
+	[moc.persistentStoreCoordinator performBlockAndWait:^{
+		NSError *saveError = nil;
+		[moc save:&saveError];
+		if (saveError) {
+			NSLog(@"Could not save context: %@", saveError);
+		}
+	}];
+}
+
+- (void)markReview {
+	[self markUnread:!reviews[index].unread.boolValue];
 }
 
 - (void)previousReview {
@@ -77,45 +109,29 @@
 
 - (void)updateCurrentReview {
 	[self updateToolbarButtons];
-	
-	Review *review = reviews[index];
-	review.unread = @(NO);
-	
-	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-	moc.persistentStoreCoordinator = review.managedObjectContext.persistentStoreCoordinator;
-	moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
-	
-	[moc.persistentStoreCoordinator performBlockAndWait:^{
-		NSError *saveError = nil;
-		[moc save:&saveError];
-		if (saveError) {
-			NSLog(@"Could not save context: %@", saveError);
-		}
-	}];
-	
+	[self markUnread:NO];
 	[self updateReviewWithTitle:nil text:nil];
 }
 
 - (void)updateReviewWithTitle:(NSString *)title text:(NSString *)text {
 	Review *review = reviews[index];
 	
-	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
+	NSString *reviewTitle = title ?: review.title;
+	
+	NSString *reviewText = text ?: review.text;
+	reviewText = [reviewText stringByReplacingOccurrencesOfString:@"\n" withString:@"<br/>"];
 	
 	NSString *ratingString = [@"" stringByPaddingToLength:review.rating.integerValue withString:@"\u2605" startingAtIndex:0];
 	ratingString = [ratingString stringByPaddingToLength:5 withString:@"\u2606" startingAtIndex:0];
 	
-	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:title ?: review.title];
+	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:reviewTitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[RATING]]]" withString:ratingString];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[NICKNAME]]]" withString:review.nickname];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[DATE]]]" withString:[dateFormatter stringFromDate:review.created]];
-	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:text ?: review.text];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:reviewText];
 	
 	[webView loadHTMLString:template baseURL:nil];
-}
-
-- (void)updateToolbarButtons {
-	previousItem.enabled = (0 < index);
-	nextItem.enabled = (index < (reviews.count - 1));
 }
 
 - (void)sendReviewViaEmail {
