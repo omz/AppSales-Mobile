@@ -149,58 +149,60 @@ NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/WebObjects/iTunesC
 			if (![statusCode isEqualToString:@"SUCCESS"]) {
 				[self showAlert:statusCode withMessages:versionPage[@"messages"]];
 			} else {
-				Product *product = (Product *)[moc objectWithID:productObjectID];
-				
-				versionPage = versionPage[@"data"];
-				NSArray *reviews = versionPage[@"reviews"];
-				for (NSDictionary *reviewData in reviews) {
-					NSNumber *identifier = reviewData[@"id"];
-					NSTimeInterval timeInterval = [reviewData[@"created"] doubleValue];
-					timeInterval /= 1000.0;
-					NSDate *created = [NSDate dateWithTimeIntervalSince1970:timeInterval];
-					NSString *nickname = reviewData[@"nickname"];
-					NSNumber *rating = reviewData[@"rating"];
-					NSString *title = reviewData[@"title"];
-					NSString *text = reviewData[@"review"];
+				@synchronized(moc) {
+					Product *product = (Product *)[moc objectWithID:productObjectID];
 					
-					Review *review = existingReviews[identifier];
-					if (review == nil) {
-						review = (Review *)[NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
-						review.identifier = identifier;
-						review.created = created;
-						review.version = version;
-						review.product = product;
-						review.countryCode = countryCode;
-						review.nickname = nickname;
-						review.rating = rating;
-						review.title = title;
-						review.text = text;
-						review.unread = @(YES);
-						[[version mutableSetValueForKey:@"reviews"] addObject:review];
-						[[product mutableSetValueForKey:@"reviews"] addObject:review];
-					} else if (([created compare:review.created] != NSOrderedSame) ||
-							   (rating.intValue != review.rating.intValue) ||
-							   ![title isEqualToString:review.title] ||
-							   ![text isEqualToString:review.text] ||
-							   ![nickname isEqualToString:review.nickname]) {
-						review.created = created;
-						review.nickname = nickname;
-						review.rating = rating;
-						review.title = title;
-						review.text = text;
-						review.unread = @(YES);
-						[[version mutableSetValueForKey:@"reviews"] addObject:review];
-						[[product mutableSetValueForKey:@"reviews"] addObject:review];
+					versionPage = versionPage[@"data"];
+					NSArray *reviews = versionPage[@"reviews"];
+					for (NSDictionary *reviewData in reviews) {
+						NSNumber *identifier = reviewData[@"id"];
+						NSTimeInterval timeInterval = [reviewData[@"created"] doubleValue];
+						timeInterval /= 1000.0;
+						NSDate *created = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+						NSString *nickname = reviewData[@"nickname"];
+						NSNumber *rating = reviewData[@"rating"];
+						NSString *title = reviewData[@"title"];
+						NSString *text = reviewData[@"review"];
+						
+						Review *review = existingReviews[identifier];
+						if (review == nil) {
+							review = (Review *)[NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
+							review.identifier = identifier;
+							review.created = created;
+							review.version = version;
+							review.product = product;
+							review.countryCode = countryCode;
+							review.nickname = nickname;
+							review.rating = rating;
+							review.title = title;
+							review.text = text;
+							review.unread = @(YES);
+							[[version mutableSetValueForKey:@"reviews"] addObject:review];
+							[[product mutableSetValueForKey:@"reviews"] addObject:review];
+						} else if (([created compare:review.created] != NSOrderedSame) ||
+								   (rating.intValue != review.rating.intValue) ||
+								   ![title isEqualToString:review.title] ||
+								   ![text isEqualToString:review.text] ||
+								   ![nickname isEqualToString:review.nickname]) {
+							review.created = created;
+							review.nickname = nickname;
+							review.rating = rating;
+							review.title = title;
+							review.text = text;
+							review.unread = @(YES);
+							[[version mutableSetValueForKey:@"reviews"] addObject:review];
+							[[product mutableSetValueForKey:@"reviews"] addObject:review];
+						}
 					}
+					
+					[moc.persistentStoreCoordinator performBlockAndWait:^{
+						NSError *saveError = nil;
+						[moc save:&saveError];
+						if (saveError) {
+							NSLog(@"Could not save context: %@", saveError);
+						}
+					}];
 				}
-				
-				[moc.persistentStoreCoordinator performBlockAndWait:^{
-					NSError *saveError = nil;
-					[moc save:&saveError];
-					if (saveError) {
-						NSLog(@"Could not save context: %@", saveError);
-					}
-				}];
 			}
 		}
 		
