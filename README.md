@@ -21,6 +21,20 @@ AppSales requires the iOS 8.2 SDK or later.
 
 Because there is no API to access some parts of iTunes Connect, AppSales scrapes [itunesconnect.apple.com](https://itunesconnect.apple.com). This means that even small changes on this website can break some functionality. In most cases, this is easy to fix and I'll try to make a new version available here. The report download itself uses Apple's auto-ingestion interface to iTunes Connect and should generally be unaffected by changes to the website.
 
+## Getting Started
+
+Run the following command in Terminal.app to download a copy of this repo (along with all submodules) to your machine:
+
+```
+git clone --recursive https://github.com/nicolasgomollon/AppSales-Mobile.git
+```
+
+NOTE: Make sure to run the following command after `git pull`ing any changes:
+
+```
+git submodule update --recursive
+```
+
 ## About
 
 You can follow me on Twitter for updates on the development: [@olemoritz](https://twitter.com/olemoritz)
