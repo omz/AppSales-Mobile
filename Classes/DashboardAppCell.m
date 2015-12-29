@@ -53,7 +53,7 @@ CGFloat const kLabelPadding = 10.0f;
 	self.separatorInset = UIEdgeInsetsMake(0.0f, CGRectGetMaxX(iconView.frame) + kIconPadding + 1.0f, 0.0f, 0.0f);
 	
 	CGSize contentSize = self.contentView.bounds.size;
-	CGFloat labelOriginX = (product != nil) ? (CGRectGetMaxX(iconView.frame) + kIconPadding + 1.0f) : (self.layoutMargins.left * 2.0f);
+	CGFloat labelOriginX = (product != nil) ? (CGRectGetMaxX(iconView.frame) + kIconPadding + 1.0f) : 15.0f;
 	nameLabel.frame = CGRectMake(labelOriginX, 0.0f, contentSize.width - labelOriginX - kLabelPadding, contentSize.height);
 	
 	nameLabel.text = product.displayName ?: NSLocalizedString(@"All Apps", nil);
