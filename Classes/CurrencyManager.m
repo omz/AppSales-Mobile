@@ -131,7 +131,7 @@
 		[exchangeRates setObject:@(0.635250) forKey:@"\"SGD/EUR\""];
 		[exchangeRates setObject:@(0.0331939) forKey:@"\"SKK/EUR\""];
 		[exchangeRates setObject:@(0.0251129) forKey:@"\"THB/EUR\""];
-        [exchangeRates setObject:@(0.302758) forKey:@"\"TRY/EUR\""];
+		[exchangeRates setObject:@(0.302758) forKey:@"\"TRY/EUR\""];
 		[exchangeRates setObject:@(0.0266770) forKey:@"\"TWD/EUR\""];
 		[exchangeRates setObject:@(0.892245) forKey:@"\"USD/EUR\""];
 		[exchangeRates setObject:@(0.0550936) forKey:@"\"ZAR/EUR\""];
