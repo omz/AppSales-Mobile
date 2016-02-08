@@ -71,7 +71,7 @@
 								 @"QAR",
 								 @"RUB",
 								 @"SAR", @"SEK", @"SGD",
-								 @"THB", @"TWD",
+								 @"THB", @"TRY", @"TWD",
 								 @"ZAR"];
 	
 	currencySymbols = @{@"EUR": @"€",
@@ -131,6 +131,7 @@
 		[exchangeRates setObject:@(0.5226) forKey:@"\"SGD/EUR\""];
 		[exchangeRates setObject:@(0.0329) forKey:@"\"SKK/EUR\""];
 		[exchangeRates setObject:@(0.0228) forKey:@"\"THB/EUR\""];
+        [exchangeRates setObject:@(0.3058) forKey:@"\"TRY/EUR\""];
 		[exchangeRates setObject:@(0.024) forKey:@"\"TWD/EUR\""];
 		[exchangeRates setObject:@(0.8003) forKey:@"\"USD/EUR\""];
 		[exchangeRates setObject:@(0.0764) forKey:@"\"ZAR/EUR\""];
