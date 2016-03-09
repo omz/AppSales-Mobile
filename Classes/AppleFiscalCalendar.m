@@ -38,8 +38,8 @@
 		[dateNovember2011Components setYear:2011];
 		NSDate *dateNovember2011 = [calendar dateFromComponents:dateNovember2011Components];
 		
-        NSDate* now = [NSDate date];
-        
+		NSDate* now = [NSDate date];
+		
 		//Covers fiscal calendar from 2008 to one period after the current fiscal period
 		while ([currentDate earlierDate:now] == currentDate || [currentDate isEqualToDate:now]) {
 			NSDate *nextDate;
