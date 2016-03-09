@@ -141,7 +141,12 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 				
 				// Clean up device name.
 				name = [htmlTagsRegex stringByReplacingMatchesInString:name options:0 range:NSMakeRange(0, name.length) withTemplate:@""];
+				// TODO: A more complete HTML-decoding utility should be used instead.
 				name = [name stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
+				name = [name stringByReplacingOccurrencesOfString:@"&lsquo;" withString:@"‘"];
+				name = [name stringByReplacingOccurrencesOfString:@"&rsquo;" withString:@"’"];
+				name = [name stringByReplacingOccurrencesOfString:@"&ldquo;" withString:@"“"];
+				name = [name stringByReplacingOccurrencesOfString:@"&rdquo;" withString:@"”"];
 				name = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 				
 				NSMutableDictionary *trustedDevice = [[NSMutableDictionary alloc] init];
