@@ -38,8 +38,10 @@
 		[dateNovember2011Components setYear:2011];
 		NSDate *dateNovember2011 = [calendar dateFromComponents:dateNovember2011Components];
 		
-		//Covers the fiscal calendar from 2008 to 2016:
-		while (period < 100) {
+		NSDate* now = [NSDate date];
+		
+		//Covers fiscal calendar from 2008 to one period after the current fiscal period
+		while ([currentDate earlierDate:now] == currentDate || [currentDate isEqualToDate:now]) {
 			NSDate *nextDate;
 			//First month in a quarter covers 5 weeks, the others 4:
 			if ([currentDate isEqualToDate:dateNovember2011]){ // December 2011 has 5 weeks
