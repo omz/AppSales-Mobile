@@ -141,12 +141,56 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 				
 				// Clean up device name.
 				name = [htmlTagsRegex stringByReplacingMatchesInString:name options:0 range:NSMakeRange(0, name.length) withTemplate:@""];
-				// TODO: A more complete HTML-decoding utility should be used instead.
+				
+				// Decode common ASCII symbols by their HTML name.
 				name = [name stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
 				name = [name stringByReplacingOccurrencesOfString:@"&lsquo;" withString:@"‘"];
 				name = [name stringByReplacingOccurrencesOfString:@"&rsquo;" withString:@"’"];
 				name = [name stringByReplacingOccurrencesOfString:@"&ldquo;" withString:@"“"];
 				name = [name stringByReplacingOccurrencesOfString:@"&rdquo;" withString:@"”"];
+				name = [name stringByReplacingOccurrencesOfString:@"&quot;" withString:@"\""];
+				name = [name stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
+				name = [name stringByReplacingOccurrencesOfString:@"&lt;" withString:@"<"];
+				name = [name stringByReplacingOccurrencesOfString:@"&gt;" withString:@">"];
+				
+				// Decode common ASCII symbols.
+				name = [name stringByReplacingOccurrencesOfString:@"&#32;" withString:@" "];
+				name = [name stringByReplacingOccurrencesOfString:@"&#33;" withString:@"!"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#34;" withString:@"\""];
+				name = [name stringByReplacingOccurrencesOfString:@"&#35;" withString:@"#"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#36;" withString:@"$"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#37;" withString:@"%"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#38;" withString:@"&"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#39;" withString:@"'"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#40;" withString:@"("];
+				name = [name stringByReplacingOccurrencesOfString:@"&#41;" withString:@")"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#42;" withString:@"*"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#43;" withString:@"+"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#44;" withString:@","];
+				name = [name stringByReplacingOccurrencesOfString:@"&#45;" withString:@"-"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#46;" withString:@"."];
+				name = [name stringByReplacingOccurrencesOfString:@"&#47;" withString:@"/"];
+				
+				name = [name stringByReplacingOccurrencesOfString:@"&#58;" withString:@":"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#59;" withString:@";"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#60;" withString:@"<"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#61;" withString:@"="];
+				name = [name stringByReplacingOccurrencesOfString:@"&#62;" withString:@">"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#63;" withString:@"?"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#64;" withString:@"@"];
+				
+				name = [name stringByReplacingOccurrencesOfString:@"&#91;" withString:@"["];
+				name = [name stringByReplacingOccurrencesOfString:@"&#92;" withString:@"\\"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#93;" withString:@"]"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#94;" withString:@"^"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#95;" withString:@"_"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#96;" withString:@"`"];
+				
+				name = [name stringByReplacingOccurrencesOfString:@"&#123;" withString:@"{"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#124;" withString:@"|"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#125;" withString:@"}"];
+				name = [name stringByReplacingOccurrencesOfString:@"&#126;" withString:@"~"];
+				
 				name = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 				
 				NSMutableDictionary *trustedDevice = [[NSMutableDictionary alloc] init];
