@@ -12,9 +12,12 @@
 #import "Review.h"
 #import "Version.h"
 
-NSString *const kITCReviewAPISummaryPageAction           = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews/summary?platform=ios";
-NSString *const kITCReviewAPISummaryVersionPageAction    = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews/summary?platform=ios&versionId=%@";
-NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews?platform=ios&versionId=%@&storefront=%@";
+NSString *const kITCReviewAPISummaryPageAction           = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews/summary?platform=%@";
+NSString *const kITCReviewAPISummaryVersionPageAction    = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews/summary?platform=%@&versionId=%@";
+NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews?platform=%@&versionId=%@&storefront=%@";
+
+NSString *const kITCReviewAPIPlatformiOS = @"ios";
+NSString *const kITCReviewAPIPlatformMac = @"osx";
 
 @implementation ReviewDownloader
 
@@ -67,7 +70,8 @@ NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/WebObjects/iTunesC
 		NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
 		NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:nil error:nil];
 		if (paymentsPageData) {
-			NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryPageAction, _product.productID];
+			NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
+			NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryPageAction, _product.productID, platform];
 			NSURL *summaryPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:summaryPagePath]];
 			NSData *summaryPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:summaryPageURL] returningResponse:nil error:nil];
 			
@@ -113,7 +117,8 @@ NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/WebObjects/iTunesC
 			existingReviews[review.identifier] = review;
 		}
 		
-		NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryVersionPageAction, _product.productID, version.identifier];
+		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
+		NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryVersionPageAction, _product.productID, platform, version.identifier];
 		NSURL *summaryPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:summaryPagePath]];
 		NSData *summaryPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:summaryPageURL] returningResponse:nil error:nil];
 		
@@ -139,7 +144,8 @@ NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/WebObjects/iTunesC
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSString *versionPagePath = [NSString stringWithFormat:kITCReviewAPIVersionStorefrontPageAction, _product.productID, version.identifier, countryCode];
+		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
+		NSString *versionPagePath = [NSString stringWithFormat:kITCReviewAPIVersionStorefrontPageAction, _product.productID, platform, version.identifier, countryCode];
 		NSURL *versionPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:versionPagePath]];
 		NSData *versionPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:versionPageURL] returningResponse:nil error:nil];
 		
