@@ -32,9 +32,9 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 	ASAccount *account;
 	NSDictionary *loginInfo;
 	NSMutableArray *trustedDevices;
-	NSString *ctkn;
-	NSString *generateCodeAction;
-	NSString *deviceIndex;
+	NSString *appleAuthSessionId;
+	NSString *appleAuthScnt;
+	NSString *appleAuthTrustedDeviceId;
 	UIActionSheet *verifyActionSheet;
 }
 

@@ -8,11 +8,21 @@
 
 #import "LoginManager.h"
 
-NSString *const kMemberCenterAuthAppID          = @"891bd3417a7776362562d2197f89480a8547b108fd934911bcbea0110d07f757";
-NSString *const kMemberCenterBaseURL            = @"https://idmsa.apple.com/IDMSWebAuth/";
-NSString *const kMemberCenterAuthenticateAction = @"authenticate";
-NSString *const kMemberCenterValidateCodeAction = @"validateSecurityCode";
-NSString *const kMemberCenterLogoutURL          = @"https://developer.apple.com/membercenter/logout.action";
+// Apple Auth API
+NSString *const kAppleAuthBaseURL      = @"https://idmsa.apple.com/appleauth/auth";
+NSString *const kAppleAuthSignInAction = @"/signin";
+NSString *const kAppleAuthDeviceAction = @"/verify/device/%@/securitycode";
+NSString *const kAppleAuthTrustAction  = @"/2sv/trust";
+
+// Apple Auth API Headers
+NSString *const kAppleAuthWidgetKey        = @"X-Apple-Widget-Key";
+NSString *const kAppleAuthWidgetValue      = @"22d448248055bab0dc197c6271d738c3";
+NSString *const kAppleAuthSessionIdKey     = @"X-Apple-ID-Session-Id";
+NSString *const kAppleAuthScntKey          = @"scnt";
+NSString *const kAppleAuthContentTypeKey   = @"Content-Type";
+NSString *const kAppleAuthContentTypeValue = @"application/json;charset=UTF-8";
+NSString *const kAppleAuthLocationKey      = @"Location";
+NSString *const kAppleAuthSetCookieKey     = @"Set-Cookie";
 
 NSString *const kITCBaseURL            = @"https://itunesconnect.apple.com";
 NSString *const kITCLoginPageAction    = @"/WebObjects/iTunesConnect.woa";
@@ -56,9 +66,6 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 }
 
 - (void)logOut {
-	NSURL *logoutURL = [NSURL URLWithString:kMemberCenterLogoutURL];
-	[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:logoutURL] returningResponse:nil error:nil];
-	
 	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 	
 	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://itunesconnect.apple.com"]];
@@ -93,209 +100,129 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 		[trustedDevices removeAllObjects];
 	}
 	
-	NSString *bodyString = [NSString stringWithFormat:@"appleId=%@&accountPassword=%@&appIdKey=%@", NSStringPercentEscaped(account.username ?: loginInfo[@"username"]), NSStringPercentEscaped(account.password ?: loginInfo[@"password"]), kMemberCenterAuthAppID];
-	NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+	NSDictionary *bodyDict = @{@"accountName": account.username ?: loginInfo[@"username"],
+							   @"password": account.password ?: loginInfo[@"password"],
+							   @"rememberMe": @(YES)};
+	NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
 	
-	NSURL *authenticateURL = [NSURL URLWithString:[kMemberCenterBaseURL stringByAppendingString:kMemberCenterAuthenticateAction]];
-	NSMutableURLRequest *authenticateRequest = [NSMutableURLRequest requestWithURL:authenticateURL];
-	[authenticateRequest setHTTPMethod:@"POST"];
-	[authenticateRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-	[authenticateRequest setHTTPBody:bodyData];
+	NSURL *signInURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingString:kAppleAuthSignInAction]];
+	NSMutableURLRequest *signInRequest = [NSMutableURLRequest requestWithURL:signInURL];
+	[signInRequest setHTTPMethod:@"POST"];
+	[signInRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
+	[signInRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
+	[signInRequest setHTTPBody:bodyData];
 	
-	NSHTTPURLResponse *response = nil;
-	NSData *authenticatePageData = [NSURLConnection sendSynchronousRequest:authenticateRequest returningResponse:&response error:nil];
-	NSString *authenticatePage = [[NSString alloc] initWithData:authenticatePageData encoding:NSUTF8StringEncoding];
-	NSScanner *authenticatePageScanner = [NSScanner scannerWithString:authenticatePage];
-	[authenticatePageScanner scanUpToString:@"<form id=\"command\" name=\"deviceForm\"" intoString:nil];
-	[authenticatePageScanner scanString:@"<form id=\"command\" name=\"deviceForm\"" intoString:nil];
-	if (self.isLoggedIn) {
-		// We're in!
-		if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self.delegate loginSucceeded];
-			});
-		}
-	} else if ([authenticatePageScanner scanString:@"action=\"" intoString:nil]) {
-		// Looks like this account has Two-Step Verification enabled.
-		NSString *_generateCodeAction = nil;
-		[authenticatePageScanner scanUpToString:@"\"" intoString:&_generateCodeAction];
-		generateCodeAction = _generateCodeAction;
-		[authenticatePageScanner scanUpToString:@"<div id=\"devices\">" intoString:nil];
-		if ([authenticatePageScanner scanString:@"<div id=\"devices\">" intoString:nil]) {
-			NSRegularExpression *htmlTagsRegex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:0 error:nil];
-			NSUInteger scanLocation = authenticatePageScanner.scanLocation;
-			[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:nil];
-			while ([authenticatePageScanner scanString:@"<div class=\"formrow radio hsa\">" intoString:nil]) {
-				NSString *name = nil;
-				NSString *value = nil;
-				
-				// Parse device index.
-				[authenticatePageScanner scanUpToString:@"value=\"" intoString:nil];
-				[authenticatePageScanner scanString:@"value=\"" intoString:nil];
-				[authenticatePageScanner scanUpToString:@"\"" intoString:&value];
-				
-				// Parse device name.
-				[authenticatePageScanner scanUpToString:@"<label" intoString:nil];
-				[authenticatePageScanner scanString:@">" intoString:nil];
-				[authenticatePageScanner scanUpToString:@"</label>" intoString:&name];
-				
-				// Clean up device name.
-				name = [htmlTagsRegex stringByReplacingMatchesInString:name options:0 range:NSMakeRange(0, name.length) withTemplate:@""];
-				
-				// Decode common ASCII symbols by their HTML name.
-				name = [name stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
-				name = [name stringByReplacingOccurrencesOfString:@"&lsquo;" withString:@"‘"];
-				name = [name stringByReplacingOccurrencesOfString:@"&rsquo;" withString:@"’"];
-				name = [name stringByReplacingOccurrencesOfString:@"&ldquo;" withString:@"“"];
-				name = [name stringByReplacingOccurrencesOfString:@"&rdquo;" withString:@"”"];
-				name = [name stringByReplacingOccurrencesOfString:@"&quot;" withString:@"\""];
-				name = [name stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
-				name = [name stringByReplacingOccurrencesOfString:@"&lt;" withString:@"<"];
-				name = [name stringByReplacingOccurrencesOfString:@"&gt;" withString:@">"];
-				
-				// Decode common ASCII symbols.
-				name = [name stringByReplacingOccurrencesOfString:@"&#32;" withString:@" "];
-				name = [name stringByReplacingOccurrencesOfString:@"&#33;" withString:@"!"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#34;" withString:@"\""];
-				name = [name stringByReplacingOccurrencesOfString:@"&#35;" withString:@"#"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#36;" withString:@"$"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#37;" withString:@"%"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#38;" withString:@"&"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#39;" withString:@"'"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#40;" withString:@"("];
-				name = [name stringByReplacingOccurrencesOfString:@"&#41;" withString:@")"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#42;" withString:@"*"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#43;" withString:@"+"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#44;" withString:@","];
-				name = [name stringByReplacingOccurrencesOfString:@"&#45;" withString:@"-"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#46;" withString:@"."];
-				name = [name stringByReplacingOccurrencesOfString:@"&#47;" withString:@"/"];
-				
-				name = [name stringByReplacingOccurrencesOfString:@"&#58;" withString:@":"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#59;" withString:@";"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#60;" withString:@"<"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#61;" withString:@"="];
-				name = [name stringByReplacingOccurrencesOfString:@"&#62;" withString:@">"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#63;" withString:@"?"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#64;" withString:@"@"];
-				
-				name = [name stringByReplacingOccurrencesOfString:@"&#91;" withString:@"["];
-				name = [name stringByReplacingOccurrencesOfString:@"&#92;" withString:@"\\"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#93;" withString:@"]"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#94;" withString:@"^"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#95;" withString:@"_"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#96;" withString:@"`"];
-				
-				name = [name stringByReplacingOccurrencesOfString:@"&#123;" withString:@"{"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#124;" withString:@"|"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#125;" withString:@"}"];
-				name = [name stringByReplacingOccurrencesOfString:@"&#126;" withString:@"~"];
-				
-				name = [name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-				
-				NSMutableDictionary *trustedDevice = [[NSMutableDictionary alloc] init];
-				trustedDevice[@"name"] = name;
-				trustedDevice[@"value"] = value;
-				
-				[trustedDevices addObject:trustedDevice];
-				[authenticatePageScanner scanUpToString:@"<div class=\"formrow radio hsa\">" intoString:nil];
-			}
-			
-			if (trustedDevices.count > 0) {
-				NSString *_ctkn = nil;
-				authenticatePageScanner.scanLocation = scanLocation;
-				[authenticatePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
-				[authenticatePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
-				[authenticatePageScanner scanUpToString:@"value=\"" intoString:nil];
-				[authenticatePageScanner scanString:@"value=\"" intoString:nil];
-				[authenticatePageScanner scanUpToString:@"\"" intoString:&_ctkn];
-				ctkn = _ctkn;
-				
-				if (ctkn != nil) {
-					[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
-				} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.delegate loginFailed];
-					});
-				}
-			} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginFailed];
-				});
-			}
-		} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self.delegate loginFailed];
-			});
-		}
-	} else {
+	NSHTTPURLResponse *signInResponse = nil;
+	[NSURLConnection sendSynchronousRequest:signInRequest returningResponse:&signInResponse error:nil];
+	NSString *location = signInResponse.allHeaderFields[kAppleAuthLocationKey];
+	appleAuthSessionId = signInResponse.allHeaderFields[kAppleAuthSessionIdKey];
+	appleAuthScnt = signInResponse.allHeaderFields[kAppleAuthScntKey];
+	
+	if ((appleAuthSessionId.length == 0) || (appleAuthScnt.length == 0)) {
 		// Wrong credentials?
 		if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self.delegate loginFailed];
 			});
 		}
+	} else if (location.length == 0) {
+		// We're in!
+		if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.delegate loginSucceeded];
+			});
+		}
+	} else {
+		// Looks like this account has Two-Step Verification enabled.
+		NSURL *authURL = [NSURL URLWithString:kAppleAuthBaseURL];
+		NSMutableURLRequest *authRequest = [NSMutableURLRequest requestWithURL:authURL];
+		[authRequest setHTTPMethod:@"GET"];
+		[authRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
+		[authRequest setValue:appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+		[authRequest setValue:appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+		[authRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
+		NSHTTPURLResponse *authResponse = nil;
+		NSData *authData = [NSURLConnection sendSynchronousRequest:authRequest returningResponse:&authResponse error:nil];
+		NSDictionary *authDict = [NSJSONSerialization JSONObjectWithData:authData options:0 error:nil];
+		
+		NSNumber *accountLocked = authDict[@"accountLocked"];
+		NSNumber *recoveryKeyLocked = authDict[@"recoveryKeyLocked"];
+		NSNumber *securityCodeLocked = authDict[@"securityCodeLocked"];
+		[trustedDevices addObjectsFromArray:authDict[@"trustedDevices"] ?: @[]];
+		if (accountLocked.boolValue || recoveryKeyLocked.boolValue || securityCodeLocked.boolValue) {
+			// Account is locked with some other method.
+			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self.delegate loginFailed];
+				});
+			}
+		} else if (trustedDevices.count == 0) {
+			// Account has no trusted devices.
+			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self.delegate loginFailed];
+				});
+			}
+		} else {
+			// Allow user to choose a trusted device.
+			[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
+		}
 	}
 }
 
-- (void)generateCode:(NSString *)_deviceIndex {
-	deviceIndex = _deviceIndex;
+- (void)generateCode:(NSString *)_appleAuthTrustedDeviceId {
+	appleAuthTrustedDeviceId = _appleAuthTrustedDeviceId;
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSString *bodyString = [NSString stringWithFormat:@"deviceIndex=%@&ctkn=%@", _deviceIndex, NSStringPercentEscaped(ctkn)];
-		NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+		NSURL *deviceURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, _appleAuthTrustedDeviceId]];
+		NSMutableURLRequest *deviceRequest = [NSMutableURLRequest requestWithURL:deviceURL];
+		[deviceRequest setHTTPMethod:@"PUT"];
+		[deviceRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
+		[deviceRequest setValue:appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+		[deviceRequest setValue:appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+		[deviceRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
+		NSHTTPURLResponse *deviceResponse = nil;
+		NSData *deviceData = [NSURLConnection sendSynchronousRequest:deviceRequest returningResponse:&deviceResponse error:nil];
+		NSDictionary *deviceDict = [NSJSONSerialization JSONObjectWithData:deviceData options:0 error:nil];
 		
-		NSURL *generateCodeURL = [NSURL URLWithString:[kMemberCenterBaseURL stringByAppendingString:generateCodeAction]];
-		NSMutableURLRequest *generateCodeRequest = [NSMutableURLRequest requestWithURL:generateCodeURL];
-		[generateCodeRequest setHTTPMethod:@"POST"];
-		[generateCodeRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-		[generateCodeRequest setHTTPBody:bodyData];
-		
-		NSHTTPURLResponse *response = nil;
-		NSData *generateCodePageData = [NSURLConnection sendSynchronousRequest:generateCodeRequest returningResponse:&response error:nil];
-		NSString *generateCodePage = [[NSString alloc] initWithData:generateCodePageData encoding:NSUTF8StringEncoding];
-		NSScanner *generateCodePageScanner = [NSScanner scannerWithString:generateCodePage];
-		
-		NSString *_ctkn = nil;
-		[generateCodePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
-		[generateCodePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
-		[generateCodePageScanner scanUpToString:@"value=\"" intoString:nil];
-		[generateCodePageScanner scanString:@"value=\"" intoString:nil];
-		[generateCodePageScanner scanUpToString:@"\"" intoString:&_ctkn];
-		ctkn = _ctkn;
-		
-		if (ctkn != nil) {
+		NSDictionary *securityCode = deviceDict[@"securityCode"];
+		NSNumber *securityCodeLength = securityCode[@"length"];
+		if (securityCodeLength.integerValue == 4) {
+			// Display security code input controller.
 			dispatch_async(dispatch_get_main_queue(), ^{
 				SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] init];
 				securityCodeInput.delegate = self;
 				[securityCodeInput show];
 			});
-		} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self.delegate loginFailed];
-			});
+		} else {
+			// Authentication is requesting a security code with an unsupported number of digits.
+			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self.delegate loginFailed];
+				});
+			}
 		}
 	});
 }
 
 - (void)validateCode:(NSString *)securityCode {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSString *bodyString = [NSString stringWithFormat:@"digit1=%c&digit2=%c&digit3=%c&digit4=%c&rememberMeSelected=%@&ctkn=%@", [securityCode characterAtIndex:0], [securityCode characterAtIndex:1], [securityCode characterAtIndex:2], [securityCode characterAtIndex:3], YES ? @"true" : @"false", NSStringPercentEscaped(ctkn)];
-		NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+		NSDictionary *bodyDict = @{@"code": securityCode};
+		NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
 		
-		NSURL *validateCodeURL = [NSURL URLWithString:[kMemberCenterBaseURL stringByAppendingString:kMemberCenterValidateCodeAction]];
-		NSMutableURLRequest *validateCodeRequest = [NSMutableURLRequest requestWithURL:validateCodeURL];
-		[validateCodeRequest setHTTPMethod:@"POST"];
-		[validateCodeRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-		[validateCodeRequest setHTTPBody:bodyData];
+		NSURL *verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, appleAuthTrustedDeviceId]];
+		NSMutableURLRequest *verifyRequest = [NSMutableURLRequest requestWithURL:verifyURL];
+		[verifyRequest setHTTPMethod:@"POST"];
+		[verifyRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
+		[verifyRequest setValue:appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+		[verifyRequest setValue:appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+		[verifyRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
+		[verifyRequest setHTTPBody:bodyData];
+		NSHTTPURLResponse *verifyResponse = nil;
+		[NSURLConnection sendSynchronousRequest:verifyRequest returningResponse:&verifyResponse error:nil];
 		
-		NSHTTPURLResponse *response = nil;
-		NSData *validateCodePageData = [NSURLConnection sendSynchronousRequest:validateCodeRequest returningResponse:&response error:nil];
-		NSString *validateCodePage = [[NSString alloc] initWithData:validateCodePageData encoding:NSUTF8StringEncoding];
-		NSScanner *validateCodePageScanner = [NSScanner scannerWithString:validateCodePage];
-		
-		ctkn = nil;
-		if (self.isLoggedIn) {
+		NSString *setCookie = verifyResponse.allHeaderFields[kAppleAuthSetCookieKey];
+		if (([setCookie rangeOfString:@"myacinfo"].location != NSNotFound) || self.isLoggedIn) {
 			// We're in!
 			if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -304,21 +231,7 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 			}
 		} else {
 			// Incorrect verification code. Retry?
-			NSString *_ctkn = nil;
-			[validateCodePageScanner scanUpToString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
-			[validateCodePageScanner scanString:@"<input type=\"hidden\" id=\"ctkn\" name=\"ctkn\"" intoString:nil];
-			[validateCodePageScanner scanUpToString:@"value=\"" intoString:nil];
-			[validateCodePageScanner scanString:@"value=\"" intoString:nil];
-			[validateCodePageScanner scanUpToString:@"\"" intoString:&_ctkn];
-			ctkn = _ctkn;
-			
-			if (ctkn != nil) {
-				[self generateCode:deviceIndex];
-			} else if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginFailed];
-				});
-			}
+			[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
 		}
 	});
 }
@@ -329,10 +242,17 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 																	  preferredStyle:UIAlertControllerStyleActionSheet];
 	
 	for (NSDictionary *trustedDevice in trustedDevices) {
+		NSNumber *isDevice = trustedDevice[@"device"];
 		NSString *deviceName = trustedDevice[@"name"];
-		NSString *deviceValue = trustedDevice[@"value"];
+		if (isDevice.boolValue) {
+			NSString *modelName = trustedDevice[@"modelName"];
+			deviceName = [deviceName stringByAppendingFormat:@" (%@)", modelName];
+		} else if ([trustedDevice[@"type"] isEqualToString:@"sms"]) {
+			deviceName = [NSString stringWithFormat:@"Phone number ending in %@", trustedDevice[@"lastTwoDigits"]];
+		}
+		NSString *deviceId = trustedDevice[@"id"];
 		[alertController addAction:[UIAlertAction actionWithTitle:deviceName style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-			[self generateCode:deviceValue];
+			[self generateCode:deviceId];
 		}]];
 	}
 	
