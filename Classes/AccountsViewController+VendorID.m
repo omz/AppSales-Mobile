@@ -30,82 +30,34 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
 			
-			NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
-			NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:nil error:nil];
+			NSURL *userInfoURL = [NSURL URLWithString:kITCUserInfoAPIURL];
+			NSData *userInfoData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:userInfoURL] returningResponse:nil error:nil];
+			NSDictionary *userInfo = [NSJSONSerialization JSONObjectWithData:userInfoData options:0 error:nil];
+			NSString *contentProviderId = userInfo[@"contentProviderId"];
 			
-			if (paymentsPageData) {
-				NSString *paymentsPage = [[NSString alloc] initWithData:paymentsPageData encoding:NSUTF8StringEncoding];
+			if (contentProviderId.length > 0) {
+				NSURL *paymentVendorsURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsAction, contentProviderId]];
+				NSData *paymentVendorsData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentVendorsURL] returningResponse:nil error:nil];
+				NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:paymentVendorsData options:0 error:nil];
+				NSArray *sapVendors = paymentVendors[@"data"];
 				
-				NSScanner *vendorFormScanner = [NSScanner scannerWithString:paymentsPage];
-				[vendorFormScanner scanUpToString:@"<form name=\"mainForm\"" intoString:nil];
-				[vendorFormScanner scanString:@"<form name=\"mainForm\"" intoString:nil];
-				
-				// The Payments page lists the available vendors only if there is more than one.
-				if ([vendorFormScanner scanUpToString:@"<div class=\"vendor-id-container\">" intoString:nil]) {
-					[vendorFormScanner scanString:@"<div class=\"vendor-id-container\">" intoString:nil];
-					NSString *vendorIDContainer = nil;
-					[vendorFormScanner scanUpToString:@"</div>" intoString:&vendorIDContainer];
-					
-					if (vendorIDContainer) {
-						vendorFormScanner = [NSScanner scannerWithString:vendorIDContainer];
-						
-						[vendorFormScanner scanUpToString:@"<option" intoString:nil];
-						while ([vendorFormScanner scanString:@"<option" intoString:nil]) {
-							NSString *vendorName = nil;
-							NSString *vendorID = nil;
-							
-							// Parse vendor name.
-							[vendorFormScanner scanUpToString:@">" intoString:nil];
-							[vendorFormScanner scanString:@">" intoString:nil];
-							[vendorFormScanner scanUpToString:@" - " intoString:&vendorName];
-							
-							// Parse vendor ID.
-							[vendorFormScanner scanString:@"- " intoString:nil];
-							[vendorFormScanner scanUpToString:@"</option>" intoString:&vendorID];
-							
-							vendors[vendorID] = vendorName;
-							
-							[vendorFormScanner scanUpToString:@"<option" intoString:nil];
-						}
-						
-						[self performSelectorOnMainThread:@selector(finishedLoadingVendors) withObject:nil waitUntilDone:YES];
+				if (sapVendors.count > 0) {
+					for (NSDictionary *vendor in sapVendors) {
+						NSNumber *vendorID = vendor[@"sapVendorNumber"];
+						NSString *vendorName = vendor[@"vendorName"];
+						vendors[vendorID.description] = vendorName;
 					}
+					[self performSelectorOnMainThread:@selector(finishedLoadingVendors) withObject:nil waitUntilDone:YES];
+				} else {
+					[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
 				}
-				
-				if (vendors.count == 0) {
-					// Looks like no vendors were found when parsing the Payments page.
-					// This means there's either one vendor or the page structure has changed.
-					// Let's try asking the reports API instead.
-					NSURL *reportsPageURL = [NSURL URLWithString:kITCReportsAPIURL];
-					NSData *reportsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:reportsPageURL] returningResponse:nil error:nil];
-					
-					if (reportsPageData) {
-						NSDictionary *reportsPage = [NSJSONSerialization JSONObjectWithData:reportsPageData options:0 error:nil];
-						
-						NSArray *reports = reportsPage[@"reports"];
-						if (reports.count > 0) {
-							NSArray *reportsVendors = reports[0][@"vendors"];
-							for (NSDictionary *vendor in reportsVendors) {
-								NSString *vendorID = vendor[@"id"];
-								NSString *vendorName = vendor[@"name"];
-								vendorName = [vendorName substringToIndex:(vendorName.length - vendorID.length - 3)];
-								vendors[vendorID] = vendorName;
-							}
-							[self performSelectorOnMainThread:@selector(finishedLoadingVendors) withObject:nil waitUntilDone:YES];
-						} else {
-							[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-						}
-					} else {
-						[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-					}
-				}
-				
-				LoginManager *loginManager = [[LoginManager alloc] initWithLoginInfo:nil];
-				loginManager.shouldDeleteCookies = NO;
-				[loginManager logOut];
 			} else {
 				[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
 			}
+			
+			LoginManager *loginManager = [[LoginManager alloc] initWithLoginInfo:nil];
+			loginManager.shouldDeleteCookies = NO;
+			[loginManager logOut];
 		}
 	});
 }

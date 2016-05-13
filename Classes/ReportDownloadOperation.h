@@ -16,6 +16,8 @@
 	NSString *username;
 	NSString *password;
 	NSString *appPassword;
+	NSString *contentProviderId;
+	NSMutableDictionary *downloadedVendors;
 	NSPersistentStoreCoordinator *psc;
 	NSManagedObjectID *accountObjectID;
 	UIBackgroundTaskIdentifier backgroundTaskID;

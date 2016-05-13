@@ -24,11 +24,13 @@ NSString *const kAppleAuthContentTypeValue = @"application/json;charset=UTF-8";
 NSString *const kAppleAuthLocationKey      = @"Location";
 NSString *const kAppleAuthSetCookieKey     = @"Set-Cookie";
 
-NSString *const kITCBaseURL            = @"https://itunesconnect.apple.com";
-NSString *const kITCLoginPageAction    = @"/WebObjects/iTunesConnect.woa";
-NSString *const kITCPaymentsPageAction = @"/WebObjects/iTunesConnect.woa/da/jumpTo?page=paymentsAndFinancialReports";
+// iTunes Connect Payments API
+NSString *const kITCBaseURL                     = @"https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa";
+NSString *const kITCSetCookiesAction            = @"/wa/route?noext";
+NSString *const kITCPaymentVendorsAction        = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers";
+NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers/%@?year=%ld&month=%ld";
 
-NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/reports";
+NSString *const kITCUserInfoAPIURL = @"https://reportingitc2.apple.com/api/user/info";
 
 @implementation LoginManager
 
@@ -127,6 +129,7 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 		}
 	} else if (location.length == 0) {
 		// We're in!
+		[self fetchRemainingCookies];
 		if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self.delegate loginSucceeded];
@@ -168,6 +171,20 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 			[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
 		}
 	}
+}
+
+- (void)fetchRemainingCookies {
+	NSURL *trustURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingString:kAppleAuthTrustAction]];
+	NSMutableURLRequest *trustRequest = [NSMutableURLRequest requestWithURL:trustURL];
+	[trustRequest setHTTPMethod:@"GET"];
+	[trustRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
+	[trustRequest setValue:appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+	[trustRequest setValue:appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+	[trustRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
+	[NSURLConnection sendSynchronousRequest:trustRequest returningResponse:nil error:nil];
+	
+	NSURL *setCookiesURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCSetCookiesAction]];
+	[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:setCookiesURL] returningResponse:nil error:nil];
 }
 
 - (void)generateCode:(NSString *)_appleAuthTrustedDeviceId {
@@ -224,6 +241,7 @@ NSString *const kITCReportsAPIURL = @"https://reportingitc2.apple.com/api/report
 		NSString *setCookie = verifyResponse.allHeaderFields[kAppleAuthSetCookieKey];
 		if (([setCookie rangeOfString:@"myacinfo"].location != NSNotFound) || self.isLoggedIn) {
 			// We're in!
+			[self fetchRemainingCookies];
 			if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[self.delegate loginSucceeded];

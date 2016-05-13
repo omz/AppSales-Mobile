@@ -19,7 +19,7 @@ Please see the screenshot below for a visual guide to AppSales' main interface a
 
 AppSales requires the iOS 8.2 SDK or later.
 
-Because there is no API to access some parts of iTunes Connect, AppSales scrapes [itunesconnect.apple.com](https://itunesconnect.apple.com). This means that even small changes on this website can break some functionality. In most cases, this is easy to fix and I'll try to make a new version available here. The report download itself uses Apple's auto-ingestion interface to iTunes Connect and should generally be unaffected by changes to the website.
+Report downloads uses Apple's auto-ingestion interface to iTunes Connect, while Payments and Customer Reviews are fetched using their appropriate JSON API. This means that the app should generally be unaffected by changes to the website.
 
 ## Getting Started
 
@@ -37,12 +37,9 @@ git submodule update --recursive
 
 ## About
 
-You can follow me on Twitter for updates on the development: [@olemoritz](https://twitter.com/olemoritz)
+Original _(now obsolete)_ project by [@olemoritz](https://twitter.com/olemoritz) at [omz/AppSales-Mobile](https://github.com/omz/AppSales-Mobile). Continued maintenance and development by [Nicolas Gomollon](https://nicolas.gomollon.me/).
 
-If you'd like to support this effort, please consider a donation via PayPal or Flattr:
-
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YDQN4S3WVRCBU&lc=US&item_name=AppSales&no_note=1&currency_code=USD"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a> <a href="http://flattr.com/thing/366574/AppSales" target="_blank">
-<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+If you'd like to support this effort, please consider a donation via Square Cash [$gomollon](https://cash.me/$gomollon).
 
 ![AppSales Screenshot](Screenshot.png?raw=true)
 

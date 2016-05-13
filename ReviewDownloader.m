@@ -66,40 +66,35 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 	hud.labelText = NSLocalizedString(@"Downloading", nil);
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		// Need to request some page within iTunes Connect first in order to have the right cookies before accessing the reviews API.
-		NSURL *paymentsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCPaymentsPageAction]];
-		NSData *paymentsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentsPageURL] returningResponse:nil error:nil];
-		if (paymentsPageData) {
-			NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
-			NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryPageAction, _product.productID, platform];
-			NSURL *summaryPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:summaryPagePath]];
-			NSData *summaryPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:summaryPageURL] returningResponse:nil error:nil];
-			
-			if (summaryPageData) {
-				NSDictionary *summaryPage = [NSJSONSerialization JSONObjectWithData:summaryPageData options:0 error:nil];
-				NSString *statusCode = summaryPage[@"statusCode"];
-				if (![statusCode isEqualToString:@"SUCCESS"]) {
-					[self showAlert:statusCode withMessages:summaryPage[@"messages"]];
-				} else {
-					Product *product = (Product *)[moc objectWithID:productObjectID];
-					
-					NSMutableDictionary *productVersions = [[NSMutableDictionary alloc] init];
-					for (Version *version in product.versions) {
-						productVersions[version.identifier] = version;
+		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
+		NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryPageAction, _product.productID, platform];
+		NSURL *summaryPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:summaryPagePath]];
+		NSData *summaryPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:summaryPageURL] returningResponse:nil error:nil];
+		
+		if (summaryPageData) {
+			NSDictionary *summaryPage = [NSJSONSerialization JSONObjectWithData:summaryPageData options:0 error:nil];
+			NSString *statusCode = summaryPage[@"statusCode"];
+			if (![statusCode isEqualToString:@"SUCCESS"]) {
+				[self showAlert:statusCode withMessages:summaryPage[@"messages"]];
+			} else {
+				Product *product = (Product *)[moc objectWithID:productObjectID];
+				
+				NSMutableDictionary *productVersions = [[NSMutableDictionary alloc] init];
+				for (Version *version in product.versions) {
+					productVersions[version.identifier] = version;
+				}
+				
+				summaryPage = summaryPage[@"data"];
+				NSDictionary *versions = summaryPage[@"versions"];
+				for (NSString *identifier in versions) {
+					Version *version = productVersions[identifier];
+					if (version == nil) {
+						version = (Version *)[NSEntityDescription insertNewObjectForEntityForName:@"Version" inManagedObjectContext:moc];
+						version.identifier = identifier;
+						version.number = versions[identifier];
+						version.product = product;
 					}
-					
-					summaryPage = summaryPage[@"data"];
-					NSDictionary *versions = summaryPage[@"versions"];
-					for (NSString *identifier in versions) {
-						Version *version = productVersions[identifier];
-						if (version == nil) {
-							version = (Version *)[NSEntityDescription insertNewObjectForEntityForName:@"Version" inManagedObjectContext:moc];
-							version.identifier = identifier;
-							version.number = versions[identifier];
-							version.product = product;
-						}
-						[self fetchReviewsForVersion:version];
-					}
+					[self fetchReviewsForVersion:version];
 				}
 			}
 		}
