@@ -12,9 +12,9 @@
 #import "Review.h"
 #import "Version.h"
 
-NSString *const kITCReviewAPISummaryPageAction           = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews/summary?platform=%@";
-NSString *const kITCReviewAPISummaryVersionPageAction    = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews/summary?platform=%@&versionId=%@";
-NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/WebObjects/iTunesConnect.woa/ra/apps/%@/reviews?platform=%@&versionId=%@&storefront=%@";
+NSString *const kITCReviewAPISummaryPageAction           = @"/ra/apps/%@/reviews/summary?platform=%@";
+NSString *const kITCReviewAPISummaryVersionPageAction    = @"/ra/apps/%@/reviews/summary?platform=%@&versionId=%@";
+NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/ra/apps/%@/reviews?platform=%@&versionId=%@&storefront=%@";
 
 NSString *const kITCReviewAPIPlatformiOS = @"ios";
 NSString *const kITCReviewAPIPlatformMac = @"osx";
