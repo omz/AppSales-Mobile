@@ -30,10 +30,10 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
 			
-			NSURL *userInfoURL = [NSURL URLWithString:kITCUserInfoAPIURL];
-			NSData *userInfoData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:userInfoURL] returningResponse:nil error:nil];
-			NSDictionary *userInfo = [NSJSONSerialization JSONObjectWithData:userInfoData options:0 error:nil];
-			NSString *contentProviderId = userInfo[@"contentProviderId"];
+			NSURL *userDetailURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCUserDetailAction]];
+			NSData *userDetailData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:userDetailURL] returningResponse:nil error:nil];
+			NSDictionary *userDetail = [NSJSONSerialization JSONObjectWithData:userDetailData options:0 error:nil];
+			NSString *contentProviderId = userDetail[@"data"][@"contentProviderId"];
 			
 			if (contentProviderId.length > 0) {
 				NSURL *paymentVendorsURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsAction, contentProviderId]];

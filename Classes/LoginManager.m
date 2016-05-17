@@ -27,10 +27,9 @@ NSString *const kAppleAuthSetCookieKey     = @"Set-Cookie";
 // iTunes Connect Payments API
 NSString *const kITCBaseURL                     = @"https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa";
 NSString *const kITCSetCookiesAction            = @"/wa/route?noext";
+NSString *const kITCUserDetailAction            = @"/ra/user/detail";
 NSString *const kITCPaymentVendorsAction        = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers";
 NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers/%@?year=%ld&month=%ld";
-
-NSString *const kITCUserInfoAPIURL = @"https://reportingitc2.apple.com/api/user/info";
 
 @implementation LoginManager
 

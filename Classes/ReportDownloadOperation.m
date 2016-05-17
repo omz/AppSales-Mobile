@@ -281,14 +281,13 @@
 			
 			//==== Payments
 			
-			NSURL *userInfoURL = [NSURL URLWithString:kITCUserInfoAPIURL];
-			NSData *userInfoData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:userInfoURL] returningResponse:nil error:nil];
-			NSDictionary *userInfo = [NSJSONSerialization JSONObjectWithData:userInfoData options:0 error:nil];
-			contentProviderId = userInfo[@"contentProviderId"];
+			NSURL *userDetailURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCUserDetailAction]];
+			NSData *userDetailData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:userDetailURL] returningResponse:nil error:nil];
+			NSDictionary *userDetail = [NSJSONSerialization JSONObjectWithData:userDetailData options:0 error:nil];
+			contentProviderId = userDetail[@"data"][@"contentProviderId"];
 			
 			if (self.isCancelled) {
 				[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
-				return;
 			} else if (contentProviderId.length > 0) {
 				NSURL *paymentVendorsURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsAction, contentProviderId]];
 				NSData *paymentVendorsData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentVendorsURL] returningResponse:nil error:nil];
@@ -297,7 +296,6 @@
 				
 				if (self.isCancelled) {
 					[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
-					return;
 				} else if (sapVendors.count > 0) {
 					if (downloadedVendors == nil) {
 						downloadedVendors = [[NSMutableDictionary alloc] init];

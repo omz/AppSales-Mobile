@@ -12,10 +12,9 @@
 #import "SecurityCodeInputController.h"
 
 extern NSString *const kITCBaseURL;
+extern NSString *const kITCUserDetailAction;
 extern NSString *const kITCPaymentVendorsAction;
 extern NSString *const kITCPaymentVendorsPaymentAction;
-
-extern NSString *const kITCUserInfoAPIURL;
 
 static NSString *NSStringPercentEscaped(NSString *string) {
 	return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
