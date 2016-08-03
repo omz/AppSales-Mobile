@@ -11,13 +11,19 @@
 @implementation SecurityCodeInputController
 
 - (instancetype)init {
-	return [self initWithStyle:UITableViewStyleGrouped];
+	return [self initWithType:SCInputTypeTwoStepVerificationCode];
 }
 
 - (instancetype)initWithStyle:(UITableViewStyle)style {
+	return [self initWithType:SCInputTypeTwoStepVerificationCode];
+}
+
+- (instancetype)initWithType:(SCInputType)_inputType {
 	self = [super initWithStyle:UITableViewStyleGrouped];
 	if (self) {
 		// Initialization code
+		inputType = _inputType;
+		
 		securityCodeField = [[UITextField alloc] initWithFrame:CGRectZero];
 		securityCodeField.delegate = self;
 		securityCodeField.keyboardAppearance = UIKeyboardAppearanceDark;
@@ -48,17 +54,50 @@
 		[digits addObject:digit3];
 		[digits addObject:digit4];
 		
+		if (_inputType == SCInputTypeTwoFactorAuthenticationCode) {
+			digit5 = self.digitLabel;
+			[digitView addSubview:digit5];
+			[digits addObject:digit5];
+			
+			digit6 = self.digitLabel;
+			[digitView addSubview:digit6];
+			[digits addObject:digit6];
+		}
+		
 		
 		/* Horizontal Layout */
 		
 		CGFloat digitViewWidth = 280.0f;
 		CGFloat digitWidth = 50.0f;
-		CGFloat digitPadding = (digitViewWidth - (digitWidth * (CGFloat)digits.count)) / (CGFloat)(digits.count - 1);
 		
-		[digitView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[digit1(w)]-p-[digit2(w)]-p-[digit3(w)]-p-[digit4(w)]|"
-																		  options:0
-																		  metrics:@{@"w": @(digitWidth), @"p": @(digitPadding)}
-																			views:@{@"digit1": digit1, @"digit2": digit2, @"digit3": digit3, @"digit4": digit4}]];
+		switch (_inputType) {
+			
+			case SCInputTypeTwoStepVerificationCode: {
+				digitWidth = 50.0f;
+				CGFloat digitPadding = (digitViewWidth - (digitWidth * (CGFloat)digits.count)) / (CGFloat)(digits.count - 1);
+				
+				[digitView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[digit1(w)]-p-[digit2(w)]-p-[digit3(w)]-p-[digit4(w)]|"
+																				  options:0
+																				  metrics:@{@"w": @(digitWidth), @"p": @(digitPadding)}
+																					views:@{@"digit1": digit1, @"digit2": digit2, @"digit3": digit3, @"digit4": digit4}]];
+				break;
+			}
+			
+			case SCInputTypeTwoFactorAuthenticationCode: {
+				digitWidth = 40.0f;
+				CGFloat digitPadding = (digitViewWidth - (digitWidth * (CGFloat)digits.count)) / 7.0f;
+				
+				[digitView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[digit1(w)]-p-[digit2(w)]-p-[digit3(w)]-m-[digit4(w)]-p-[digit5(w)]-p-[digit6(w)]|"
+																				  options:0
+																				  metrics:@{@"w": @(digitWidth), @"p": @(digitPadding), @"m": @(digitPadding * 3.0f)}
+																					views:@{@"digit1": digit1, @"digit2": digit2, @"digit3": digit3, @"digit4": digit4, @"digit5": digit5, @"digit6": digit6}]];
+				break;
+			}
+			
+			default:
+				break;
+			
+		}
 		
 		[self.view addConstraint:[NSLayoutConstraint constraintWithItem:digitView
 															  attribute:NSLayoutAttributeWidth
@@ -99,13 +138,25 @@
 																		  metrics:nil
 																			views:@{@"digit4": digit4}]];
 		
+		if (_inputType == SCInputTypeTwoFactorAuthenticationCode) {
+			[digitView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[digit5]|"
+																			  options:0
+																			  metrics:nil
+																				views:@{@"digit5": digit5}]];
+			
+			[digitView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[digit6]|"
+																			  options:0
+																			  metrics:nil
+																				views:@{@"digit6": digit6}]];
+		}
+		
 		[self.view addConstraint:[NSLayoutConstraint constraintWithItem:digitView
 															  attribute:NSLayoutAttributeHeight
 															  relatedBy:NSLayoutRelationEqual
 																 toItem:nil
 															  attribute:NSLayoutAttributeNotAnAttribute
 															 multiplier:1.0f
-															   constant:60.0f]];
+															   constant:digitWidth + 10.0f]];
 		
 		digitViewCenterYConstraint = [NSLayoutConstraint constraintWithItem:digitView
 																  attribute:NSLayoutAttributeCenterY
@@ -198,9 +249,9 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
 	NSString *newText = [textField.text stringByReplacingCharactersInRange:range withString:string];
-	if ((range.length > 1) || (newText.length > 4)) { return NO; }
+	if ((range.length > 1) || (newText.length > (4 + ((inputType == SCInputTypeTwoFactorAuthenticationCode) ? 2 : 0)))) { return NO; }
 	if ((string.length == 0) || [self isValidDigit:string]) {
-		self.navigationItem.rightBarButtonItem.enabled = (newText.length == 4);
+		self.navigationItem.rightBarButtonItem.enabled = (newText.length == (4 + ((inputType == SCInputTypeTwoFactorAuthenticationCode) ? 2 : 0)));
 		for (NSInteger i = 0; i < digits.count; i++) {
 			UILabel *digit = digits[i];
 			if (i < newText.length) {

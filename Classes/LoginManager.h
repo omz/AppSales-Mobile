@@ -36,6 +36,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 	NSString *appleAuthScnt;
 	NSString *appleAuthTrustedDeviceId;
 	UIActionSheet *verifyActionSheet;
+	SCInputType authType;
 }
 
 @property (nonatomic, strong) id<LoginManagerDelegate> delegate;

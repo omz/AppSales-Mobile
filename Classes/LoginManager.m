@@ -12,13 +12,16 @@
 NSString *const kAppleAuthBaseURL      = @"https://idmsa.apple.com/appleauth/auth";
 NSString *const kAppleAuthSignInAction = @"/signin";
 NSString *const kAppleAuthDeviceAction = @"/verify/device/%@/securitycode";
+NSString *const kAppleAuthCodeAction   = @"/verify/trusteddevice/securitycode";
 NSString *const kAppleAuthTrustAction  = @"/2sv/trust";
 
 // Apple Auth API Headers
 NSString *const kAppleAuthWidgetKey        = @"X-Apple-Widget-Key";
-NSString *const kAppleAuthWidgetValue      = @"22d448248055bab0dc197c6271d738c3";
+NSString *const kAppleAuthWidgetValue      = @"e0b80c3bf78523bfe80974d320935bfa30add02e1bff88ec2166c6bd5a706c42";
 NSString *const kAppleAuthSessionIdKey     = @"X-Apple-ID-Session-Id";
 NSString *const kAppleAuthScntKey          = @"scnt";
+NSString *const kAppleAuthAcceptKey        = @"Accept";
+NSString *const kAppleAuthAcceptValue      = @"application/json, text/javascript, */*; q=0.01";
 NSString *const kAppleAuthContentTypeKey   = @"Content-Type";
 NSString *const kAppleAuthContentTypeValue = @"application/json;charset=UTF-8";
 NSString *const kAppleAuthLocationKey      = @"Location";
@@ -42,6 +45,7 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	if (self) {
 		// Initialization code
 		account = _account;
+		authType = SCInputTypeUnknown;
 	}
 	return self;
 }
@@ -51,6 +55,7 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	if (self) {
 		// Initialization code
 		loginInfo = _loginInfo;
+		authType = SCInputTypeUnknown;
 	}
 	return self;
 }
@@ -95,6 +100,8 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 - (void)logIn {
 	[self logOut];
 	
+	authType = SCInputTypeUnknown;
+	appleAuthTrustedDeviceId = nil;
 	if (trustedDevices == nil) {
 		trustedDevices = [[NSMutableArray alloc] init];
 	} else {
@@ -110,6 +117,7 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	NSMutableURLRequest *signInRequest = [NSMutableURLRequest requestWithURL:signInURL];
 	[signInRequest setHTTPMethod:@"POST"];
 	[signInRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
+	[signInRequest setValue:kAppleAuthAcceptValue forHTTPHeaderField:kAppleAuthAcceptKey];
 	[signInRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
 	[signInRequest setHTTPBody:bodyData];
 	
@@ -135,39 +143,74 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 			});
 		}
 	} else {
-		// Looks like this account has Two-Step Verification enabled.
+		// This account has either Two-Step Verification or Two-Factor Authentication enabled.
 		NSURL *authURL = [NSURL URLWithString:kAppleAuthBaseURL];
 		NSMutableURLRequest *authRequest = [NSMutableURLRequest requestWithURL:authURL];
 		[authRequest setHTTPMethod:@"GET"];
 		[authRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
 		[authRequest setValue:appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
 		[authRequest setValue:appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+		[authRequest setValue:kAppleAuthAcceptValue forHTTPHeaderField:kAppleAuthAcceptKey];
 		[authRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
 		NSHTTPURLResponse *authResponse = nil;
 		NSData *authData = [NSURLConnection sendSynchronousRequest:authRequest returningResponse:&authResponse error:nil];
 		NSDictionary *authDict = [NSJSONSerialization JSONObjectWithData:authData options:0 error:nil];
 		
-		NSNumber *accountLocked = authDict[@"accountLocked"];
-		NSNumber *recoveryKeyLocked = authDict[@"recoveryKeyLocked"];
-		NSNumber *securityCodeLocked = authDict[@"securityCodeLocked"];
-		[trustedDevices addObjectsFromArray:authDict[@"trustedDevices"] ?: @[]];
-		if (accountLocked.boolValue || recoveryKeyLocked.boolValue || securityCodeLocked.boolValue) {
-			// Account is locked with some other method.
-			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginFailed];
-				});
+		NSString *authenticationType = authDict[@"authType"] ?: authDict[@"authenticationType"];
+		if ([authenticationType isEqualToString:@"hsa"]) {
+			// This account has Two-Step Verification enabled.
+			authType = SCInputTypeTwoStepVerificationCode;
+			NSNumber *accountLocked = authDict[@"accountLocked"];
+			NSNumber *recoveryKeyLocked = authDict[@"recoveryKeyLocked"];
+			NSNumber *securityCodeLocked = authDict[@"securityCodeLocked"];
+			[trustedDevices addObjectsFromArray:authDict[@"trustedDevices"] ?: @[]];
+			if (accountLocked.boolValue || recoveryKeyLocked.boolValue || securityCodeLocked.boolValue) {
+				// User is temporarily locked out of account, and is unable to sign in at the moment. Try again later?
+				if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginFailed];
+					});
+				}
+			} else if (trustedDevices.count == 0) {
+				// Account has no trusted devices.
+				if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginFailed];
+					});
+				}
+			} else {
+				// Allow user to choose a trusted device.
+				[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
 			}
-		} else if (trustedDevices.count == 0) {
-			// Account has no trusted devices.
-			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+		} else if ([authenticationType isEqualToString:@"hsa2"]) {
+			// This account has Two-Factor Authentication enabled.
+			authType = SCInputTypeTwoFactorAuthenticationCode;
+			NSDictionary *securityCodeDict = authDict[@"securityCode"];
+			NSNumber *tooManyCodesSent = securityCodeDict[@"tooManyCodesSent"];
+			NSNumber *tooManyCodesValidated = securityCodeDict[@"tooManyCodesValidated"];
+			NSNumber *securityCodeLocked = securityCodeDict[@"securityCodeLocked"];
+			if (tooManyCodesSent.boolValue || tooManyCodesValidated.boolValue || securityCodeLocked.boolValue) {
+				// User is temporarily locked out of account, and is unable to sign in at the moment. Try again later?
+				if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginFailed];
+					});
+				}
+			} else {
+				// Display security code input controller.
 				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginFailed];
+					SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] initWithType:SCInputTypeTwoFactorAuthenticationCode];
+					securityCodeInput.delegate = self;
+					[securityCodeInput show];
 				});
 			}
 		} else {
-			// Allow user to choose a trusted device.
-			[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
+			// Something else went wrong.
+			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self.delegate loginFailed];
+				});
+			}
 		}
 	}
 }
@@ -206,7 +249,7 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		if (securityCodeLength.integerValue == 4) {
 			// Display security code input controller.
 			dispatch_async(dispatch_get_main_queue(), ^{
-				SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] init];
+				SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] initWithType:SCInputTypeTwoStepVerificationCode];
 				securityCodeInput.delegate = self;
 				[securityCodeInput show];
 			});
@@ -223,10 +266,24 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 
 - (void)validateCode:(NSString *)securityCode {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSDictionary *bodyDict = @{@"code": securityCode};
+		NSDictionary *bodyDict = nil;
+		switch (authType) {
+			case SCInputTypeTwoStepVerificationCode:
+				bodyDict = @{@"code": securityCode};
+				break;
+			case SCInputTypeTwoFactorAuthenticationCode:
+				bodyDict = @{@"securityCode": @{@"code": securityCode}};
+				break;
+			default:
+				bodyDict = @{};
+				break;
+		}
 		NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
 		
-		NSURL *verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, appleAuthTrustedDeviceId]];
+		NSURL *verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthCodeAction]];
+		if (authType == SCInputTypeTwoStepVerificationCode) {
+			verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, appleAuthTrustedDeviceId]];
+		}
 		NSMutableURLRequest *verifyRequest = [NSMutableURLRequest requestWithURL:verifyURL];
 		[verifyRequest setHTTPMethod:@"POST"];
 		[verifyRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
@@ -248,7 +305,23 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 			}
 		} else {
 			// Incorrect verification code. Retry?
-			[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
+			switch (authType) {
+				case SCInputTypeTwoStepVerificationCode: {
+					[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
+					break;
+				}
+				case SCInputTypeTwoFactorAuthenticationCode: {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] initWithType:SCInputTypeTwoFactorAuthenticationCode];
+						securityCodeInput.delegate = self;
+						[securityCodeInput show];
+					});
+					break;
+				}
+				default: {
+					break;
+				}
+			}
 		}
 	});
 }
