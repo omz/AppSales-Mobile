@@ -83,6 +83,7 @@
 		7FDF6E8313D89B1000B8CC4E /* countries_simple.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7FDF6E8213D89B1000B8CC4E /* countries_simple.plist */; };
 		7FDF727513D8E64D00B8CC4E /* ReportCSVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727413D8E64D00B8CC4E /* ReportCSVViewController.m */; };
 		7FDF727D13DAAF2900B8CC4E /* ReportCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */; };
+		DA2231801DB30908009071A3 /* ReviewDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = DA22317F1DB30908009071A3 /* ReviewDownloader.m */; };
 		DA2995CD1C120E4C0009D4F1 /* Icon216.png in Resources */ = {isa = PBXBuildFile; fileRef = DA2995CC1C120E4C0009D4F1 /* Icon216.png */; };
 		DA4357FC1C113B670056702C /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4357FB1C113B670056702C /* LocalAuthentication.framework */; };
 		DA4984391C129F95009BFC8F /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = DA49842F1C129F95009BFC8F /* ioapi.c */; };
@@ -105,7 +106,6 @@
 		DAFC5F831C16B5F400261B16 /* ReviewsByVersionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F821C16B5F400261B16 /* ReviewsByVersionViewController.m */; };
 		DAFC5F931C16BFAD00261B16 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F921C16BFAD00261B16 /* Review.m */; };
 		DAFC5F961C16C07100261B16 /* Version.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F951C16C07100261B16 /* Version.m */; };
-		DAFC5F991C16C2C400261B16 /* ReviewDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F981C16C2C400261B16 /* ReviewDownloader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -244,6 +244,8 @@
 		7FDF727B13DAAF2900B8CC4E /* ReportCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportCollection.h; sourceTree = "<group>"; };
 		7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportCollection.m; sourceTree = "<group>"; };
 		7FED633913DB69EA00DF33B1 /* GlobalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalSettings.h; sourceTree = "<group>"; };
+		DA22317E1DB30908009071A3 /* ReviewDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewDownloader.h; path = Classes/ReviewDownloader.h; sourceTree = "<group>"; };
+		DA22317F1DB30908009071A3 /* ReviewDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewDownloader.m; path = Classes/ReviewDownloader.m; sourceTree = "<group>"; };
 		DA2995CC1C120E4C0009D4F1 /* Icon216.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon216.png; sourceTree = "<group>"; };
 		DA4357FB1C113B670056702C /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
 		DA49842E1C129F95009BFC8F /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
@@ -285,8 +287,6 @@
 		DAFC5F921C16BFAD00261B16 /* Review.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Review.m; sourceTree = "<group>"; };
 		DAFC5F941C16C07100261B16 /* Version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Version.h; sourceTree = "<group>"; };
 		DAFC5F951C16C07100261B16 /* Version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Version.m; sourceTree = "<group>"; };
-		DAFC5F971C16C2C400261B16 /* ReviewDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewDownloader.h; sourceTree = "<group>"; };
-		DAFC5F981C16C2C400261B16 /* ReviewDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewDownloader.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -548,8 +548,8 @@
 		7F89BCDA13DFA43E001C607F /* Review Download */ = {
 			isa = PBXGroup;
 			children = (
-				DAFC5F971C16C2C400261B16 /* ReviewDownloader.h */,
-				DAFC5F981C16C2C400261B16 /* ReviewDownloader.m */,
+				DA22317E1DB30908009071A3 /* ReviewDownloader.h */,
+				DA22317F1DB30908009071A3 /* ReviewDownloader.m */,
 			);
 			name = "Review Download";
 			path = ..;
@@ -738,7 +738,13 @@
 		7F709D1E13BC98860008DBAD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
+				ORGANIZATIONNAME = "omz:software";
+				TargetAttributes = {
+					7F709D2613BC98860008DBAD = {
+						CreatedOnToolsVersion = 7.1;
+					};
+				};
 			};
 			buildConfigurationList = 7F709D2113BC98860008DBAD /* Build configuration list for PBXProject "AppSales" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -793,7 +799,6 @@
 				7F709D3A13BC98860008DBAD /* main.m in Sources */,
 				7F709D3E13BC98860008DBAD /* AppSalesAppDelegate.m in Sources */,
 				DAFC5F961C16C07100261B16 /* Version.m in Sources */,
-				DAFC5F991C16C2C400261B16 /* ReviewDownloader.m in Sources */,
 				7F709D4113BC98860008DBAD /* AppSales.xcdatamodeld in Sources */,
 				7F709D4713BC98860008DBAD /* AccountsViewController.m in Sources */,
 				7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */,
@@ -845,6 +850,7 @@
 				7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */,
 				7F7F1D0C13F6442C00F18143 /* PromoCodesViewController.m in Sources */,
 				7F7F1D0F13F6455A00F18143 /* PromoCodesAppViewController.m in Sources */,
+				DA2231801DB30908009071A3 /* ReviewDownloader.m in Sources */,
 				7FA3EA9913F76E3500C80C07 /* DownloadStepOperation.m in Sources */,
 				DA49843C1C129F95009BFC8F /* zip.c in Sources */,
 				7FA3EA9D13F77DF000C80C07 /* MultiOperation.m in Sources */,
@@ -884,11 +890,22 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -896,8 +913,12 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				ONLY_ACTIVE_ARCH = YES;
@@ -912,12 +933,27 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
