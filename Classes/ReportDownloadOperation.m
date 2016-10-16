@@ -37,15 +37,15 @@
 - (void)main {
 	@autoreleasepool {
 		
-		int numberOfReportsDownloaded = 0;
+		NSInteger numberOfReportsDownloaded = 0;
 		[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Starting download", nil)];
 		
 		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-		[moc setPersistentStoreCoordinator:psc];
-		[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
+		moc.persistentStoreCoordinator = psc;
+		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 		
 		ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
-		NSInteger previousBadge = [account.reportsBadge integerValue];
+		NSInteger previousBadge = account.reportsBadge.integerValue;
 		NSString *vendorID = account.vendorID;
 		
 		NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
@@ -63,7 +63,7 @@
 				NSInteger weekday = -1;
 				while (YES) {
 					NSDateComponents *weekdayComponents = [calendar components:NSCalendarUnitWeekday fromDate:today];
-					weekday = [weekdayComponents weekday];
+					weekday = weekdayComponents.weekday;
 					if (weekday == 1) {
 						break;
 					} else {

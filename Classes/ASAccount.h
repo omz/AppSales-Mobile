@@ -1,5 +1,5 @@
 //
-//  Account.h
+//  ASAccount.h
 //  AppSales
 //
 //  Created by Ole Zorn on 30.06.11.
@@ -11,17 +11,17 @@
 
 
 @interface ASAccount : NSManagedObject {
-
 	BOOL isDownloadingReports;
 	NSString *downloadStatus;
 	float downloadProgress;
 }
 
 @property (nonatomic, assign) BOOL isDownloadingReports;
-@property (nonatomic, strong) NSString *password;		// these properties encapsulate the keychain access,
-@property (nonatomic, strong) NSString *appPassword;	// they are not actually stored in the Core Data model
 @property (nonatomic, strong) NSString *downloadStatus;
 @property (nonatomic, assign) float downloadProgress;
+
+@property (nonatomic, strong) NSString *password;    // these properties encapsulate the keychain access,
+@property (nonatomic, strong) NSString *appPassword;	 // they are not actually stored in the Core Data model
 
 // Core Data properties:
 @property (nonatomic, strong) NSString *username;

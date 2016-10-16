@@ -15,13 +15,12 @@
 
 @implementation ReportDownloadCoordinator
 
-@synthesize isBusy;
-
 - (instancetype)init {
 	self = [super init];
 	if (self) {
 		reportDownloadQueue = [[NSOperationQueue alloc] init];
 		reportDownloadQueue.maxConcurrentOperationCount = 1;
+		reportDownloadQueue.qualityOfService = NSQualityOfServiceUserInitiated;
 		[reportDownloadQueue addObserver:self forKeyPath:@"operationCount" options:NSKeyValueObservingOptionNew context:nil];
 	}
 	return self;
@@ -38,14 +37,16 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"operationCount"]) {
-		self.isBusy = (reportDownloadQueue.operationCount > 0);
+		isBusy = (reportDownloadQueue.operationCount > 0);
 	}
 }
 
+- (BOOL)isBusy {
+	return isBusy;
+}
+
 - (void)downloadReportsForAccount:(ASAccount *)account {
-	if (account.isDownloadingReports) {
-		return;
-	}
+	if (account.isDownloadingReports) { return; }
 	ReportDownloadOperation *operation = [[ReportDownloadOperation alloc] initWithAccount:account];
 	account.isDownloadingReports = YES;
 	account.downloadStatus = NSLocalizedString(@"Waiting...", nil);
@@ -54,17 +55,17 @@
 }
 
 - (void)cancelDownloadForAccount:(ASAccount *)account {
-	if (!account.isDownloadingReports) return;
-	account.downloadStatus = NSLocalizedString(@"Cancelling...", nil);
-	for (NSOperation *operation in [reportDownloadQueue operations]) {
-		if ([operation isKindOfClass:[ReportDownloadOperation class]] && [[(ReportDownloadOperation *)operation accountObjectID] isEqual:account.objectID]) {
+	if (!account.isDownloadingReports) { return; }
+	account.downloadStatus = NSLocalizedString(@"Canceling...", nil);
+	for (NSOperation *operation in reportDownloadQueue.operations) {
+		if ([operation isKindOfClass:[ReportDownloadOperation class]] && [((ReportDownloadOperation *)operation).accountObjectID isEqual:account.objectID]) {
 			[operation cancel];
 		}
 	}
 }
 
 - (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes {
-	if (product.isDownloadingPromoCodes) return;
+	if (product.isDownloadingPromoCodes) { return; }
 	product.isDownloadingPromoCodes = YES;
 	PromoCodeOperation *operation = [[PromoCodeOperation alloc] initWithProduct:product numberOfCodes:numberOfCodes];
 	operation.completionBlock = ^{
