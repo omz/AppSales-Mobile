@@ -12,7 +12,7 @@
 #import "ReportDownloadOperation.h"
 #import "ReportDownloadCoordinator.h"
 #import "PromoCodeOperation.h"
-#import "SSKeychain.h"
+#import "SAMKeychain.h"
 #import "ASAccount.h"
 #import "SalesViewController.h"
 #import "ReviewsViewController.h"
@@ -193,7 +193,7 @@
 	NSString *oldUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"iTunesConnectUsername"];
 	NSString *oldPassword = nil;
 	if (oldUsername) {
-		oldPassword = [SSKeychain passwordForService:@"omz:software AppSales Mobile Service" account:oldUsername];
+		oldPassword = [SAMKeychain passwordForService:@"omz:software AppSales Mobile Service" account:oldUsername];
 	}
 	ASAccount *account = nil;
 	if (oldUsername) {

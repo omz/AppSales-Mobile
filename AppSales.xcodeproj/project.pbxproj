@@ -84,6 +84,9 @@
 		7FDF727513D8E64D00B8CC4E /* ReportCSVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727413D8E64D00B8CC4E /* ReportCSVViewController.m */; };
 		7FDF727D13DAAF2900B8CC4E /* ReportCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */; };
 		DA2231801DB30908009071A3 /* ReviewDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = DA22317F1DB30908009071A3 /* ReviewDownloader.m */; };
+		DA2231A41DB318C7009071A3 /* SAMKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2231A11DB318C7009071A3 /* SAMKeychain.m */; };
+		DA2231A51DB318C7009071A3 /* SAMKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2231A31DB318C7009071A3 /* SAMKeychainQuery.m */; };
+		DA2231A71DB318CC009071A3 /* SAMKeychain.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA2231A61DB318CC009071A3 /* SAMKeychain.bundle */; };
 		DA2995CD1C120E4C0009D4F1 /* Icon216.png in Resources */ = {isa = PBXBuildFile; fileRef = DA2995CC1C120E4C0009D4F1 /* Icon216.png */; };
 		DA4357FC1C113B670056702C /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4357FB1C113B670056702C /* LocalAuthentication.framework */; };
 		DA4984391C129F95009BFC8F /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = DA49842F1C129F95009BFC8F /* ioapi.c */; };
@@ -93,9 +96,6 @@
 		DA49843D1C129F95009BFC8F /* ZIPArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA4984381C129F95009BFC8F /* ZIPArchive.mm */; };
 		DA4984411C12A884009BFC8F /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4984401C12A884009BFC8F /* MBProgressHUD.m */; };
 		DA4984471C12C85F009BFC8F /* UIViewController+Orientation.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4984461C12C85F009BFC8F /* UIViewController+Orientation.m */; };
-		DA7B08C31C1312F500BEAB57 /* SSKeychain.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA7B08BD1C1312F500BEAB57 /* SSKeychain.strings */; };
-		DA7B08C41C1312F500BEAB57 /* SSKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C01C1312F500BEAB57 /* SSKeychain.m */; };
-		DA7B08C51C1312F500BEAB57 /* SSKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C21C1312F500BEAB57 /* SSKeychainQuery.m */; };
 		DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */; };
 		DA7B08E11C154CFB00BEAB57 /* FlagKit.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */; };
 		DA7D58F41C234D9700A3EA12 /* ReviewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7D58F31C234D9700A3EA12 /* ReviewCell.m */; };
@@ -246,6 +246,11 @@
 		7FED633913DB69EA00DF33B1 /* GlobalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalSettings.h; sourceTree = "<group>"; };
 		DA22317E1DB30908009071A3 /* ReviewDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewDownloader.h; path = Classes/ReviewDownloader.h; sourceTree = "<group>"; };
 		DA22317F1DB30908009071A3 /* ReviewDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewDownloader.m; path = Classes/ReviewDownloader.m; sourceTree = "<group>"; };
+		DA2231A01DB318C7009071A3 /* SAMKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychain.h; path = Vendor/SAMKeychain/Sources/SAMKeychain.h; sourceTree = SOURCE_ROOT; };
+		DA2231A11DB318C7009071A3 /* SAMKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychain.m; path = Vendor/SAMKeychain/Sources/SAMKeychain.m; sourceTree = SOURCE_ROOT; };
+		DA2231A21DB318C7009071A3 /* SAMKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychainQuery.h; path = Vendor/SAMKeychain/Sources/SAMKeychainQuery.h; sourceTree = SOURCE_ROOT; };
+		DA2231A31DB318C7009071A3 /* SAMKeychainQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychainQuery.m; path = Vendor/SAMKeychain/Sources/SAMKeychainQuery.m; sourceTree = SOURCE_ROOT; };
+		DA2231A61DB318CC009071A3 /* SAMKeychain.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SAMKeychain.bundle; path = Vendor/SAMKeychain/Support/SAMKeychain.bundle; sourceTree = SOURCE_ROOT; };
 		DA2995CC1C120E4C0009D4F1 /* Icon216.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon216.png; sourceTree = "<group>"; };
 		DA4357FB1C113B670056702C /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
 		DA49842E1C129F95009BFC8F /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
@@ -263,11 +268,6 @@
 		DA4984401C12A884009BFC8F /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = Vendor/MBProgressHUD/MBProgressHUD.m; sourceTree = SOURCE_ROOT; };
 		DA4984451C12C85F009BFC8F /* UIViewController+Orientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Orientation.h"; sourceTree = "<group>"; };
 		DA4984461C12C85F009BFC8F /* UIViewController+Orientation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Orientation.m"; sourceTree = "<group>"; };
-		DA7B08BE1C1312F500BEAB57 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SSKeychain.strings; sourceTree = "<group>"; };
-		DA7B08BF1C1312F500BEAB57 /* SSKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSKeychain.h; sourceTree = "<group>"; };
-		DA7B08C01C1312F500BEAB57 /* SSKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychain.m; sourceTree = "<group>"; };
-		DA7B08C11C1312F500BEAB57 /* SSKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSKeychainQuery.h; sourceTree = "<group>"; };
-		DA7B08C21C1312F500BEAB57 /* SSKeychainQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychainQuery.m; sourceTree = "<group>"; };
 		DA7B08C71C135EA300BEAB57 /* UIAlertController+Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertController+Window.h"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.h"; sourceTree = SOURCE_ROOT; };
 		DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertController+Window.m"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.m"; sourceTree = SOURCE_ROOT; };
 		DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = FlagKit.xcassets; path = Vendor/FlagKit/FlagKit.xcassets; sourceTree = "<group>"; };
@@ -632,6 +632,18 @@
 			name = "Accounts and Settings";
 			sourceTree = "<group>";
 		};
+		DA2231A81DB318CF009071A3 /* SAMKeychain */ = {
+			isa = PBXGroup;
+			children = (
+				DA2231A61DB318CC009071A3 /* SAMKeychain.bundle */,
+				DA2231A01DB318C7009071A3 /* SAMKeychain.h */,
+				DA2231A11DB318C7009071A3 /* SAMKeychain.m */,
+				DA2231A21DB318C7009071A3 /* SAMKeychainQuery.h */,
+				DA2231A31DB318C7009071A3 /* SAMKeychainQuery.m */,
+			);
+			name = SAMKeychain;
+			sourceTree = "<group>";
+		};
 		DA49842C1C129F95009BFC8F /* ZIPArchive */ = {
 			isa = PBXGroup;
 			children = (
@@ -664,7 +676,7 @@
 			children = (
 				DA7B08C61C135E9500BEAB57 /* FFGlobalAlertController */,
 				DA4984421C12A887009BFC8F /* MBProgressHUD */,
-				DA7B08BC1C1312F500BEAB57 /* SSKeychain */,
+				DA2231A81DB318CF009071A3 /* SAMKeychain */,
 				DA49842C1C129F95009BFC8F /* ZIPArchive */,
 			);
 			name = Vendor;
@@ -678,19 +690,6 @@
 			);
 			name = MBProgressHUD;
 			sourceTree = "<group>";
-		};
-		DA7B08BC1C1312F500BEAB57 /* SSKeychain */ = {
-			isa = PBXGroup;
-			children = (
-				DA7B08BD1C1312F500BEAB57 /* SSKeychain.strings */,
-				DA7B08BF1C1312F500BEAB57 /* SSKeychain.h */,
-				DA7B08C01C1312F500BEAB57 /* SSKeychain.m */,
-				DA7B08C11C1312F500BEAB57 /* SSKeychainQuery.h */,
-				DA7B08C21C1312F500BEAB57 /* SSKeychainQuery.m */,
-			);
-			name = SSKeychain;
-			path = Vendor/SSKeychain/SSKeychain;
-			sourceTree = SOURCE_ROOT;
 		};
 		DA7B08C61C135E9500BEAB57 /* FFGlobalAlertController */ = {
 			isa = PBXGroup;
@@ -774,10 +773,10 @@
 				7FDF6E8113D8962500B8CC4E /* countries.plist in Resources */,
 				7FDF6E8313D89B1000B8CC4E /* countries_simple.plist in Resources */,
 				DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */,
-				DA7B08C31C1312F500BEAB57 /* SSKeychain.strings in Resources */,
 				DA2995CD1C120E4C0009D4F1 /* Icon216.png in Resources */,
 				62E09F1B19E693F3002917FE /* Images.xcassets in Resources */,
 				7FAB533413DD0F9A0027274F /* country_names.plist in Resources */,
+				DA2231A71DB318CC009071A3 /* SAMKeychain.bundle in Resources */,
 				DA7B08E11C154CFB00BEAB57 /* FlagKit.xcassets in Resources */,
 				7F89BCE313DFB4F1001C607F /* stores.plist in Resources */,
 				7F26DF9413E1358B001D0F33 /* ReviewTemplate.html in Resources */,
@@ -821,12 +820,14 @@
 				7F454F9A13D5B97100AE47D1 /* Product.m in Sources */,
 				7F454F9D13D5C19D00AE47D1 /* CrayonColorPickerViewController.m in Sources */,
 				7F454FA013D5C25000AE47D1 /* UIColor+Extensions.m in Sources */,
+				DA2231A41DB318C7009071A3 /* SAMKeychain.m in Sources */,
 				DA4984471C12C85F009BFC8F /* UIViewController+Orientation.m in Sources */,
 				7F454FAE13D6496900AE47D1 /* IconManager.m in Sources */,
 				7F2946EE13D880260023F530 /* ReportDetailViewController.m in Sources */,
 				7F2946F113D8806F0023F530 /* MapView.m in Sources */,
 				7FDF727513D8E64D00B8CC4E /* ReportCSVViewController.m in Sources */,
 				7FDF727D13DAAF2900B8CC4E /* ReportCollection.m in Sources */,
+				DA2231A51DB318C7009071A3 /* SAMKeychainQuery.m in Sources */,
 				7FD4ECDC13DAFF120054FE6D /* AppleFiscalCalendar.m in Sources */,
 				7FAB532C13DCFA7E0027274F /* AppIconView.m in Sources */,
 				7F4065CA13DD379B006148AA /* ReportDetailEntryCell.m in Sources */,
@@ -840,7 +841,6 @@
 				7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */,
 				DA4984391C129F95009BFC8F /* ioapi.c in Sources */,
 				DAFC5F931C16BFAD00261B16 /* Review.m in Sources */,
-				DA7B08C41C1312F500BEAB57 /* SSKeychain.m in Sources */,
 				DA7D58F41C234D9700A3EA12 /* ReviewCell.m in Sources */,
 				7F7F4A3F13E50A52006C6651 /* PaymentsViewController.m in Sources */,
 				7F7F4A4213E51A99006C6651 /* YearView.m in Sources */,
@@ -864,7 +864,6 @@
 				6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */,
 				6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */,
 				6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */,
-				DA7B08C51C1312F500BEAB57 /* SSKeychainQuery.m in Sources */,
 				6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */,
 				DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */,
 				DA49843A1C129F95009BFC8F /* mztools.c in Sources */,
@@ -872,17 +871,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		DA7B08BD1C1312F500BEAB57 /* SSKeychain.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DA7B08BE1C1312F500BEAB57 /* en */,
-			);
-			name = SSKeychain.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		7F709D4B13BC98860008DBAD /* Debug */ = {

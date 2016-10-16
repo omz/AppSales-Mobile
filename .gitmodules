@@ -4,9 +4,9 @@
 [submodule "Vendor/MBProgressHUD"]
 	path = Vendor/MBProgressHUD
 	url = https://github.com/jdg/MBProgressHUD.git
-[submodule "Vendor/SSKeychain"]
-	path = Vendor/SSKeychain
-	url = https://github.com/nicolasgomollon/SSKeychain.git
+[submodule "Vendor/SAMKeychain"]
+	path = Vendor/SAMKeychain
+	url = https://github.com/nicolasgomollon/SAMKeychain.git
 [submodule "Vendor/FFGlobalAlertController"]
 	path = Vendor/FFGlobalAlertController
 	url = https://github.com/agilityvision/FFGlobalAlertController.git
