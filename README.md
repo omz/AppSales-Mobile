@@ -19,7 +19,7 @@ Please see the screenshot below for a visual guide to AppSales' main interface a
 
 AppSales requires the iOS 8.2 SDK or later.
 
-Report downloads uses Apple's auto-ingestion interface to iTunes Connect, while Payments and Customer Reviews are fetched using their appropriate JSON API. This means that the app should generally be unaffected by changes to the website.
+Report downloads uses Apple's Reporter API, while Payments and Customer Reviews are fetched using their appropriate iTunes Connect JSON API. This means that the app should generally be unaffected by changes to the website.
 
 ## Getting Started
 

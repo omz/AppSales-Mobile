@@ -11,6 +11,16 @@
 #import "Report.h"
 #import "WeeklyReport.h"
 #import "NSData+Compression.h"
+#import "ReporterParser.h"
+
+// iTunes Connect Reporter API
+NSString *const kITCReporterVersion            = @"1.0";
+NSString *const kITCReporterMode               = @"Robot.XML";
+NSString *const kITCReporterBaseURL            = @"https://reportingitc-reporter.apple.com";
+NSString *const kITCReporterServiceAction      = @"/reportservice/%@/v1";
+NSString *const kITCReporterServiceTypeSales   = @"sales";
+NSString *const kITCReporterServiceTypeFinance = @"finance";
+NSString *const kITCReporterServiceBody        = @"[p=Reporter.properties, %@]";
 
 @implementation ReportDownloadOperation
 
@@ -47,6 +57,7 @@
 		ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
 		NSInteger previousBadge = account.reportsBadge.integerValue;
 		NSString *vendorID = account.vendorID;
+		NSString *salesKey = kITCReporterServiceTypeSales.capitalizedString;
 		
 		NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
 		for (NSString *dateType in @[@"Daily", @"Weekly"]) {
@@ -138,48 +149,64 @@
 					}
 				}
 				
-				NSString *reportDownloadBodyString = [NSString stringWithFormat:@"USERNAME=%@&PASSWORD=%@&VNDNUMBER=%@&TYPEOFREPORT=%@&DATETYPE=%@&REPORTTYPE=%@&REPORTDATE=%@", NSStringPercentEscaped(username), NSStringPercentEscaped(appPassword), vendorID, @"Sales", dateType, @"Summary", reportDateString];
+				NSString *query = [NSString stringWithFormat:@"%@.getReport, %@,%@,Summary,%@,%@", salesKey, vendorID, salesKey, dateType, reportDateString];
 				
-				NSData *reportDownloadBodyData = [reportDownloadBodyString dataUsingEncoding:NSUTF8StringEncoding];
-				NSMutableURLRequest *reportDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/autoingestion.tft"]];
-				[reportDownloadRequest setHTTPMethod:@"POST"];
-				[reportDownloadRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-				[reportDownloadRequest setValue:@"java/1.6.0_26" forHTTPHeaderField:@"User-Agent"];
-				[reportDownloadRequest setHTTPBody:reportDownloadBodyData];
+				NSDictionary *getReportData = @{@"userid":     username,
+												@"password":   appPassword,
+												@"version":    kITCReporterVersion,
+												@"mode":       kITCReporterMode,
+												@"queryInput": [NSString stringWithFormat:kITCReporterServiceBody, query],
+												};
+				NSData *jsonData = [NSJSONSerialization dataWithJSONObject:getReportData options:0 error:nil];
+				NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+				NSString *getReportBody = [NSString stringWithFormat:@"jsonRequest=%@", NSStringPercentEscaped(jsonString)];
+				NSData *getReportBodyData = [getReportBody dataUsingEncoding:NSUTF8StringEncoding];
+				
+				NSURL *reporterURL = [NSURL URLWithString:[kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales]];
+				NSMutableURLRequest *reporterRequest = [NSMutableURLRequest requestWithURL:reporterURL];
+				[reporterRequest setHTTPMethod:@"POST"];
+				[reporterRequest setValue:@"application/x-www-form-urlencoded; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+				[reporterRequest setHTTPBody:getReportBodyData];
 				
 				NSHTTPURLResponse *response = nil;
-				NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:nil];
+				NSData *reportData = [NSURLConnection sendSynchronousRequest:reporterRequest returningResponse:&response error:nil];
 				
-				NSString *errorMessage = response.allHeaderFields[@"Errormsg"];
-				// The message "Daily Reports are only available for past 365 days. Please enter a new date."
-				// just means that the report in question has not yet been released.
-				// We can safely ignore this error and move on.
-				if ([errorMessage rangeOfString:@"past 365 days"].location == NSNotFound) {
-					NSLog(@"%@ -> %@", reportDateString, errorMessage);
-					
-					NSInteger year = [[reportDateString substringWithRange:NSMakeRange(0, 4)] intValue];
-					NSInteger month = [[reportDateString substringWithRange:NSMakeRange(4, 2)] intValue];
-					NSInteger day = [[reportDateString substringWithRange:NSMakeRange(6, 2)] intValue];
-					
-					NSDateComponents *components = [[NSDateComponents alloc] init];
-					[components setYear:year];
-					[components setMonth:month];
-					[components setDay:day];
-					
-					NSDate *reportDate = [[NSCalendar currentCalendar] dateFromComponents:components];
-					
-					NSMutableDictionary *reportTypes = [[NSMutableDictionary alloc] initWithDictionary:errors[errorMessage]];
-					
-					NSMutableArray *reports = [[NSMutableArray alloc] initWithArray:reportTypes[dateType]];
-					[reports addObject:reportDate];
-					reportTypes[dateType] = reports;
-					
-					errors[errorMessage] = reportTypes;
-				} else if (reportData) {
-					NSString *originalFilename = response.allHeaderFields[@"Filename"];
+				if ([response.MIMEType isEqualToString:@"text/plain"]) {
+					ReporterParser *reporterParser = [[ReporterParser alloc] initWithData:reportData];
+					[reporterParser parse];
+					NSDictionary *root = reporterParser.root;
+					NSDictionary *node = root[kReporterErrorKey];
+					if (node != nil) {
+						NSNumber *errorCode = node[kReporterCodeKey];
+						NSString *errorMessage = node[kReporterMessageKey];
+						if ((errorCode.integerValue != 210) && (errorMessage != nil)) {
+							NSLog(@"%@ -> %@", reportDateString, errorMessage);
+							
+							NSInteger year = [[reportDateString substringWithRange:NSMakeRange(0, 4)] intValue];
+							NSInteger month = [[reportDateString substringWithRange:NSMakeRange(4, 2)] intValue];
+							NSInteger day = [[reportDateString substringWithRange:NSMakeRange(6, 2)] intValue];
+							
+							NSDateComponents *components = [[NSDateComponents alloc] init];
+							[components setYear:year];
+							[components setMonth:month];
+							[components setDay:day];
+							
+							NSDate *reportDate = [[NSCalendar currentCalendar] dateFromComponents:components];
+							
+							NSMutableDictionary *reportTypes = [[NSMutableDictionary alloc] initWithDictionary:errors[errorMessage]];
+							
+							NSMutableArray *reports = [[NSMutableArray alloc] initWithArray:reportTypes[dateType]];
+							[reports addObject:reportDate];
+							reportTypes[dateType] = reports;
+							
+							errors[errorMessage] = reportTypes;
+						}
+					}
+				} else if ([response.MIMEType isEqualToString:@"application/a-gzip"]) {
+					NSString *originalFilename = response.allHeaderFields[@"filename"];
 					NSData *inflatedReportData = [reportData gzipInflate];
 					NSString *reportCSV = [[NSString alloc] initWithData:inflatedReportData encoding:NSUTF8StringEncoding];
-					if (originalFilename && [reportCSV length] > 0) {
+					if (originalFilename && (reportCSV.length > 0)) {
 						// Parse report CSV.
 						Report *report = [Report insertNewReportWithCSV:reportCSV inAccount:account];
 						

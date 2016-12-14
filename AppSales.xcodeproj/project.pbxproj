@@ -99,6 +99,7 @@
 		DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */; };
 		DA7B08E11C154CFB00BEAB57 /* FlagKit.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */; };
 		DA7D58F41C234D9700A3EA12 /* ReviewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7D58F31C234D9700A3EA12 /* ReviewCell.m */; };
+		DA8C71F31E00E4A100F7490B /* ReporterParser.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8C71F21E00E4A100F7490B /* ReporterParser.m */; };
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
@@ -273,6 +274,8 @@
 		DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = FlagKit.xcassets; path = Vendor/FlagKit/FlagKit.xcassets; sourceTree = "<group>"; };
 		DA7D58F21C234D9700A3EA12 /* ReviewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewCell.h; sourceTree = "<group>"; };
 		DA7D58F31C234D9700A3EA12 /* ReviewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewCell.m; sourceTree = "<group>"; };
+		DA8C71F11E00E4A100F7490B /* ReporterParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReporterParser.h; sourceTree = "<group>"; };
+		DA8C71F21E00E4A100F7490B /* ReporterParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReporterParser.m; sourceTree = "<group>"; };
 		DA9DB1B11C0FEC48007B0178 /* LoginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginManager.h; sourceTree = "<group>"; };
 		DA9DB1B21C0FEC48007B0178 /* LoginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginManager.m; sourceTree = "<group>"; };
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
@@ -312,6 +315,8 @@
 		7F1499D113BE312100D89064 /* Report Download */ = {
 			isa = PBXGroup;
 			children = (
+				DA8C71F11E00E4A100F7490B /* ReporterParser.h */,
+				DA8C71F21E00E4A100F7490B /* ReporterParser.m */,
 				7F1499DF13BE544F00D89064 /* ReportDownloadCoordinator.h */,
 				7F1499E013BE544F00D89064 /* ReportDownloadCoordinator.m */,
 				7F1499CE13BE311600D89064 /* ReportDownloadOperation.h */,
@@ -798,6 +803,7 @@
 				7F709D3A13BC98860008DBAD /* main.m in Sources */,
 				7F709D3E13BC98860008DBAD /* AppSalesAppDelegate.m in Sources */,
 				DAFC5F961C16C07100261B16 /* Version.m in Sources */,
+				DA8C71F31E00E4A100F7490B /* ReporterParser.m in Sources */,
 				7F709D4113BC98860008DBAD /* AppSales.xcdatamodeld in Sources */,
 				7F709D4713BC98860008DBAD /* AccountsViewController.m in Sources */,
 				7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */,
