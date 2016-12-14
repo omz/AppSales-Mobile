@@ -52,12 +52,13 @@
 	[numberFormatterWithoutFraction setMinimumFractionDigits:0];
 	[numberFormatterWithoutFraction setMaximumFractionDigits:0];
 	[numberFormatterWithoutFraction setMinimumIntegerDigits:1];
-		
+	
 	self.availableCurrencies = @[@"USD", @"EUR",
 								 @"AED", @"AUD",
 								 @"BHD", @"BND", @"BRL",
 								 @"CAD", @"CHF", @"CLP", @"CNY", @"CZK",
 								 @"DKK",
+								 @"EGP",
 								 @"GBP",
 								 @"HUF", @"HKD",
 								 @"IDR", @"ILS", @"INR", @"ISK",
@@ -65,13 +66,14 @@
 								 @"KRW", @"KWD", @"KZT",
 								 @"LKR",
 								 @"MUR", @"MXN", @"MYR",
-								 @"NOK", @"NPR", @"NZD",
+								 @"NGN", @"NOK", @"NPR", @"NZD",
 								 @"OMR",
-								 @"PKR",
+								 @"PHP", @"PKR",
 								 @"QAR",
 								 @"RUB",
 								 @"SAR", @"SEK", @"SGD",
-								 @"THB", @"TRY", @"TWD",
+								 @"THB", @"TRY", @"TWD", @"TZS",
+								 @"VND",
 								 @"ZAR"];
 	
 	currencySymbols = @{@"EUR": @"€",
@@ -90,51 +92,53 @@
 	exchangeRates = [[NSUserDefaults standardUserDefaults] objectForKey:@"CurrencyManagerExchangeRates"];
 	if (!exchangeRates) {
 		exchangeRates = [NSMutableDictionary new];
-		[exchangeRates setObject:@(0.242829) forKey:@"\"AED/EUR\""];
-		[exchangeRates setObject:@(0.631788) forKey:@"\"AUD/EUR\""];
-		[exchangeRates setObject:@(2.36573) forKey:@"\"BHD/EUR\""];
-		[exchangeRates setObject:@(0.634964) forKey:@"\"BND/EUR\""];
-		[exchangeRates setObject:@(0.228870) forKey:@"\"BRL/EUR\""];
-		[exchangeRates setObject:@(0.639934) forKey:@"\"CAD/EUR\""];
-		[exchangeRates setObject:@(0.905730) forKey:@"\"CHF/EUR\""];
-		[exchangeRates setObject:@(0.00125179) forKey:@"\"CLP/EUR\""];
-		[exchangeRates setObject:@(0.135733) forKey:@"\"CNY/EUR\""];
-		[exchangeRates setObject:@(1.70860) forKey:@"\"CYP/EUR\""];
-		[exchangeRates setObject:@(0.0369449) forKey:@"\"CZK/EUR\""];
-		[exchangeRates setObject:@(0.133990) forKey:@"\"DKK/EUR\""];
+		[exchangeRates setObject:@(0.2553) forKey:@"\"AED/EUR\""];
+		[exchangeRates setObject:@(0.7045) forKey:@"\"AUD/EUR\""];
+		[exchangeRates setObject:@(2.4866) forKey:@"\"BHD/EUR\""];
+		[exchangeRates setObject:@(0.6595) forKey:@"\"BND/EUR\""];
+		[exchangeRates setObject:@(0.2812) forKey:@"\"BRL/EUR\""];
+		[exchangeRates setObject:@(0.7137) forKey:@"\"CAD/EUR\""];
+		[exchangeRates setObject:@(0.9282) forKey:@"\"CHF/EUR\""];
+		[exchangeRates setObject:@(0.0014) forKey:@"\"CLP/EUR\""];
+		[exchangeRates setObject:@(0.1359) forKey:@"\"CNY/EUR\""];
+		[exchangeRates setObject:@(0.0370) forKey:@"\"CZK/EUR\""];
+		[exchangeRates setObject:@(0.1344) forKey:@"\"DKK/EUR\""];
+		[exchangeRates setObject:@(0.0493) forKey:@"\"EGP/EUR\""];
 		[exchangeRates setObject:@(1.0000) forKey:@"\"EUR/EUR\""];
-		[exchangeRates setObject:@(1.28771) forKey:@"\"GBP/EUR\""];
-		[exchangeRates setObject:@(0.114475) forKey:@"\"HKD/EUR\""];
-		[exchangeRates setObject:@(0.00321362) forKey:@"\"HUF/EUR\""];
-		[exchangeRates setObject:@(0.0000651) forKey:@"\"IDR/EUR\""];
-		[exchangeRates setObject:@(0.229208) forKey:@"\"ILS/EUR\""];
-		[exchangeRates setObject:@(0.0131144) forKey:@"\"INR/EUR\""];
-		[exchangeRates setObject:@(0.00695861) forKey:@"\"ISK/EUR\""];
-		[exchangeRates setObject:@(0.00773167) forKey:@"\"JPY/EUR\""];
-		[exchangeRates setObject:@(0.000739939) forKey:@"\"KRW/EUR\""];
-		[exchangeRates setObject:@(2.97282) forKey:@"\"KWD/EUR\""];
-		[exchangeRates setObject:@(0.00249111) forKey:@"\"KZT/EUR\""];
-		[exchangeRates setObject:@(0.00619831) forKey:@"\"LKR/EUR\""];
-		[exchangeRates setObject:@(2.32937) forKey:@"\"MTL/EUR\""];
-		[exchangeRates setObject:@(0.0250685) forKey:@"\"MUR/EUR\""];
-		[exchangeRates setObject:@(0.0475557) forKey:@"\"MXN/EUR\""];
-		[exchangeRates setObject:@(0.213494) forKey:@"\"MYR/EUR\""];
-		[exchangeRates setObject:@(0.103968) forKey:@"\"NOK/EUR\""];
-		[exchangeRates setObject:@(0.00820824) forKey:@"\"NPR/EUR\""];
-		[exchangeRates setObject:@(0.590547) forKey:@"\"NZD/EUR\""];
-		[exchangeRates setObject:@(2.31784) forKey:@"\"OMR/EUR\""];
-		[exchangeRates setObject:@(0.00854538) forKey:@"\"PKR/EUR\""];
-		[exchangeRates setObject:@(0.245013) forKey:@"\"QAR/EUR\""];
-		[exchangeRates setObject:@(0.0114155) forKey:@"\"RUB/EUR\""];
-		[exchangeRates setObject:@(0.237926) forKey:@"\"SAR/EUR\""];
-		[exchangeRates setObject:@(0.105716) forKey:@"\"SEK/EUR\""];
-		[exchangeRates setObject:@(0.635250) forKey:@"\"SGD/EUR\""];
-		[exchangeRates setObject:@(0.0331939) forKey:@"\"SKK/EUR\""];
-		[exchangeRates setObject:@(0.0251129) forKey:@"\"THB/EUR\""];
-		[exchangeRates setObject:@(0.302758) forKey:@"\"TRY/EUR\""];
-		[exchangeRates setObject:@(0.0266770) forKey:@"\"TWD/EUR\""];
-		[exchangeRates setObject:@(0.892245) forKey:@"\"USD/EUR\""];
-		[exchangeRates setObject:@(0.0550936) forKey:@"\"ZAR/EUR\""];
+		[exchangeRates setObject:@(1.1911) forKey:@"\"GBP/EUR\""];
+		[exchangeRates setObject:@(0.1210) forKey:@"\"HKD/EUR\""];
+		[exchangeRates setObject:@(0.0031) forKey:@"\"HUF/EUR\""];
+		[exchangeRates setObject:@(0.0001) forKey:@"\"IDR/EUR\""];
+		[exchangeRates setObject:@(0.2458) forKey:@"\"ILS/EUR\""];
+		[exchangeRates setObject:@(0.0139) forKey:@"\"INR/EUR\""];
+		[exchangeRates setObject:@(0.0084) forKey:@"\"ISK/EUR\""];
+		[exchangeRates setObject:@(0.0081) forKey:@"\"JPY/EUR\""];
+		[exchangeRates setObject:@(0.0008) forKey:@"\"KRW/EUR\""];
+		[exchangeRates setObject:@(3.0646) forKey:@"\"KWD/EUR\""];
+		[exchangeRates setObject:@(0.0028) forKey:@"\"KZT/EUR\""];
+		[exchangeRates setObject:@(0.0063) forKey:@"\"LKR/EUR\""];
+		[exchangeRates setObject:@(0.0259) forKey:@"\"MUR/EUR\""];
+		[exchangeRates setObject:@(0.0459) forKey:@"\"MXN/EUR\""];
+		[exchangeRates setObject:@(0.2110) forKey:@"\"MYR/EUR\""];
+		[exchangeRates setObject:@(0.0030) forKey:@"\"NGN/EUR\""];
+		[exchangeRates setObject:@(0.1108) forKey:@"\"NOK/EUR\""];
+		[exchangeRates setObject:@(0.0087) forKey:@"\"NPR/EUR\""];
+		[exchangeRates setObject:@(0.6774) forKey:@"\"NZD/EUR\""];
+		[exchangeRates setObject:@(2.4336) forKey:@"\"OMR/EUR\""];
+		[exchangeRates setObject:@(0.0188) forKey:@"\"PHP/EUR\""];
+		[exchangeRates setObject:@(0.0089) forKey:@"\"PKR/EUR\""];
+		[exchangeRates setObject:@(0.2572) forKey:@"\"QAR/EUR\""];
+		[exchangeRates setObject:@(0.0152) forKey:@"\"RUB/EUR\""];
+		[exchangeRates setObject:@(0.2478) forKey:@"\"SAR/EUR\""];
+		[exchangeRates setObject:@(0.1019) forKey:@"\"SEK/EUR\""];
+		[exchangeRates setObject:@(0.6591) forKey:@"\"SGD/EUR\""];
+		[exchangeRates setObject:@(0.0262) forKey:@"\"THB/EUR\""];
+		[exchangeRates setObject:@(0.2706) forKey:@"\"TRY/EUR\""];
+		[exchangeRates setObject:@(0.0295) forKey:@"\"TWD/EUR\""];
+		[exchangeRates setObject:@(0.0004) forKey:@"\"TZS/EUR\""];
+		[exchangeRates setObject:@(0.9383) forKey:@"\"USD/EUR\""];
+		[exchangeRates setObject:@(0.00004) forKey:@"\"VND/EUR\""];
+		[exchangeRates setObject:@(0.0680) forKey:@"\"ZAR/EUR\""];
 		[self forceRefresh];
 	}
 
