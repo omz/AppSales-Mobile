@@ -22,6 +22,10 @@ NSString *const kITCReporterServiceTypeSales   = @"sales";
 NSString *const kITCReporterServiceTypeFinance = @"finance";
 NSString *const kITCReporterServiceBody        = @"[p=Reporter.properties, %@]";
 
+static NSString *NSStringPercentEscaped(NSString *string) {
+	return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
+}
+
 @implementation ReportDownloadOperation
 
 @synthesize accountObjectID;

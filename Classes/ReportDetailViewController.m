@@ -59,7 +59,7 @@
 	mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	mapView.alpha = !mapHidden;
 	if (!mapHidden) {
-		mapView.report = self.selectedReport;
+		mapView.report = (Report *)self.selectedReport;
 	}
 	[self.view addSubview:mapView];
 	
@@ -188,7 +188,7 @@
 
 - (void)toggleMap:(id)sender {
 	if (mapHidden) {
-		mapView.report = self.selectedReport;
+		mapView.report = (Report *)self.selectedReport;
 		mapView.selectedCountry = self.selectedCountry;
 		mapView.selectedProduct = self.selectedProduct;
 	}
@@ -220,7 +220,7 @@
 - (void)showCSV:(id)sender {
 	NSArray *allReports = [self.selectedReport allReports];
 	if ([allReports count] == 1) {
-		ReportCSVViewController *csvViewController = [[ReportCSVViewController alloc] initWithReport:self.selectedReport];
+		ReportCSVViewController *csvViewController = [[ReportCSVViewController alloc] initWithReport:(Report *)self.selectedReport];
 		UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:csvViewController];
 		[self presentViewController:navController animated:YES completion:nil];
 	} else {
@@ -236,7 +236,7 @@
 	
 	[self reloadData];
 	if (!mapHidden) {
-		self.mapView.report = self.selectedReport;
+		self.mapView.report = (Report *)self.selectedReport;
 	}
 }
 

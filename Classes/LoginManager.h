@@ -16,10 +16,6 @@ extern NSString *const kITCUserDetailAction;
 extern NSString *const kITCPaymentVendorsAction;
 extern NSString *const kITCPaymentVendorsPaymentAction;
 
-static NSString *NSStringPercentEscaped(NSString *string) {
-	return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
-}
-
 @protocol LoginManagerDelegate <NSObject>
 
 @required
