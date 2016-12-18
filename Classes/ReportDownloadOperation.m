@@ -14,13 +14,13 @@
 #import "ReporterParser.h"
 
 // iTunes Connect Reporter API
-NSString *const kITCReporterVersion            = @"1.0";
+NSString *const kITCReporterVersion            = @"2.0";
 NSString *const kITCReporterMode               = @"Robot.XML";
 NSString *const kITCReporterBaseURL            = @"https://reportingitc-reporter.apple.com";
 NSString *const kITCReporterServiceAction      = @"/reportservice/%@/v1";
 NSString *const kITCReporterServiceTypeSales   = @"sales";
 NSString *const kITCReporterServiceTypeFinance = @"finance";
-NSString *const kITCReporterServiceBody        = @"[p=Reporter.properties, %@]";
+NSString *const kITCReporterServiceBody        = @"[p=Reporter.properties, m=Robot.XML, %@]";
 
 static NSString *NSStringPercentEscaped(NSString *string) {
 	return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
@@ -159,17 +159,20 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 												@"password":   appPassword,
 												@"version":    kITCReporterVersion,
 												@"mode":       kITCReporterMode,
-												@"queryInput": [NSString stringWithFormat:kITCReporterServiceBody, query],
+												@"queryInput": NSStringPercentEscaped([NSString stringWithFormat:kITCReporterServiceBody, query]),
+												@"salesurl":   [kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales],
+												@"financeurl": [kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeFinance],
 												};
 				NSData *jsonData = [NSJSONSerialization dataWithJSONObject:getReportData options:0 error:nil];
 				NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-				NSString *getReportBody = [NSString stringWithFormat:@"jsonRequest=%@", NSStringPercentEscaped(jsonString)];
+				NSString *getReportBody = [NSString stringWithFormat:@"jsonRequest=%@", jsonString];
 				NSData *getReportBodyData = [getReportBody dataUsingEncoding:NSUTF8StringEncoding];
 				
 				NSURL *reporterURL = [NSURL URLWithString:[kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales]];
 				NSMutableURLRequest *reporterRequest = [NSMutableURLRequest requestWithURL:reporterURL];
 				[reporterRequest setHTTPMethod:@"POST"];
-				[reporterRequest setValue:@"application/x-www-form-urlencoded; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+				[reporterRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+				[reporterRequest setValue:@"*/*" forHTTPHeaderField:@"Accept"];
 				[reporterRequest setHTTPBody:getReportBodyData];
 				
 				NSHTTPURLResponse *response = nil;
@@ -250,6 +253,10 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 							}
 						}];
 					}
+				} else {
+					NSString *content = [[NSString alloc] initWithData:reportData encoding:NSUTF8StringEncoding];
+					NSLog(@"Error downloading %@ report for %@.", dateType, reportDateString);
+					NSLog(@"%@: %@", response.MIMEType, content);
 				}
 				i++;
 			}
