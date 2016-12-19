@@ -382,6 +382,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 			
 			NSNumberFormatter *currencyFormatter = [[NSNumberFormatter alloc] init];
 			currencyFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+			currencyFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
 			
 			NSDate *currDate = [NSDate date];
 			
