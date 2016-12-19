@@ -89,6 +89,11 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		[cookieStorage deleteCookie:cookie];
 	}
 	
+	cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc-reporter.apple.com"]];
+	for (NSHTTPCookie *cookie in cookies) {
+		[cookieStorage deleteCookie:cookie];
+	}
+	
 	if (self.shouldDeleteCookies) {
 		cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://idmsa.apple.com"]];
 		for (NSHTTPCookie *cookie in cookies) {

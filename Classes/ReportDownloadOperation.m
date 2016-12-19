@@ -63,6 +63,10 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 		NSString *vendorID = account.vendorID;
 		NSString *salesKey = kITCReporterServiceTypeSales.capitalizedString;
 		
+		LoginManager *loginManager = [[LoginManager alloc] initWithLoginInfo:nil];
+		loginManager.shouldDeleteCookies = NO;
+		[loginManager logOut];
+		
 		NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
 		for (NSString *dateType in @[@"Daily", @"Weekly"]) {
 			// Determine which reports should be available for download.
@@ -155,13 +159,13 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				
 				NSString *query = [NSString stringWithFormat:@"%@.getReport, %@,%@,Summary,%@,%@", salesKey, vendorID, salesKey, dateType, reportDateString];
 				
-				NSDictionary *getReportData = @{@"userid":     username,
-												@"password":   appPassword,
+				NSDictionary *getReportData = @{@"userid":     NSStringPercentEscaped(username),
+												@"password":   NSStringPercentEscaped(appPassword),
 												@"version":    kITCReporterVersion,
 												@"mode":       kITCReporterMode,
 												@"queryInput": NSStringPercentEscaped([NSString stringWithFormat:kITCReporterServiceBody, query]),
-												@"salesurl":   [kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales],
-												@"financeurl": [kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeFinance],
+												@"salesurl":   NSStringPercentEscaped([kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales]),
+												@"financeurl": NSStringPercentEscaped([kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeFinance]),
 												};
 				NSData *jsonData = [NSJSONSerialization dataWithJSONObject:getReportData options:0 error:nil];
 				NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -172,7 +176,6 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				NSMutableURLRequest *reporterRequest = [NSMutableURLRequest requestWithURL:reporterURL];
 				[reporterRequest setHTTPMethod:@"POST"];
 				[reporterRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-				[reporterRequest setValue:@"*/*" forHTTPHeaderField:@"Accept"];
 				[reporterRequest setHTTPBody:getReportBodyData];
 				
 				NSHTTPURLResponse *response = nil;
