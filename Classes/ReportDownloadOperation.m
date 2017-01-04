@@ -159,22 +159,36 @@
 			
 			NSString *escapedUsername = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)username, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8) autorelease];
 			NSString *escapedPassword = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)password, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8) autorelease];
-			NSString *reportDownloadBodyString = [NSString stringWithFormat:@"USERNAME=%@&PASSWORD=%@&VNDNUMBER=%@&TYPEOFREPORT=%@&DATETYPE=%@&REPORTTYPE=%@&REPORTDATE=%@",
-												  escapedUsername, escapedPassword, vendorID, @"Sales", dateType, @"Summary", reportDateString];
 			
+			NSURL *URL = [NSURL URLWithString:@"https://reportingitc-reporter.apple.com/reportservice/sales/v1"];
+
+			NSString *command = [NSString stringWithFormat:@"[p=Reporter.properties, Sales.getReport, %@,Sales,Summary,%@,%@]", vendorID, dateType, reportDateString];
+			NSDictionary *body = @{
+				@"userid" : escapedUsername,
+				@"password" : escapedPassword,
+				@"version" : @"2.0",
+				@"mode" : @"Normal",
+				@"queryInput" : command
+			};
+
+			NSData *bodyData = [NSJSONSerialization dataWithJSONObject:body options:NSJSONWritingPrettyPrinted error:NULL];
+			NSString *bodyString = [[[NSString alloc] initWithData:bodyData encoding:NSUTF8StringEncoding] autorelease];
+
+			NSString *reportDownloadBodyString = [NSString stringWithFormat:@"jsonRequest=%@", bodyString];
 			NSData *reportDownloadBodyData = [reportDownloadBodyString dataUsingEncoding:NSUTF8StringEncoding];
-			NSMutableURLRequest *reportDownloadRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://reportingitc.apple.com/autoingestion.tft"]];
+			NSMutableURLRequest *reportDownloadRequest = [NSMutableURLRequest requestWithURL:URL];
 			[reportDownloadRequest setHTTPMethod:@"POST"];
 			[reportDownloadRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
 			[reportDownloadRequest setValue:@"java/1.6.0_26" forHTTPHeaderField:@"User-Agent"];
+			[reportDownloadRequest setValue:@"text/html,image/gif,image/jpeg; q=.2, */*; q=.2" forHTTPHeaderField:@"Accept"];
 			[reportDownloadRequest setHTTPBody:reportDownloadBodyData];
 			
 			NSHTTPURLResponse *response = nil;
 			NSData *reportData = [NSURLConnection sendSynchronousRequest:reportDownloadRequest returningResponse:&response error:NULL];
 			
-			NSString *errorMessage = [[response allHeaderFields] objectForKey:@"Errormsg"];
-			if (errorMessage) {
-				NSLog(@"  %@", errorMessage);
+			if (response.statusCode != 200) {
+				NSString *responseDataString = [[[NSString alloc] initWithData:reportData encoding:NSUTF8StringEncoding] autorelease];
+				NSLog(@"Failed to retrieve %@ sales report for %@ with response: \n%@", dateType, reportDateString, responseDataString);
 			} else if (reportData) {
 				NSString *originalFilename = [[response allHeaderFields] objectForKey:@"Filename"];
 				NSData *inflatedReportData = [reportData gzipInflate];
