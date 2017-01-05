@@ -10,6 +10,8 @@
 
 #define kIconManagerDownloadedIconNotificationAppID		@"appID"
 #define IconManagerDownloadedIconNotification			@"IconManagerDownloadedIconNotification"
+#define kIconManagerClearedIconNotificationAppID		@"appID"
+#define IconManagerClearedIconNotification              @"IconManagerClearedIconNotification"
 
 @interface IconManager : NSObject {
 	
@@ -22,5 +24,6 @@
 + (id)sharedManager;
 - (NSString *)iconDirectory;
 - (UIImage *)iconForAppID:(NSString *)appID;
+- (void)clearIconForAppID:(NSString *)appID;
 
 @end

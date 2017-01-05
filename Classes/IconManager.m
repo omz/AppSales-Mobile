@@ -111,6 +111,16 @@
 	});
 }
 
+- (void)clearIconForAppID:(NSString *)appID
+{
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
+        [[NSFileManager defaultManager] removeItemAtPath:iconPath error:NULL];
+        [iconCache removeObjectForKey:appID];
+        [[NSNotificationCenter defaultCenter] postNotificationName:IconManagerClearedIconNotification object:self userInfo:[NSDictionary dictionaryWithObject:appID forKey:kIconManagerClearedIconNotificationAppID]];
+    });
+}
+
 - (void)dealloc
 {
 	dispatch_release(queue);
