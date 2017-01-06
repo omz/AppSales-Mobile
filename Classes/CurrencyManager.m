@@ -159,8 +159,7 @@
 
 - (NSString *)baseCurrencyDescription
 {
-	NSString *currencySymbol = [currencySymbols objectForKey:baseCurrency];
-	return (currencySymbol != nil) ? currencySymbol : baseCurrency;
+	return [self currencySymbolForCurrency:[self baseCurrency]];
 }
 
 - (NSString *)currencySymbolForCurrency:(NSString *)currencyCode
@@ -169,16 +168,26 @@
 	return (currencySymbol != nil) ? currencySymbol : currencyCode;
 }
 
+- (NSString *)descriptionForAmount:(NSString *)amount currency:(NSString *)currencyCode
+{
+	return [NSString stringWithFormat:@"%@%@", [self currencySymbolForCurrency:currencyCode], amount];
+}
+
+- (NSString *)descriptionForAmount:(NSNumber *)amount currency:(NSString *)currencyCode withFraction:(BOOL)withFraction
+{
+    NSNumberFormatter *numberFormatter = (withFraction) ? (numberFormatterWithFraction) : (numberFormatterWithoutFraction);
+	NSString *formattedAmount = [numberFormatter stringFromNumber:amount];
+    return [self descriptionForAmount:formattedAmount currency:currencyCode];
+}
+
 - (NSString *)baseCurrencyDescriptionForAmount:(NSString *)amount
 {
-	return [NSString stringWithFormat:@"%@%@", [self baseCurrencyDescription], amount];
+	return [self descriptionForAmount:amount currency:[self baseCurrency]];
 }
 
 - (NSString *)baseCurrencyDescriptionForAmount:(NSNumber *)amount withFraction:(BOOL)withFraction
 {
-	NSNumberFormatter *numberFormatter = (withFraction) ? (numberFormatterWithFraction) : (numberFormatterWithoutFraction);
-	NSString *formattedAmount = [numberFormatter stringFromNumber:amount];
-	return [self baseCurrencyDescriptionForAmount:formattedAmount];
+	return [self descriptionForAmount:amount currency:[self baseCurrency] withFraction:withFraction];
 }
 
 - (void)refreshIfNeeded

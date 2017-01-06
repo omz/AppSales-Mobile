@@ -34,7 +34,8 @@
 		//Covers the fiscal calendar from 2008 to 2016:
 		while (period < 100) {
 			//First month in a quarter covers 5 weeks, the others 4:
-			NSDate *nextDate = [calendar dateByAddingComponents:((period % 3 == 0) ? components5Weeks : components4Weeks) toDate:currentDate options:0];
+      NSDate *nextDate = [calendar dateByAddingComponents:((period % 3 == 0) || (period % 50 == 0) ? 
+                                                           components5Weeks : components4Weeks) toDate:currentDate options:0];
 			[dates addObject:nextDate];
 			currentDate = nextDate;
 			period++;
