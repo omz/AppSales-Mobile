@@ -45,8 +45,11 @@
 {
 	[super loadView];
 	
-	self.edgesForExtendedLayout = UIRectEdgeNone;
-	
+#if defined(__IPHONE_7_0)
+	if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+		self.edgesForExtendedLayout = UIRectEdgeNone;
+	}
+#endif
 	self.view.backgroundColor = [UIColor whiteColor];
 	
 	self.enterPasscodeTableView = [[[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped] autorelease];

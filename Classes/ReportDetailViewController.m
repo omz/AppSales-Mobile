@@ -41,7 +41,11 @@
 		[revenueFormatter setMaximumFractionDigits:2];
 		mapHidden = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingReportDetailMapHidden];
 		self.preferredContentSize = CGSizeMake(320, 500);
-		self.edgesForExtendedLayout = UIRectEdgeNone;
+#if defined(__IPHONE_7_0)
+		if([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+			self.edgesForExtendedLayout = UIRectEdgeNone;
+		}
+#endif
     }
     return self;
 }
