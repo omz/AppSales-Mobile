@@ -206,19 +206,36 @@
 		if (platform) {
 			product.platform = platform;
 		}
-		
+
 		if (!report) {
-			if (isWeeklyReport) {
-				report = [NSEntityDescription insertNewObjectForEntityForName:@"WeeklyReport" inManagedObjectContext:moc];
-				[(WeeklyReport *)report setEndDate:endDate];
-				[(WeeklyReport *)report setAccount:account];
-			} else {
-				report = [NSEntityDescription insertNewObjectForEntityForName:@"DailyReport" inManagedObjectContext:moc];
-				[(DailyReport *)report setAccount:account];
-			}
-			report.startDate = beginDate;
-		}
-		[[report mutableSetValueForKey:@"transactions"] addObject:transaction];
+      NSFetchRequest *existingReportsFetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+      if (isWeeklyReport) {
+        [existingReportsFetchRequest setEntity:[NSEntityDescription entityForName:@"WeeklyReport" inManagedObjectContext:moc]];
+        [existingReportsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND endDate == %@", account, endDate]];
+      } else {
+        [existingReportsFetchRequest setEntity:[NSEntityDescription entityForName:@"DailyReport" inManagedObjectContext:moc]];
+        [existingReportsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND startDate == %@", account, endDate]];
+      }
+      
+      NSArray *existingReports = [moc executeFetchRequest:existingReportsFetchRequest error:NULL];
+
+      // in case there's already a report with the same date, skip this report
+      if ([existingReports count]!=0) {
+        return nil;
+      }
+
+      if (isWeeklyReport) {
+        report = [NSEntityDescription insertNewObjectForEntityForName:@"WeeklyReport" inManagedObjectContext:moc];
+        [(WeeklyReport *)report setEndDate:endDate];
+        [(WeeklyReport *)report setAccount:account];
+      } else {
+        report = [NSEntityDescription insertNewObjectForEntityForName:@"DailyReport" inManagedObjectContext:moc];
+        [(DailyReport *)report setAccount:account];
+      }
+        report.startDate = beginDate;
+    }
+    [[report mutableSetValueForKey:@"transactions"] addObject:transaction];
+    
 	}
 	return report;
 }
