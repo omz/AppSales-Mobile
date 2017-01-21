@@ -373,21 +373,24 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 			
 			ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
-		
-			NSSet *allExistingPayments = account.payments;
-			NSMutableSet *existingPaymentIdentifiers = [NSMutableSet set];
-			for (NSManagedObject *payment in allExistingPayments) {
-				[existingPaymentIdentifiers addObject:[NSString stringWithFormat:@"%@-%@", [payment valueForKey:@"year"], [payment valueForKey:@"month"]]];
+            NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+            
+			NSSet *allExistingPaymentReports = account.paymentReports;
+			NSMutableSet *existingPaymentReportIdentifiers = [NSMutableSet set];
+			for (NSManagedObject *paymentReport in allExistingPaymentReports) {
+                NSDateComponents *dateComponents = [calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:[paymentReport valueForKey:@"reportDate"]];
+				[existingPaymentReportIdentifiers addObject:[NSString stringWithFormat:@"%li-%li", (long)dateComponents.year, (long)dateComponents.month]];
 			}
 			
 			NSNumberFormatter *currencyFormatter = [[NSNumberFormatter alloc] init];
 			currencyFormatter.numberStyle = NSNumberFormatterDecimalStyle;
 			currencyFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
 			
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+            
 			NSDate *currDate = [NSDate date];
-			
-			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-			NSDateComponents *offsetComponents = [[NSDateComponents alloc] init];
+            NSDateComponents *offsetComponents = [[NSDateComponents alloc] init];
 			offsetComponents.month = -1;
 			
 			while (YES) {
@@ -397,8 +400,8 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				NSInteger year = dateComponents.year;
 				NSInteger month = dateComponents.month;
 				
-				NSString *paymentIdentifier = [NSString stringWithFormat:@"%li-%li", (long)year, (long)month];
-				if ([existingPaymentIdentifiers containsObject:paymentIdentifier]) {
+				NSString *paymentReportIdentifier = [NSString stringWithFormat:@"%li-%li", (long)year, (long)month];
+				if ([existingPaymentReportIdentifiers containsObject:paymentReportIdentifier]) {
 					// We've already been here before, so bail out.
 					break;
 				}
@@ -407,6 +410,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				NSData *paymentData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentURL] returningResponse:nil error:nil];
 				NSDictionary *payment = [NSJSONSerialization JSONObjectWithData:paymentData options:0 error:nil];
 				payment = payment[@"data"];
+                NSDate *paymentReportDate = [dateFormatter dateFromString:payment[@"reportDate"]];
 				NSArray *paymentSummaries = payment[@"reportSummaries"];
 				
 				if (self.isCancelled) {
@@ -424,43 +428,39 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					@synchronized(downloadedVendors) {
 						downloadedVendors[vendorID] = @(0);
 					}
-					BOOL shouldSave = NO;
-					CGFloat amount = 0.0f;
-					NSString *currency = nil;
-					for (NSDictionary *payment in paymentSummaries) {
-						if ([payment[@"status"] isEqualToString:@"PAID"]) {
-							shouldSave = YES;
-							amount += [currencyFormatter numberFromString:payment[@"amount"]].floatValue;
-							if (currency == nil) {
-								currency = payment[@"currency"];
-							}
-						}
-					}
-					if (shouldSave) {
-						NSManagedObject *payment = [NSEntityDescription insertNewObjectForEntityForName:@"Payment" inManagedObjectContext:moc];
-						[payment setValue:account forKey:@"account"];
-						[payment setValue:@(year) forKey:@"year"];
-						[payment setValue:@(month) forKey:@"month"];
-						[payment setValue:@(amount) forKey:@"amount"];
-						[payment setValue:currency forKey:@"currency"];
-						[payment setValue:vendorID forKey:@"vendorID"];
-						
-						if ([moc hasChanges]) {
-							[psc performBlockAndWait:^{
-								NSError *saveError = nil;
-								[moc save:&saveError];
-								if (saveError) {
-									NSLog(@"Could not save context: %@", saveError);
-								}
-							}];
-						}
-						
-						dispatch_async(dispatch_get_main_queue(), ^{
-							@synchronized(account.paymentsBadge) {
-								account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
-							}
-						});
-					}
+                    NSManagedObject *paymentReport = [NSEntityDescription insertNewObjectForEntityForName:@"PaymentReport" inManagedObjectContext:moc];
+                    [paymentReport setValue:paymentReportDate forKey:@"reportDate"];
+                    [paymentReport setValue:account forKey:@"account"];
+                    
+                    for (NSDictionary *payment in paymentSummaries) {
+                        NSManagedObject *paymentDetailed = [NSEntityDescription insertNewObjectForEntityForName:@"PaymentDetailed" inManagedObjectContext:moc];
+                        CGFloat amount = [currencyFormatter numberFromString:payment[@"amount"]].floatValue;
+                        NSDate *paidOrExpectedDate = [dateFormatter dateFromString:payment[@"paidOrExpectingPaymentDate"]];
+                        [paymentDetailed setValue:@(amount) forKey:@"amount"];
+                        [paymentDetailed setValue:payment[@"currency"] forKey:@"currency"];
+                        [paymentDetailed setValue:payment[@"bankName"] forKey:@"bankName"];
+                        [paymentDetailed setValue:payment[@"isPaymentExpected"] forKey:@"isExpected"];
+                        [paymentDetailed setValue:payment[@"maskedBankAccount"] forKey:@"maskedBankAccount"];
+                        [paymentDetailed setValue:paidOrExpectedDate forKey:@"paidOrExpectingPaymentDate"];
+                        [paymentDetailed setValue:payment[@"status"] forKey:@"status"];
+                        [paymentDetailed setValue:paymentReport forKey:@"paymentReport"];
+                    }
+                    
+                    if ([moc hasChanges]) {
+                        [psc performBlockAndWait:^{
+                            NSError *saveError = nil;
+                            [moc save:&saveError];
+                            if (saveError) {
+                                NSLog(@"Could not save context: %@", saveError);
+                            }
+                        }];
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        @synchronized(account.paymentsBadge) {
+                            account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
+                        }
+                    });
 				}
 			}
 			
