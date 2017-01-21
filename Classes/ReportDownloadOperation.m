@@ -446,6 +446,8 @@ static NSString *NSStringPercentEscaped(NSString *string) {
                         [paymentDetailed setValue:paymentReport forKey:@"paymentReport"];
                     }
                     
+                    account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
+                    
                     if ([moc hasChanges]) {
                         [psc performBlockAndWait:^{
                             NSError *saveError = nil;
@@ -455,12 +457,6 @@ static NSString *NSStringPercentEscaped(NSString *string) {
                             }
                         }];
                     }
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        @synchronized(account.paymentsBadge) {
-                            account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
-                        }
-                    });
 				}
 			}
 			
