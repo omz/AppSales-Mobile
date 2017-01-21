@@ -61,38 +61,59 @@
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
 	numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
 	
-	NSMutableDictionary *paymentsByYear = [NSMutableDictionary dictionary];
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    
+    NSString *paymentCurrencyCode = nil;
+    
+	NSMutableDictionary *paymentReportsByYear = [NSMutableDictionary dictionary];
 	NSMutableDictionary *sumsByYear = [NSMutableDictionary dictionary];
-	NSSet *allPayments = account.payments;
-	for (NSManagedObject *payment in allPayments) {
-		NSNumber *year = [payment valueForKey:@"year"];
-		NSMutableDictionary *paymentsForYear = paymentsByYear[year];
-		if (!paymentsForYear) {
-			paymentsForYear = [NSMutableDictionary dictionary];
-			paymentsByYear[year] = paymentsForYear;
+	NSSet *allPaymentReports = account.paymentReports;
+	for (NSManagedObject *paymentReport in allPaymentReports) {
+        NSDateComponents *dateComponents = [calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:[paymentReport valueForKey:@"reportDate"]];
+        NSNumber *year = @(dateComponents.year);
+		NSMutableDictionary *paymentReportsForYear = paymentReportsByYear[year];
+		if (!paymentReportsForYear) {
+			paymentReportsForYear = [NSMutableDictionary dictionary];
+			paymentReportsByYear[year] = paymentReportsForYear;
 		}
-		NSNumber *month = [payment valueForKey:@"month"];
-		NSMutableArray *paymentsForMonth = paymentsForYear[month];
-		if (!paymentsForMonth) {
-			paymentsForMonth = [NSMutableArray array];
-			paymentsForYear[month] = paymentsForMonth;
+        NSNumber *month = @(dateComponents.month);
+		NSMutableArray *paymentReportsForMonth = paymentReportsForYear[month];
+		if (!paymentReportsForMonth) {
+			paymentReportsForMonth = [NSMutableArray array];
+			paymentReportsForYear[month] = paymentReportsForMonth;
 		}
-		[paymentsForMonth addObject:payment];
+		[paymentReportsForMonth addObject:paymentReport];
 		
-		CGFloat currentSum = [sumsByYear[year] floatValue];
-		sumsByYear[year] = @(currentSum + [[payment valueForKey:@"amount"] floatValue]);
+        NSSet *paymentReportPayments = [paymentReport valueForKey:@"payments"];
+        if (paymentReportPayments.count > 0) {
+            if (!paymentCurrencyCode) {
+                // We assume that all payments have the same currency.
+                paymentCurrencyCode = [[paymentReportPayments anyObject] valueForKey:@"currency"];
+            }
+            CGFloat reportAmount = 0;
+            for (NSManagedObject *payment in paymentReportPayments) {
+                reportAmount += [[payment valueForKey:@"amount"] floatValue];
+            }
+            CGFloat currentSum = [sumsByYear[year] floatValue];
+            sumsByYear[year] = @(currentSum + reportAmount);
+        }
 	}
 	
 	NSMutableDictionary *labelsByYear = [NSMutableDictionary dictionary];
-	for (NSNumber *year in paymentsByYear) {
-		NSDictionary *paymentsForYear = paymentsByYear[year];
-		for (NSNumber *month in paymentsForYear) {
-			NSArray *payments = paymentsForYear[month];
-			if ([payments count] > 0) {
-				NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
-				NSString *currencyCode = [payments[0] valueForKey:@"currency"];
-				numberFormatter.currencyCode = currencyCode;
-				NSString *label = [numberFormatter stringFromNumber:sum];
+	for (NSNumber *year in paymentReportsByYear) {
+		NSDictionary *paymentReportsForYear = paymentReportsByYear[year];
+		for (NSNumber *month in paymentReportsForYear) {
+			NSArray *paymentReports = paymentReportsForYear[month];
+            CGFloat sumForMonth = 0;
+            for (NSManagedObject *paymentReport in paymentReports) {
+                NSSet *payments = [paymentReport valueForKey:@"payments"];
+                for (NSManagedObject *payment in payments) {
+                    sumForMonth += [[payment valueForKey:@"amount"] floatValue];
+                }
+            }
+			if (sumForMonth > 0) {
+				numberFormatter.currencyCode = paymentCurrencyCode;
+				NSString *label = [numberFormatter stringFromNumber:@(sumForMonth)];
 				NSMutableDictionary *labelsForYear = labelsByYear[year];
 				if (!labelsForYear) {
 					labelsForYear = [NSMutableDictionary dictionary];
@@ -104,7 +125,7 @@
 	}
 	
 	
-	NSArray *sortedYears = [[paymentsByYear allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	NSArray *sortedYears = [[paymentReportsByYear allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	if ([sortedYears count] == 0) {
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 		NSDateComponents *currentYearComponents = [calendar components:NSCalendarUnitYear fromDate:[NSDate date]];
@@ -117,9 +138,9 @@
 		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)];
 		yearView.year = [year integerValue];
 		yearView.labelsByMonth = labelsByYear[year];
-		if ([allPayments count] > 0) {
+		if ([allPaymentReports count] > 0) {
 			// We assume that all payments have the same currency.
-			numberFormatter.currencyCode = [[allPayments anyObject] valueForKey:@"currency"];
+			numberFormatter.currencyCode = paymentCurrencyCode;
 			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@", [numberFormatter stringFromNumber:sumsByYear[year]]];
 		}
 		yearView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
