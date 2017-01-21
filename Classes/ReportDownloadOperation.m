@@ -373,9 +373,28 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 			
 			ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
-            NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
             
-			NSSet *allExistingPaymentReports = account.paymentReports;
+            NSMutableArray *reportsToDelete = [NSMutableArray array];
+            NSMutableSet *allExistingPaymentReports = [NSMutableSet setWithSet:account.paymentReports];
+            
+            for (NSManagedObject *paymentReport in allExistingPaymentReports) {
+                NSSet *payments = [paymentReport valueForKey:@"payments"];
+                for (NSManagedObject *payment in payments) {
+                    if ([[payment valueForKey:@"isExpected"] boolValue]) {
+                        NSDate *expectedPaymentDate = [payment valueForKey:@"paidOrExpectingPaymentDate"];
+                        if ([expectedPaymentDate compare:[NSDate date]] == NSOrderedAscending) {
+                            [reportsToDelete addObject:paymentReport];
+                            break;
+                        }
+                    }
+                }
+            }
+            for (NSManagedObject* reportToDelete in reportsToDelete) {
+                [moc deleteObject:reportToDelete];
+                [allExistingPaymentReports removeObject:reportToDelete];
+            }
+            
+            NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 			NSMutableSet *existingPaymentReportIdentifiers = [NSMutableSet set];
 			for (NSManagedObject *paymentReport in allExistingPaymentReports) {
                 NSDateComponents *dateComponents = [calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:[paymentReport valueForKey:@"reportDate"]];
