@@ -114,17 +114,27 @@
 		for (NSNumber *month in paymentsForYear) {
 			NSDictionary *payments = paymentsForYear[month];
             NSArray *keys = [payments.allKeys sortedArrayUsingSelector:@selector(compare:)];
-            NSString *label;
+            NSMutableAttributedString *label = [[NSMutableAttributedString alloc] init];
             for (NSDate *key in keys) {
                 NSManagedObject *payment = payments[key];
                 NSNumber *amount = [payment valueForKey:@"amount"];
                 numberFormatter.currencyCode = paymentCurrencyCode;
-                if (label) {
-                    NSString *nextAmount = [NSString stringWithFormat:@"\n%@", [numberFormatter stringFromNumber:amount]];
-                    label = [label stringByAppendingString:nextAmount];
+                NSString *nextAmount;
+                if (label.length > 0) {
+                    nextAmount = [NSString stringWithFormat:@"\n%@", [numberFormatter stringFromNumber:amount]];
                 } else {
-                    label = [numberFormatter stringFromNumber:amount];
+                    nextAmount = [numberFormatter stringFromNumber:amount];
                 }
+                
+                NSMutableAttributedString *nextAmountAttributed = [[NSMutableAttributedString alloc] initWithString:nextAmount];
+                UIColor *textColor;
+                if ([[payment valueForKey:@"isExpected"] boolValue]) {
+                    textColor = [UIColor redColor];
+                } else {
+                    textColor = [UIColor blackColor];
+                }
+                [nextAmountAttributed addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, nextAmountAttributed.length)];
+                [label appendAttributedString:nextAmountAttributed];
             }
             NSMutableDictionary *labelsForYear = labelsByYear[year];
             if (!labelsForYear) {

@@ -88,20 +88,22 @@
 		[month drawInRect:monthRect withAttributes:@{NSFontAttributeName: monthFont,
 													 NSParagraphStyleAttributeName: style}];
 		
-		NSString *label = labelsByMonth[@(i + 1)];
+		NSMutableAttributedString *label = labelsByMonth[@(i + 1)];
 		if (label) {
 			CGSize size = CGSizeMake(FLT_MAX, FLT_MAX);
 			float fontSize = maxPaymentFontSize;
 			while (size.width > monthRect.size.width) {
 				fontSize -= 1.0;
-				size = [label sizeWithAttributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:fontSize]}];
+                [label addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:fontSize] range:NSMakeRange(0, label.length)];
+                size = [label size];
 			}
 			CGRect labelRect = CGRectMake(monthRect.origin.x, monthRect.origin.y + monthRect.size.height/2 - size.height/2, monthRect.size.width, size.height);
 			
 			NSMutableParagraphStyle *labelStyle = [NSMutableParagraphStyle new];
 			labelStyle.alignment = NSTextAlignmentCenter;
-			[label drawInRect:labelRect withAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:fontSize],
-														 NSParagraphStyleAttributeName: labelStyle}];
+            [label addAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:fontSize],
+                                   NSParagraphStyleAttributeName: labelStyle} range:NSMakeRange(0, label.length)];
+			[label drawInRect:labelRect];
 		}
 	}
 	
