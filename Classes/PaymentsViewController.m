@@ -100,7 +100,12 @@
 				paymentsForMonth = [NSMutableDictionary dictionary];
 				paymentsForYear[month] = paymentsForMonth;
 			}
-			paymentsForMonth[date] = payment;
+			NSMutableArray *monthPayments = paymentsForMonth[date];
+			if (!monthPayments) {
+				monthPayments = [NSMutableArray array];
+			}
+			[monthPayments addObject:payment];
+			paymentsForMonth[date] = monthPayments;
 
 			CGFloat amount = [[payment valueForKey:@"amount"] floatValue];
 			CGFloat currentSum = [sumsByYear[year] floatValue];
@@ -116,8 +121,18 @@
 			NSArray *keys = [payments.allKeys sortedArrayUsingSelector:@selector(compare:)];
 			NSMutableAttributedString *label = [[NSMutableAttributedString alloc] init];
 			for (NSDate *key in keys) {
-				NSManagedObject *payment = payments[key];
-				NSNumber *amount = [payment valueForKey:@"amount"];
+				NSArray *monthPayments = payments[key];
+				BOOL isExpected = NO;
+				CGFloat sumForMonth = 0.0f;
+				for (NSManagedObject *monthPayment in monthPayments) {
+					if (!isExpected && [[monthPayment valueForKey:@"isExpected"] boolValue]) {
+						isExpected = YES;
+					}
+					NSNumber *amount = [monthPayment valueForKey:@"amount"];
+					sumForMonth += amount.floatValue;
+				}
+				
+				NSNumber *amount = @(sumForMonth);
 				numberFormatter.currencyCode = paymentCurrencyCode;
 				NSString *nextAmount;
 				if (label.length > 0) {
@@ -128,7 +143,7 @@
 
 				NSMutableAttributedString *nextAmountAttributed = [[NSMutableAttributedString alloc] initWithString:nextAmount];
 				UIColor *textColor;
-				if ([[payment valueForKey:@"isExpected"] boolValue]) {
+				if (isExpected) {
 					textColor = [UIColor redColor];
 				} else {
 					textColor = [UIColor blackColor];

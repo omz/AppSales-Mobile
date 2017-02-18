@@ -389,7 +389,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					}
 				}
 			}
-			for (NSManagedObject* reportToDelete in reportsToDelete) {
+			for (NSManagedObject *reportToDelete in reportsToDelete) {
 				[moc deleteObject:reportToDelete];
 				[allExistingPaymentReports removeObject:reportToDelete];
 			}
@@ -452,9 +452,13 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					[paymentReport setValue:account forKey:@"account"];
 
 					for (NSDictionary *payment in paymentSummaries) {
+						NSDate *paidOrExpectedDate = [dateFormatter dateFromString:payment[@"paidOrExpectingPaymentDate"]];
+						if (paidOrExpectedDate == nil) {
+							// This payment is neither paid nor expected. Ignore it.
+							continue;
+						}
 						NSManagedObject *paymentDetailed = [NSEntityDescription insertNewObjectForEntityForName:@"PaymentDetailed" inManagedObjectContext:moc];
 						CGFloat amount = [currencyFormatter numberFromString:payment[@"amount"]].floatValue;
-						NSDate *paidOrExpectedDate = [dateFormatter dateFromString:payment[@"paidOrExpectingPaymentDate"]];
 						[paymentDetailed setValue:@(amount) forKey:@"amount"];
 						[paymentDetailed setValue:payment[@"currency"] forKey:@"currency"];
 						[paymentDetailed setValue:payment[@"bankName"] forKey:@"bankName"];
