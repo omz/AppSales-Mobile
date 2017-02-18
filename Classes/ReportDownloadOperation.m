@@ -39,7 +39,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 		_account = account;
 		accountObjectID = [account.objectID copy];
 		psc = [account.managedObjectContext persistentStoreCoordinator];
-		
+
 		[UIApplication sharedApplication].idleTimerDisabled = YES;
 		backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
 			NSLog(@"Background task for downloading reports has expired!");
@@ -50,23 +50,23 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 - (void)main {
 	@autoreleasepool {
-		
+
 		NSInteger numberOfReportsDownloaded = 0;
 		[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Starting download", nil)];
-		
+
 		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 		moc.persistentStoreCoordinator = psc;
 		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
-		
+
 		ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
 		NSInteger previousBadge = account.reportsBadge.integerValue;
 		NSString *vendorID = account.vendorID;
 		NSString *salesKey = kITCReporterServiceTypeSales.capitalizedString;
-		
+
 		LoginManager *loginManager = [[LoginManager alloc] initWithLoginInfo:nil];
 		loginManager.shouldDeleteCookies = NO;
 		[loginManager logOut];
-		
+
 		NSMutableDictionary *errors = [[NSMutableDictionary alloc] init];
 		for (NSString *dateType in @[@"Daily", @"Weekly"]) {
 			// Determine which reports should be available for download.
@@ -74,8 +74,8 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 			[dateFormatter setDateFormat:@"yyyyMMdd"];
 			[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-			[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]]; 
-			
+			[calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+
 			NSDate *today = [NSDate date];
 			if ([dateType isEqualToString:@"Weekly"]) {
 				// Find the next Sunday.
@@ -90,10 +90,10 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					}
 				}
 			}
-			
+
 			NSMutableArray *availableReportDateStrings = [NSMutableArray array];
 			NSMutableSet *availableReportDates = [NSMutableSet set];
-			
+
 			NSInteger maxNumberOfAvailableReports = [dateType isEqualToString:@"Daily"] ? 31 : 20;
 			for (int i = 1; i <= maxNumberOfAvailableReports; i++) {
 				NSDate *date = nil;
@@ -108,7 +108,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				[availableReportDateStrings insertObject:dateString atIndex:0];
 				[availableReportDates addObject:normalizedDate];
 			}
-			
+
 			// Filter out reports we already have.
 			NSFetchRequest *existingReportsFetchRequest = [[NSFetchRequest alloc] init];
 			if ([dateType isEqualToString:@"Daily"]) {
@@ -119,7 +119,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				[existingReportsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"account == %@ AND endDate IN %@", account, availableReportDates]];
 			}
 			NSArray *existingReports = [moc executeFetchRequest:existingReportsFetchRequest error:nil];
-			
+
 			for (Report *report in existingReports) {
 				if ([dateType isEqualToString:@"Daily"]) {
 					NSDate *startDate = report.startDate;
@@ -131,7 +131,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					[availableReportDateStrings removeObject:endDateString];
 				}
 			}
-			
+
 			int i = 0;
 			NSUInteger numberOfReportsAvailable = [availableReportDateStrings count];
 			for (NSString *reportDateString in availableReportDateStrings) {
@@ -156,9 +156,9 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 						[self downloadProgress:progress withStatus:status];
 					}
 				}
-				
+
 				NSString *query = [NSString stringWithFormat:@"%@.getReport, %@,%@,Summary,%@,%@", salesKey, vendorID, salesKey, dateType, reportDateString];
-				
+
 				NSDictionary *getReportData = @{@"userid":     NSStringPercentEscaped(username),
 												@"password":   NSStringPercentEscaped(appPassword),
 												@"version":    kITCReporterVersion,
@@ -171,16 +171,16 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 				NSString *getReportBody = [NSString stringWithFormat:@"jsonRequest=%@", jsonString];
 				NSData *getReportBodyData = [getReportBody dataUsingEncoding:NSUTF8StringEncoding];
-				
+
 				NSURL *reporterURL = [NSURL URLWithString:[kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales]];
 				NSMutableURLRequest *reporterRequest = [NSMutableURLRequest requestWithURL:reporterURL];
 				[reporterRequest setHTTPMethod:@"POST"];
 				[reporterRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
 				[reporterRequest setHTTPBody:getReportBodyData];
-				
+
 				NSHTTPURLResponse *response = nil;
 				NSData *reportData = [NSURLConnection sendSynchronousRequest:reporterRequest returningResponse:&response error:nil];
-				
+
 				if ([response.MIMEType isEqualToString:@"text/plain"]) {
 					ReporterParser *reporterParser = [[ReporterParser alloc] initWithData:reportData];
 					[reporterParser parse];
@@ -191,24 +191,24 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 						NSString *errorMessage = node[kReporterMessageKey];
 						if ((errorCode.integerValue != 210) && (errorMessage != nil)) {
 							NSLog(@"%@ -> %@", reportDateString, errorMessage);
-							
+
 							NSInteger year = [[reportDateString substringWithRange:NSMakeRange(0, 4)] intValue];
 							NSInteger month = [[reportDateString substringWithRange:NSMakeRange(4, 2)] intValue];
 							NSInteger day = [[reportDateString substringWithRange:NSMakeRange(6, 2)] intValue];
-							
+
 							NSDateComponents *components = [[NSDateComponents alloc] init];
 							[components setYear:year];
 							[components setMonth:month];
 							[components setDay:day];
-							
+
 							NSDate *reportDate = [[NSCalendar currentCalendar] dateFromComponents:components];
-							
+
 							NSMutableDictionary *reportTypes = [[NSMutableDictionary alloc] initWithDictionary:errors[errorMessage]];
-							
+
 							NSMutableArray *reports = [[NSMutableArray alloc] initWithArray:reportTypes[dateType]];
 							[reports addObject:reportDate];
 							reportTypes[dateType] = reports;
-							
+
 							errors[errorMessage] = reportTypes;
 						}
 					}
@@ -219,7 +219,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					if (originalFilename && (reportCSV.length > 0)) {
 						// Parse report CSV.
 						Report *report = [Report insertNewReportWithCSV:reportCSV inAccount:account];
-						
+
 						// Check if the downloaded report is actually the one we expect.
 						// (mostly to work around a bug in ITC that causes the wrong weekly report to be downloaded).
 						NSString *downloadedReportDateString = nil;
@@ -235,7 +235,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 							report = nil;
 							continue;
 						}
-						
+
 						if (report && originalFilename) {
 							NSManagedObject *originalReport = [NSEntityDescription insertNewObjectForEntityForName:@"ReportCSV" inManagedObjectContext:moc];
 							[originalReport setValue:reportCSV forKey:@"content"];
@@ -268,13 +268,13 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 			[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 			return;
 		}
-	
+
 		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 		dateFormatter.timeStyle = NSDateFormatterNoStyle;
 		dateFormatter.dateStyle = NSDateFormatterShortStyle;
 		for (NSString *error in errors.allKeys) {
 			NSString *message = error;
-			
+
 			NSDictionary *reportTypes = errors[error];
 			for (NSString *reportType in reportTypes.allKeys) {
 				message = [message stringByAppendingFormat:@"\n\n%@ Reports:", reportType];
@@ -282,14 +282,14 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					message = [message stringByAppendingFormat:@"\n%@", [dateFormatter stringFromDate:reportDate]];
 				}
 			}
-			
+
 			[self showErrorWithMessage:message];
 		}
-		
+
 		BOOL downloadPayments = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDownloadPayments];
 		if (downloadPayments && ((numberOfReportsDownloaded > 0) || (account.payments.count == 0))) {
 			[self downloadProgress:0.9f withStatus:NSLocalizedString(@"Loading payments...", nil)];
-			
+
 			LoginManager *loginManager = [[LoginManager alloc] initWithAccount:_account];
 			loginManager.shouldDeleteCookies = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDeleteCookies];
 			loginManager.delegate = self;
@@ -301,7 +301,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				[self completeDownloadWithStatus:NSLocalizedString(@"No new reports found", nil)];
 			}
 		}
-		
+
 		if ([moc hasChanges]) {
 			[psc performBlockAndWait:^{
 				NSError *saveError = nil;
@@ -317,16 +317,16 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 - (void)loginSucceeded {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
-			
+
 			[self downloadProgress:0.95f withStatus:NSLocalizedString(@"Loading payments...", nil)];
-			
+
 			//==== Payments
-			
+
 			NSURL *userDetailURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCUserDetailAction]];
 			NSData *userDetailData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:userDetailURL] returningResponse:nil error:nil];
 			NSDictionary *userDetail = [NSJSONSerialization JSONObjectWithData:userDetailData options:0 error:nil];
 			contentProviderId = userDetail[@"data"][@"contentProviderId"];
-			
+
 			if (self.isCancelled) {
 				[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 			} else if (contentProviderId.length > 0) {
@@ -334,7 +334,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				NSData *paymentVendorsData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentVendorsURL] returningResponse:nil error:nil];
 				NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:paymentVendorsData options:0 error:nil];
 				NSArray *sapVendors = paymentVendors[@"data"];
-				
+
 				if (self.isCancelled) {
 					[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 				} else if (sapVendors.count > 0) {
@@ -354,7 +354,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					[self completeDownload];
 				}
 			}
-			
+
 			//==== /Payments
 		}
 	});
@@ -367,48 +367,71 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 - (void)fetchPaymentsForVendorID:(NSString *)vendorID {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
-			
+
 			NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 			[moc setPersistentStoreCoordinator:psc];
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
-			
+
 			ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
-		
-			NSSet *allExistingPayments = account.payments;
-			NSMutableSet *existingPaymentIdentifiers = [NSMutableSet set];
-			for (NSManagedObject *payment in allExistingPayments) {
-				[existingPaymentIdentifiers addObject:[NSString stringWithFormat:@"%@-%@", [payment valueForKey:@"year"], [payment valueForKey:@"month"]]];
+
+			NSMutableArray *reportsToDelete = [NSMutableArray array];
+			NSMutableSet *allExistingPaymentReports = [NSMutableSet setWithSet:account.paymentReports];
+
+			for (NSManagedObject *paymentReport in allExistingPaymentReports) {
+				NSSet *payments = [paymentReport valueForKey:@"payments"];
+				for (NSManagedObject *payment in payments) {
+					if ([[payment valueForKey:@"isExpected"] boolValue]) {
+						NSDate *expectedPaymentDate = [payment valueForKey:@"paidOrExpectingPaymentDate"];
+						if ([expectedPaymentDate compare:[NSDate date]] == NSOrderedAscending) {
+							[reportsToDelete addObject:paymentReport];
+							break;
+						}
+					}
+				}
 			}
-			
+			for (NSManagedObject* reportToDelete in reportsToDelete) {
+				[moc deleteObject:reportToDelete];
+				[allExistingPaymentReports removeObject:reportToDelete];
+			}
+
+			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+			NSMutableSet *existingPaymentReportIdentifiers = [NSMutableSet set];
+			for (NSManagedObject *paymentReport in allExistingPaymentReports) {
+				NSDateComponents *dateComponents = [calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:[paymentReport valueForKey:@"reportDate"]];
+				[existingPaymentReportIdentifiers addObject:[NSString stringWithFormat:@"%li-%li", (long)dateComponents.year, (long)dateComponents.month]];
+			}
+
 			NSNumberFormatter *currencyFormatter = [[NSNumberFormatter alloc] init];
 			currencyFormatter.numberStyle = NSNumberFormatterDecimalStyle;
 			currencyFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
-			
+
+			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+			[dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+
 			NSDate *currDate = [NSDate date];
-			
-			NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
 			NSDateComponents *offsetComponents = [[NSDateComponents alloc] init];
 			offsetComponents.month = -1;
-			
+
 			while (YES) {
 				currDate = [calendar dateByAddingComponents:offsetComponents toDate:currDate options:0];
-				
+
 				NSDateComponents *dateComponents = [calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:currDate];
 				NSInteger year = dateComponents.year;
 				NSInteger month = dateComponents.month;
-				
-				NSString *paymentIdentifier = [NSString stringWithFormat:@"%li-%li", (long)year, (long)month];
-				if ([existingPaymentIdentifiers containsObject:paymentIdentifier]) {
+
+				NSString *paymentReportIdentifier = [NSString stringWithFormat:@"%li-%li", (long)year, (long)month];
+				if ([existingPaymentReportIdentifiers containsObject:paymentReportIdentifier]) {
 					// We've already been here before, so bail out.
 					break;
 				}
-				
+
 				NSURL *paymentURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsPaymentAction, contentProviderId, vendorID, year, month]];
 				NSData *paymentData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentURL] returningResponse:nil error:nil];
 				NSDictionary *payment = [NSJSONSerialization JSONObjectWithData:paymentData options:0 error:nil];
 				payment = payment[@"data"];
+				NSDate *paymentReportDate = [dateFormatter dateFromString:payment[@"reportDate"]];
 				NSArray *paymentSummaries = payment[@"reportSummaries"];
-				
+
 				if (self.isCancelled) {
 					[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 					break;
@@ -424,46 +447,38 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					@synchronized(downloadedVendors) {
 						downloadedVendors[vendorID] = @(0);
 					}
-					BOOL shouldSave = NO;
-					CGFloat amount = 0.0f;
-					NSString *currency = nil;
+					NSManagedObject *paymentReport = [NSEntityDescription insertNewObjectForEntityForName:@"PaymentReport" inManagedObjectContext:moc];
+					[paymentReport setValue:paymentReportDate forKey:@"reportDate"];
+					[paymentReport setValue:account forKey:@"account"];
+
 					for (NSDictionary *payment in paymentSummaries) {
-						if ([payment[@"status"] isEqualToString:@"PAID"]) {
-							shouldSave = YES;
-							amount += [currencyFormatter numberFromString:payment[@"amount"]].floatValue;
-							if (currency == nil) {
-								currency = payment[@"currency"];
-							}
-						}
+						NSManagedObject *paymentDetailed = [NSEntityDescription insertNewObjectForEntityForName:@"PaymentDetailed" inManagedObjectContext:moc];
+						CGFloat amount = [currencyFormatter numberFromString:payment[@"amount"]].floatValue;
+						NSDate *paidOrExpectedDate = [dateFormatter dateFromString:payment[@"paidOrExpectingPaymentDate"]];
+						[paymentDetailed setValue:@(amount) forKey:@"amount"];
+						[paymentDetailed setValue:payment[@"currency"] forKey:@"currency"];
+						[paymentDetailed setValue:payment[@"bankName"] forKey:@"bankName"];
+						[paymentDetailed setValue:payment[@"isPaymentExpected"] forKey:@"isExpected"];
+						[paymentDetailed setValue:payment[@"maskedBankAccount"] forKey:@"maskedBankAccount"];
+						[paymentDetailed setValue:paidOrExpectedDate forKey:@"paidOrExpectingPaymentDate"];
+						[paymentDetailed setValue:payment[@"status"] forKey:@"status"];
+						[paymentDetailed setValue:paymentReport forKey:@"paymentReport"];
 					}
-					if (shouldSave) {
-						NSManagedObject *payment = [NSEntityDescription insertNewObjectForEntityForName:@"Payment" inManagedObjectContext:moc];
-						[payment setValue:account forKey:@"account"];
-						[payment setValue:@(year) forKey:@"year"];
-						[payment setValue:@(month) forKey:@"month"];
-						[payment setValue:@(amount) forKey:@"amount"];
-						[payment setValue:currency forKey:@"currency"];
-						[payment setValue:vendorID forKey:@"vendorID"];
-						
-						if ([moc hasChanges]) {
-							[psc performBlockAndWait:^{
-								NSError *saveError = nil;
-								[moc save:&saveError];
-								if (saveError) {
-									NSLog(@"Could not save context: %@", saveError);
-								}
-							}];
-						}
-						
-						dispatch_async(dispatch_get_main_queue(), ^{
-							@synchronized(account.paymentsBadge) {
-								account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
+
+					account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
+
+					if ([moc hasChanges]) {
+						[psc performBlockAndWait:^{
+							NSError *saveError = nil;
+							[moc save:&saveError];
+							if (saveError) {
+								NSLog(@"Could not save context: %@", saveError);
 							}
-						});
+						}];
 					}
 				}
 			}
-			
+
 			@synchronized(downloadedVendors) {
 				[downloadedVendors removeObjectForKey:vendorID];
 				if (downloadedVendors.count == 0) {

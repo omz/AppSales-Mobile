@@ -32,6 +32,7 @@
 @property (nonatomic, strong) NSSet *weeklyReports;
 @property (nonatomic, strong) NSSet *products;
 @property (nonatomic, strong) NSSet *payments;
+@property (nonatomic, strong) NSSet *paymentReports;
 @property (nonatomic, strong) NSNumber *reportsBadge;
 @property (nonatomic, strong) NSNumber *paymentsBadge;
 

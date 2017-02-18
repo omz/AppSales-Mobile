@@ -11,6 +11,12 @@
 #import "ASAccount.h"
 #import "CurrencyManager.h"
 
+@interface PaymentsViewController ()
+
+@property (nonatomic, assign) BOOL sortByMonthPaid;
+
+@end
+
 @implementation PaymentsViewController
 
 @synthesize scrollView, pageControl;
@@ -22,7 +28,7 @@
 		self.title = NSLocalizedString(@"Payments", nil);
 		self.tabBarItem.image = [UIImage imageNamed:@"Payments"];
 		self.hidesBottomBarWhenPushed = [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
-		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deletePayments:)];
+		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Sort", nil) style:UIBarButtonItemStylePlain target:self action:@selector(sortPayments)];
 		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 			[account addObserver:self forKeyPath:@"payments" options:NSKeyValueObservingOptionNew context:nil];
 		}
@@ -33,18 +39,18 @@
 - (void)loadView {
 	[super loadView];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
-	
+
 	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
-	
+
 	self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
 	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	scrollView.alwaysBounceHorizontal = YES;
 	scrollView.showsHorizontalScrollIndicator = NO;
 	scrollView.pagingEnabled = YES;
 	scrollView.delegate = self;
-	
+
 	[self.view addSubview:scrollView];
-	
+
 	self.pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 15, self.view.bounds.size.width, 10)];
 	pageControl.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	pageControl.userInteractionEnabled = NO;
@@ -57,53 +63,89 @@
 
 - (void)reloadData {
 	for (UIView *v in [NSArray arrayWithArray:self.scrollView.subviews]) [v removeFromSuperview];
-	
+
 	NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
 	numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
-	
+
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+
+	NSString *paymentCurrencyCode = nil;
+
 	NSMutableDictionary *paymentsByYear = [NSMutableDictionary dictionary];
 	NSMutableDictionary *sumsByYear = [NSMutableDictionary dictionary];
-	NSSet *allPayments = account.payments;
-	for (NSManagedObject *payment in allPayments) {
-		NSNumber *year = [payment valueForKey:@"year"];
-		NSMutableDictionary *paymentsForYear = paymentsByYear[year];
-		if (!paymentsForYear) {
-			paymentsForYear = [NSMutableDictionary dictionary];
-			paymentsByYear[year] = paymentsForYear;
+	NSSet *allPaymentReports = account.paymentReports;
+	for (NSManagedObject *paymentReport in allPaymentReports) {
+		NSSet *paymentReportPayments = [paymentReport valueForKey:@"payments"];
+		for (NSManagedObject *payment in paymentReportPayments) {
+			if (!paymentCurrencyCode) {
+				// We assume that all payments have the same currency.
+				paymentCurrencyCode = [[paymentReportPayments anyObject] valueForKey:@"currency"];
+			}
+			NSDate *date;
+			if (self.sortByMonthPaid) {
+				date = [payment valueForKey:@"paidOrExpectingPaymentDate"];
+			} else {
+				date = [paymentReport valueForKey:@"reportDate"];
+			}
+			NSDateComponents *dateComponents = [calendar components:(NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:date];
+			NSNumber *year = @(dateComponents.year);
+			NSMutableDictionary *paymentsForYear = paymentsByYear[year];
+			if (!paymentsForYear) {
+				paymentsForYear = [NSMutableDictionary dictionary];
+				paymentsByYear[year] = paymentsForYear;
+			}
+			NSNumber *month = @(dateComponents.month);
+			NSMutableDictionary *paymentsForMonth = paymentsForYear[month];
+			if (!paymentsForMonth) {
+				paymentsForMonth = [NSMutableDictionary dictionary];
+				paymentsForYear[month] = paymentsForMonth;
+			}
+			paymentsForMonth[date] = payment;
+
+			CGFloat amount = [[payment valueForKey:@"amount"] floatValue];
+			CGFloat currentSum = [sumsByYear[year] floatValue];
+			sumsByYear[year] = @(currentSum + amount);
 		}
-		NSNumber *month = [payment valueForKey:@"month"];
-		NSMutableArray *paymentsForMonth = paymentsForYear[month];
-		if (!paymentsForMonth) {
-			paymentsForMonth = [NSMutableArray array];
-			paymentsForYear[month] = paymentsForMonth;
-		}
-		[paymentsForMonth addObject:payment];
-		
-		CGFloat currentSum = [sumsByYear[year] floatValue];
-		sumsByYear[year] = @(currentSum + [[payment valueForKey:@"amount"] floatValue]);
 	}
-	
+
 	NSMutableDictionary *labelsByYear = [NSMutableDictionary dictionary];
 	for (NSNumber *year in paymentsByYear) {
 		NSDictionary *paymentsForYear = paymentsByYear[year];
 		for (NSNumber *month in paymentsForYear) {
-			NSArray *payments = paymentsForYear[month];
-			if ([payments count] > 0) {
-				NSNumber *sum = [payments valueForKeyPath:@"@sum.amount"];
-				NSString *currencyCode = [payments[0] valueForKey:@"currency"];
-				numberFormatter.currencyCode = currencyCode;
-				NSString *label = [numberFormatter stringFromNumber:sum];
-				NSMutableDictionary *labelsForYear = labelsByYear[year];
-				if (!labelsForYear) {
-					labelsForYear = [NSMutableDictionary dictionary];
-					labelsByYear[year] = labelsForYear;
+			NSDictionary *payments = paymentsForYear[month];
+			NSArray *keys = [payments.allKeys sortedArrayUsingSelector:@selector(compare:)];
+			NSMutableAttributedString *label = [[NSMutableAttributedString alloc] init];
+			for (NSDate *key in keys) {
+				NSManagedObject *payment = payments[key];
+				NSNumber *amount = [payment valueForKey:@"amount"];
+				numberFormatter.currencyCode = paymentCurrencyCode;
+				NSString *nextAmount;
+				if (label.length > 0) {
+					nextAmount = [NSString stringWithFormat:@"\n%@", [numberFormatter stringFromNumber:amount]];
+				} else {
+					nextAmount = [numberFormatter stringFromNumber:amount];
 				}
-				labelsForYear[month] = label;
+
+				NSMutableAttributedString *nextAmountAttributed = [[NSMutableAttributedString alloc] initWithString:nextAmount];
+				UIColor *textColor;
+				if ([[payment valueForKey:@"isExpected"] boolValue]) {
+					textColor = [UIColor redColor];
+				} else {
+					textColor = [UIColor blackColor];
+				}
+				[nextAmountAttributed addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, nextAmountAttributed.length)];
+				[label appendAttributedString:nextAmountAttributed];
 			}
+			NSMutableDictionary *labelsForYear = labelsByYear[year];
+			if (!labelsForYear) {
+				labelsForYear = [NSMutableDictionary dictionary];
+				labelsByYear[year] = labelsForYear;
+			}
+			labelsForYear[month] = label;
 		}
 	}
-	
-	
+
+
 	NSArray *sortedYears = [[paymentsByYear allKeys] sortedArrayUsingSelector:@selector(compare:)];
 	if ([sortedYears count] == 0) {
 		NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
@@ -111,25 +153,25 @@
 		NSInteger currentYear = [currentYearComponents year];
 		sortedYears = @[@(currentYear)];
 	}
-	
+
 	CGFloat x = 0.0;
 	for (NSNumber *year in sortedYears) {
 		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)];
 		yearView.year = [year integerValue];
 		yearView.labelsByMonth = labelsByYear[year];
-		if ([allPayments count] > 0) {
+		if ([allPaymentReports count] > 0) {
 			// We assume that all payments have the same currency.
-			numberFormatter.currencyCode = [[allPayments anyObject] valueForKey:@"currency"];
+			numberFormatter.currencyCode = paymentCurrencyCode;
 			yearView.footerText = [NSString stringWithFormat:@"\u2211 %@", [numberFormatter stringFromNumber:sumsByYear[year]]];
 		}
 		yearView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 		[scrollView addSubview:yearView];
 		x += scrollView.bounds.size.width;
 	}
-	
+
 	scrollView.contentSize = CGSizeMake(scrollView.bounds.size.width * [sortedYears count], 0);
 	[scrollView setContentOffset:CGPointMake(scrollView.contentSize.width - scrollView.bounds.size.width, 0)];
-	
+
 	self.pageControl.numberOfPages = [sortedYears count];
 	self.pageControl.currentPage = pageControl.numberOfPages - 1;
 }
@@ -138,18 +180,28 @@
 	[self reloadData];
 }
 
-- (void)deletePayments:(id)sender {
-	UIActionSheet *deletePaymentsSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all payments for this account? Payments will be reloaded from iTunes Connect when sales reports are downloaded.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Payments", nil) otherButtonTitles:nil];
+- (void)sortPayments {
+	NSString *monthEarned = NSLocalizedString(@"Month Earned", nil);
+	NSString *monthPaid = NSLocalizedString(@"Month Paid", nil);
+
+	if (self.sortByMonthPaid) {
+		monthPaid = [monthPaid stringByAppendingString:@" ✓"];
+	} else {
+		monthEarned = [monthEarned stringByAppendingString:@" ✓"];
+	}
+
+	UIActionSheet *deletePaymentsSheet =
+		[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Sort By", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:monthEarned, monthPaid, nil];
 	[deletePaymentsSheet showInView:self.view];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
-	if (buttonIndex != actionSheet.cancelButtonIndex) {
-		account.payments = [NSSet set];
-		[[account managedObjectContext] save:nil];
-		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-			[self.navigationController popViewControllerAnimated:YES];
-		}
+	if (buttonIndex == 0) {
+		self.sortByMonthPaid = false;
+		[self reloadData];
+	} else if (buttonIndex == 1) {
+		self.sortByMonthPaid = true;
+		[self reloadData];
 	}
 }
 
