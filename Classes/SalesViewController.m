@@ -390,18 +390,22 @@
 			if (buttonIndex == 0) {
 				showWeeks = NO;
 				[self.graphView reloadData];
+				[self reloadTableView];
 			} else if (buttonIndex == 1) {
 				showWeeks = YES;
 				[self.graphView reloadData];
+				[self reloadTableView];
 			}
 			[[NSUserDefaults standardUserDefaults] setBool:showWeeks forKey:kSettingDashboardShowWeeks];
 		} else if (actionSheet.tag == kSheetTagMonthlyGraphOptions) {
 			if (buttonIndex == 0) {
 				showFiscalMonths = NO;
 				[self.graphView reloadData];
+				[self reloadTableView];
 			} else if (buttonIndex == 1) {
 				showFiscalMonths = YES;
 				[self.graphView reloadData];
+				[self reloadTableView];
 			}
 			[[NSUserDefaults standardUserDefaults] setBool:showFiscalMonths forKey:kSettingShowFiscalMonths];
 		} else if (actionSheet.tag == kSheetTagAdvancedViewMode) {
