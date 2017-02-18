@@ -31,24 +31,20 @@
 		NSDate *currentDate = firstDate;
 		int period = 0;
 		
-		//DATE TO CHECK NOVEMBER 2011
-		NSDateComponents *dateNovember2011Components = [[NSDateComponents alloc] init];
-		[dateNovember2011Components setMonth:11];
-		[dateNovember2011Components setDay:26];
-		[dateNovember2011Components setYear:2011];
-		NSDate *dateNovember2011 = [calendar dateFromComponents:dateNovember2011Components];
+		NSDate *now = [NSDate date];
 		
-		NSDate* now = [NSDate date];
-		
-		//Covers fiscal calendar from 2008 to one period after the current fiscal period
+		// Covers fiscal calendar from 2008 to one period after the current fiscal period.
 		while ([currentDate earlierDate:now] == currentDate || [currentDate isEqualToDate:now]) {
-			NSDate *nextDate;
-			//First month in a quarter covers 5 weeks, the others 4:
-			if ([currentDate isEqualToDate:dateNovember2011]){ // December 2011 has 5 weeks
-				nextDate = [calendar dateByAddingComponents:components5Weeks toDate:currentDate options:0];
-			}else{
-				nextDate = [calendar dateByAddingComponents:((period % 3 == 0) ? components5Weeks : components4Weeks) toDate:currentDate options:0];
-			}
+			
+			// First month in a quarter covers 5 weeks, the others 4.
+			BOOL isFirstPeriodOfQtr = (period % 3 == 0);
+			
+			// Special case: <rdar://problem/29996766>
+			// December has 5 weeks when (year - 1) is divisible by 5 (every 60 months).
+			BOOL specialCase = (((period + 10) % 60) == 0);
+			
+			NSDate *nextDate = [calendar dateByAddingComponents:((isFirstPeriodOfQtr || specialCase) ? components5Weeks : components4Weeks) toDate:currentDate options:0];
+			
 			[dates addObject:nextDate];
 			currentDate = nextDate;
 			period++;
