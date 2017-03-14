@@ -19,6 +19,13 @@ NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/ra/apps/%@/reviews
 NSString *const kITCReviewAPIPlatformiOS = @"ios";
 NSString *const kITCReviewAPIPlatformMac = @"osx";
 
+@interface ReviewDownloader ()
+
+@property (nonatomic, assign) BOOL showingAlert;
+@property (nonatomic, weak) MBProgressHUD *hud;
+
+@end
+
 @implementation ReviewDownloader
 
 - (instancetype)initWithProduct:(Product *)product {
@@ -60,11 +67,11 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 
 - (void)loginSucceeded {
 	[self downloadProgress:0.1f withStatus:NSLocalizedString(@"Loading reviews...", nil)];
-	
-	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
-	hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
-	hud.labelText = NSLocalizedString(@"Downloading", nil);
-	
+
+	self.hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
+	self.hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
+	self.hud.labelText = NSLocalizedString(@"Downloading", nil);
+
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
 		NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryPageAction, _product.productID, platform];
@@ -234,11 +241,16 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 		}
 	}
 	dispatch_async(dispatch_get_main_queue(), ^{
-		UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-																				 message:[errorMessage componentsJoinedByString:@"\n"]
-																		  preferredStyle:UIAlertControllerStyleAlert];
-		[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleCancel handler:nil]];
-		[alertController show];
+		if (!self.showingAlert) {
+			self.showingAlert = YES;
+			UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                     message:[errorMessage componentsJoinedByString:@"\n"]
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+			[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+				self.showingAlert = NO;
+			}]];
+			[alertController show];
+        }
 	});
 }
 
@@ -258,9 +270,7 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 			_product.account.downloadStatus = status;
 		}
 		_product.account.downloadProgress = progress;
-		
-		MBProgressHUD *hud = [MBProgressHUD HUDForView:[UIApplication sharedApplication].keyWindow];
-		hud.progress = progress;
+		self.hud.progress = progress;
 	});
 }
 
@@ -273,7 +283,7 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 		if ([self.delegate respondsToSelector:@selector(reviewDownloaderDidFinish:)]) {
 			[self.delegate reviewDownloaderDidFinish:self];
 		}
-		[MBProgressHUD hideHUDForView:[UIApplication sharedApplication].keyWindow animated:YES];
+		[self.hud hide:YES];
 		_product.account.downloadStatus = status;
 		_product.account.downloadProgress = 1.0f;
 		_product.account.isDownloadingReports = NO;
