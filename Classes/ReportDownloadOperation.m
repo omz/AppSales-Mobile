@@ -379,6 +379,10 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 			for (NSManagedObject *paymentReport in allExistingPaymentReports) {
 				NSSet *payments = [paymentReport valueForKey:@"payments"];
+				if (payments.count == 0) {
+					[reportsToDelete addObject:paymentReport];
+					continue;
+				}
 				for (NSManagedObject *payment in payments) {
 					if ([[payment valueForKey:@"isExpected"] boolValue]) {
 						NSDate *expectedPaymentDate = [payment valueForKey:@"paidOrExpectingPaymentDate"];
@@ -451,12 +455,14 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					[paymentReport setValue:paymentReportDate forKey:@"reportDate"];
 					[paymentReport setValue:account forKey:@"account"];
 
+					BOOL hasOnePaymentSummary = NO;
 					for (NSDictionary *payment in paymentSummaries) {
 						NSDate *paidOrExpectedDate = [dateFormatter dateFromString:payment[@"paidOrExpectingPaymentDate"]];
 						if (paidOrExpectedDate == nil) {
 							// This payment is neither paid nor expected. Ignore it.
 							continue;
 						}
+						hasOnePaymentSummary = YES;
 						NSManagedObject *paymentDetailed = [NSEntityDescription insertNewObjectForEntityForName:@"PaymentDetailed" inManagedObjectContext:moc];
 						CGFloat amount = [currencyFormatter numberFromString:payment[@"amount"]].floatValue;
 						[paymentDetailed setValue:@(amount) forKey:@"amount"];
@@ -468,7 +474,10 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 						[paymentDetailed setValue:payment[@"status"] forKey:@"status"];
 						[paymentDetailed setValue:paymentReport forKey:@"paymentReport"];
 					}
-
+					if (!hasOnePaymentSummary) {
+						[moc deleteObject:paymentReport];
+						continue;
+					}
 					account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
 
 					if ([moc hasChanges]) {
