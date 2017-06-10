@@ -103,6 +103,8 @@
 		DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B21C0FEC48007B0178 /* LoginManager.m */; };
 		DA9DB1B61C0FEC48007B0178 /* SecurityCodeInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */; };
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
+		DAD39BA51EEC9B2D00CB3524 /* passcode_square_empty@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DAD39BA41EEC9B2D00CB3524 /* passcode_square_empty@3x.png */; };
+		DAD39BA71EEC9B3100CB3524 /* passcode_square_filled@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */; };
 		DAFC5F801C16B29D00261B16 /* ReviewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */; };
 		DAFC5F831C16B5F400261B16 /* ReviewsByVersionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F821C16B5F400261B16 /* ReviewsByVersionViewController.m */; };
 		DAFC5F931C16BFAD00261B16 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F921C16BFAD00261B16 /* Review.m */; };
@@ -282,6 +284,8 @@
 		DA9DB1B31C0FEC48007B0178 /* SecurityCodeInputController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecurityCodeInputController.h; sourceTree = "<group>"; };
 		DA9DB1B41C0FEC48007B0178 /* SecurityCodeInputController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecurityCodeInputController.m; sourceTree = "<group>"; };
 		DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = AppSales/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DAD39BA41EEC9B2D00CB3524 /* passcode_square_empty@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_empty@3x.png"; sourceTree = "<group>"; };
+		DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_filled@3x.png"; sourceTree = "<group>"; };
 		DAFC5F7E1C16B29D00261B16 /* ReviewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsViewController.h; sourceTree = "<group>"; };
 		DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsViewController.m; sourceTree = "<group>"; };
 		DAFC5F811C16B5F400261B16 /* ReviewsByVersionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsByVersionViewController.h; sourceTree = "<group>"; };
@@ -457,8 +461,10 @@
 				DA2995CC1C120E4C0009D4F1 /* Icon216.png */,
 				6D81576114CB44BE005E8F3F /* passcode_square_empty.png */,
 				6D81576214CB44BE005E8F3F /* passcode_square_empty@2x.png */,
+				DAD39BA41EEC9B2D00CB3524 /* passcode_square_empty@3x.png */,
 				6D81576314CB44BE005E8F3F /* passcode_square_filled.png */,
 				6D81576414CB44BE005E8F3F /* passcode_square_filled@2x.png */,
+				DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */,
 				7F0BF5D813D3317D0063A6B0 /* ShadowTop.png */,
 				7F0BF5D913D3317D0063A6B0 /* ShadowBottom.png */,
 				7F0BF5D313D3154F0063A6B0 /* TopBackground.png */,
@@ -777,11 +783,13 @@
 				7F0BF5DA13D3317D0063A6B0 /* ShadowTop.png in Resources */,
 				7F0BF5DB13D3317D0063A6B0 /* ShadowBottom.png in Resources */,
 				7FDF6E8113D8962500B8CC4E /* countries.plist in Resources */,
+				DAD39BA71EEC9B3100CB3524 /* passcode_square_filled@3x.png in Resources */,
 				7FDF6E8313D89B1000B8CC4E /* countries_simple.plist in Resources */,
 				DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */,
 				DA2995CD1C120E4C0009D4F1 /* Icon216.png in Resources */,
 				62E09F1B19E693F3002917FE /* Images.xcassets in Resources */,
 				7FAB533413DD0F9A0027274F /* country_names.plist in Resources */,
+				DAD39BA51EEC9B2D00CB3524 /* passcode_square_empty@3x.png in Resources */,
 				DA2231A71DB318CC009071A3 /* SAMKeychain.bundle in Resources */,
 				DA7B08E11C154CFB00BEAB57 /* FlagKit.xcassets in Resources */,
 				7F89BCE313DFB4F1001C607F /* stores.plist in Resources */,
