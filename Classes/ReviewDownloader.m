@@ -12,9 +12,8 @@
 #import "Review.h"
 #import "Version.h"
 
-NSString *const kITCReviewAPISummaryPageAction           = @"/ra/apps/%@/reviews/summary?platform=%@";
-NSString *const kITCReviewAPISummaryVersionPageAction    = @"/ra/apps/%@/reviews/summary?platform=%@&versionId=%@";
-NSString *const kITCReviewAPIVersionStorefrontPageAction = @"/ra/apps/%@/reviews?platform=%@&versionId=%@&storefront=%@";
+NSString *const kITCReviewAPIRefPageAction     = @"/ra/apps/%@/platforms/%@/reviews/ref";
+NSString *const kITCReviewAPIReviewsPageAction = @"/ra/apps/%@/platforms/%@/reviews?sort=REVIEW_SORT_ORDER_MOST_RECENT";
 
 NSString *const kITCReviewAPIPlatformiOS = @"ios";
 NSString *const kITCReviewAPIPlatformMac = @"osx";
@@ -38,8 +37,8 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 		moc.persistentStoreCoordinator = product.account.managedObjectContext.persistentStoreCoordinator;
 		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 		
-		processedRequests = @(0);
-		totalRequests = @(0);
+		productVersions = [[NSMutableDictionary alloc] init];
+		existingReviews = [[NSMutableDictionary alloc] init];
 		
 		[UIApplication sharedApplication].idleTimerDisabled = YES;
 		backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
@@ -50,12 +49,12 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 }
 
 - (BOOL)isDownloading {
-	return (processedRequests.unsignedIntegerValue != totalRequests.unsignedIntegerValue);
+	return _product.account.isDownloadingReports;
 }
 
 - (void)start {
 	_product.account.isDownloadingReports = YES;
-	[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Loading reviews...", nil)];
+	[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Logging in...", nil)];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		LoginManager *loginManager = [[LoginManager alloc] initWithAccount:_product.account];
@@ -66,43 +65,27 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 }
 
 - (void)loginSucceeded {
-	[self downloadProgress:0.1f withStatus:NSLocalizedString(@"Loading reviews...", nil)];
-
+	[self downloadProgress:(1.0f/3.0f) withStatus:NSLocalizedString(@"Downloading reviews...", nil)];
+	
 	self.hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
 	self.hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
 	self.hud.labelText = NSLocalizedString(@"Downloading", nil);
-
+	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
-		NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryPageAction, _product.productID, platform];
-		NSURL *summaryPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:summaryPagePath]];
-		NSData *summaryPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:summaryPageURL] returningResponse:nil error:nil];
+		NSString *refPagePath = [NSString stringWithFormat:kITCReviewAPIRefPageAction, _product.productID, platform];
+		NSURL *refPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:refPagePath]];
+		NSData *refPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:refPageURL] returningResponse:nil error:nil];
 		
-		if (summaryPageData) {
-			NSDictionary *summaryPage = [NSJSONSerialization JSONObjectWithData:summaryPageData options:0 error:nil];
-			NSString *statusCode = summaryPage[@"statusCode"];
+		if (refPageData) {
+			NSDictionary *refPage = [NSJSONSerialization JSONObjectWithData:refPageData options:0 error:nil];
+			NSString *statusCode = refPage[@"statusCode"];
 			if (![statusCode isEqualToString:@"SUCCESS"]) {
-				[self showAlert:statusCode withMessages:summaryPage[@"messages"]];
+				[self showAlert:statusCode withMessages:refPage[@"messages"]];
 			} else {
-				Product *product = (Product *)[moc objectWithID:productObjectID];
-				
-				NSMutableDictionary *productVersions = [[NSMutableDictionary alloc] init];
-				for (Version *version in product.versions) {
-					productVersions[version.identifier] = version;
-				}
-				
-				summaryPage = summaryPage[@"data"];
-				NSDictionary *versions = summaryPage[@"versions"];
-				for (NSString *identifier in versions) {
-					Version *version = productVersions[identifier];
-					if (version == nil) {
-						version = (Version *)[NSEntityDescription insertNewObjectForEntityForName:@"Version" inManagedObjectContext:moc];
-						version.identifier = identifier;
-						version.number = versions[identifier];
-						version.product = product;
-					}
-					[self fetchReviewsForVersion:version];
-				}
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self processRefPage:refPage];
+				});
 			}
 		}
 	});
@@ -112,122 +95,121 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 	[self completeDownload];
 }
 
-- (void)fetchReviewsForVersion:(Version *)version {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSMutableDictionary *existingReviews = [[NSMutableDictionary alloc] init];
-		for (Review *review in version.reviews) {
-			existingReviews[review.identifier] = review;
+- (void)processRefPage:(NSDictionary *)refPage {
+	Product *product = (Product *)[moc objectWithID:productObjectID];
+	
+	[productVersions removeAllObjects];
+	[existingReviews removeAllObjects];
+	for (Version *version in product.versions) {
+		productVersions[version.number] = version;
+	}
+	
+	refPage = refPage[@"data"];
+	NSDictionary *versions = refPage[@"versions"];
+	for (NSDictionary *v in versions) {
+		NSString *identifier = [v[@"id"] stringValue];
+		NSString *number = v[@"versionString"];
+		Version *version = productVersions[number];
+		if (version == nil) {
+			version = (Version *)[NSEntityDescription insertNewObjectForEntityForName:@"Version" inManagedObjectContext:moc];
+			version.identifier = identifier;
+			version.number = number;
+			version.product = product;
+			productVersions[number] = version;
+		} else {
+			for (Review *review in version.reviews) {
+				existingReviews[review.identifier] = review;
+			}
 		}
-		
+	}
+	
+	[self fetchReviews];
+}
+
+- (void)fetchReviews {
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
-		NSString *summaryPagePath = [NSString stringWithFormat:kITCReviewAPISummaryVersionPageAction, _product.productID, platform, version.identifier];
-		NSURL *summaryPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:summaryPagePath]];
-		NSData *summaryPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:summaryPageURL] returningResponse:nil error:nil];
+		NSString *reviewsPagePath = [NSString stringWithFormat:kITCReviewAPIReviewsPageAction, _product.productID, platform];
+		NSURL *reviewsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:reviewsPagePath]];
+		NSData *reviewsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:reviewsPageURL] returningResponse:nil error:nil];
 		
-		if (summaryPageData) {
-			NSDictionary *summaryPage = [NSJSONSerialization JSONObjectWithData:summaryPageData options:0 error:nil];
-			NSString *statusCode = summaryPage[@"statusCode"];
+		if (reviewsPageData) {
+			NSDictionary *reviewsPage = [NSJSONSerialization JSONObjectWithData:reviewsPageData options:0 error:nil];
+			NSString *statusCode = reviewsPage[@"statusCode"];
 			if (![statusCode isEqualToString:@"SUCCESS"]) {
-				[self showAlert:statusCode withMessages:summaryPage[@"messages"]];
+				[self showAlert:statusCode withMessages:reviewsPage[@"messages"]];
+				[self completeDownloadWithStatus:NSLocalizedString(@"Failed", nil)];
 			} else {
-				summaryPage = summaryPage[@"data"];
-				NSArray *storeFronts = summaryPage[@"storeFronts"];
-				for (NSDictionary *storeFront in storeFronts) {
-					[self fetchReviewsForVersion:version storefront:storeFront[@"countryCode"] existingReviews:existingReviews];
-				}
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self processReviewsPage:reviewsPage];
+				});
 			}
 		}
 	});
 }
 
-- (void)fetchReviewsForVersion:(Version *)version storefront:(NSString *)countryCode existingReviews:(NSDictionary *)existingReviews {
-	@synchronized(totalRequests) {
-		totalRequests = @(totalRequests.unsignedIntegerValue + 1);
+- (void)processReviewsPage:(NSDictionary *)reviewsPage {
+	[self downloadProgress:(2.0f/3.0f) withStatus:NSLocalizedString(@"Processing reviews...", nil)];
+	@synchronized(moc) {
+		Product *product = (Product *)[moc objectWithID:productObjectID];
+		
+		reviewsPage = reviewsPage[@"data"];
+		NSArray *reviews = reviewsPage[@"reviews"];
+		for (__strong NSDictionary *reviewData in reviews) {
+			reviewData = reviewData[@"value"];
+			
+			NSNumber *identifier = reviewData[@"id"];
+			NSTimeInterval timeInterval = [reviewData[@"lastModified"] doubleValue];
+			timeInterval /= 1000.0;
+			NSDate *created = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+			NSString *nickname = reviewData[@"nickname"];
+			NSNumber *rating = reviewData[@"rating"];
+			NSString *title = reviewData[@"title"];
+			NSString *text = reviewData[@"review"];
+			NSString *countryCode = reviewData[@"storeFront"];
+			NSString *versionNumber = reviewData[@"appVersionString"];
+			Version *version = productVersions[versionNumber];
+			
+			Review *review = existingReviews[identifier];
+			if (review == nil) {
+				review = (Review *)[NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
+				review.identifier = identifier;
+				review.created = created;
+				review.version = version;
+				review.product = product;
+				review.countryCode = countryCode;
+				review.nickname = nickname;
+				review.rating = rating;
+				review.title = title;
+				review.text = text;
+				review.unread = @(YES);
+				[[version mutableSetValueForKey:@"reviews"] addObject:review];
+				[[product mutableSetValueForKey:@"reviews"] addObject:review];
+			} else if (([created compare:review.created] != NSOrderedSame) ||
+					   (rating.intValue != review.rating.intValue) ||
+					   ![title isEqualToString:review.title] ||
+					   ![text isEqualToString:review.text] ||
+					   ![nickname isEqualToString:review.nickname]) {
+				review.created = created;
+				review.nickname = nickname;
+				review.rating = rating;
+				review.title = title;
+				review.text = text;
+				review.unread = @(YES);
+				[[version mutableSetValueForKey:@"reviews"] addObject:review];
+				[[product mutableSetValueForKey:@"reviews"] addObject:review];
+			}
+		}
+		
+		[moc.persistentStoreCoordinator performBlockAndWait:^{
+			NSError *saveError = nil;
+			[moc save:&saveError];
+			if (saveError) {
+				NSLog(@"Could not save context: %@", saveError);
+			}
+		}];
 	}
-	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
-		NSString *versionPagePath = [NSString stringWithFormat:kITCReviewAPIVersionStorefrontPageAction, _product.productID, platform, version.identifier, countryCode];
-		NSURL *versionPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:versionPagePath]];
-		NSData *versionPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:versionPageURL] returningResponse:nil error:nil];
-		
-		if (versionPageData) {
-			NSDictionary *versionPage = [NSJSONSerialization JSONObjectWithData:versionPageData options:0 error:nil];
-			NSString *statusCode = versionPage[@"statusCode"];
-			if (![statusCode isEqualToString:@"SUCCESS"]) {
-				[self showAlert:statusCode withMessages:versionPage[@"messages"]];
-			} else {
-				@synchronized(moc) {
-					Product *product = (Product *)[moc objectWithID:productObjectID];
-					
-					versionPage = versionPage[@"data"];
-					NSArray *reviews = versionPage[@"reviews"];
-					for (NSDictionary *reviewData in reviews) {
-						NSNumber *identifier = reviewData[@"id"];
-						NSTimeInterval timeInterval = [reviewData[@"created"] doubleValue];
-						timeInterval /= 1000.0;
-						NSDate *created = [NSDate dateWithTimeIntervalSince1970:timeInterval];
-						NSString *nickname = reviewData[@"nickname"];
-						NSNumber *rating = reviewData[@"rating"];
-						NSString *title = reviewData[@"title"];
-						NSString *text = reviewData[@"review"];
-						
-						Review *review = existingReviews[identifier];
-						if (review == nil) {
-							review = (Review *)[NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
-							review.identifier = identifier;
-							review.created = created;
-							review.version = version;
-							review.product = product;
-							review.countryCode = countryCode;
-							review.nickname = nickname;
-							review.rating = rating;
-							review.title = title;
-							review.text = text;
-							review.unread = @(YES);
-							[[version mutableSetValueForKey:@"reviews"] addObject:review];
-							[[product mutableSetValueForKey:@"reviews"] addObject:review];
-						} else if (([created compare:review.created] != NSOrderedSame) ||
-								   (rating.intValue != review.rating.intValue) ||
-								   ![title isEqualToString:review.title] ||
-								   ![text isEqualToString:review.text] ||
-								   ![nickname isEqualToString:review.nickname]) {
-							review.created = created;
-							review.nickname = nickname;
-							review.rating = rating;
-							review.title = title;
-							review.text = text;
-							review.unread = @(YES);
-							[[version mutableSetValueForKey:@"reviews"] addObject:review];
-							[[product mutableSetValueForKey:@"reviews"] addObject:review];
-						}
-					}
-					
-					[moc.persistentStoreCoordinator performBlockAndWait:^{
-						NSError *saveError = nil;
-						[moc save:&saveError];
-						if (saveError) {
-							NSLog(@"Could not save context: %@", saveError);
-						}
-					}];
-				}
-			}
-		}
-		
-		@synchronized(processedRequests) {
-			processedRequests = @(processedRequests.unsignedIntegerValue + 1);
-			CGFloat processedRatio = (CGFloat)processedRequests.unsignedIntegerValue;
-			@synchronized(totalRequests) {
-				processedRatio /= (CGFloat)totalRequests.unsignedIntegerValue;
-			}
-			CGFloat progress = 0.1f;
-			progress += (1.0f - progress) * processedRatio;
-			[self downloadProgress:progress withStatus:NSLocalizedString(@"Loading reviews...", nil)];
-			if (processedRequests.unsignedIntegerValue == totalRequests.unsignedIntegerValue) {
-				[self completeDownload];
-			}
-		}
-	});
+	[self completeDownload];
 }
 
 #pragma mark - Helper Methods

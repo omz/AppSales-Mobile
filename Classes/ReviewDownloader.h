@@ -23,8 +23,8 @@
 	NSManagedObjectID *productObjectID;
 	NSManagedObjectContext *moc;
 	UIBackgroundTaskIdentifier backgroundTaskID;
-	NSNumber *processedRequests;
-	NSNumber *totalRequests;
+	NSMutableDictionary *productVersions;
+	NSMutableDictionary *existingReviews;
 }
 
 @property (nonatomic, strong) id<ReviewDownloaderDelegate> delegate;
