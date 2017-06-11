@@ -8,12 +8,29 @@
 
 #import "AboutViewController.h"
 
+NSString *const kAppGitHubRepoInfoPLIST = @"https://gitcdn.xyz/repo/nicolasgomollon/AppSales-Mobile/master/Support/AppSales-Info.plist";
+
 @implementation AboutViewController
 
 + (NSString *)appVersion {
 	NSString *version = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
 	NSString *build = [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
 	return [NSString stringWithFormat:@"%@ (%@)", version, build];
+}
+
++ (NSString *)latestVersion {
+	NSDictionary *latestInfo = [[NSDictionary alloc] initWithContentsOfURL:[NSURL URLWithString:kAppGitHubRepoInfoPLIST]];
+	if (latestInfo == nil) { return nil; }
+	NSString *version = latestInfo[@"CFBundleShortVersionString"];
+	NSString *build = latestInfo[@"CFBundleVersion"];
+	return [NSString stringWithFormat:@"%@ (%@)", version, build];
+}
+
++ (BOOL)isLatestVersion {
+	NSString *latestVersion = AboutViewController.latestVersion;
+	if (latestVersion == nil) { return YES; }
+	NSString *currentVersion = AboutViewController.appVersion;
+	return [currentVersion isEqualToString:latestVersion];
 }
 
 + (NSString *)aboutHTML {
@@ -38,7 +55,32 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-	[webView loadHTMLString:AboutViewController.aboutHTML baseURL:[NSBundle mainBundle].bundleURL];
+	NSString *aboutHTML = AboutViewController.aboutHTML;
+	aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_COLOR]]" withString:@""];
+	aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_TEXT]]" withString:@"CHECKING FOR UPDATES..."];
+	[webView loadHTMLString:aboutHTML baseURL:[NSBundle mainBundle].bundleURL];
+	
+	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+		NSString *aboutHTML = AboutViewController.aboutHTML;
+		NSString *latestVersion = AboutViewController.latestVersion;
+		if (latestVersion == nil) {
+			aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_TEXT]]" withString:@"UNABLE TO CHECK FOR UPDATES"];
+		} else {
+			NSString *currentVersion = AboutViewController.appVersion;
+			if ([currentVersion isEqualToString:latestVersion]) {
+				aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_COLOR]]" withString:@"green"];
+				aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_TEXT]]" withString:@"LATEST VERSION"];
+			} else {
+				aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_COLOR]]" withString:@"orange"];
+				aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_TEXT]]" withString:@"UPDATE AVAILABLE"];
+			}
+		}
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[webView loadHTMLString:aboutHTML baseURL:[NSBundle mainBundle].bundleURL];
+			[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+		});
+	});
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
