@@ -151,7 +151,7 @@
 	
 	// Show latest unread reviews first.
 	NSSortDescriptor *sortDescriptorVersion = [NSSortDescriptor sortDescriptorWithKey:@"version.number" ascending:NO];
-	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"created" ascending:NO];
+	NSSortDescriptor *sortDescriptorReviewDate = [[NSSortDescriptor alloc] initWithKey:@"lastModified" ascending:NO];
 	
 	fetchRequest.sortDescriptors = @[sortDescriptorVersion, sortDescriptorReviewDate];
 	

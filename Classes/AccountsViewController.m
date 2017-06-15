@@ -111,13 +111,15 @@
 		if (account.password && account.password.length > 0) { // Only download reports for accounts with a login.
 			if (!account.vendorID || account.vendorID.length == 0) {
 				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
-											 message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), [account displayName]] 
+											 message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]
 											delegate:nil 
 								   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
 								   otherButtonTitles:nil] show];
 			} else {
 				[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
 			}
+		} else {
+			NSLog(@"Login details not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", account.displayName);
 		}
 	}
 }

@@ -9,8 +9,9 @@
 #import "ReviewDownloader.h"
 #import "MBProgressHUD.h"
 #import "Product.h"
-#import "Review.h"
 #import "Version.h"
+#import "Review.h"
+#import "DeveloperResponse.h"
 
 NSString *const kITCReviewAPIRefPageAction     = @"/ra/apps/%@/platforms/%@/reviews/ref";
 NSString *const kITCReviewAPIReviewsPageAction = @"/ra/apps/%@/platforms/%@/reviews?sort=REVIEW_SORT_ORDER_MOST_RECENT";
@@ -53,6 +54,16 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 }
 
 - (void)start {
+	if (!_product.account.password || (_product.account.password.length == 0)) { // Only download reviews for accounts with a login.
+		NSLog(@"Login details not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", _product.account.displayName);
+		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Login Credentials", nil)
+									message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered complete login credentials for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), _product.account.displayName]
+											delegate:nil
+						  cancelButtonTitle:NSLocalizedString(@"OK", nil)
+						  otherButtonTitles:nil] show];
+		return;
+	}
+	
 	_product.account.isDownloadingReports = YES;
 	[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Logging in...", nil)];
 	
@@ -161,43 +172,88 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 			NSNumber *identifier = reviewData[@"id"];
 			NSTimeInterval timeInterval = [reviewData[@"lastModified"] doubleValue];
 			timeInterval /= 1000.0;
-			NSDate *created = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+			NSDate *lastModified = [NSDate dateWithTimeIntervalSince1970:timeInterval];
 			NSString *nickname = reviewData[@"nickname"];
 			NSNumber *rating = reviewData[@"rating"];
 			NSString *title = reviewData[@"title"];
 			NSString *text = reviewData[@"review"];
+			NSNumber *helpfulViews = reviewData[@"helpfulViews"];
+			NSNumber *totalViews = reviewData[@"totalViews"];
+			NSNumber *edited = reviewData[@"edited"];
 			NSString *countryCode = reviewData[@"storeFront"];
 			NSString *versionNumber = reviewData[@"appVersionString"];
 			Version *version = productVersions[versionNumber];
 			
+			BOOL updateReview = NO;
 			Review *review = existingReviews[identifier];
 			if (review == nil) {
 				review = (Review *)[NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
 				review.identifier = identifier;
-				review.created = created;
-				review.version = version;
 				review.product = product;
 				review.countryCode = countryCode;
-				review.nickname = nickname;
-				review.rating = rating;
-				review.title = title;
-				review.text = text;
-				review.unread = @(YES);
-				[[version mutableSetValueForKey:@"reviews"] addObject:review];
-				[[product mutableSetValueForKey:@"reviews"] addObject:review];
-			} else if (([created compare:review.created] != NSOrderedSame) ||
+				updateReview = YES;
+			} else if (([lastModified compare:review.lastModified] != NSOrderedSame) ||
+					   ![version.identifier isEqualToString:review.version.identifier] ||
+					   ![nickname isEqualToString:review.nickname] ||
 					   (rating.intValue != review.rating.intValue) ||
 					   ![title isEqualToString:review.title] ||
 					   ![text isEqualToString:review.text] ||
-					   ![nickname isEqualToString:review.nickname]) {
-				review.created = created;
+					   (helpfulViews.intValue != review.helpfulViews.intValue) ||
+					   (totalViews.intValue != review.totalViews.intValue) ||
+					   (edited.boolValue != review.edited.boolValue)) {
+				updateReview = YES;
+			}
+			if (updateReview) {
+				review.lastModified = lastModified;
+				review.version = version;
 				review.nickname = nickname;
 				review.rating = rating;
 				review.title = title;
 				review.text = text;
+				review.helpfulViews = helpfulViews;
+				review.totalViews = totalViews;
+				review.edited = edited;
 				review.unread = @(YES);
 				[[version mutableSetValueForKey:@"reviews"] addObject:review];
 				[[product mutableSetValueForKey:@"reviews"] addObject:review];
+			}
+			
+			NSDictionary *devResp = reviewData[@"developerResponse"];
+			if (devResp != nil) {
+				// Developer response was posted.
+				NSNumber *identifier = devResp[@"responseId"];
+				NSTimeInterval timeInterval = [devResp[@"lastModified"] doubleValue];
+				timeInterval /= 1000.0;
+				NSDate *lastModified = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+				NSString *text = devResp[@"response"];
+				NSString *pendingState = devResp[@"pendingState"];
+				
+				DeveloperResponse *developerResponse = review.developerResponse;
+				if (developerResponse == nil) {
+					developerResponse = (DeveloperResponse *)[NSEntityDescription insertNewObjectForEntityForName:@"DeveloperResponse" inManagedObjectContext:moc];
+					developerResponse.identifier = identifier;
+					developerResponse.lastModified = lastModified;
+					developerResponse.text = text;
+					developerResponse.pendingState = pendingState;
+				} else {
+					if ([lastModified compare:developerResponse.lastModified] != NSOrderedSame) {
+						developerResponse.lastModified = lastModified;
+					}
+					if (![text isEqualToString:developerResponse.text]) {
+						developerResponse.text = text;
+					}
+					if (![pendingState isEqualToString:developerResponse.pendingState]) {
+						developerResponse.pendingState = pendingState;
+					}
+				}
+				developerResponse.review = review;
+				review.developerResponse = developerResponse;
+			} else {
+				// Developer response was deleted.
+				DeveloperResponse *developerResponse = review.developerResponse;
+				if (developerResponse != nil) {
+					[moc deleteObject:developerResponse];
+				}
 			}
 		}
 		

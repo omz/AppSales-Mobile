@@ -9,9 +9,10 @@
 #import "ReviewDetailViewController.h"
 #import "LoginManager.h"
 #import "CountryDictionary.h"
-#import "Review.h"
-#import "Version.h"
 #import "Product.h"
+#import "Version.h"
+#import "Review.h"
+#import "DeveloperResponse.h"
 
 @implementation ReviewDetailViewController
 
@@ -45,20 +46,22 @@
 	toolbar.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth);
 	[self.view addSubview:toolbar];
 	
-	previousItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Back"] style:UIBarButtonItemStylePlain target:self action:@selector(previousReview)];
-	nextItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Forward"] style:UIBarButtonItemStylePlain target:self action:@selector(nextReview)];
-	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-	markItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Mark Unread", nil) style:UIBarButtonItemStylePlain target:self action:@selector(markReview)];
+	previousItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ChevronUp"] style:UIBarButtonItemStylePlain target:self action:@selector(previousReview)];
+	nextItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ChevronDown"] style:UIBarButtonItemStylePlain target:self action:@selector(nextReview)];
 	
-	toolbar.items = @[previousItem, nextItem, flexSpaceItem, markItem];
+	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+	markItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Circle"] style:UIBarButtonItemStylePlain target:self action:@selector(markReview)];
+	UIBarButtonItem *sendReviewButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)];
+	UIBarButtonItem *replyButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyToReview)];
+	
+	toolbar.items = @[markItem, flexSpaceItem, sendReviewButtonItem, flexSpaceItem, replyButtonItem];
 	toolbar.translucent = YES;
 }
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	
-	UIBarButtonItem *sendReviewButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)];
-	self.navigationItem.rightBarButtonItem = sendReviewButtonItem;
+	self.navigationItem.rightBarButtonItems = @[nextItem, previousItem];
 	
 	[self updateCurrentReview];
 }
@@ -70,16 +73,14 @@
 - (void)updateToolbarButtons {
 	previousItem.enabled = (0 < index);
 	nextItem.enabled = (index < (reviews.count - 1));
-	markItem.title = reviews[index].unread.boolValue ? NSLocalizedString(@"Mark Read", nil) : NSLocalizedString(@"Mark Unread", nil);
-	markItem.style = reviews[index].unread.boolValue ? UIBarButtonItemStyleDone : UIBarButtonItemStylePlain;
+	markItem.image = reviews[index].unread.boolValue ? [UIImage imageNamed:@"CircleFilled"] : [UIImage imageNamed:@"Circle"];
 }
 
 - (void)markUnread:(BOOL)unread {
 	Review *review = reviews[index];
 	review.unread = @(unread);
 	
-	markItem.title = review.unread.boolValue ? NSLocalizedString(@"Mark Read", nil) : NSLocalizedString(@"Mark Unread", nil);
-	markItem.style = reviews[index].unread.boolValue ? UIBarButtonItemStyleDone : UIBarButtonItemStylePlain;
+	markItem.image = review.unread.boolValue ? [UIImage imageNamed:@"CircleFilled"] : [UIImage imageNamed:@"Circle"];
 	
 	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
 	moc.persistentStoreCoordinator = review.managedObjectContext.persistentStoreCoordinator;
@@ -96,6 +97,10 @@
 
 - (void)markReview {
 	[self markUnread:!reviews[index].unread.boolValue];
+}
+
+- (void)replyToReview {
+	NSLog(@"Reply to customer review here.");
 }
 
 - (void)previousReview {
@@ -141,7 +146,7 @@
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:reviewTitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[RATING]]]" withString:ratingString];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[NICKNAME]]]" withString:review.nickname];
-	template = [template stringByReplacingOccurrencesOfString:@"[[[DATE]]]" withString:[dateFormatter stringFromDate:review.created]];
+	template = [template stringByReplacingOccurrencesOfString:@"[[[DATE]]]" withString:[dateFormatter stringFromDate:review.lastModified]];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_FLAG]]]" withString:flagBase64];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_NAME]]]" withString:countryName];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:reviewText];

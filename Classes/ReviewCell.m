@@ -46,7 +46,7 @@
 	
 	NSString *ratingString = [@"" stringByPaddingToLength:review.rating.integerValue withString:@"\u2605" startingAtIndex:0];
 	ratingString = [ratingString stringByPaddingToLength:5 withString:@"\u2606" startingAtIndex:0];
-	NSString *detailText = [NSString stringWithFormat:@"%@ %@ - %@", ratingString, review.nickname, [dateFormatter stringFromDate:review.created]];
+	NSString *detailText = [NSString stringWithFormat:@"%@ %@ - %@", ratingString, review.nickname, [dateFormatter stringFromDate:review.lastModified]];
 	
 	NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:detailText];
 	[attributedText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:12.0f] range:NSMakeRange(0, detailText.length)];

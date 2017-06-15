@@ -88,6 +88,7 @@
 		DA2231A51DB318C7009071A3 /* SAMKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2231A31DB318C7009071A3 /* SAMKeychainQuery.m */; };
 		DA2231A71DB318CC009071A3 /* SAMKeychain.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA2231A61DB318CC009071A3 /* SAMKeychain.bundle */; };
 		DA2995CD1C120E4C0009D4F1 /* Icon216.png in Resources */ = {isa = PBXBuildFile; fileRef = DA2995CC1C120E4C0009D4F1 /* Icon216.png */; };
+		DA3DF5FF1EF1D92900CBEF87 /* DeveloperResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = DA3DF5FE1EF1D92900CBEF87 /* DeveloperResponse.m */; };
 		DA4357FC1C113B670056702C /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4357FB1C113B670056702C /* LocalAuthentication.framework */; };
 		DA4984391C129F95009BFC8F /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = DA49842F1C129F95009BFC8F /* ioapi.c */; };
 		DA49843A1C129F95009BFC8F /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = DA4984311C129F95009BFC8F /* mztools.c */; };
@@ -256,6 +257,9 @@
 		DA2231A31DB318C7009071A3 /* SAMKeychainQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychainQuery.m; path = Vendor/SAMKeychain/Sources/SAMKeychainQuery.m; sourceTree = SOURCE_ROOT; };
 		DA2231A61DB318CC009071A3 /* SAMKeychain.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SAMKeychain.bundle; path = Vendor/SAMKeychain/Support/SAMKeychain.bundle; sourceTree = SOURCE_ROOT; };
 		DA2995CC1C120E4C0009D4F1 /* Icon216.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon216.png; sourceTree = "<group>"; };
+		DA3DF5F01EF1D6CA00CBEF87 /* AppSales 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 6.xcdatamodel"; sourceTree = "<group>"; };
+		DA3DF5FD1EF1D92900CBEF87 /* DeveloperResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeveloperResponse.h; sourceTree = "<group>"; };
+		DA3DF5FE1EF1D92900CBEF87 /* DeveloperResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeveloperResponse.m; sourceTree = "<group>"; };
 		DA4357FB1C113B670056702C /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
 		DA49842E1C129F95009BFC8F /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		DA49842F1C129F95009BFC8F /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
@@ -493,6 +497,8 @@
 				DAFC5F951C16C07100261B16 /* Version.m */,
 				DAFC5F911C16BFAD00261B16 /* Review.h */,
 				DAFC5F921C16BFAD00261B16 /* Review.m */,
+				DA3DF5FD1EF1D92900CBEF87 /* DeveloperResponse.h */,
+				DA3DF5FE1EF1D92900CBEF87 /* DeveloperResponse.m */,
 				7FD4ECDA13DAFF120054FE6D /* AppleFiscalCalendar.h */,
 				7FD4ECDB13DAFF120054FE6D /* AppleFiscalCalendar.m */,
 				7F1B14F113C51AC900243AA3 /* CurrencyManager.h */,
@@ -852,6 +858,7 @@
 				7F89BCE913DFD925001C607F /* ReviewSummaryView.m in Sources */,
 				7FA2C58413E0370B00BA9875 /* ReviewListViewController.m in Sources */,
 				7F26DF9113E13319001D0F33 /* ReviewDetailViewController.m in Sources */,
+				DA3DF5FF1EF1D92900CBEF87 /* DeveloperResponse.m in Sources */,
 				DAFC5F831C16B5F400261B16 /* ReviewsByVersionViewController.m in Sources */,
 				7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */,
 				DA4984391C129F95009BFC8F /* ioapi.c in Sources */,
@@ -1033,13 +1040,14 @@
 		7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				DA3DF5F01EF1D6CA00CBEF87 /* AppSales 6.xcdatamodel */,
 				AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */,
 				DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */,
 				7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */,
 				7F0B8A6B13F7B776006E9151 /* AppSales 2.xcdatamodel */,
 				7F709D4013BC98860008DBAD /* AppSales.xcdatamodel */,
 			);
-			currentVersion = AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */;
+			currentVersion = DA3DF5F01EF1D6CA00CBEF87 /* AppSales 6.xcdatamodel */;
 			path = AppSales.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
