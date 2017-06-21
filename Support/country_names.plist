@@ -9,7 +9,7 @@
 	<key>AF</key>
 	<string>Afghanistan</string>
 	<key>AG</key>
-	<string>Antigua </string>
+	<string>Antigua</string>
 	<key>AI</key>
 	<string>Anguilla</string>
 	<key>AL</key>
@@ -35,7 +35,7 @@
 	<key>AZ</key>
 	<string>Azerbaijan</string>
 	<key>BA</key>
-	<string>Bosnia </string>
+	<string>Bosnia</string>
 	<key>BB</key>
 	<string>Barbados</string>
 	<key>BD</key>
@@ -99,7 +99,7 @@
 	<key>CR</key>
 	<string>Costa Rica</string>
 	<key>CS</key>
-	<string>Serbia </string>
+	<string>Serbia</string>
 	<key>CU</key>
 	<string>Cuba</string>
 	<key>CV</key>
@@ -175,7 +175,7 @@
 	<key>GR</key>
 	<string>Greece</string>
 	<key>GS</key>
-	<string>South Georgia </string>
+	<string>South Georgia</string>
 	<key>GT</key>
 	<string>Guatemala</string>
 	<key>GU</key>
@@ -231,7 +231,7 @@
 	<key>KM</key>
 	<string>Comoros</string>
 	<key>KN</key>
-	<string>St. Kitts </string>
+	<string>St. Kitts</string>
 	<key>KP</key>
 	<string>North Korea</string>
 	<key>KR</key>
@@ -345,7 +345,7 @@
 	<key>PL</key>
 	<string>Poland</string>
 	<key>PM</key>
-	<string>St. Pierre </string>
+	<string>St. Pierre</string>
 	<key>PN</key>
 	<string>Pitcairn Islands</string>
 	<key>PR</key>
@@ -399,7 +399,7 @@
 	<key>SR</key>
 	<string>Suriname</string>
 	<key>ST</key>
-	<string>Sao Tome </string>
+	<string>Sao Tome</string>
 	<key>SV</key>
 	<string>El Salvador</string>
 	<key>SY</key>
@@ -407,11 +407,11 @@
 	<key>SZ</key>
 	<string>Swaziland</string>
 	<key>TC</key>
-	<string>Turks </string>
+	<string>Turks</string>
 	<key>TD</key>
 	<string>Chad</string>
 	<key>TF</key>
-	<string>French Southern </string>
+	<string>French Southern</string>
 	<key>TG</key>
 	<string>Togo</string>
 	<key>TH</key>
@@ -431,7 +431,7 @@
 	<key>TR</key>
 	<string>Turkey</string>
 	<key>TT</key>
-	<string>Trinidad </string>
+	<string>Trinidad</string>
 	<key>TV</key>
 	<string>Tuvalu</string>
 	<key>TW</key>
@@ -443,7 +443,7 @@
 	<key>UG</key>
 	<string>Uganda</string>
 	<key>UM</key>
-	<string>United States Minor Outlying Islands</string>
+	<string>U.S. Minor Outlying Islands</string>
 	<key>US</key>
 	<string>United States</string>
 	<key>UY</key>
@@ -451,19 +451,19 @@
 	<key>UZ</key>
 	<string>Uzbekistan</string>
 	<key>VC</key>
-	<string>St. Vincent </string>
+	<string>St. Vincent</string>
 	<key>VE</key>
 	<string>Venezuela</string>
 	<key>VG</key>
 	<string>British Virgin Islands</string>
 	<key>VI</key>
-	<string>United States Virgin Islands</string>
+	<string>U.S. Virgin Islands</string>
 	<key>VN</key>
 	<string>Vietnam</string>
 	<key>VU</key>
 	<string>Vanuatu</string>
 	<key>WF</key>
-	<string>Wallis </string>
+	<string>Wallis</string>
 	<key>WS</key>
 	<string>Samoa</string>
 	<key>YE</key>
