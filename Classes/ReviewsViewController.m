@@ -10,7 +10,7 @@
 #import "ASAccount.h"
 #import "Product.h"
 #import "BadgedCell.h"
-#import "ReviewsByVersionViewController.h"
+#import "ReviewListViewController.h"
 
 @implementation ReviewsViewController
 
@@ -98,14 +98,14 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	Product *product = sortedApps[indexPath.row];
-	ReviewsByVersionViewController *reviewsByVersionVC = [[ReviewsByVersionViewController alloc] initWithProduct:product];
+	ReviewListViewController *reviewListVC = [[ReviewListViewController alloc] initWithProduct:product];
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-		[self.navigationController pushViewController:reviewsByVersionVC animated:YES];
+		[self.navigationController pushViewController:reviewListVC animated:YES];
 	} else {
-		UINavigationController *reviewsByVersionNC = [[UINavigationController alloc] initWithRootViewController:reviewsByVersionVC];
-		reviewsByVersionNC.modalPresentationStyle = UIModalPresentationFormSheet;
-		reviewsByVersionNC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-		[self presentViewController:reviewsByVersionNC animated:YES completion:nil];
+		UINavigationController *reviewListNC = [[UINavigationController alloc] initWithRootViewController:reviewListVC];
+		reviewListNC.modalPresentationStyle = UIModalPresentationFormSheet;
+		reviewListNC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+		[self presentViewController:reviewListNC animated:YES completion:nil];
 	}
 }
 
