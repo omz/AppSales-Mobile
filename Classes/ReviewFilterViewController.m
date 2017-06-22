@@ -92,7 +92,6 @@
 		cell = [[FilterTableViewCell alloc] initWithReuseIdentifier:CellIdentifier];
 	}
 	
-	cell.separatorInset = UIEdgeInsetsMake(0.0f, 16.0f, 0.0f, 0.0f);
 	if (indexPath.section == 0) {
 		if (applied.count) {
 			NSNumber *index = applied[indexPath.row];

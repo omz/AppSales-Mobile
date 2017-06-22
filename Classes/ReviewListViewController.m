@@ -231,10 +231,10 @@
 	
 	for (NSNumber *index in applied) {
 		ReviewFilter *filter = filters[index];
+		if (filter.predicate.length == 0) { continue; }
 		[pred appendString:[@" AND " stringByAppendingString:filter.predicate]];
-		if (filter.object != nil) {
-			[args addObject:filter.object];
-		}
+		if (filter.object == nil) { continue; }
+		[args addObject:filter.object];
 	}
 	
 	fetchRequest.predicate = [NSPredicate predicateWithFormat:pred argumentArray:args];

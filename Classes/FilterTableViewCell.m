@@ -24,6 +24,7 @@
 
 - (void)layoutSubviews {
 	[super layoutSubviews];
+	self.separatorInset = UIEdgeInsetsMake(0.0f, 16.0f, 0.0f, 0.0f);
 	if (self.imageView) {
 		self.imageView.frame = CGRectMake(10.0f, 9.0f, 26.0f, 26.0f);
 	}
