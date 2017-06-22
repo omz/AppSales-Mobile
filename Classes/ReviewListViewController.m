@@ -243,7 +243,7 @@
 	
 	fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																   managedObjectContext:managedObjectContext
-																	 sectionNameKeyPath:@"version.number"
+																	 sectionNameKeyPath:nil
 																			  cacheName:nil];
 	fetchedResultsController.delegate = self;
 	
