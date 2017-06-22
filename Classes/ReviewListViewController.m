@@ -196,7 +196,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	Review *review = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	return [ReviewCell heightForReview:review thatFits:tableView.contentSize.width];
+	return [[ReviewCellHelper sharedHelper] heightForReview:review thatFits:tableView.contentSize.width];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

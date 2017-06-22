@@ -20,42 +20,78 @@ CGFloat const kReviewNicknameFontSize = 13.0f;
 CGFloat const kReviewTextFontSize = 15.0f;
 CGFloat const kReviewDetailsFontSize = 13.0f;
 
-@implementation ReviewCell
+@implementation ReviewCellHelper
 
-@synthesize review;
+- (instancetype)init {
+	self = [super init];
+	if (self) {
+		// Initialization code
+		NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+		paragraphStyle.alignment = NSTextAlignmentLeft;
+		
+		titleAttrs = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:kReviewTitleFontSize],
+					   NSParagraphStyleAttributeName: paragraphStyle};
+		
+		reviewAttrs = @{NSFontAttributeName: [UIFont systemFontOfSize:kReviewTextFontSize],
+						NSParagraphStyleAttributeName: paragraphStyle};
+	}
+	return self;
+}
 
-+ (CGFloat)heightForReview:(Review *)review thatFits:(CGFloat)width {
++ (instancetype)sharedHelper {
+	static id sharedHelper = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		sharedHelper = [[self alloc] init];
+	});
+	return sharedHelper;
+}
+
+- (CGFloat)titleLabelHeightForReview:(Review *)review thatFits:(CGFloat)width {
+	NSString *titleText = review.title ?: NSLocalizedString(@"Untitled", nil);
+	NSTextStorage *textStorage = [[NSTextStorage alloc] initWithString:titleText attributes:titleAttrs];
+	
+	NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeMake(width - (kReviewMarginHorizontal * 2.0f), CGFLOAT_MAX)];
+	textContainer.lineFragmentPadding = 0.0f;
+	
+	UIBezierPath *ratingRect = [UIBezierPath bezierPathWithRect:CGRectMake(textContainer.size.width - 70.0f - 4.0f, 0.0f, 70.0f + 4.0f, kReviewTitleFontSize + 3.0f)];
+	textContainer.exclusionPaths = @[ratingRect];
+	
+	NSLayoutManager *layoutManager = [[NSLayoutManager alloc] init];
+	[layoutManager addTextContainer:textContainer];
+	[textStorage addLayoutManager:layoutManager];
+	
+	CGRect titleFrame = [layoutManager usedRectForTextContainer:textContainer];
+	return MAX(kReviewTitleFontSize + 3.0f, titleFrame.size.height);
+}
+
+- (CGFloat)reviewLabelHeightForReview:(Review *)review thatFits:(CGFloat)width {
+	NSString *reviewText = review.text ?: NSLocalizedString(@"Lorem ipsum dolor sit amet.", nil);
+	NSTextStorage *textStorage = [[NSTextStorage alloc] initWithString:reviewText attributes:reviewAttrs];
+	
+	NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeMake(width - (kReviewMarginHorizontal * 2.0f), CGFLOAT_MAX)];
+	textContainer.lineFragmentPadding = 0.0f;
+	
+	NSLayoutManager *layoutManager = [[NSLayoutManager alloc] init];
+	[layoutManager addTextContainer:textContainer];
+	[textStorage addLayoutManager:layoutManager];
+	
+	CGRect reviewFrame = [layoutManager usedRectForTextContainer:textContainer];
+	return MAX(kReviewTextFontSize + 3.0f, reviewFrame.size.height);
+}
+
+- (CGFloat)heightForReview:(Review *)review thatFits:(CGFloat)width {
 	// Top Margin
 	CGFloat intrinsicHeight = kReviewMarginVertical;
 	
 	// titleLabel + starRatingView
-	UITextView *titleLabel = [[UITextView alloc] initWithFrame:CGRectMake(kReviewMarginHorizontal, 0.0f, width - (kReviewMarginHorizontal * 2.0f), kReviewTitleFontSize + 3.0f)];
-	titleLabel.textAlignment = NSTextAlignmentLeft;
-	titleLabel.font = [UIFont boldSystemFontOfSize:kReviewTitleFontSize];
-	
-	UIBezierPath *ratingRect = [UIBezierPath bezierPathWithRect:CGRectMake(CGRectGetWidth(titleLabel.frame) - 70.0f - 4.0f, 0.0f, 70.0f + 4.0f, kReviewTitleFontSize + 3.0f)];
-	titleLabel.textContainerInset = UIEdgeInsetsZero;
-	titleLabel.textContainer.lineFragmentPadding = 0.0f;
-	titleLabel.textContainer.exclusionPaths = @[ratingRect];
-	
-	titleLabel.text = review.title ?: NSLocalizedString(@"Untitled", nil);
-	CGSize titleLabelSize = [titleLabel sizeThatFits:CGSizeMake(CGRectGetWidth(titleLabel.frame), CGFLOAT_MAX)];
-	
-	intrinsicHeight += MAX(kReviewTitleFontSize + 3.0f, titleLabelSize.height);
+	intrinsicHeight += [self titleLabelHeightForReview:review thatFits:width];
 	
 	// nicknameLabel + padding
 	intrinsicHeight += (4.0f + (kReviewNicknameFontSize + 3.0f) + 4.0f);
 	
 	// reviewLabel
-	UILabel *reviewLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, width - (kReviewMarginHorizontal * 2.0f), kReviewTextFontSize + 3.0f)];
-	reviewLabel.textAlignment = NSTextAlignmentLeft;
-	reviewLabel.font = [UIFont systemFontOfSize:kReviewTextFontSize];
-	reviewLabel.numberOfLines = 0;
-	
-	reviewLabel.text = review.text ?: NSLocalizedString(@"Lorem ipsum dolor sit amet.", nil);
-	CGSize reviewLabelSize = [reviewLabel sizeThatFits:CGSizeMake(CGRectGetWidth(reviewLabel.frame), CGFLOAT_MAX)];
-	
-	intrinsicHeight += MAX(kReviewTextFontSize + 3.0f, reviewLabelSize.height);
+	intrinsicHeight += [self reviewLabelHeightForReview:review thatFits:width];
 	
 	// detailsLabel + padding
 	intrinsicHeight += (4.0f + (kReviewDetailsFontSize + 3.0f));
@@ -65,6 +101,12 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 	
 	return intrinsicHeight;
 }
+
+@end
+
+@implementation ReviewCell
+
+@synthesize review;
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];

@@ -10,6 +10,20 @@
 
 @class Review, StarRatingView;
 
+@interface ReviewCellHelper : NSObject {
+	NSDictionary<NSString *, id> *titleAttrs;
+	NSDictionary<NSString *, id> *reviewAttrs;
+}
+
+- (instancetype)init;
++ (instancetype)sharedHelper;
+
+- (CGFloat)titleLabelHeightForReview:(Review *)review thatFits:(CGFloat)width;
+- (CGFloat)reviewLabelHeightForReview:(Review *)review thatFits:(CGFloat)width;
+- (CGFloat)heightForReview:(Review *)review thatFits:(CGFloat)width;
+
+@end
+
 @interface ReviewCell : UITableViewCell {
 	NSDateFormatter *dateFormatter;
 	UIView *colorView;
@@ -22,7 +36,5 @@
 }
 
 @property (nonatomic, strong) Review *review;
-
-+ (CGFloat)heightForReview:(Review *)review thatFits:(CGFloat)width;
 
 @end

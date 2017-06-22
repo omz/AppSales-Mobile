@@ -11,6 +11,41 @@
 CGFloat const kStarWidth  = 14.0f;
 CGFloat const kStarHeight = 13.0f;
 
+@implementation StarRatingViewHelper
+
+- (instancetype)init {
+	self = [super init];
+	if (self) {
+		// Initialization code
+	}
+	return self;
+}
+
++ (instancetype)sharedHelper {
+	static id sharedHelper = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		sharedHelper = [[self alloc] init];
+	});
+	return sharedHelper;
+}
+
+- (UIImage *)starImage {
+	if (starImage == nil) {
+		starImage = [[UIImage imageNamed:@"Star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+	}
+	return starImage;
+}
+
+- (UIImage *)starFilledImage {
+	if (starFilledImage == nil) {
+		starFilledImage = [[UIImage imageNamed:@"StarFilled"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+	}
+	return starFilledImage;
+}
+
+@end
+
 @implementation StarRatingView
 
 @synthesize origin, height, rating;
@@ -45,29 +80,29 @@ CGFloat const kStarHeight = 13.0f;
 	rating = _rating;
 	switch (rating) {
 		case 0:
-			star1.image = [self templateImageNamed:@"Star"];
+			star1.image = [StarRatingViewHelper sharedHelper].starImage;
 		case 1:
-			star2.image = [self templateImageNamed:@"Star"];
+			star2.image = [StarRatingViewHelper sharedHelper].starImage;
 		case 2:
-			star3.image = [self templateImageNamed:@"Star"];
+			star3.image = [StarRatingViewHelper sharedHelper].starImage;
 		case 3:
-			star4.image = [self templateImageNamed:@"Star"];
+			star4.image = [StarRatingViewHelper sharedHelper].starImage;
 		case 4:
-			star5.image = [self templateImageNamed:@"Star"];
+			star5.image = [StarRatingViewHelper sharedHelper].starImage;
 		default:
 			break;
 	}
 	switch (rating) {
 		case 5:
-			star5.image = [self templateImageNamed:@"StarFilled"];
+			star5.image = [StarRatingViewHelper sharedHelper].starFilledImage;
 		case 4:
-			star4.image = [self templateImageNamed:@"StarFilled"];
+			star4.image = [StarRatingViewHelper sharedHelper].starFilledImage;
 		case 3:
-			star3.image = [self templateImageNamed:@"StarFilled"];
+			star3.image = [StarRatingViewHelper sharedHelper].starFilledImage;
 		case 2:
-			star2.image = [self templateImageNamed:@"StarFilled"];
+			star2.image = [StarRatingViewHelper sharedHelper].starFilledImage;
 		case 1:
-			star1.image = [self templateImageNamed:@"StarFilled"];
+			star1.image = [StarRatingViewHelper sharedHelper].starFilledImage;
 		default:
 			break;
 	}
@@ -89,17 +124,13 @@ CGFloat const kStarHeight = 13.0f;
 	return self.frame.size.height;
 }
 
-- (UIImage *)templateImageNamed:(NSString *)name {
-	return [[UIImage imageNamed:name] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-}
-
 - (UIImageView *)newStar:(CGPoint)_origin {
 	UIImageView *star = [[UIImageView alloc] initWithFrame:CGRectMake(_origin.x, _origin.y, kStarWidth, self.frame.size.height)];
 	star.autoresizingMask = UIViewAutoresizingFlexibleHeight;
 	star.backgroundColor = [UIColor clearColor];
 	star.contentMode = UIViewContentModeCenter;
 	star.tintColor = [UIColor colorWithRed:255.0f/255.0f green:149.0f/255.0f blue:0.0f/255.0f alpha:1.0f];
-	star.image = [self templateImageNamed:@"Star"];
+	star.image = [StarRatingViewHelper sharedHelper].starImage;
 	[self addSubview:star];
 	return star;
 }

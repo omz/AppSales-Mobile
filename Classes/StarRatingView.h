@@ -8,6 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
+@interface StarRatingViewHelper : NSObject {
+	UIImage *starImage;
+	UIImage *starFilledImage;
+}
+
+@property (nonatomic, readonly) UIImage *starImage;
+@property (nonatomic, readonly) UIImage *starFilledImage;
+
+- (instancetype)init;
++ (instancetype)sharedHelper;
+
+@end
+
 @interface StarRatingView : UIView {
 	UIImageView *star1;
 	UIImageView *star2;
