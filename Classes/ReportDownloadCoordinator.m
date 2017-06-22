@@ -9,6 +9,7 @@
 #import "ReportDownloadCoordinator.h"
 #import "ReportDownloadOperation.h"
 #import "ReportImportOperation.h"
+#import "ReviewDownloadCoordinator.h"
 #import "PromoCodeOperation.h"
 #import "ASAccount.h"
 #import "Product.h"
@@ -54,6 +55,15 @@
 	account.downloadProgress = 0.0f;
 	ReportDownloadOperation *operation = [[ReportDownloadOperation alloc] initWithAccount:account];
 	[reportDownloadQueue addOperation:operation];
+}
+
+- (void)downloadReviewsForAccount:(ASAccount *)account products:(NSArray<Product *> *)products {
+	if (account.isDownloadingReports) { return; }
+	account.isDownloadingReports = YES;
+	account.downloadStatus = NSLocalizedString(@"Waiting...", nil);
+	account.downloadProgress = 0.0f;
+	ReviewDownloadCoordinator *coordinator = [[ReviewDownloadCoordinator alloc] initWithAccount:account products:products downloadQueue:reportDownloadQueue];
+	[coordinator start];
 }
 
 - (void)cancelDownloadForAccount:(ASAccount *)account {

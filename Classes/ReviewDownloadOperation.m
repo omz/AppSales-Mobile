@@ -1,13 +1,14 @@
 //
-//  ReviewDownloader.m
+//  ReviewDownloadOperation.m
 //  AppSales
 //
-//  Created by Nicolas Gomollon on 12/7/15.
+//  Created by Nicolas Gomollon on 6/21/17.
 //
 //
 
-#import "ReviewDownloader.h"
-#import "MBProgressHUD.h"
+#import "ReviewDownloadOperation.h"
+#import "LoginManager.h"
+#import "ASAccount.h"
 #import "Product.h"
 #import "Version.h"
 #import "Review.h"
@@ -19,91 +20,83 @@ NSString *const kITCReviewAPIReviewsPageAction = @"/ra/apps/%@/platforms/%@/revi
 NSString *const kITCReviewAPIPlatformiOS = @"ios";
 NSString *const kITCReviewAPIPlatformMac = @"osx";
 
-@interface ReviewDownloader ()
-
-@property (nonatomic, assign) BOOL showingAlert;
-@property (nonatomic, weak) MBProgressHUD *hud;
-
-@end
-
-@implementation ReviewDownloader
+@implementation ReviewDownloadOperation
 
 - (instancetype)initWithProduct:(Product *)product {
 	self = [super init];
 	if (self) {
-		// Initialization code
+		executing = NO;
+		finished = NO;
+		
 		_product = product;
 		productObjectID = [product.objectID copy];
+		
 		moc = [[NSManagedObjectContext alloc] init];
 		moc.persistentStoreCoordinator = product.account.managedObjectContext.persistentStoreCoordinator;
 		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 		
 		productVersions = [[NSMutableDictionary alloc] init];
 		existingReviews = [[NSMutableDictionary alloc] init];
-		
-		[UIApplication sharedApplication].idleTimerDisabled = YES;
-		backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
-			NSLog(@"Background task for downloading reports has expired!");
-		}];
 	}
 	return self;
 }
 
-- (BOOL)isDownloading {
-	return _product.account.isDownloadingReports;
+- (BOOL)isConcurrent {
+	return YES;
+}
+
+- (BOOL)isExecuting {
+	return executing;
+}
+
+- (BOOL)isFinished {
+	return finished;
 }
 
 - (void)start {
-	if (!_product.account.password || (_product.account.password.length == 0)) { // Only download reviews for accounts with a login.
-		NSLog(@"Login details not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", _product.account.displayName);
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Login Credentials", nil)
-									message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered complete login credentials for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), _product.account.displayName]
-											delegate:nil
-						  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-						  otherButtonTitles:nil] show];
+	if (self.isCancelled) {
+		[self willChangeValueForKey:@"isFinished"];
+		finished = YES;
+		[self didChangeValueForKey:@"isFinished"];
 		return;
 	}
-	
-	_product.account.isDownloadingReports = YES;
-	[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Logging in...", nil)];
-	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		LoginManager *loginManager = [[LoginManager alloc] initWithAccount:_product.account];
-		loginManager.shouldDeleteCookies = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDeleteCookies];
-		loginManager.delegate = self;
-		[loginManager logIn];
-	});
+	[self willChangeValueForKey:@"isExecuting"];
+	[NSThread detachNewThreadSelector:@selector(main) toTarget:self withObject:nil];
+	executing = YES;
+	[self didChangeValueForKey:@"isExecuting"];
 }
 
-- (void)loginSucceeded {
+- (void)finish {
+	[self willChangeValueForKey:@"isExecuting"];
+	executing = NO;
+	[self didChangeValueForKey:@"isExecuting"];
+	
+	[self willChangeValueForKey:@"isFinished"];
+	finished = YES;
+	[self didChangeValueForKey:@"isFinished"];
+}
+
+- (void)main {
 	[self downloadProgress:(1.0f/3.0f) withStatus:NSLocalizedString(@"Downloading reviews...", nil)];
 	
-	self.hud = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].keyWindow animated:YES];
-	self.hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
-	self.hud.labelText = NSLocalizedString(@"Downloading", nil);
+	NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
+	NSString *refPagePath = [NSString stringWithFormat:kITCReviewAPIRefPageAction, _product.productID, platform];
+	NSURL *refPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:refPagePath]];
+	NSData *refPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:refPageURL] returningResponse:nil error:nil];
 	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
-		NSString *refPagePath = [NSString stringWithFormat:kITCReviewAPIRefPageAction, _product.productID, platform];
-		NSURL *refPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:refPagePath]];
-		NSData *refPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:refPageURL] returningResponse:nil error:nil];
-		
-		if (refPageData) {
-			NSDictionary *refPage = [NSJSONSerialization JSONObjectWithData:refPageData options:0 error:nil];
-			NSString *statusCode = refPage[@"statusCode"];
-			if (![statusCode isEqualToString:@"SUCCESS"]) {
-				[self showAlert:statusCode withMessages:refPage[@"messages"]];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self processRefPage:refPage];
-				});
-			}
+	if (refPageData) {
+		NSDictionary *refPage = [NSJSONSerialization JSONObjectWithData:refPageData options:0 error:nil];
+		NSString *statusCode = refPage[@"statusCode"];
+		if (![statusCode isEqualToString:@"SUCCESS"]) {
+			[self showAlert:statusCode withMessages:refPage[@"messages"]];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self processRefPage:refPage];
+			});
 		}
-	});
-}
-
-- (void)loginFailed {
-	[self completeDownload];
+	} else {
+		[self failDownload];
+	}
 }
 
 - (void)processRefPage:(NSDictionary *)refPage {
@@ -134,29 +127,31 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 		}
 	}
 	
-	[self fetchReviews];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+		[self fetchReviews];
+	});
 }
 
 - (void)fetchReviews {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
-		NSString *reviewsPagePath = [NSString stringWithFormat:kITCReviewAPIReviewsPageAction, _product.productID, platform];
-		NSURL *reviewsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:reviewsPagePath]];
-		NSData *reviewsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:reviewsPageURL] returningResponse:nil error:nil];
-		
-		if (reviewsPageData) {
-			NSDictionary *reviewsPage = [NSJSONSerialization JSONObjectWithData:reviewsPageData options:0 error:nil];
-			NSString *statusCode = reviewsPage[@"statusCode"];
-			if (![statusCode isEqualToString:@"SUCCESS"]) {
-				[self showAlert:statusCode withMessages:reviewsPage[@"messages"]];
-				[self completeDownloadWithStatus:NSLocalizedString(@"Failed", nil)];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self processReviewsPage:reviewsPage];
-				});
-			}
+	NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
+	NSString *reviewsPagePath = [NSString stringWithFormat:kITCReviewAPIReviewsPageAction, _product.productID, platform];
+	NSURL *reviewsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:reviewsPagePath]];
+	NSData *reviewsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:reviewsPageURL] returningResponse:nil error:nil];
+	
+	if (reviewsPageData) {
+		NSDictionary *reviewsPage = [NSJSONSerialization JSONObjectWithData:reviewsPageData options:0 error:nil];
+		NSString *statusCode = reviewsPage[@"statusCode"];
+		if (![statusCode isEqualToString:@"SUCCESS"]) {
+			[self showAlert:statusCode withMessages:reviewsPage[@"messages"]];
+			[self failDownload];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self processReviewsPage:reviewsPage];
+			});
 		}
-	});
+	} else {
+		[self failDownload];
+	}
 }
 
 - (void)processReviewsPage:(NSDictionary *)reviewsPage {
@@ -268,7 +263,11 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 	[self completeDownload];
 }
 
-#pragma mark - Helper Methods
+#pragma mark - Alert Helper Methods
+
+- (void)showErrorWithMessage:(NSString *)message {
+	[self showAlertWithTitle:NSLocalizedString(@"Error", nil) message:message];
+}
 
 - (void)showAlert:(NSString *)title withMessages:(NSDictionary *)messages {
 	NSMutableArray *errorMessage = [[NSMutableArray alloc] init];
@@ -278,23 +277,12 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 			[errorMessage addObjectsFromArray:message];
 		}
 	}
-	dispatch_async(dispatch_get_main_queue(), ^{
-		if (!self.showingAlert) {
-			self.showingAlert = YES;
-			UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                                     message:[errorMessage componentsJoinedByString:@"\n"]
-                                                                              preferredStyle:UIAlertControllerStyleAlert];
-			[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-				self.showingAlert = NO;
-			}]];
-			[alertController show];
-        }
-	});
+	[self showAlertWithTitle:title message:[errorMessage componentsJoinedByString:@"\n"]];
 }
 
-- (void)showErrorWithMessage:(NSString *)message {
+- (void)showAlertWithTitle:(NSString *)title message:(NSString *)message {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error", nil)
+		UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
 																				 message:message
 																		  preferredStyle:UIAlertControllerStyleAlert];
 		[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil) style:UIAlertActionStyleCancel handler:nil]];
@@ -302,14 +290,16 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 	});
 }
 
+#pragma mark - Progress Helper Methods
+
 - (void)downloadProgress:(CGFloat)progress withStatus:(NSString *)status {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		if (status != nil) {
-			_product.account.downloadStatus = status;
-		}
-		_product.account.downloadProgress = progress;
-		self.hud.progress = progress;
-	});
+	if (self.delegate) {
+		[self.delegate downloadProgress:progress withStatus:status];
+	}
+}
+
+- (void)failDownload {
+	[self completeDownloadWithStatus:NSLocalizedString(@"Failed", nil)];
 }
 
 - (void)completeDownload {
@@ -317,19 +307,10 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 }
 
 - (void)completeDownloadWithStatus:(NSString *)status {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		if ([self.delegate respondsToSelector:@selector(reviewDownloaderDidFinish:)]) {
-			[self.delegate reviewDownloaderDidFinish:self];
-		}
-		[self.hud hide:YES];
-		_product.account.downloadStatus = status;
-		_product.account.downloadProgress = 1.0f;
-		_product.account.isDownloadingReports = NO;
-		[UIApplication sharedApplication].idleTimerDisabled = NO;
-		if (backgroundTaskID != UIBackgroundTaskInvalid) {
-			[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-		}
-	});
+	[self finish];
+	if (self.delegate) {
+		[self.delegate completeDownloadWithStatus:status];
+	}
 }
 
 @end

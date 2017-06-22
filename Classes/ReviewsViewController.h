@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@class ASAccount;
+@class ASAccount, StatusToolbar;
 
 @interface ReviewsViewController : UITableViewController {
 	ASAccount *account;
 	NSArray *sortedApps;
+	StatusToolbar *statusToolbar;
 }
 
 - (instancetype)initWithAccount:(ASAccount *)_account;

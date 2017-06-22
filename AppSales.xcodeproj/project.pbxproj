@@ -82,7 +82,6 @@
 		7FDF6E8313D89B1000B8CC4E /* countries_simple.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7FDF6E8213D89B1000B8CC4E /* countries_simple.plist */; };
 		7FDF727513D8E64D00B8CC4E /* ReportCSVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727413D8E64D00B8CC4E /* ReportCSVViewController.m */; };
 		7FDF727D13DAAF2900B8CC4E /* ReportCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */; };
-		DA2231801DB30908009071A3 /* ReviewDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = DA22317F1DB30908009071A3 /* ReviewDownloader.m */; };
 		DA2231A41DB318C7009071A3 /* SAMKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2231A11DB318C7009071A3 /* SAMKeychain.m */; };
 		DA2231A51DB318C7009071A3 /* SAMKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2231A31DB318C7009071A3 /* SAMKeychainQuery.m */; };
 		DA2231A71DB318CC009071A3 /* SAMKeychain.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA2231A61DB318CC009071A3 /* SAMKeychain.bundle */; };
@@ -103,6 +102,9 @@
 		DA4AC6A61EFAD348003CAF4D /* ReviewFilterOption.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4AC6A51EFAD348003CAF4D /* ReviewFilterOption.m */; };
 		DA4AC6A91EFAF7A6003CAF4D /* ReviewFilterDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4AC6A81EFAF7A6003CAF4D /* ReviewFilterDetailViewController.m */; };
 		DA4AC6AC1EFB051F003CAF4D /* FilterDetailTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4AC6AB1EFB051F003CAF4D /* FilterDetailTableViewCell.m */; };
+		DA4AC6B61EFB54D6003CAF4D /* ReviewDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4AC6B51EFB54D6003CAF4D /* ReviewDownloadOperation.m */; };
+		DA4AC6B91EFB5AAD003CAF4D /* ReviewDownloadCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4AC6B81EFB5AAD003CAF4D /* ReviewDownloadCoordinator.m */; };
+		DA4AC6BC1EFB9E2C003CAF4D /* StatusToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4AC6BB1EFB9E2C003CAF4D /* StatusToolbar.m */; };
 		DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */; };
 		DA7B08E11C154CFB00BEAB57 /* FlagKit.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */; };
 		DA7D58F41C234D9700A3EA12 /* ReviewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DA7D58F31C234D9700A3EA12 /* ReviewCell.m */; };
@@ -252,8 +254,6 @@
 		7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportCollection.m; sourceTree = "<group>"; };
 		7FED633913DB69EA00DF33B1 /* GlobalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalSettings.h; sourceTree = "<group>"; };
 		AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 5.xcdatamodel"; sourceTree = "<group>"; };
-		DA22317E1DB30908009071A3 /* ReviewDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewDownloader.h; path = Classes/ReviewDownloader.h; sourceTree = "<group>"; };
-		DA22317F1DB30908009071A3 /* ReviewDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewDownloader.m; path = Classes/ReviewDownloader.m; sourceTree = "<group>"; };
 		DA2231A01DB318C7009071A3 /* SAMKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychain.h; path = Vendor/SAMKeychain/Sources/SAMKeychain.h; sourceTree = SOURCE_ROOT; };
 		DA2231A11DB318C7009071A3 /* SAMKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychain.m; path = Vendor/SAMKeychain/Sources/SAMKeychain.m; sourceTree = SOURCE_ROOT; };
 		DA2231A21DB318C7009071A3 /* SAMKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychainQuery.h; path = Vendor/SAMKeychain/Sources/SAMKeychainQuery.h; sourceTree = SOURCE_ROOT; };
@@ -293,6 +293,12 @@
 		DA4AC6A81EFAF7A6003CAF4D /* ReviewFilterDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewFilterDetailViewController.m; sourceTree = "<group>"; };
 		DA4AC6AA1EFB051F003CAF4D /* FilterDetailTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilterDetailTableViewCell.h; sourceTree = "<group>"; };
 		DA4AC6AB1EFB051F003CAF4D /* FilterDetailTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterDetailTableViewCell.m; sourceTree = "<group>"; };
+		DA4AC6B41EFB54D6003CAF4D /* ReviewDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewDownloadOperation.h; path = Classes/ReviewDownloadOperation.h; sourceTree = "<group>"; };
+		DA4AC6B51EFB54D6003CAF4D /* ReviewDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewDownloadOperation.m; path = Classes/ReviewDownloadOperation.m; sourceTree = "<group>"; };
+		DA4AC6B71EFB5AAD003CAF4D /* ReviewDownloadCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReviewDownloadCoordinator.h; path = Classes/ReviewDownloadCoordinator.h; sourceTree = "<group>"; };
+		DA4AC6B81EFB5AAD003CAF4D /* ReviewDownloadCoordinator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ReviewDownloadCoordinator.m; path = Classes/ReviewDownloadCoordinator.m; sourceTree = "<group>"; };
+		DA4AC6BA1EFB9E2C003CAF4D /* StatusToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusToolbar.h; sourceTree = "<group>"; };
+		DA4AC6BB1EFB9E2C003CAF4D /* StatusToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusToolbar.m; sourceTree = "<group>"; };
 		DA7B08C71C135EA300BEAB57 /* UIAlertController+Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertController+Window.h"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.h"; sourceTree = SOURCE_ROOT; };
 		DA7B08C81C135EA300BEAB57 /* UIAlertController+Window.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertController+Window.m"; path = "Vendor/FFGlobalAlertController/Pod/Classes/UIAlertController+Window.m"; sourceTree = SOURCE_ROOT; };
 		DA7B08E01C154CFB00BEAB57 /* FlagKit.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = FlagKit.xcassets; path = Vendor/FlagKit/FlagKit.xcassets; sourceTree = "<group>"; };
@@ -385,6 +391,8 @@
 				7F454F9313D5B64F00AE47D1 /* ColorButton.m */,
 				7F454F9B13D5C19B00AE47D1 /* CrayonColorPickerViewController.h */,
 				7F454F9C13D5C19C00AE47D1 /* CrayonColorPickerViewController.m */,
+				DA4AC6BA1EFB9E2C003CAF4D /* StatusToolbar.h */,
+				DA4AC6BB1EFB9E2C003CAF4D /* StatusToolbar.m */,
 			);
 			name = Common;
 			sourceTree = "<group>";
@@ -574,8 +582,10 @@
 		7F89BCDA13DFA43E001C607F /* Review Download */ = {
 			isa = PBXGroup;
 			children = (
-				DA22317E1DB30908009071A3 /* ReviewDownloader.h */,
-				DA22317F1DB30908009071A3 /* ReviewDownloader.m */,
+				DA4AC6B71EFB5AAD003CAF4D /* ReviewDownloadCoordinator.h */,
+				DA4AC6B81EFB5AAD003CAF4D /* ReviewDownloadCoordinator.m */,
+				DA4AC6B41EFB54D6003CAF4D /* ReviewDownloadOperation.h */,
+				DA4AC6B51EFB54D6003CAF4D /* ReviewDownloadOperation.m */,
 			);
 			name = "Review Download";
 			path = ..;
@@ -923,6 +933,7 @@
 				7F137EB313DDDABF004655D8 /* CountryDictionary.m in Sources */,
 				7F398ED213DF21F2004BEC44 /* Transaction.m in Sources */,
 				7F398ED513DF570E004BEC44 /* ReportDetailEntry.m in Sources */,
+				DA4AC6BC1EFB9E2C003CAF4D /* StatusToolbar.m in Sources */,
 				7FA2C58413E0370B00BA9875 /* ReviewListViewController.m in Sources */,
 				7F26DF9113E13319001D0F33 /* ReviewDetailViewController.m in Sources */,
 				DA3DF5FF1EF1D92900CBEF87 /* DeveloperResponse.m in Sources */,
@@ -939,10 +950,10 @@
 				7F963B4213E98B8600CA62FD /* AccountStatusView.m in Sources */,
 				7F7F1D0C13F6442C00F18143 /* PromoCodesViewController.m in Sources */,
 				7F7F1D0F13F6455A00F18143 /* PromoCodesAppViewController.m in Sources */,
-				DA2231801DB30908009071A3 /* ReviewDownloader.m in Sources */,
 				7FA3EA9913F76E3500C80C07 /* DownloadStepOperation.m in Sources */,
 				DA49843C1C129F95009BFC8F /* zip.c in Sources */,
 				DA4AC6AC1EFB051F003CAF4D /* FilterDetailTableViewCell.m in Sources */,
+				DA4AC6B61EFB54D6003CAF4D /* ReviewDownloadOperation.m in Sources */,
 				7FA3EA9D13F77DF000C80C07 /* MultiOperation.m in Sources */,
 				7F0B8A6913F77F95006E9151 /* PromoCodeOperation.m in Sources */,
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
@@ -955,6 +966,7 @@
 				DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */,
 				6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */,
 				6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */,
+				DA4AC6B91EFB5AAD003CAF4D /* ReviewDownloadCoordinator.m in Sources */,
 				6D81575614CB3C2B005E8F3F /* KKPasscodeSettingsViewController.m in Sources */,
 				6D81575714CB3C2B005E8F3F /* KKPasscodeViewController.m in Sources */,
 				DA7B08C91C135EA300BEAB57 /* UIAlertController+Window.m in Sources */,

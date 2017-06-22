@@ -19,6 +19,7 @@
 
 + (instancetype)sharedReportDownloadCoordinator;
 - (void)downloadReportsForAccount:(ASAccount *)account;
+- (void)downloadReviewsForAccount:(ASAccount *)account products:(NSArray<Product *> *)products;
 - (void)cancelDownloadForAccount:(ASAccount *)account;
 - (void)cancelAllDownloads;
 - (void)importReportsIntoAccount:(ASAccount *)account;
