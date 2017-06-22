@@ -12,8 +12,10 @@
 
 @interface ReportDownloadCoordinator : NSObject {
 	NSOperationQueue *reportDownloadQueue;
-	BOOL isBusy;
+	BOOL busy;
 }
+
+@property (nonatomic, readonly) BOOL isBusy;
 
 + (instancetype)sharedReportDownloadCoordinator;
 - (void)downloadReportsForAccount:(ASAccount *)account;
@@ -22,6 +24,5 @@
 - (void)importReportsIntoAccount:(ASAccount *)account;
 - (void)importReportsIntoAccount:(ASAccount *)account fromDirectory:(NSString *)path deleteAfterImport:(BOOL)deleteFlag;
 - (void)downloadPromoCodesForProduct:(Product *)product numberOfCodes:(NSInteger)numberOfCodes;
-- (BOOL)isBusy;
 
 @end

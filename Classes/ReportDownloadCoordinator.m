@@ -9,9 +9,9 @@
 #import "ReportDownloadCoordinator.h"
 #import "ReportDownloadOperation.h"
 #import "ReportImportOperation.h"
+#import "PromoCodeOperation.h"
 #import "ASAccount.h"
 #import "Product.h"
-#import "PromoCodeOperation.h"
 
 @implementation ReportDownloadCoordinator
 
@@ -37,20 +37,22 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
 	if ([keyPath isEqualToString:@"operationCount"]) {
-		isBusy = (reportDownloadQueue.operationCount > 0);
+		[self willChangeValueForKey:@"isBusy"];
+		busy = (reportDownloadQueue.operationCount > 0);
+		[self didChangeValueForKey:@"isBusy"];
 	}
 }
 
 - (BOOL)isBusy {
-	return isBusy;
+	return busy;
 }
 
 - (void)downloadReportsForAccount:(ASAccount *)account {
 	if (account.isDownloadingReports) { return; }
-	ReportDownloadOperation *operation = [[ReportDownloadOperation alloc] initWithAccount:account];
 	account.isDownloadingReports = YES;
 	account.downloadStatus = NSLocalizedString(@"Waiting...", nil);
-	account.downloadProgress = 0.0;
+	account.downloadProgress = 0.0f;
+	ReportDownloadOperation *operation = [[ReportDownloadOperation alloc] initWithAccount:account];
 	[reportDownloadQueue addOperation:operation];
 }
 
