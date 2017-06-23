@@ -114,6 +114,7 @@
 		DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */; };
 		DAD39BA51EEC9B2D00CB3524 /* passcode_square_empty@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DAD39BA41EEC9B2D00CB3524 /* passcode_square_empty@3x.png */; };
 		DAD39BA71EEC9B3100CB3524 /* passcode_square_filled@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */; };
+		DAD53A531EFC87630038C925 /* ReviewFilterComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD53A521EFC87630038C925 /* ReviewFilterComparator.m */; };
 		DAFC5F801C16B29D00261B16 /* ReviewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */; };
 		DAFC5F931C16BFAD00261B16 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F921C16BFAD00261B16 /* Review.m */; };
 		DAFC5F961C16C07100261B16 /* Version.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F951C16C07100261B16 /* Version.m */; };
@@ -313,6 +314,8 @@
 		DA9DB1B81C101FB2007B0178 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = AppSales/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DAD39BA41EEC9B2D00CB3524 /* passcode_square_empty@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_empty@3x.png"; sourceTree = "<group>"; };
 		DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_filled@3x.png"; sourceTree = "<group>"; };
+		DAD53A511EFC87630038C925 /* ReviewFilterComparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewFilterComparator.h; sourceTree = "<group>"; };
+		DAD53A521EFC87630038C925 /* ReviewFilterComparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewFilterComparator.m; sourceTree = "<group>"; };
 		DAFC5F7E1C16B29D00261B16 /* ReviewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsViewController.h; sourceTree = "<group>"; };
 		DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsViewController.m; sourceTree = "<group>"; };
 		DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 4.xcdatamodel"; sourceTree = "<group>"; };
@@ -758,6 +761,8 @@
 				DA4AC6A21EF9CBB4003CAF4D /* ReviewFilter.m */,
 				DA4AC6A41EFAD348003CAF4D /* ReviewFilterOption.h */,
 				DA4AC6A51EFAD348003CAF4D /* ReviewFilterOption.m */,
+				DAD53A511EFC87630038C925 /* ReviewFilterComparator.h */,
+				DAD53A521EFC87630038C925 /* ReviewFilterComparator.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -923,6 +928,7 @@
 				7F2946EE13D880260023F530 /* ReportDetailViewController.m in Sources */,
 				7F2946F113D8806F0023F530 /* MapView.m in Sources */,
 				7FDF727513D8E64D00B8CC4E /* ReportCSVViewController.m in Sources */,
+				DAD53A531EFC87630038C925 /* ReviewFilterComparator.m in Sources */,
 				7FDF727D13DAAF2900B8CC4E /* ReportCollection.m in Sources */,
 				DA2231A51DB318C7009071A3 /* SAMKeychainQuery.m in Sources */,
 				DA4AC6A91EFAF7A6003CAF4D /* ReviewFilterDetailViewController.m in Sources */,

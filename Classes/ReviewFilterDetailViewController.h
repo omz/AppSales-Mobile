@@ -10,8 +10,11 @@
 
 @class ReviewFilter;
 
-@interface ReviewFilterDetailViewController : UITableViewController {
+@interface ReviewFilterDetailViewController : UITableViewController <UIPickerViewDataSource, UIPickerViewDelegate> {
 	ReviewFilter *filter;
+	UISwitch *switchView;
+	UIPickerView *pickerView;
+	BOOL hasInlineDatePicker;
 }
 
 - (instancetype)initWithFilter:(ReviewFilter *)_filter;

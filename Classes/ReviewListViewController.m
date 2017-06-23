@@ -16,6 +16,7 @@
 #import "Version.h"
 #import "ReviewFilter.h"
 #import "ReviewFilterOption.h"
+#import "ReviewFilterComparator.h"
 #import "CountryDictionary.h"
 
 @implementation ReviewListViewController
@@ -29,15 +30,13 @@
 		managedObjectContext = product.managedObjectContext;
 		self.title = product.displayName;
 		
-		filters = [[NSMutableDictionary alloc] init];
-		applied = [[NSMutableArray alloc] init];
+		filters = [[NSMutableArray alloc] init];
 		{
 			NSArray<Version *> *versions = [product.versions.allObjects sortedArrayUsingComparator:^NSComparisonResult(Version *version1, Version *version2) {
 				return version1.identifier.integerValue < version2.identifier.integerValue;
 			}];
 			
 			NSMutableArray<ReviewFilterOption *> *options = [[NSMutableArray alloc] init];
-			[options addObject:[ReviewFilterOption title:NSLocalizedString(@"All", nil) predicate:@"" object:nil]];
 			for (NSInteger i = 0; i < versions.count; i++) {
 				Version *version = versions[i];
 				ReviewFilterOption *option = [ReviewFilterOption title:version.number predicate:nil object:version];
@@ -46,7 +45,15 @@
 				}
 				[options addObject:option];
 			}
-			filters[@(0)] = [ReviewFilter title:NSLocalizedString(@"Version", nil) predicate:@"(version == %@)" options:options];
+			
+			ReviewFilter *filter = [ReviewFilter title:NSLocalizedString(@"Version", nil) predicate:@"(version %@ %@)" options:options];
+			filter.comparators = @[[ReviewFilterComparator comparator:@"==" title:@"Equals"],
+								   [ReviewFilterComparator comparator:@"!=" title:@"Does Not Equal"],
+								   [ReviewFilterComparator comparator:@">" title:@"Is Greater Than"],
+								   [ReviewFilterComparator comparator:@">=" title:@"Is Greater Than or Equal To"],
+								   [ReviewFilterComparator comparator:@"<" title:@"Is Less Than"],
+								   [ReviewFilterComparator comparator:@"<=" title:@"Is Less Than or Equal To"]];
+			[filters addObject:filter];
 		}
 		{
 			NSEntityDescription *entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:self.managedObjectContext];
@@ -66,35 +73,40 @@
 			NSArray<ReviewFilterOption *> *options = [countries sortedArrayUsingComparator:^NSComparisonResult(ReviewFilterOption *option1, ReviewFilterOption *option2) {
 				return [option1.title compare:option2.title options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)];
 			}];
-			options = [@[[ReviewFilterOption title:NSLocalizedString(@"All", nil) predicate:@"" object:nil]] arrayByAddingObjectsFromArray:options];
 			
-			filters[@(1)] = [ReviewFilter title:NSLocalizedString(@"Country", nil) predicate:@"(countryCode == %@)" options:options];
+			ReviewFilter *filter = [ReviewFilter title:NSLocalizedString(@"Country", nil) predicate:@"(countryCode %@ %@)" options:options];
+			filter.comparators = @[[ReviewFilterComparator comparator:@"==" title:@"Equals"],
+								   [ReviewFilterComparator comparator:@"!=" title:@"Does Not Equal"]];
+			[filters addObject:filter];
 		}
 		{
-			NSArray<ReviewFilterOption *> *options = @[[ReviewFilterOption title:NSLocalizedString(@"All", nil) predicate:@"" object:nil],
-													   [ReviewFilterOption title:@"\u2605\u2605\u2605\u2605\u2605" predicate:nil object:@(5)],
+			NSArray<ReviewFilterOption *> *options = @[[ReviewFilterOption title:@"\u2605\u2605\u2605\u2605\u2605" predicate:nil object:@(5)],
 													   [ReviewFilterOption title:@"\u2605\u2605\u2605\u2605\u2606" predicate:nil object:@(4)],
 													   [ReviewFilterOption title:@"\u2605\u2605\u2605\u2606\u2606" predicate:nil object:@(3)],
 													   [ReviewFilterOption title:@"\u2605\u2605\u2606\u2606\u2606" predicate:nil object:@(2)],
 													   [ReviewFilterOption title:@"\u2605\u2606\u2606\u2606\u2606" predicate:nil object:@(1)]];
-			filters[@(2)] = [ReviewFilter title:NSLocalizedString(@"Rating", nil) predicate:@"(rating == %@)" options:options];
+			ReviewFilter *filter = [ReviewFilter title:NSLocalizedString(@"Rating", nil) predicate:@"(rating %@ %@)" options:options];
+			filter.comparators = @[[ReviewFilterComparator comparator:@"==" title:@"Equals"],
+								   [ReviewFilterComparator comparator:@"!=" title:@"Does Not Equal"],
+								   [ReviewFilterComparator comparator:@">" title:@"Is Greater Than"],
+								   [ReviewFilterComparator comparator:@">=" title:@"Is Greater Than or Equal To"],
+								   [ReviewFilterComparator comparator:@"<" title:@"Is Less Than"],
+								   [ReviewFilterComparator comparator:@"<=" title:@"Is Less Than or Equal To"]];
+			[filters addObject:filter];
 		}
 		{
-			NSArray<ReviewFilterOption *> *options = @[[ReviewFilterOption title:NSLocalizedString(@"All", nil) predicate:@"" object:nil],
-													   [ReviewFilterOption title:NSLocalizedString(@"With Reply", nil) predicate:@"(developerResponse != nil)" object:nil],
+			NSArray<ReviewFilterOption *> *options = @[[ReviewFilterOption title:NSLocalizedString(@"With Reply", nil) predicate:@"(developerResponse != nil)" object:nil],
 													   [ReviewFilterOption title:NSLocalizedString(@"Without Reply", nil) predicate:@"(developerResponse == nil)" object:nil],
 													   [ReviewFilterOption title:NSLocalizedString(@"Edited", nil) predicate:@"(edited == %@)" object:@YES]];
-			filters[@(3)] = [ReviewFilter title:NSLocalizedString(@"Review", nil) predicate:nil options:options];
+			[filters addObject:[ReviewFilter title:NSLocalizedString(@"Review", nil) predicate:nil options:options]];
 		}
 		{
-			NSArray<ReviewFilterOption *> *options = @[[ReviewFilterOption title:NSLocalizedString(@"All", nil) predicate:@"" object:nil],
-													   [ReviewFilterOption title:NSLocalizedString(@"Unread", nil) predicate:nil object:@YES],
+			NSArray<ReviewFilterOption *> *options = @[[ReviewFilterOption title:NSLocalizedString(@"Unread", nil) predicate:nil object:@YES],
 													   [ReviewFilterOption title:NSLocalizedString(@"Read", nil) predicate:nil object:@NO]];
-			filters[@(4)] = [ReviewFilter title:NSLocalizedString(@"Status", nil) predicate:@"(unread == %@)" options:options];
+			[filters addObject:[ReviewFilter title:NSLocalizedString(@"Status", nil) predicate:@"(unread == %@)" options:options]];
 		}
 		reviewFilter = [[ReviewFilterViewController alloc] init];
 		reviewFilter.filters = filters;
-		reviewFilter.applied = applied;
 	}
 	return self;
 }
@@ -109,11 +121,17 @@
 	
 	// Do any additional setup after loading the view.
 	filterButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Filter"] style:UIBarButtonItemStylePlain target:self action:@selector(filterButtonPressed:)];
-	filterButton.image = (applied.count > 0) ? [UIImage imageNamed:@"FilterActive"] : [UIImage imageNamed:@"Filter"];
+	filterButton.image = (self.enabledFilters.count > 0) ? [UIImage imageNamed:@"FilterActive"] : [UIImage imageNamed:@"Filter"];
 	
 	UIBarButtonItem *markAllButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Circle"] style:UIBarButtonItemStylePlain target:self action:@selector(markAllReviews)];
 	
 	self.navigationItem.rightBarButtonItems = @[filterButton, markAllButton];
+}
+
+- (NSArray<ReviewFilter *> *)enabledFilters {
+	return [filters filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(ReviewFilter *_Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+		return evaluatedObject.isEnabled;
+	}]];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -158,7 +176,6 @@
 
 - (void)filterButtonPressed:(id)sender {
 	reviewFilter.filters = filters;
-	reviewFilter.applied = applied;
 	
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:reviewFilter];
 	navController.modalPresentationStyle = UIModalPresentationPopover;
@@ -173,9 +190,8 @@
 
 - (void)popoverPresentationControllerDidDismissPopover:(UIPopoverPresentationController *)popoverPresentationController {
 	filters = reviewFilter.filters;
-	applied = reviewFilter.applied;
 	
-	filterButton.image = (applied.count > 0) ? [UIImage imageNamed:@"FilterActive"] : [UIImage imageNamed:@"Filter"];
+	filterButton.image = (self.enabledFilters.count > 0) ? [UIImage imageNamed:@"FilterActive"] : [UIImage imageNamed:@"Filter"];
 	fetchedResultsController = nil;
 	[self.tableView reloadData];
 }
@@ -229,8 +245,8 @@
 	NSMutableString *pred = [NSMutableString stringWithString:@"(product == %@)"];
 	NSMutableArray *args = [NSMutableArray arrayWithObject:product];
 	
-	for (NSNumber *index in applied) {
-		ReviewFilter *filter = filters[index];
+	for (ReviewFilter *filter in filters) {
+		if (!filter.isEnabled) { continue; }
 		if (filter.predicate.length == 0) { continue; }
 		[pred appendString:[@" AND " stringByAppendingString:filter.predicate]];
 		if (filter.object == nil) { continue; }

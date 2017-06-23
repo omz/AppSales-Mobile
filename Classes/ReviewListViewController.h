@@ -13,8 +13,7 @@
 @interface ReviewListViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIPopoverPresentationControllerDelegate> {
 	Product *product;
 	
-	NSMutableDictionary<NSNumber *, ReviewFilter *> *filters;
-	NSMutableArray<NSNumber *> *applied;
+	NSMutableArray<ReviewFilter *> *filters;
 	ReviewFilterViewController *reviewFilter;
 	UIBarButtonItem *filterButton;
 	

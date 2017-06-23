@@ -12,7 +12,6 @@
 
 @interface ReviewFilterViewController : UITableViewController
 
-@property (nonatomic, strong) NSMutableDictionary<NSNumber *, ReviewFilter *> *filters;
-@property (nonatomic, strong) NSMutableArray<NSNumber *> *applied;
+@property (nonatomic, strong) NSMutableArray<ReviewFilter *> *filters;
 
 @end
