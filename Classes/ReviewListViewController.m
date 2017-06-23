@@ -9,6 +9,7 @@
 #import "ReviewListViewController.h"
 #import "ReviewDetailViewController.h"
 #import "ReviewFilterViewController.h"
+#import "ReviewListHeaderView.h"
 #import "ReviewCell.h"
 #import "ASAccount.h"
 #import "Review.h"
@@ -113,6 +114,8 @@
 
 - (void)loadView {
 	[super loadView];
+	headerView = [[ReviewListHeaderView alloc] init];
+	headerView.dataSource = self;
 	[self.tableView registerClass:[ReviewCell class] forCellReuseIdentifier:@"Cell"];
 }
 
@@ -126,6 +129,11 @@
 	UIBarButtonItem *markAllButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Circle"] style:UIBarButtonItemStylePlain target:self action:@selector(markAllReviews)];
 	
 	self.navigationItem.rightBarButtonItems = @[filterButton, markAllButton];
+	
+	headerView.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.tableView.frame), CGRectGetHeight(headerView.frame));
+	self.tableView.tableHeaderView = headerView;
+	
+	[headerView reloadData];
 }
 
 - (NSArray<ReviewFilter *> *)enabledFilters {
@@ -193,6 +201,8 @@
 	
 	filterButton.image = (self.enabledFilters.count > 0) ? [UIImage imageNamed:@"FilterActive"] : [UIImage imageNamed:@"Filter"];
 	fetchedResultsController = nil;
+	
+	[headerView reloadData];
 	[self.tableView reloadData];
 }
 
@@ -275,7 +285,32 @@
 #pragma mark - NSFetchedResultsControllerDelegate
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
+	[headerView reloadData];
 	[self.tableView reloadData];
+}
+
+#pragma mark - ReviewListHeaderViewDataSource
+
+- (NSUInteger)reviewListHeaderView:(ReviewListHeaderView *)headerView numberOfReviewsForRating:(NSInteger)rating {
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	fetchRequest.entity = [NSEntityDescription entityForName:@"Review" inManagedObjectContext:managedObjectContext];
+	
+	NSMutableString *pred = [NSMutableString stringWithString:@"(product == %@)"];
+	NSMutableArray *args = [NSMutableArray arrayWithObject:product];
+	
+	[pred appendString:@" AND (rating == %@)"];
+	[args addObject:@(rating)];
+	
+	for (ReviewFilter *filter in filters) {
+		if (!filter.isEnabled) { continue; }
+		if (filter.predicate.length == 0) { continue; }
+		[pred appendString:[@" AND " stringByAppendingString:filter.predicate]];
+		if (filter.object == nil) { continue; }
+		[args addObject:filter.object];
+	}
+	
+	fetchRequest.predicate = [NSPredicate predicateWithFormat:pred argumentArray:args];
+	return [product.managedObjectContext countForFetchRequest:fetchRequest error:nil];
 }
 
 @end

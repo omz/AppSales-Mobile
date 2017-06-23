@@ -115,6 +115,7 @@
 		DAD39BA51EEC9B2D00CB3524 /* passcode_square_empty@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DAD39BA41EEC9B2D00CB3524 /* passcode_square_empty@3x.png */; };
 		DAD39BA71EEC9B3100CB3524 /* passcode_square_filled@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */; };
 		DAD53A531EFC87630038C925 /* ReviewFilterComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD53A521EFC87630038C925 /* ReviewFilterComparator.m */; };
+		DAD53A581EFCF6ED0038C925 /* ReviewListHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD53A571EFCF6ED0038C925 /* ReviewListHeaderView.m */; };
 		DAFC5F801C16B29D00261B16 /* ReviewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */; };
 		DAFC5F931C16BFAD00261B16 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F921C16BFAD00261B16 /* Review.m */; };
 		DAFC5F961C16C07100261B16 /* Version.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F951C16C07100261B16 /* Version.m */; };
@@ -316,6 +317,8 @@
 		DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "passcode_square_filled@3x.png"; sourceTree = "<group>"; };
 		DAD53A511EFC87630038C925 /* ReviewFilterComparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewFilterComparator.h; sourceTree = "<group>"; };
 		DAD53A521EFC87630038C925 /* ReviewFilterComparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewFilterComparator.m; sourceTree = "<group>"; };
+		DAD53A561EFCF6ED0038C925 /* ReviewListHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewListHeaderView.h; sourceTree = "<group>"; };
+		DAD53A571EFCF6ED0038C925 /* ReviewListHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewListHeaderView.m; sourceTree = "<group>"; };
 		DAFC5F7E1C16B29D00261B16 /* ReviewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsViewController.h; sourceTree = "<group>"; };
 		DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsViewController.m; sourceTree = "<group>"; };
 		DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 4.xcdatamodel"; sourceTree = "<group>"; };
@@ -770,6 +773,8 @@
 		DA4AC6B21EFB1FDD003CAF4D /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				DAD53A561EFCF6ED0038C925 /* ReviewListHeaderView.h */,
+				DAD53A571EFCF6ED0038C925 /* ReviewListHeaderView.m */,
 				DA7D58F21C234D9700A3EA12 /* ReviewCell.h */,
 				DA7D58F31C234D9700A3EA12 /* ReviewCell.m */,
 				DA4AC6971EF7A1E2003CAF4D /* StarRatingView.h */,
@@ -902,6 +907,7 @@
 				7F709D4113BC98860008DBAD /* AppSales.xcdatamodeld in Sources */,
 				7F709D4713BC98860008DBAD /* AccountsViewController.m in Sources */,
 				7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */,
+				DAD53A581EFCF6ED0038C925 /* ReviewListHeaderView.m in Sources */,
 				7F709D8C13BD03D40008DBAD /* SalesViewController.m in Sources */,
 				DA4984411C12A884009BFC8F /* MBProgressHUD.m in Sources */,
 				7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */,

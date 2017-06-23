@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ReviewListHeaderView.h"
 
-@class Product, ReviewFilter, ReviewFilterViewController;
+@class Product, ReviewListHeaderView, ReviewFilter, ReviewFilterViewController;
 
-@interface ReviewListViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIPopoverPresentationControllerDelegate> {
+@interface ReviewListViewController : UITableViewController <NSFetchedResultsControllerDelegate, UIPopoverPresentationControllerDelegate, ReviewListHeaderViewDataSource> {
 	Product *product;
+	ReviewListHeaderView *headerView;
 	
 	NSMutableArray<ReviewFilter *> *filters;
 	ReviewFilterViewController *reviewFilter;
