@@ -225,6 +225,16 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 	[self layoutContent];
 }
 
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated  {
+	[super setHighlighted:highlighted animated:animated];
+	colorView.backgroundColor = self.tintColor;
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated  {
+	[super setSelected:selected animated:animated];
+	colorView.backgroundColor = self.tintColor;
+}
+
 - (void)setReview:(Review *)_review {
 	review = _review;
 	NSString *countryName = [[CountryDictionary sharedDictionary] nameForCountryCode:review.countryCode.uppercaseString];

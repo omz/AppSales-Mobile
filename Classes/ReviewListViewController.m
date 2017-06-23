@@ -200,7 +200,7 @@
 	return UIModalPresentationNone;
 }
 
-#pragma mark - Table view data source
+#pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 	return self.fetchedResultsController.sections.count;
@@ -225,14 +225,14 @@
 	return cell;
 }
 
-#pragma mark - Table view delegate
+#pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	ReviewDetailViewController *vc = [[ReviewDetailViewController alloc] initWithReviews:self.fetchedResultsController.sections[indexPath.section].objects selectedIndex:indexPath.row];
 	[self.navigationController pushViewController:vc animated:YES];
 }
 
-#pragma mark - Fetched results controller
+#pragma mark - NSFetchedResultsController
 
 - (NSFetchedResultsController *)fetchedResultsController {
 	if (fetchedResultsController != nil) {
@@ -272,7 +272,7 @@
 	return fetchedResultsController;
 }
 
-#pragma mark - Fetched results controller delegate
+#pragma mark - NSFetchedResultsControllerDelegate
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
 	[self.tableView reloadData];

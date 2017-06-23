@@ -19,6 +19,7 @@
 	UIBarButtonItem *previousItem;
 	UIBarButtonItem *nextItem;
 	UIBarButtonItem *markItem;
+	NSNumberFormatter *formatter;
 	NSDateFormatter *dateFormatter;
 }
 

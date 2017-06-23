@@ -21,9 +21,16 @@
 	index = _index;
 	self = [super init];
 	if (self) {
-		self.title = reviews[index].version.number;
+		// Initialization code
+		formatter = [[NSNumberFormatter alloc] init];
+		formatter.locale = [NSLocale currentLocale];
+		formatter.numberStyle = NSNumberFormatterDecimalStyle;
+		formatter.usesGroupingSeparator = YES;
+		
 		dateFormatter = [[NSDateFormatter alloc] init];
 		[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+		
+		self.title = [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", nil), [formatter stringFromNumber:@(index + 1)], [formatter stringFromNumber:@(reviews.count)]];
 	}
 	return self;
 }
@@ -124,6 +131,8 @@
 }
 
 - (void)updateReviewWithTitle:(NSString *)title text:(NSString *)text {
+	self.title = [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", nil), [formatter stringFromNumber:@(index + 1)], [formatter stringFromNumber:@(reviews.count)]];
+	
 	Review *review = reviews[index];
 	
 	NSString *reviewTitle = title ?: review.title;

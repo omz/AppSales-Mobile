@@ -34,6 +34,7 @@
 	[switchView addTarget:self action:@selector(toggledSwitch) forControlEvents:UIControlEventValueChanged];
 	
 	pickerView = [[UIPickerView alloc] initWithFrame:CGRectZero];
+	pickerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	pickerView.dataSource = self;
 	pickerView.delegate = self;
 	
