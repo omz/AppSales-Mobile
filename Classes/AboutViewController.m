@@ -18,19 +18,14 @@ NSString *const kAppGitHubRepoInfoPLIST = @"https://gitcdn.xyz/repo/nicolasgomol
 	return [NSString stringWithFormat:@"%@ (%@)", version, build];
 }
 
-+ (NSString *)latestVersion {
-	NSDictionary *latestInfo = [[NSDictionary alloc] initWithContentsOfURL:[NSURL URLWithString:kAppGitHubRepoInfoPLIST]];
-	if (latestInfo == nil) { return nil; }
-	NSString *version = latestInfo[@"CFBundleShortVersionString"];
-	NSString *build = latestInfo[@"CFBundleVersion"];
-	return [NSString stringWithFormat:@"%@ (%@)", version, build];
++ (NSString *)currentBuild {
+	return [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
 }
 
-+ (BOOL)isLatestVersion {
-	NSString *latestVersion = AboutViewController.latestVersion;
-	if (latestVersion == nil) { return YES; }
-	NSString *currentVersion = AboutViewController.appVersion;
-	return [currentVersion isEqualToString:latestVersion];
++ (NSString *)latestBuild {
+	NSDictionary *latestInfo = [[NSDictionary alloc] initWithContentsOfURL:[NSURL URLWithString:kAppGitHubRepoInfoPLIST]];
+	if (latestInfo == nil) { return nil; }
+	return latestInfo[@"CFBundleVersion"];
 }
 
 + (NSString *)aboutHTML {
@@ -63,12 +58,12 @@ NSString *const kAppGitHubRepoInfoPLIST = @"https://gitcdn.xyz/repo/nicolasgomol
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSString *aboutHTML = AboutViewController.aboutHTML;
-		NSString *latestVersion = AboutViewController.latestVersion;
-		if (latestVersion == nil) {
+		NSString *latestBuild = AboutViewController.latestBuild;
+		if (latestBuild == nil) {
 			aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_TEXT]]" withString:@"UNABLE TO CHECK FOR UPDATES"];
 		} else {
-			NSString *currentVersion = AboutViewController.appVersion;
-			if ([currentVersion isEqualToString:latestVersion]) {
+			NSString *currentBuild = AboutViewController.currentBuild;
+			if (currentBuild.integerValue >= latestBuild.integerValue) {
 				aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_COLOR]]" withString:@"green"];
 				aboutHTML = [aboutHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_STATUS_TEXT]]" withString:@"LATEST VERSION"];
 			} else {

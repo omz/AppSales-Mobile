@@ -12,4 +12,8 @@
 	UIWebView *webView;
 }
 
++ (NSString *)appVersion;
++ (NSString *)currentBuild;
++ (NSString *)latestBuild;
+
 @end
