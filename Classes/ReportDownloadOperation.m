@@ -159,8 +159,9 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 				NSString *query = [NSString stringWithFormat:@"%@.getReport, %@,%@,Summary,%@,%@", salesKey, vendorID, salesKey, dateType, reportDateString];
 
-				NSDictionary *getReportData = @{@"userid":     NSStringPercentEscaped(username),
-												@"password":   NSStringPercentEscaped(appPassword),
+				NSDictionary *getReportData = @{//@"userid":     NSStringPercentEscaped(username),
+												//@"password":   NSStringPercentEscaped(appPassword),
+                                                @"accesstoken": NSStringPercentEscaped(appPassword),
 												@"version":    kITCReporterVersion,
 												@"mode":       kITCReporterMode,
 												@"queryInput": NSStringPercentEscaped([NSString stringWithFormat:kITCReporterServiceBody, query]),
