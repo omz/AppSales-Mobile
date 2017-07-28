@@ -18,8 +18,8 @@
 }
 
 @property (nonatomic, assign) BOOL isDownloadingReports;
-@property (nonatomic, retain) NSString *password;	// this property encapsulates the keychain access,
-													// it is not actually stored in the Core Data model
+@property (nonatomic, retain) NSString *token;	// this property encapsulates the keychain access,
+												// it is not actually stored in the Core Data model
 @property (nonatomic, retain) NSString *downloadStatus;
 @property (nonatomic, assign) float downloadProgress;
 
@@ -36,6 +36,7 @@
 @property (nonatomic, retain) NSNumber *paymentsBadge;
 
 - (void)deletePassword;
+- (void)deleteToken;
 - (NSString *)displayName;
 
 @end

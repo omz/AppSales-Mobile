@@ -14,10 +14,10 @@
 @class ASAccount;
 
 @interface ReportDownloadOperation : NSOperation {
-	
+
 	ASAccount *_account;
 	NSString *username;
-	NSString *password;
+	NSString *token;
 	NSPersistentStoreCoordinator *psc;
 	NSManagedObjectID *accountObjectID;
 	NSInteger downloadCount;

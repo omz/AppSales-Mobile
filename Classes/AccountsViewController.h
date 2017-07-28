@@ -12,6 +12,7 @@
 
 #define kAccountUsername					@"username"
 #define kAccountPassword					@"password"
+#define kAccountToken						@"token"
 #define kAccountVendorID					@"vendorID"
 #define ASViewSettingsDidChangeNotification	@"ASViewSettingsDidChangeNotification"
 
@@ -41,6 +42,7 @@
 @property (nonatomic, retain) UIDocumentInteractionController *documentInteractionController;
 
 - (void)reloadAccounts;
+- (void)deleteAllAccountPasswords;
 - (void)downloadReports:(id)sender;
 - (void)doExport;
 - (NSString *)folderNameForExportingReportsOfAccount:(ASAccount *)account;
