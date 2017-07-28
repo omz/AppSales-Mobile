@@ -300,7 +300,7 @@
 
 - (void)downloadReports:(id)sender
 {
-	if (self.account.password && self.account.password.length > 0) { //Only download reports for accounts with login
+	if (self.account.token && self.account.token.length > 0) { //Only download reports for accounts with login
 		if (!account.vendorID || account.vendorID.length == 0) {
 			[[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
 										 message:NSLocalizedString(@"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.", nil) 

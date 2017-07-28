@@ -32,7 +32,7 @@
     self = [super init];
     if (self) {
 		username = [[account username] copy];
-		password = [[account password] copy];
+		token = [[account token] copy];
 		_account = [account retain];
 		accountObjectID = [[account objectID] copy];
 		psc = [[[account managedObjectContext] persistentStoreCoordinator] retain];
@@ -157,15 +157,13 @@
 				}
 			}
 			
-			NSString *escapedUsername = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)username, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8) autorelease];
-			NSString *escapedPassword = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)password, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8) autorelease];
+			NSString *escapedToken = [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)token, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8) autorelease];
 			
 			NSURL *URL = [NSURL URLWithString:@"https://reportingitc-reporter.apple.com/reportservice/sales/v1"];
 
 			NSString *command = [NSString stringWithFormat:@"[p=Reporter.properties, Sales.getReport, %@,Sales,Summary,%@,%@]", vendorID, dateType, reportDateString];
 			NSDictionary *body = @{
-				@"userid" : escapedUsername,
-				@"password" : escapedPassword,
+				@"accesstoken" : escapedToken,
 				@"version" : @"2.0",
 				@"mode" : @"Normal",
 				@"queryInput" : command
@@ -358,7 +356,7 @@
 - (void)dealloc
 {
 	[username release];
-	[password release];
+	[token release];
 	[accountObjectID release];
 	[_account release];
 	[psc release];

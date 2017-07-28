@@ -68,6 +68,9 @@
 		[self.accountsViewController reloadAccounts];
 	}
 	
+	// since Apple uses tokens for the Reporter tool now, clean up any old passwords
+	[self.accountsViewController deleteAllAccountPasswords];
+	
 	[[CurrencyManager sharedManager] refreshIfNeeded];
 	
 	NSString* productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
@@ -183,7 +186,6 @@
 	if (!account) {
 		account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:[self managedObjectContext]];
 		if (oldUsername) account.username = oldUsername;
-		if (oldPassword) account.password = oldPassword;
 	}
 	[self saveContext];
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:account fromDirectory:legacyReportDirectory deleteAfterImport:YES];
