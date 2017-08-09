@@ -14,7 +14,7 @@
 #import "ReporterParser.h"
 
 // iTunes Connect Reporter API
-NSString *const kITCReporterVersion            = @"2.0";
+NSString *const kITCReporterVersion            = @"2.2";
 NSString *const kITCReporterMode               = @"Robot.XML";
 NSString *const kITCReporterBaseURL            = @"https://reportingitc-reporter.apple.com";
 NSString *const kITCReporterServiceAction      = @"/reportservice/%@/v1";
@@ -33,9 +33,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 - (instancetype)initWithAccount:(ASAccount *)account {
 	self = [super init];
 	if (self) {
-		username = [account.username copy];
-		password = [account.password copy];
-		appPassword = [account.appPassword copy];
+		accessToken = [account.accessToken copy];
 		_account = account;
 		accountObjectID = [account.objectID copy];
 		psc = [account.managedObjectContext persistentStoreCoordinator];
@@ -159,13 +157,12 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 				NSString *query = [NSString stringWithFormat:@"%@.getReport, %@,%@,Summary,%@,%@", salesKey, vendorID, salesKey, dateType, reportDateString];
 
-				NSDictionary *getReportData = @{@"userid":     NSStringPercentEscaped(username),
-												@"password":   NSStringPercentEscaped(appPassword),
-												@"version":    kITCReporterVersion,
-												@"mode":       kITCReporterMode,
-												@"queryInput": NSStringPercentEscaped([NSString stringWithFormat:kITCReporterServiceBody, query]),
-												@"salesurl":   NSStringPercentEscaped([kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales]),
-												@"financeurl": NSStringPercentEscaped([kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeFinance]),
+				NSDictionary *getReportData = @{@"accesstoken": NSStringPercentEscaped(accessToken),
+												@"version":     kITCReporterVersion,
+												@"mode":        kITCReporterMode,
+												@"queryInput":  NSStringPercentEscaped([NSString stringWithFormat:kITCReporterServiceBody, query]),
+												@"salesurl":    NSStringPercentEscaped([kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeSales]),
+												@"financeurl":  NSStringPercentEscaped([kITCReporterBaseURL stringByAppendingFormat:kITCReporterServiceAction, kITCReporterServiceTypeFinance]),
 												};
 				NSData *jsonData = [NSJSONSerialization dataWithJSONObject:getReportData options:0 error:nil];
 				NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];

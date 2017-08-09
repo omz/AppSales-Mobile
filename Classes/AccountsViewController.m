@@ -7,7 +7,7 @@
 //
 
 #import "AccountsViewController.h"
-#import "AccountsViewController+VendorID.h"
+#import "AccountsViewController+ButtonActions.h"
 #import "SalesViewController.h"
 #import "ReviewsViewController.h"
 #import "SAMKeychain.h"
@@ -132,7 +132,7 @@
 
 - (void)downloadReports:(id)sender {
 	for (ASAccount *account in self.accounts) {
-		if (account.password && account.password.length > 0) { // Only download reports for accounts with a login.
+		if (account.accessToken && account.accessToken.length > 0) { // Only download reports for accounts with an access token.
 			if (!account.vendorID || account.vendorID.length == 0) {
 				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
 											 message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]
@@ -143,7 +143,11 @@
 				[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
 			}
 		} else {
-			NSLog(@"Login details not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", account.displayName);
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Access Token Missing", nil)
+										message:[NSString stringWithFormat:NSLocalizedString(@"Access token not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]
+									   delegate:nil
+							  cancelButtonTitle:NSLocalizedString(@"OK", nil)
+							  otherButtonTitles:nil] show];
 		}
 	}
 }
@@ -312,11 +316,13 @@
 																			 title:NSLocalizedString(@"iTunes Connect Login", nil)
 																	   description:nil];
 	
-	FieldSpecifier *appPasswordField = [FieldSpecifier passwordFieldWithKey:kAccountAppPassword title:NSLocalizedString(@"Password", nil) defaultValue:account.appPassword ?: @""];
-	FieldSpecifier *generateAppPasswordButtonField = [FieldSpecifier buttonFieldWithKey:@"GenerateAppPasswordButton" title:NSLocalizedString(@"Generate App-Specific Password...", nil)];
-	FieldSectionSpecifier *appPasswordSection = [FieldSectionSpecifier sectionWithFields:@[appPasswordField, generateAppPasswordButtonField]
-																				   title:NSLocalizedString(@"App-Specific Password", nil)
-																	   description:NSLocalizedString(@"An app-specific password is required in order to fetch reports. Tap the button above to open the “Manage your Apple ID” web page.", nil)];
+	FieldSpecifier *accessTokenField = [FieldSpecifier textFieldWithKey:kAccountAccessToken title:NSLocalizedString(@"Token", nil) defaultValue:account.accessToken ?: @""];
+	accessTokenField.placeholder = @"XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+	FieldSpecifier *getAccessTokenButtonField = [FieldSpecifier buttonFieldWithKey:@"GetAccessTokenButton" title:NSLocalizedString(@"Get Access Token...", nil)];
+	FieldSpecifier *generateAccessTokenButtonField = [FieldSpecifier buttonFieldWithKey:@"GenerateAccessTokenButton" title:NSLocalizedString(@"Generate Access Token...", nil)];
+	FieldSectionSpecifier *accessTokenSection = [FieldSectionSpecifier sectionWithFields:@[accessTokenField, getAccessTokenButtonField, generateAccessTokenButtonField]
+																				   title:NSLocalizedString(@"Access Token", nil)
+																	   description:NSLocalizedString(@"An access token is a unique code that lets you download sales and financial reports with Reporter.\n\nNote: You can generate only one access token at a time per Apple ID. Your access token will automatically expire after 180 days. If you generate a new access token, your previous access token immediately expires.", nil)];
 	
 	FieldSpecifier *vendorIDField = [FieldSpecifier numericFieldWithKey:kAccountVendorID title:NSLocalizedString(@"Vendor ID", nil) defaultValue:account.vendorID ?: @""];
 	vendorIDField.placeholder = @"8XXXXXXX";
@@ -325,7 +331,7 @@
 																			 title:NSLocalizedString(@"Vendor ID", nil)
 																	   description:NSLocalizedString(@"You can find your Vendor ID at the top of the “Payments and Financial Reports” module in iTunes Connect.", nil)];
 	
-	return @[loginSection, appPasswordSection, vendorIDSection];
+	return @[loginSection, accessTokenSection, vendorIDSection];
 }
 
 - (void)addNewAccount {
@@ -505,20 +511,23 @@
 	if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier] || [editor.editorIdentifier isEqualToString:kEditAccountEditorIdentifier]) {
 		NSString *username = returnValues[kAccountUsername];
 		NSString *password = returnValues[kAccountPassword];
-		NSString *appPassword = returnValues[kAccountAppPassword];
+		NSString *accessToken = returnValues[kAccountAccessToken];
 		NSString *vendorID = returnValues[kAccountVendorID];
 		NSString *title = returnValues[kAccountTitle];
 		if ((username.length == 0) && (title.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nAll fields are required if you want to download reports from iTunes Connect, otherwise you can just enter a description.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nAll fields are required if you want to download reports and payments from iTunes Connect, otherwise you can just enter a description.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 			return;
 		}
-		if (((password.length > 0) && (appPassword.length == 0)) || ((password.length == 0) && (appPassword.length > 0))) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter both your account password and an app-specific password in order to download reports from iTunes Connect.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+		if ((password.length > 0) && (accessToken.length == 0)) {
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter an access token in order to download reports from iTunes Connect.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 			return;
 		}
 		if ((password.length > 0) && (vendorID.length == 0)) {
 			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 			return;
+		}
+		if (password.length == 0) {
+			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Notice", nil) message:NSLocalizedString(@"Payments will not be downloaded from iTunes Connect without your account password.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 		}
 		if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
 			ASAccount *account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:self.managedObjectContext];
@@ -527,7 +536,7 @@
 			account.vendorID = vendorID;
 			account.sortIndex = @(time(NULL));
 			account.password = password;
-			account.appPassword = appPassword;
+			account.accessToken = accessToken;
 		}
 		else if ([editor.editorIdentifier isEqualToString:kEditAccountEditorIdentifier]) {
 			ASAccount *account = (ASAccount *)editor.context;
@@ -536,7 +545,7 @@
 			account.title = title;
 			account.vendorID = vendorID;
 			account.password = password;
-			account.appPassword = appPassword;
+			account.accessToken = accessToken;
 			
 			NSMutableDictionary *productsByID = [NSMutableDictionary dictionary];
 			for (Product *product in self.selectedAccount.products) {
@@ -627,12 +636,50 @@
 															otherButtonTitles:NSLocalizedString(@"Delete", nil), nil];
 		confirmDeleteAlert.tag = kAlertTagConfirmDelete;
 		[confirmDeleteAlert show];
-	} else if ([key isEqualToString:@"GenerateAppPasswordButton"]) {
-		NSURL *manageAppleIDURL = [NSURL URLWithString:@"https://appleid.apple.com/account/manage/security"];
-		UIApplication *application = [UIApplication sharedApplication];
-		if ([application canOpenURL:manageAppleIDURL]) {
-			[application openURL:manageAppleIDURL];
+	} else if ([key isEqualToString:@"GetAccessTokenButton"]) {
+		FieldEditorViewController *vc = nil;
+		if (self.presentedViewController) {
+			UINavigationController *nav = (UINavigationController *)self.presentedViewController;
+			vc = (FieldEditorViewController *)nav.viewControllers[0];
+		} else {
+			vc = (FieldEditorViewController *)[self.navigationController.viewControllers lastObject];
 		}
+		NSString *username = vc.values[kAccountUsername];
+		NSString *password = vc.values[kAccountPassword];
+		
+		if ((username.length == 0) || (password.length == 0)) {
+			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter your username and password first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+			return;
+		}
+		[vc dismissKeyboard];
+		
+		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
+		
+		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
+		hud.labelText = NSLocalizedString(@"Getting Access Token...", nil);
+		[self getAccessTokenWithLogin:loginInfo];
+	} else if ([key isEqualToString:@"GenerateAccessTokenButton"]) {
+		FieldEditorViewController *vc = nil;
+		if (self.presentedViewController) {
+			UINavigationController *nav = (UINavigationController *)self.presentedViewController;
+			vc = (FieldEditorViewController *)nav.viewControllers[0];
+		} else {
+			vc = (FieldEditorViewController *)[self.navigationController.viewControllers lastObject];
+		}
+		NSString *username = vc.values[kAccountUsername];
+		NSString *password = vc.values[kAccountPassword];
+		
+		if ((username.length == 0) || (password.length == 0)) {
+			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter your username and password first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+			return;
+		}
+		[vc dismissKeyboard];
+		
+		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
+		
+		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
+		hud.labelText = NSLocalizedString(@"Generating Access Token...", nil);
+		[self generateAccessTokenWithLogin:loginInfo];
 	} else if ([key isEqualToString:@"SelectVendorIDButton"]) {
 		FieldEditorViewController *vc = nil;
 		if (self.presentedViewController) {

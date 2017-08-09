@@ -30,7 +30,7 @@
 		7F1B14F313C51ACA00243AA3 /* CurrencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1B14F213C51AC900243AA3 /* CurrencyManager.m */; };
 		7F1B153713C8029700243AA3 /* ReportImportOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F1B153613C8029600243AA3 /* ReportImportOperation.m */; };
 		7F24E70713E40A0D0056EA97 /* DashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F24E70613E40A0D0056EA97 /* DashboardViewController.m */; };
-		7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F26689614055D2200FD2CC5 /* AccountsViewController+VendorID.m */; };
+		7F26689714055D2200FD2CC5 /* AccountsViewController+ButtonActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F26689614055D2200FD2CC5 /* AccountsViewController+ButtonActions.m */; };
 		7F26DF9113E13319001D0F33 /* ReviewDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F26DF9013E13319001D0F33 /* ReviewDetailViewController.m */; };
 		7F26DF9413E1358B001D0F33 /* ReviewTemplate.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F26DF9313E1358B001D0F33 /* ReviewTemplate.html */; };
 		7F2946EE13D880260023F530 /* ReportDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F2946ED13D880260023F530 /* ReportDetailViewController.m */; };
@@ -163,8 +163,8 @@
 		7F24E70513E40A0D0056EA97 /* DashboardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashboardViewController.h; sourceTree = "<group>"; };
 		7F24E70613E40A0D0056EA97 /* DashboardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = DashboardViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		7F2668931405211E00FD2CC5 /* AppSales 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 3.xcdatamodel"; sourceTree = "<group>"; };
-		7F26689514055D2200FD2CC5 /* AccountsViewController+VendorID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AccountsViewController+VendorID.h"; sourceTree = "<group>"; };
-		7F26689614055D2200FD2CC5 /* AccountsViewController+VendorID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AccountsViewController+VendorID.m"; sourceTree = "<group>"; };
+		7F26689514055D2200FD2CC5 /* AccountsViewController+ButtonActions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AccountsViewController+ButtonActions.h"; sourceTree = "<group>"; };
+		7F26689614055D2200FD2CC5 /* AccountsViewController+ButtonActions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AccountsViewController+ButtonActions.m"; sourceTree = "<group>"; };
 		7F26DF8F13E13319001D0F33 /* ReviewDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewDetailViewController.h; sourceTree = "<group>"; };
 		7F26DF9013E13319001D0F33 /* ReviewDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ReviewDetailViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		7F26DF9313E1358B001D0F33 /* ReviewTemplate.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ReviewTemplate.html; sourceTree = "<group>"; };
@@ -660,8 +660,8 @@
 			children = (
 				7F709D4513BC98860008DBAD /* AccountsViewController.h */,
 				7F709D4613BC98860008DBAD /* AccountsViewController.m */,
-				7F26689514055D2200FD2CC5 /* AccountsViewController+VendorID.h */,
-				7F26689614055D2200FD2CC5 /* AccountsViewController+VendorID.m */,
+				7F26689514055D2200FD2CC5 /* AccountsViewController+ButtonActions.h */,
+				7F26689614055D2200FD2CC5 /* AccountsViewController+ButtonActions.m */,
 				7F709D6113BCB64E0008DBAD /* FieldEditorViewController.h */,
 				7F709D6213BCB64F0008DBAD /* FieldEditorViewController.m */,
 				7FAEB66413E6D0EE00750788 /* BadgedCell.h */,
@@ -974,7 +974,7 @@
 				DA4AC6A61EFAD348003CAF4D /* ReviewFilterOption.m in Sources */,
 				DA4AC69C1EF869D8003CAF4D /* ReviewFilterViewController.m in Sources */,
 				7F0B8A7313F7E647006E9151 /* PromoCodesLicenseViewController.m in Sources */,
-				7F26689714055D2200FD2CC5 /* AccountsViewController+VendorID.m in Sources */,
+				7F26689714055D2200FD2CC5 /* AccountsViewController+ButtonActions.m in Sources */,
 				DA9DB1B51C0FEC48007B0178 /* LoginManager.m in Sources */,
 				6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */,
 				6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */,

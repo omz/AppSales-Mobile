@@ -10,7 +10,7 @@
 #import "SAMKeychain.h"
 
 #define kAccountKeychainiTunesConnect  @"iTunesConnect"
-#define kAccountKeychainAppSalesMobile @"AppSalesMobile"
+#define kAccountKeychainAppSalesMobile @"AppSales-Mobile"
 
 @implementation ASAccount
 
@@ -29,15 +29,15 @@
 	[SAMKeychain deletePasswordForService:kAccountKeychainiTunesConnect account:self.username];
 }
 
-- (NSString *)appPassword {
+- (NSString *)accessToken {
 	return [SAMKeychain passwordForService:kAccountKeychainAppSalesMobile account:self.username];
 }
 
-- (void)setAppPassword:(NSString *)appPassword {
-	[SAMKeychain setPassword:appPassword forService:kAccountKeychainAppSalesMobile account:self.username];
+- (void)setAccessToken:(NSString *)accessToken {
+	[SAMKeychain setPassword:accessToken forService:kAccountKeychainAppSalesMobile account:self.username];
 }
 
-- (void)deleteAppPassword {
+- (void)deleteAccessToken {
 	[SAMKeychain deletePasswordForService:kAccountKeychainAppSalesMobile account:self.username];
 }
 

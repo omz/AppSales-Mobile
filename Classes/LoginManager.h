@@ -33,6 +33,7 @@ extern NSString *const kITCPaymentVendorsPaymentAction;
 	NSString *appleAuthTrustedDeviceId;
 	UIActionSheet *verifyActionSheet;
 	SCInputType authType;
+	NSDateFormatter *dateFormatter;
 }
 
 @property (nonatomic, strong) id<LoginManagerDelegate> delegate;
@@ -42,5 +43,9 @@ extern NSString *const kITCPaymentVendorsPaymentAction;
 - (instancetype)initWithLoginInfo:(NSDictionary *)_loginInfo;
 - (void)logIn;
 - (void)logOut;
+
+- (NSString *)generateCSRFToken;
+- (NSDictionary *)getAccessKey:(NSString *)csrfToken;
+- (NSDictionary *)resetAccessKey:(NSString *)csrfToken;
 
 @end

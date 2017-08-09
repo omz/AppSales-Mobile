@@ -12,9 +12,15 @@
 
 #define kAccountUsername                    @"username"
 #define kAccountPassword                    @"password"
-#define kAccountAppPassword                 @"appPassword"
+#define kAccountAccessToken                 @"accessToken"
 #define kAccountVendorID                    @"vendorID"
 #define ASViewSettingsDidChangeNotification @"ASViewSettingsDidChangeNotification"
+
+typedef NS_ENUM(NSInteger, AccountButtonType) {
+	AccountButtonTypeSelectVendorID,
+	AccountButtonTypeGetAccessToken,
+	AccountButtonTypeGenerateAccessToken
+};
 
 @class ASAccount;
 @protocol AccountsViewControllerDelegate;
@@ -29,6 +35,7 @@
 	FieldEditorViewController *settingsViewController;
 	UINavigationController *settingsNavController;
 	UIDocumentInteractionController *documentInteractionController;
+	AccountButtonType pressedAccountButton;
 	NSMutableDictionary *vendors;
 }
 

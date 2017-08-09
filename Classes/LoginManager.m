@@ -27,9 +27,23 @@ NSString *const kAppleAuthContentTypeValue = @"application/json;charset=UTF-8";
 NSString *const kAppleAuthLocationKey      = @"Location";
 NSString *const kAppleAuthSetCookieKey     = @"Set-Cookie";
 
+// iTunes Connect Auth API
+NSString *const kITCAuthBaseURL       = @"https://olympus.itunes.apple.com";
+NSString *const kITCAuthSessionAction = @"/v1/session";
+
+// iTunes Connect Reporter API
+NSString *const kITCRBaseURL                 = @"https://reportingitc2.apple.com";
+NSString *const kITCRGenerateCSRFTokenAction = @"/gsf/csrftoken";
+NSString *const kITCRGetAccessKeyAction      = @"/api/getAccessKey";
+NSString *const kITCRResetAccessKeyAction    = @"/api/resetAccessKey";
+
+// iTunes Connect Reporter API Headers
+NSString *const kITCRXRequestedWithKey   = @"X-Requested-With";
+NSString *const kITCRXRequestedWithValue = @"XMLHttpRequest";
+NSString *const kITCRCSRFKey             = @"CSRF";
+
 // iTunes Connect Payments API
 NSString *const kITCBaseURL                     = @"https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa";
-NSString *const kITCSetCookiesAction            = @"/wa/route?noext";
 NSString *const kITCUserDetailAction            = @"/ra/user/detail";
 NSString *const kITCPaymentVendorsAction        = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers";
 NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers/%@?year=%ld&month=%ld";
@@ -46,6 +60,8 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		// Initialization code
 		account = _account;
 		authType = SCInputTypeUnknown;
+		dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.dateFormat = @"MMM dd, yyyy";
 	}
 	return self;
 }
@@ -56,6 +72,8 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		// Initialization code
 		loginInfo = _loginInfo;
 		authType = SCInputTypeUnknown;
+		dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.dateFormat = @"MMM dd, yyyy";
 	}
 	return self;
 }
@@ -230,8 +248,8 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	[trustRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
 	[NSURLConnection sendSynchronousRequest:trustRequest returningResponse:nil error:nil];
 	
-	NSURL *setCookiesURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:kITCSetCookiesAction]];
-	[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:setCookiesURL] returningResponse:nil error:nil];
+	NSURL *authSessionURL = [NSURL URLWithString:[kITCAuthBaseURL stringByAppendingString:kITCAuthSessionAction]];
+	[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:authSessionURL] returningResponse:nil error:nil];
 }
 
 - (void)generateCode:(NSString *)_appleAuthTrustedDeviceId {
@@ -374,6 +392,72 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
 		[self.delegate loginFailed];
 	}
+}
+
+- (void)resetITCReporterAPI {
+	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc2.apple.com"]];
+	for (NSHTTPCookie *cookie in cookies) {
+		if ([cookie.name isEqualToString:@"JSESSIONID"]) {
+			[cookieStorage deleteCookie:cookie];
+		}
+	}
+}
+
+- (NSString *)generateCSRFToken {
+	[self resetITCReporterAPI];
+	NSURL *generateCSRFTokenURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRGenerateCSRFTokenAction]];
+	NSMutableURLRequest *generateRequest = [NSMutableURLRequest requestWithURL:generateCSRFTokenURL];
+	[generateRequest setHTTPMethod:@"GET"];
+	[generateRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
+	NSHTTPURLResponse *generateResponse = nil;
+	NSData *generateData = [NSURLConnection sendSynchronousRequest:generateRequest returningResponse:&generateResponse error:nil];
+	NSDictionary *generateDict = [NSJSONSerialization JSONObjectWithData:generateData options:0 error:nil];
+	NSString *status = generateDict[@"status"];
+	if ((status != nil) && [status isEqualToString:@"success"]) {
+		return generateDict[@"result"];
+	}
+	return nil;
+}
+
+- (NSDictionary *)getAccessKey:(NSString *)csrfToken {
+	NSURL *getAccessKeyURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRGetAccessKeyAction]];
+	NSMutableURLRequest *getRequest = [NSMutableURLRequest requestWithURL:getAccessKeyURL];
+	[getRequest setHTTPMethod:@"GET"];
+	[getRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
+	[getRequest setValue:csrfToken forHTTPHeaderField:kITCRCSRFKey];
+	NSHTTPURLResponse *getResponse = nil;
+	NSData *getData = [NSURLConnection sendSynchronousRequest:getRequest returningResponse:&getResponse error:nil];
+	NSDictionary *getDict = [NSJSONSerialization JSONObjectWithData:getData options:0 error:nil];
+	NSString *status = getDict[@"status"];
+	if ((status != nil) && [status isEqualToString:@"success"]) {
+		NSMutableDictionary *resultDict = [[NSMutableDictionary alloc] init];
+		resultDict[@"accessKey"] = getDict[@"accessKey"];
+		resultDict[@"createdDate"] = [dateFormatter dateFromString:getDict[@"createdDate"]];
+		resultDict[@"expiryDate"] = [dateFormatter dateFromString:getDict[@"expiryDate"]];
+		return resultDict;
+	}
+	return nil;
+}
+
+- (NSDictionary *)resetAccessKey:(NSString *)csrfToken {
+	NSURL *resetAccessKeyURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRResetAccessKeyAction]];
+	NSMutableURLRequest *resetRequest = [NSMutableURLRequest requestWithURL:resetAccessKeyURL];
+	[resetRequest setHTTPMethod:@"GET"];
+	[resetRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
+	[resetRequest setValue:csrfToken forHTTPHeaderField:kITCRCSRFKey];
+	NSHTTPURLResponse *resetResponse = nil;
+	NSData *resetData = [NSURLConnection sendSynchronousRequest:resetRequest returningResponse:&resetResponse error:nil];
+	NSDictionary *resetDict = [NSJSONSerialization JSONObjectWithData:resetData options:0 error:nil];
+	NSString *status = resetDict[@"status"];
+	if ((status != nil) && [status isEqualToString:@"success"]) {
+		NSMutableDictionary *resultDict = [[NSMutableDictionary alloc] init];
+		resultDict[@"accessKey"] = resetDict[@"accessKey"];
+		resultDict[@"createdDate"] = [dateFormatter dateFromString:resetDict[@"createdDate"]];
+		resultDict[@"expiryDate"] = [dateFormatter dateFromString:resetDict[@"expiryDate"]];
+		return resultDict;
+	}
+	return nil;
 }
 
 @end

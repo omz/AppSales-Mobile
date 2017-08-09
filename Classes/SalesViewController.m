@@ -315,7 +315,7 @@
 #pragma mark - Actions
 
 - (void)downloadReports:(id)sender {
-	if (self.account.password && self.account.password.length > 0) { // Only download reports for accounts with login.
+	if (account.accessToken && account.accessToken.length > 0) { // Only download reports for accounts with an access token.
 		if (!account.vendorID || account.vendorID.length == 0) {
 			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil) 
 										 message:NSLocalizedString(@"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.", nil) 
@@ -326,11 +326,11 @@
 			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:self.account];
 		}
 	} else {
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Login Missing", nil) 
-									 message:NSLocalizedString(@"You have not entered your iTunes Connect login for this account.", nil)
-									delegate:nil 
-						   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-						   otherButtonTitles:nil] show];
+		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Access Token Missing", nil)
+									message:[NSString stringWithFormat:NSLocalizedString(@"Access token not set for this account. Please go to the account's settings and fill in the missing information.", nil), account.displayName]
+								   delegate:nil
+						  cancelButtonTitle:NSLocalizedString(@"OK", nil)
+						  otherButtonTitles:nil] show];
 	}
 	
 }

@@ -21,7 +21,7 @@
 @property (nonatomic, assign) float downloadProgress;
 
 @property (nonatomic, strong) NSString *password;    // these properties encapsulate the keychain access,
-@property (nonatomic, strong) NSString *appPassword;	 // they are not actually stored in the Core Data model
+@property (nonatomic, strong) NSString *accessToken;	 // they are not actually stored in the Core Data model
 
 // Core Data properties:
 @property (nonatomic, strong) NSString *username;
@@ -37,6 +37,7 @@
 @property (nonatomic, strong) NSNumber *paymentsBadge;
 
 - (void)deletePassword;
+- (void)deleteAccessToken;
 - (NSString *)displayName;
 
 @end
