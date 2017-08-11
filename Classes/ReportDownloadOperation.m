@@ -454,6 +454,9 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 					BOOL hasOnePaymentSummary = NO;
 					for (NSDictionary *payment in paymentSummaries) {
+                        if (payment[@"paidOrExpectingPaymentDate"] == [NSNull null]) {
+                            continue;
+                        }
 						NSDate *paidOrExpectedDate = [dateFormatter dateFromString:payment[@"paidOrExpectingPaymentDate"]];
 						if (paidOrExpectedDate == nil) {
 							// This payment is neither paid nor expected. Ignore it.
