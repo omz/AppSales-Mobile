@@ -139,8 +139,8 @@
 			[squaresView addSubview:[squares lastObject][i]];
 		}
 		[enterPasscodeTableView.tableHeaderView addSubview:squaresView];
-		if (self.startTouchID) {
-			[self authenticateWithTouchID];
+		if (self.startBiometricAuthentication) {
+			[self authenticateWithBiometrics];
 		}
 	}
 	
@@ -172,17 +172,41 @@
 	[textFields[tableIndex] becomeFirstResponder];
 }
 
-+ (BOOL)hasTouchID {
++ (BOOL)hasBiometricAuthentication {
 	return [[[LAContext alloc] init] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
 }
 
-- (void)authenticateWithTouchID {
-	BOOL unlockWithTouchIDOn = [[KKKeychain getStringForKey:@"unlock_with_touch_id"] isEqualToString:@"YES"];
-	if (!KKPasscodeViewController.hasTouchID || !unlockWithTouchIDOn) { return; }
++ (KKBiometryType)biometryType {
+	LAContext *authenticationContext = [[LAContext alloc] init];
+	BOOL hasBiometricAuthentication = [authenticationContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
+	if (hasBiometricAuthentication) {
+		if (@available(iOS 11.0, *)) {
+			return (KKBiometryType)authenticationContext.biometryType;
+		} else {
+			return KKBiometryTypeTouchID;
+		}
+	}
+	return KKBiometryNone;
+}
+
++ (NSString *)biometryTypeString {
+	switch (KKPasscodeViewController.biometryType) {
+		case KKBiometryTypeTouchID:
+			return @"Touch ID";
+		case KKBiometryTypeFaceID:
+			return @"Face ID";
+		default:
+			return @"Biometry";
+	}
+}
+
+- (void)authenticateWithBiometrics {
+	BOOL unlockWithBiometricsOn = [[KKKeychain getStringForKey:@"unlock_with_biometrics"] isEqualToString:@"YES"];
+	if (!KKPasscodeViewController.hasBiometricAuthentication || !unlockWithBiometricsOn) { return; }
 	[[[LAContext alloc] init] evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:NSLocalizedString(@"Authenticate to Unlock AppSales", nil) reply:^(BOOL success, NSError *error) {
 		if (error) {
 			// There was a problem verifying your identity.
-			NSLog(@"WARNING [TouchID]: %@", error.localizedDescription);
+			NSLog(@"WARNING [%@]: %@", KKPasscodeViewController.biometryTypeString, error.localizedDescription);
 			return;
 		}
 		if (success) {

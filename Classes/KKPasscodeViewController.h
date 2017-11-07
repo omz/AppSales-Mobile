@@ -24,6 +24,17 @@ typedef NS_ENUM(NSInteger, KKPasscodeMode) {
 	KKPasscodeModeChange = 3
 };
 
+typedef NS_ENUM(NSInteger, KKBiometryType) {
+	/// The device does not support biometry.
+	KKBiometryNone = 0,
+	
+	/// The device supports Touch ID.
+	KKBiometryTypeTouchID = 1,
+	
+	/// The device supports Face ID.
+	KKBiometryTypeFaceID = 2,
+};
+
 @class KKPasscodeViewController;
 
 @protocol KKPasscodeViewControllerDelegate <NSObject>
@@ -65,9 +76,11 @@ typedef NS_ENUM(NSInteger, KKPasscodeMode) {
 
 @property (nonatomic, weak) id <KKPasscodeViewControllerDelegate> delegate; 
 @property (nonatomic, assign) KKPasscodeMode mode;
-@property (nonatomic, assign) BOOL startTouchID;
+@property (nonatomic, assign) BOOL startBiometricAuthentication;
 
-+ (BOOL)hasTouchID;
-- (void)authenticateWithTouchID;
++ (BOOL)hasBiometricAuthentication;
++ (KKBiometryType)biometryType;
++ (NSString *)biometryTypeString;
+- (void)authenticateWithBiometrics;
 
 @end

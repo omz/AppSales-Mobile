@@ -28,11 +28,11 @@
 @end
 
 @interface KKPasscodeSettingsViewController : UITableViewController <UIActionSheetDelegate, KKPasscodeViewControllerDelegate> {
-	UISwitch *unlockWithTouchIDSwitch;
+	UISwitch *unlockWithBiometricsSwitch;
 	UISwitch *eraseDataSwitch;
 	
 	BOOL passcodeLockOn;
-	BOOL unlockWithTouchIDOn;
+	BOOL unlockWithBiometricsOn;
 	BOOL eraseDataOn;
 }
 
