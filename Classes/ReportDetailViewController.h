@@ -40,7 +40,6 @@ typedef NS_ENUM(NSInteger, ReportDetailViewMode) {
 	UIVisualEffectView *headerView;
 	UILabel *headerLabel;
 	AppIconView *headerIconView;
-	UIToolbar *toolbar;
 }
 
 @property (nonatomic, strong) NSArray *countryEntries;
