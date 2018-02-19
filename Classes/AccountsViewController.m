@@ -656,7 +656,7 @@
 		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
 		
 		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
-		hud.labelText = NSLocalizedString(@"Getting Access Token...", nil);
+		hud.label.text = NSLocalizedString(@"Getting Access Token...", nil);
 		[self getAccessTokenWithLogin:loginInfo];
 	} else if ([key isEqualToString:@"GenerateAccessTokenButton"]) {
 		FieldEditorViewController *vc = nil;
@@ -678,7 +678,7 @@
 		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
 		
 		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
-		hud.labelText = NSLocalizedString(@"Generating Access Token...", nil);
+		hud.label.text = NSLocalizedString(@"Generating Access Token...", nil);
 		[self generateAccessTokenWithLogin:loginInfo];
 	} else if ([key isEqualToString:@"SelectVendorIDButton"]) {
 		FieldEditorViewController *vc = nil;
@@ -700,7 +700,7 @@
 		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
 		
 		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
-		hud.labelText = NSLocalizedString(@"Fetching Vendor ID...", nil);
+		hud.label.text = NSLocalizedString(@"Fetching Vendor ID...", nil);
 		[self findVendorIDsWithLogin:loginInfo];
 	}
 }
@@ -708,7 +708,7 @@
 - (void)doExport {
 	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
 	hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
-	hud.labelText = NSLocalizedString(@"Exporting", nil);
+	hud.label.text = NSLocalizedString(@"Exporting", nil);
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSURL *documentsURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
@@ -760,7 +760,7 @@
 		[reportExportQueue waitUntilAllOperationsAreFinished];
 		
 		hud.mode = MBProgressHUDModeIndeterminate;
-		hud.labelText = NSLocalizedString(@"Compressing", nil);
+		hud.label.text = NSLocalizedString(@"Compressing", nil);
 		
 		ZIPArchive *zipArchive = [[ZIPArchive alloc] initWithFileURL:exportedReportsZipFileURL];
 		[zipArchive addDirectoryToArchive:exportURL];
@@ -805,7 +805,7 @@
 	} else if (alertView.tag == kAlertTagConfirmDelete) {
 		if (buttonIndex != [alertView cancelButtonIndex]) {
 			MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-			[hud setLabelText:NSLocalizedString(@"Deleting Account...", nil)];
+			hud.label.text = NSLocalizedString(@"Deleting Account...", nil);
 			
 			ASAccount *account = self.selectedAccount;
 			[self performSelector:@selector(deleteAccount:) withObject:account afterDelay:0.1];
