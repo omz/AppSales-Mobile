@@ -16,7 +16,7 @@
 #import "Product.h"
 #import "CurrencyManager.h"
 #import "ReportDownloadCoordinator.h"
-#import "MBProgressHUD.h"
+#import "ASProgressHUD.h"
 #import "ReportImportOperation.h"
 #import "PaymentsViewController.h"
 #import "BadgedCell.h"
@@ -303,7 +303,7 @@
 	if (account) {
 		NSManagedObjectContext *context = self.managedObjectContext;
 		[context deleteObject:account];
-		[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+		[ASProgressHUD hideHUDForView:self.navigationController.view animated:YES];
 		[self reloadAccounts];
 		[self.navigationController popViewControllerAnimated:YES];
 	}
@@ -655,7 +655,7 @@
 		
 		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
 		
-		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
+		ASProgressHUD *hud = [ASProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
 		hud.label.text = NSLocalizedString(@"Getting Access Token...", nil);
 		[self getAccessTokenWithLogin:loginInfo];
 	} else if ([key isEqualToString:@"GenerateAccessTokenButton"]) {
@@ -677,7 +677,7 @@
 		
 		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
 		
-		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
+		ASProgressHUD *hud = [ASProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
 		hud.label.text = NSLocalizedString(@"Generating Access Token...", nil);
 		[self generateAccessTokenWithLogin:loginInfo];
 	} else if ([key isEqualToString:@"SelectVendorIDButton"]) {
@@ -699,14 +699,14 @@
 		
 		NSDictionary *loginInfo = @{kAccountUsername: username, kAccountPassword: password};
 		
-		MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
+		ASProgressHUD *hud = [ASProgressHUD showHUDAddedTo:vc.navigationController.view animated:YES];
 		hud.label.text = NSLocalizedString(@"Fetching Vendor ID...", nil);
 		[self findVendorIDsWithLogin:loginInfo];
 	}
 }
 
 - (void)doExport {
-	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+	ASProgressHUD *hud = [ASProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
 	hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
 	hud.label.text = NSLocalizedString(@"Exporting", nil);
 	
@@ -769,7 +769,7 @@
 		[[NSFileManager defaultManager] removeItemAtURL:exportURL error:nil];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+			[ASProgressHUD hideHUDForView:self.navigationController.view animated:YES];
 			
 			self.documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:exportedReportsZipFileURL];
 			self.documentInteractionController.delegate = self;
@@ -804,7 +804,7 @@
 		}
 	} else if (alertView.tag == kAlertTagConfirmDelete) {
 		if (buttonIndex != [alertView cancelButtonIndex]) {
-			MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+			ASProgressHUD *hud = [ASProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
 			hud.label.text = NSLocalizedString(@"Deleting Account...", nil);
 			
 			ASAccount *account = self.selectedAccount;

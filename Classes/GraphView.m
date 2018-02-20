@@ -7,7 +7,7 @@
 //
 
 #import "GraphView.h"
-#import "MBProgressHUD.h"
+#import "ASProgressHUD.h"
 
 #define ANIMATION_DURATION	0.4
 
@@ -128,9 +128,9 @@
 - (void)lockScale:(UILongPressGestureRecognizer *)recognizer {
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
 		maxLocked = !maxLocked;
-		[MBProgressHUD hideHUDForView:self animated:YES];
+		[ASProgressHUD hideHUDForView:self animated:YES];
 		
-		MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self];
+		ASProgressHUD *hud = [[ASProgressHUD alloc] initWithView:self];
 		hud.animationType = MBProgressHUDAnimationZoom;
 		hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(maxLocked ? @"Lock" : @"Unlock")]];
 		hud.mode = MBProgressHUDModeCustomView;
@@ -154,7 +154,7 @@
 }
 
 - (void)hideHUD {
-	[MBProgressHUD hideHUDForView:self animated:YES];
+	[ASProgressHUD hideHUDForView:self animated:YES];
 }
 
 - (void)barSelected:(StackedBarView *)barView {

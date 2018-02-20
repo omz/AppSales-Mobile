@@ -8,7 +8,7 @@
 
 #import "PromoCodesLicenseViewController.h"
 #import "DownloadStepOperation.h"
-#import "MBProgressHUD.h"
+#import "ASProgressHUD.h"
 
 @implementation PromoCodesLicenseViewController
 
@@ -48,7 +48,7 @@
 - (void)viewWillAppear:(BOOL)animated {
 	[self.webView loadHTMLString:licenseAgreementHTML baseURL:nil];
 	
-	[MBProgressHUD showHUDAddedTo:self.view animated:YES];
+	[ASProgressHUD showHUDAddedTo:self.view animated:YES];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -67,7 +67,7 @@
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-	[MBProgressHUD hideHUDForView:self.view animated:YES];
+	[ASProgressHUD hideHUDForView:self.view animated:YES];
 }
 
 - (void)done:(id)sender {
