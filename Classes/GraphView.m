@@ -135,13 +135,13 @@
 		hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(maxLocked ? @"Lock" : @"Unlock")]];
 		hud.mode = MBProgressHUDModeCustomView;
 		if (maxLocked) {
-			hud.labelText = NSLocalizedString(@"Scale locked", nil);
+			hud.label.text = NSLocalizedString(@"Scale locked", nil);
 		} else {
-			hud.labelText = NSLocalizedString(@"Scale unlocked", nil);
+			hud.label.text = NSLocalizedString(@"Scale unlocked", nil);
 		}
 		hud.userInteractionEnabled = NO;
 		[self addSubview:hud];
-		[hud show:YES];
+		[hud showAnimated:YES];
 		
 		lockIndicatorView.hidden = !maxLocked;
 		if (!maxLocked) {
