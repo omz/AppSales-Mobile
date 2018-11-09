@@ -214,7 +214,7 @@
 	cell.textLabel.font = [UIFont boldSystemFontOfSize:16.0];
 	cell.accessoryType = UITableViewCellAccessoryNone;
 	CGSize labelSize = [field.title sizeWithAttributes:@{NSFontAttributeName : cell.textLabel.font}];
-	CGRect textLabelFrame = CGRectMake(10, 0, labelSize.width, 10);
+	CGRect textLabelFrame = CGRectMake(20, 0, labelSize.width, 10);
 	
 	cell.detailTextLabel.text = @"";
 	

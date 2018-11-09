@@ -9,7 +9,7 @@
 #import "IconManager.h"
 
 NSString *const kITunesStorePageURLFormat             = @"https://itunes.apple.com/app/id%@";
-NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-ssl\\.mzstatic\\.com\\/image\\/thumb\\/[a-zA-Z0-9\\/\\.-]+\\/source(?:\\.icns)?\\/)1024x1024sr.\\w{3,4}";
+NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-ssl\\.mzstatic\\.com\\/image\\/thumb\\/[a-zA-Z0-9\\/\\.-]+png)";
 NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.com/icons/%@/%@_larger.png";
 
 @implementation IconManager
@@ -108,22 +108,26 @@ NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.
 			}
 		};
 		
-		if (iTunesStorePage != nil) {
+		if (iTunesStorePage != nil && iTunesStorePage.length > 0) {
 			NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
-			NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, 3500)];
+			NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, iTunesStorePage.length-1)];
 			if (match.numberOfRanges > 0) {
-				CGFloat iconSize = 30.0f * [UIScreen mainScreen].scale;
-				NSString *iconFile = [NSString stringWithFormat:@"%.0fx%.0f.png", iconSize, iconSize];
-				
 				NSRange matchRange = [match rangeAtIndex:1];
 				NSString *iTunesStoreThumbnailPath = [iTunesStorePage substringWithRange:matchRange];
-				iTunesStoreThumbnailPath = [iTunesStoreThumbnailPath stringByAppendingPathComponent:iconFile];
-				
 				NSURL *iTunesStoreThumbnailURL = [NSURL URLWithString:iTunesStoreThumbnailPath];
 				NSData *iconData = [[NSData alloc] initWithContentsOfURL:iTunesStoreThumbnailURL];
 				UIImage *icon = [UIImage imageWithData:iconData];
+                
+                //resize icon
+                CGFloat iconSize = 30.0f * [UIScreen mainScreen].scale;
+                CGSize newSize = CGSizeMake(iconSize, iconSize);
+                UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+                [icon drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+                UIImage *resizedIcon = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+
 				if (icon != nil) {
-					successBlock(icon, iconData, nextAppID);
+					successBlock(resizedIcon, iconData, nextAppID);
 				} else {
 					retryAlternativePNG(nextAppID);
 				}
