@@ -24,6 +24,7 @@
 
 - (NSString *)iconDirectory;
 - (UIImage *)iconForAppID:(NSString *)appID;
+- (UIImage *)resizeIcon:(UIImage *)icon;
 - (void)clearIconForAppID:(NSString *)appID;
 
 @end
