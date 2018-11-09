@@ -370,16 +370,31 @@
 	FieldSectionSpecifier *importExportSection = [FieldSectionSpecifier sectionWithFields:@[importButtonField, exportButtonField] title:nil description:nil];
 	
 	NSMutableArray *productFields = [[NSMutableArray alloc] init];
-	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
-		NSInteger productID1 = product1.productID.integerValue;
-		NSInteger productID2 = product2.productID.integerValue;
-		if (productID1 < productID2) {
-			return NSOrderedDescending;
-		} else if (productID1 > productID2) {
-			return NSOrderedAscending;
-		}
-		return NSOrderedSame;
-	}];
+    
+    NSArray *allProducts;
+    NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+    if ([productSortByValue isEqualToString:@"productName"]) {
+        
+        // Sort products by Name.
+        allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+            NSString *productName1 = product1.name;
+            NSString *productName2 = product2.name;
+            
+            NSComparisonResult result = [productName1 caseInsensitiveCompare:productName2];
+            return result;
+        }];
+    } else {
+            allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+            NSInteger productID1 = product1.productID.integerValue;
+            NSInteger productID2 = product2.productID.integerValue;
+            if (productID1 < productID2) {
+                return NSOrderedDescending;
+            } else if (productID1 > productID2) {
+                return NSOrderedAscending;
+            }
+            return NSOrderedSame;
+        }];
+    }
 	
 	for (Product *product in allProducts) {
 		NSMutableArray *sections = [[NSMutableArray alloc] init];
@@ -479,9 +494,11 @@
 	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 	FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
 																			defaultValue:[productSortByValue isEqualToString:@"productId"]];
+    FieldSpecifier *productSortingByNameField = [FieldSpecifier checkFieldWithKey:@"sortby.productName" title:@"Name"
+                                                                     defaultValue:[productSortByValue isEqualToString:@"productName"]];
 	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
 																		defaultValue:[productSortByValue isEqualToString:@"color"]];
-	NSMutableArray *productSortingFields = [[NSMutableArray alloc] initWithArray:@[productSortingByProductIdField, productSortingByColorField]];
+	NSMutableArray *productSortingFields = [[NSMutableArray alloc] initWithArray:@[productSortingByProductIdField, productSortingByNameField, productSortingByColorField]];
 	
 	
 	FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields

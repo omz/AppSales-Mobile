@@ -47,18 +47,33 @@
 - (void)loadView {
 	[super loadView];
 	
-	sortedApps = [[[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
-		NSInteger productID1 = product1.productID.integerValue;
-		NSInteger productID2 = product2.productID.integerValue;
-		if (productID1 < productID2) {
-			return NSOrderedDescending;
-		} else if (productID1 > productID2) {
-			return NSOrderedAscending;
-		}
-		return NSOrderedSame;
-	}] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
-		return !product.hidden.boolValue && !(product.parentSKU.length > 1); // In-App Purchases don't have reviews, so don't include them.
-	}]];
+    NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+    if ([productSortByValue isEqualToString:@"productName"]) {
+        
+        // Sort products by Name.
+        sortedApps = [[[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+            NSString *productName1 = product1.name;
+            NSString *productName2 = product2.name;
+            
+            NSComparisonResult result = [productName1 caseInsensitiveCompare:productName2];
+            return result;
+        }] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
+            return !product.hidden.boolValue && !(product.parentSKU.length > 1); // In-App Purchases don't have reviews, so don't include them.
+        }]];
+    } else {
+        sortedApps = [[[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+            NSInteger productID1 = product1.productID.integerValue;
+            NSInteger productID2 = product2.productID.integerValue;
+            if (productID1 < productID2) {
+                return NSOrderedDescending;
+            } else if (productID1 > productID2) {
+                return NSOrderedAscending;
+            }
+            return NSOrderedSame;
+        }] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
+            return !product.hidden.boolValue && !(product.parentSKU.length > 1); // In-App Purchases don't have reviews, so don't include them.
+        }]];
+    }
 	
 	[self.tableView registerClass:[BadgedCell class] forCellReuseIdentifier:@"Cell"];
 	[self.tableView reloadData];
