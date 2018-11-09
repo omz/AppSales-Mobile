@@ -19,7 +19,7 @@
 		account = _account;
 		products = _products;
 		downloadQueue = _downloadQueue;
-		
+        
 		[UIApplication sharedApplication].idleTimerDisabled = YES;
 		backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(void) {
 			NSLog(@"Background task for downloading reviews has expired!");
@@ -85,7 +85,7 @@
 }
 
 - (void)completeDownloadWithStatus:(NSString *)status {
-	dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
 		CGFloat completed = (CGFloat)(products.count - downloadQueue.operationCount);
 		CGFloat progress = completed / (CGFloat)products.count;
 		account.downloadStatus = status;
@@ -95,6 +95,7 @@
 			[UIApplication sharedApplication].idleTimerDisabled = NO;
 			if (backgroundTaskID != UIBackgroundTaskInvalid) {
 				[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+                backgroundTaskID = UIBackgroundTaskInvalid;
 			}
 		}
 	});

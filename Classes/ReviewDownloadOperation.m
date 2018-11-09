@@ -58,6 +58,7 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 		[self willChangeValueForKey:@"isFinished"];
 		finished = YES;
 		[self didChangeValueForKey:@"isFinished"];
+        [self cancelDownload];
 		return;
 	}
 	[self willChangeValueForKey:@"isExecuting"];
@@ -77,12 +78,12 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 }
 
 - (void)main {
-	[self downloadProgress:(1.0f/3.0f) withStatus:NSLocalizedString(@"Downloading reviews...", nil)];
-	
     if ([_product.platform.lowercaseString containsString:@"bundle"]) {
         [self failDownload];
         return;
     }
+    
+	[self downloadProgress:(1.0f/3.0f) withStatus:NSLocalizedString(@"Downloading reviews...", nil)];
     
 	NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
 	NSString *refPagePath = [NSString stringWithFormat:kITCReviewAPIRefPageAction, _product.productID, platform];
@@ -98,8 +99,7 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
             NSMutableDictionary *errDict = [[NSMutableDictionary alloc] initWithDictionary:refPage[@"messages"]];
             [errDict setObject:_product.name forKey:@"product"];
             
-			[self showAlert:statusCode withMessages:errDict
-             ];
+			[self showAlert:statusCode withMessages:errDict];
             [self failDownload];
 		} else {
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -301,8 +301,9 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
         }
 	}
     
-    if (appName.length > 0)
+    if (appName.length > 0) {
         [errorMessage insertObject:appName atIndex:0];
+    }
 	[self showAlertWithTitle:title message:[errorMessage componentsJoinedByString:@"\n"]];
 }
 
@@ -324,8 +325,15 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 	}
 }
 
+
+- (void)cancelDownload {
+    [self completeDownloadWithStatus:NSLocalizedString(@"Cancelled", nil)];
+}
+
 - (void)failDownload {
-	[self completeDownloadWithStatus:NSLocalizedString(@"Failed", nil)];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self completeDownloadWithStatus:NSLocalizedString(@"Failed", nil)];
+    });
 }
 
 - (void)completeDownload {
