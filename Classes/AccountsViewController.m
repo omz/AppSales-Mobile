@@ -622,8 +622,24 @@
 		[self doExport];
 	} else if ([key hasPrefix:@"product.appstore."]) {
 		NSString *productID = [key substringFromIndex:[@"product.appstore." length]];
-		NSString *appStoreURLString = [NSString stringWithFormat:@"http://itunes.apple.com/app/id%@", productID];
-		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreURLString]];
+		NSString *appStoreURLString = [NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", productID];
+        
+        //create product dict to check what kind of app were looking at
+        NSMutableDictionary *productsByID = [NSMutableDictionary dictionary];
+        for (Product *product in self.selectedAccount.products) {
+            [productsByID setObject:product forKey:product.productID];
+        }
+        
+        //check if app is a bundle
+        Product *product = productsByID[productID];
+        if ([product.platform.lowercaseString containsString:@"bundle"]) {
+            appStoreURLString = [NSString stringWithFormat:@"https://itunes.apple.com/app-bundle/id%@", productID];
+        }
+        
+        UIApplication *application = [UIApplication sharedApplication];
+        NSURL *URL = [NSURL URLWithString:appStoreURLString];
+        [application openURL:URL options:@{} completionHandler:nil];
+        
 	} else if ([key hasPrefix:@"product.reload."]) {
 		NSString *productID = [key substringFromIndex:[@"product.reload." length]];
 		IconManager *iconManager = [IconManager sharedManager];
