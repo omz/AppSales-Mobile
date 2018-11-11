@@ -21,7 +21,8 @@
 			background-color: transparent;
 		}
 		
-		#content-pane {
+		#content-pane,
+        #response-content-pane {
 			margin: 0;
 			padding-top: 6px;
 			padding-bottom: 10px;
@@ -33,7 +34,8 @@
 			line-height: 1.5;
 		}
 		
-		.review-title {
+		.review-title,
+        .response-title {
 			margin: 0;
 			padding: 10px;
 			padding-left: 12px;
@@ -47,8 +49,13 @@
 			border-width: 0 0 1px 0;
 			word-wrap: break-word;
 		}
+    
+        .response-title {
+            margin-top: 20px;
+        }
 		
-		.review-subtitle {
+		.review-subtitle,
+        .response-subtitle {
 			margin: 0;
 			padding: 10px;
 			padding-left: 12px;
@@ -107,5 +114,10 @@
 	<div id="content-pane">
 		[[[CONTENT]]]
 	</div>
+    <h2 class="response-title">Replied...</h2>
+    <div class="response-subtitle">[[[RESPONSE_DATE]]]</div>
+    <div id="response-content-pane">
+        [[[RESPONSE_CONTENT]]]
+    </div>
 </body>
 </html>

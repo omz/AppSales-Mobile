@@ -57,9 +57,10 @@
 	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	markItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Circle"] style:UIBarButtonItemStylePlain target:self action:@selector(markReview)];
 	UIBarButtonItem *sendReviewButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)];
-	UIBarButtonItem *replyButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyToReview)];
+	//UIBarButtonItem *replyButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyToReview)];
 	
-	self.toolbarItems = @[markItem, flexSpaceItem, sendReviewButtonItem, flexSpaceItem, replyButtonItem];
+    //self.toolbarItems = @[markItem, flexSpaceItem, sendReviewButtonItem, flexSpaceItem, replyButtonItem];
+    self.toolbarItems = @[markItem, flexSpaceItem, sendReviewButtonItem];
 	
 	[self updateCurrentReview];
 }
@@ -160,6 +161,17 @@
 	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_FLAG]]]" withString:flagBase64];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_NAME]]]" withString:countryName];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:reviewText];
+    
+    
+    //responses
+    DeveloperResponse *developerResponse = review.developerResponse;
+    if (developerResponse != nil) {
+        NSString *lastModified = [dateFormatter stringFromDate:developerResponse.lastModified];
+        NSString *text = developerResponse.text;
+        
+        template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_DATE]]]" withString:lastModified];
+        template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_CONTENT]]]" withString:text];
+    }
 	
 	[webView loadHTMLString:template baseURL:nil];
 }
