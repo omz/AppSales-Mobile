@@ -14,6 +14,8 @@
 #import "Review.h"
 #import "DeveloperResponse.h"
 
+NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*(</div>)";
+
 @implementation ReviewDetailViewController
 
 - (instancetype)initWithReviews:(NSArray<Review *> *)_reviews selectedIndex:(NSInteger)_index {
@@ -171,6 +173,8 @@
         
         template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_DATE]]]" withString:lastModified];
         template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_CONTENT]]]" withString:text];
+    } else {
+        template = [template stringByReplacingOccurrencesOfString:developerResponseRegex withString:@"" options:NSRegularExpressionSearch range:NSMakeRange(0, [template length])];
     }
 	
 	[webView loadHTMLString:template baseURL:nil];
