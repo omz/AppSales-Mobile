@@ -86,16 +86,25 @@
 }
 
 - (void)reloadData {
-	NSArray *allApps = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
-		NSInteger productID1 = product1.productID.integerValue;
-		NSInteger productID2 = product2.productID.integerValue;
-		if (productID1 < productID2) {
-			return NSOrderedDescending;
-		} else if (productID1 > productID2) {
-			return NSOrderedAscending;
-		}
-		return NSOrderedSame;
-	}];
+	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+	NSArray *allApps;
+	if ([productSortByValue isEqualToString:@"productName"]) {
+		// Sort products by name.
+		allApps = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+			return [product1.name caseInsensitiveCompare:product2.name];
+		}];
+	} else {
+		allApps = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+			NSInteger productID1 = product1.productID.integerValue;
+			NSInteger productID2 = product2.productID.integerValue;
+			if (productID1 < productID2) {
+				return NSOrderedDescending;
+			} else if (productID1 > productID2) {
+				return NSOrderedAscending;
+			}
+			return NSOrderedSame;
+		}];
+	}
 	
 	self.sortedApps = [allApps filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Product *product, NSDictionary *bindings) {
 		return !product.hidden.boolValue && !(product.parentSKU.length > 1); // In-App Purchases don't have promo codes, so don't include them.

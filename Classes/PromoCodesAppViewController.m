@@ -47,9 +47,7 @@
 		UILabel *statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 200, 20)];
 		statusLabel.font = [UIFont boldSystemFontOfSize:14.0];
 		statusLabel.backgroundColor = [UIColor clearColor];
-		statusLabel.textColor = [UIColor whiteColor];
-		statusLabel.shadowColor = [UIColor blackColor];
-		statusLabel.shadowOffset = CGSizeMake(0, -1);
+		statusLabel.textColor = [UIColor darkGrayColor];
 		statusLabel.textAlignment = NSTextAlignmentCenter;
 		statusLabel.text = NSLocalizedString(@"Loading Promo Codes...", nil);
 		

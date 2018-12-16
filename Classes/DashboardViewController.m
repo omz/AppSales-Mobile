@@ -134,8 +134,6 @@
 	statusLabel.font = [UIFont boldSystemFontOfSize:14.0];
 	statusLabel.backgroundColor = [UIColor clearColor];
 	statusLabel.textColor = [UIColor whiteColor];
-	statusLabel.shadowColor = [UIColor blackColor];
-	statusLabel.shadowOffset = CGSizeMake(0, -1);
 	statusLabel.textAlignment = NSTextAlignmentCenter;
 	
 	self.progressBar = [[UIProgressView alloc] initWithFrame:CGRectMake(0, 25, 200, 10)];
@@ -222,9 +220,13 @@
 
 - (void)reloadData {
 	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
-	
 	NSArray *allProducts;
-	if ([productSortByValue isEqualToString:@"color"]) {
+	if ([productSortByValue isEqualToString:@"productName"]) {
+		// Sort products by name.
+		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+			return [product1.name caseInsensitiveCompare:product2.name];
+		}];
+	} else if ([productSortByValue isEqualToString:@"color"]) {
 		// Sort products by color.
 		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
 			if (product1.color.luminance < product2.color.luminance) {
@@ -268,7 +270,7 @@
 	} else {
 		NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 		[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
-  	}
+	}
 }
 
 - (void)changeColorAtIndexPath:(NSIndexPath *)indexPath {

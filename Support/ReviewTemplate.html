@@ -21,7 +21,7 @@
 			background-color: transparent;
 		}
 		
-		#content-pane {
+		.content-pane {
 			margin: 0;
 			padding-top: 6px;
 			padding-bottom: 10px;
@@ -94,6 +94,27 @@
 			vertical-align: middle;
 		}
 		
+		.response-title {
+			margin: 0;
+			margin-top: 10px;
+			padding: 10px;
+			padding-left: 12px;
+			padding-right: 12px;
+			padding-bottom: 0;
+			display: block;
+			color: #111111;
+			font-size: 12pt;
+			word-wrap: break-word;
+		}
+		
+		.response-date {
+			display: inline-block;
+			float: right;
+			color: #8999a5;
+			font-size: 11pt;
+			font-weight: normal;
+		}
+		
 		a, a:visited {
 			color: #007aff;
 		}
@@ -104,8 +125,12 @@
 	<h2 class="review-title">[[[TITLE]]]</h2>
 	<div class="review-subtitle"><span class="rating-text">[[[RATING]]]</span>[[[NICKNAME]]] - [[[DATE]]]</div>
 	<div class="review-country"><img class="flag-icon" src="data:image/png;base64,[[[COUNTRY_FLAG]]]" /><span class="country-name">[[[COUNTRY_NAME]]]</span></div>
-	<div id="content-pane">
+	<div class="content-pane">
 		[[[CONTENT]]]
+	</div>
+	<h2 class="response-title">Developer Response<span class="response-date">[[[RESPONSE_DATE]]]</span></h2>
+	<div class="content-pane">
+		[[[RESPONSE_CONTENT]]]
 	</div>
 </body>
 </html>

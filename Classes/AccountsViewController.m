@@ -242,7 +242,7 @@
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
 		cell.imageName = @"Account";
 		cell.badgeCount = 0;
-	}	
+	}
 	return cell;
 }
 
@@ -322,14 +322,14 @@
 	FieldSpecifier *generateAccessTokenButtonField = [FieldSpecifier buttonFieldWithKey:@"GenerateAccessTokenButton" title:NSLocalizedString(@"Generate Access Token...", nil)];
 	FieldSectionSpecifier *accessTokenSection = [FieldSectionSpecifier sectionWithFields:@[accessTokenField, getAccessTokenButtonField, generateAccessTokenButtonField]
 																				   title:NSLocalizedString(@"Access Token", nil)
-																	   description:NSLocalizedString(@"An access token is a unique code that lets you download sales and financial reports with Reporter.\n\nNote: You can generate only one access token at a time per Apple ID. Your access token will automatically expire after 180 days. If you generate a new access token, your previous access token immediately expires.", nil)];
+																			 description:NSLocalizedString(@"An access token is a unique code that lets you download sales and financial reports with Reporter.\n\nNote: You can generate only one access token at a time per Apple ID. Your access token will automatically expire after 180 days. If you generate a new access token, your previous access token immediately expires.", nil)];
 	
 	FieldSpecifier *vendorIDField = [FieldSpecifier numericFieldWithKey:kAccountVendorID title:NSLocalizedString(@"Vendor ID", nil) defaultValue:account.vendorID ?: @""];
 	vendorIDField.placeholder = @"8XXXXXXX";
 	FieldSpecifier *selectVendorIDButtonField = [FieldSpecifier buttonFieldWithKey:@"SelectVendorIDButton" title:NSLocalizedString(@"Auto-Fill Vendor ID...", nil)];
 	FieldSectionSpecifier *vendorIDSection = [FieldSectionSpecifier sectionWithFields:@[vendorIDField, selectVendorIDButtonField]
-																			 title:NSLocalizedString(@"Vendor ID", nil)
-																	   description:NSLocalizedString(@"You can find your Vendor ID at the top of the “Payments and Financial Reports” module in iTunes Connect.", nil)];
+																				title:NSLocalizedString(@"Vendor ID", nil)
+																		  description:NSLocalizedString(@"You can find your Vendor ID at the top of the “Payments and Financial Reports” module in iTunes Connect.", nil)];
 	
 	return @[loginSection, accessTokenSection, vendorIDSection];
 }
@@ -370,16 +370,26 @@
 	FieldSectionSpecifier *importExportSection = [FieldSectionSpecifier sectionWithFields:@[importButtonField, exportButtonField] title:nil description:nil];
 	
 	NSMutableArray *productFields = [[NSMutableArray alloc] init];
-	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
-		NSInteger productID1 = product1.productID.integerValue;
-		NSInteger productID2 = product2.productID.integerValue;
-		if (productID1 < productID2) {
-			return NSOrderedDescending;
-		} else if (productID1 > productID2) {
-			return NSOrderedAscending;
-		}
-		return NSOrderedSame;
-	}];
+	
+	NSArray *allProducts;
+	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+	if ([productSortByValue isEqualToString:@"productName"]) {
+		// Sort products by name.
+		allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+			return [product1.name caseInsensitiveCompare:product2.name];
+		}];
+	} else {
+		allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+			NSInteger productID1 = product1.productID.integerValue;
+			NSInteger productID2 = product2.productID.integerValue;
+			if (productID1 < productID2) {
+				return NSOrderedDescending;
+			} else if (productID1 > productID2) {
+				return NSOrderedAscending;
+			}
+			return NSOrderedSame;
+		}];
+	}
 	
 	for (Product *product in allProducts) {
 		NSMutableArray *sections = [[NSMutableArray alloc] init];
@@ -477,21 +487,23 @@
 	
 	// products section
 	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
-	FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
-																			defaultValue:[productSortByValue isEqualToString:@"productId"]];
-	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
-																		defaultValue:[productSortByValue isEqualToString:@"color"]];
-	NSMutableArray *productSortingFields = [[NSMutableArray alloc] initWithArray:@[productSortingByProductIdField, productSortingByColorField]];
+	FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID"
+																		  defaultValue:[productSortByValue isEqualToString:@"productId"]];
+	FieldSpecifier *productSortingByNameField = [FieldSpecifier checkFieldWithKey:@"sortby.productName" title:@"Name"
+																	 defaultValue:[productSortByValue isEqualToString:@"productName"]];
+	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color"
+																	  defaultValue:[productSortByValue isEqualToString:@"color"]];
+	NSMutableArray *productSortingFields = [[NSMutableArray alloc] initWithArray:@[productSortingByProductIdField, productSortingByNameField, productSortingByColorField]];
 	
 	
 	FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields
-																				  title:NSLocalizedString(@"Sort By", nil)
-																			description:nil];
+																					  title:NSLocalizedString(@"Sort By", nil)
+																				description:nil];
 	productSortingSection.exclusiveSelection = YES;
 	FieldSpecifier *productsSectionField = [FieldSpecifier subsectionFieldWithSection:productSortingSection key:@"sortby"];
 	FieldSectionSpecifier *productsSection = [FieldSectionSpecifier sectionWithFields:@[productsSectionField]
-																				  title:NSLocalizedString(@"Products", nil) 
-																			description:NSLocalizedString(@"", nil)];
+																				title:NSLocalizedString(@"Products", nil)
+																		  description:NSLocalizedString(@"", nil)];
 	
 	NSArray *sections = @[generalSection, paymentsSection, productsSection];
 	settingsViewController = [[FieldEditorViewController alloc] initWithFieldSections:sections title:NSLocalizedString(@"Settings",nil)];
@@ -622,8 +634,19 @@
 		[self doExport];
 	} else if ([key hasPrefix:@"product.appstore."]) {
 		NSString *productID = [key substringFromIndex:[@"product.appstore." length]];
-		NSString *appStoreURLString = [NSString stringWithFormat:@"http://itunes.apple.com/app/id%@", productID];
-		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreURLString]];
+		NSString *appStoreURLString = [NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", productID];
+		// Create product dict to check what kind of app were looking at.
+		NSMutableDictionary *productsByID = [NSMutableDictionary dictionary];
+		for (Product *product in self.selectedAccount.products) {
+			[productsByID setObject:product forKey:product.productID];
+		}
+		// Check if app is a bundle.
+		Product *product = productsByID[productID];
+		if ([product.platform.lowercaseString containsString:@"bundle"]) {
+			appStoreURLString = [NSString stringWithFormat:@"https://itunes.apple.com/app-bundle/id%@", productID];
+		}
+		UIApplication *application = [UIApplication sharedApplication];
+		[application openURL:[NSURL URLWithString:appStoreURLString]];
 	} else if ([key hasPrefix:@"product.reload."]) {
 		NSString *productID = [key substringFromIndex:[@"product.reload." length]];
 		IconManager *iconManager = [IconManager sharedManager];

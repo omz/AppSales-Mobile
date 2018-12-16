@@ -741,8 +741,6 @@
 	
 	latestValueButton.titleLabel.font = [UIFont systemFontOfSize:16.0f weight:UIFontWeightSemibold];
 	latestValueButton.titleLabel.adjustsFontSizeToFitWidth = YES;
-	latestValueButton.titleLabel.shadowOffset = CGSizeMake(0.0f, -1.0f);
-	[latestValueButton setTitleShadowColor:borderColor forState:UIControlStateNormal];
 	[latestValueButton setTitle:title forState:UIControlStateNormal];
 	
 	latestValueButton.backgroundColor = topColor;

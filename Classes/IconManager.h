@@ -23,6 +23,7 @@
 + (instancetype)sharedManager;
 
 - (NSString *)iconDirectory;
+- (UIImage *)resizeIcon:(UIImage *)icon;
 - (UIImage *)iconForAppID:(NSString *)appID;
 - (void)clearIconForAppID:(NSString *)appID;
 

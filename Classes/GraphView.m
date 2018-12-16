@@ -61,8 +61,6 @@
 		titleLabel.textAlignment = NSTextAlignmentCenter;
 		titleLabel.textColor = [UIColor grayColor];
 		titleLabel.backgroundColor = [UIColor clearColor];
-		titleLabel.shadowColor = [UIColor whiteColor];
-		titleLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
 		[self addSubview:titleLabel];
 		
 		self.sectionLabelButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -323,8 +321,6 @@
 			dateLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
 			dateLabel.backgroundColor = [UIColor clearColor];
 			dateLabel.textColor = [UIColor darkGrayColor];
-			dateLabel.shadowColor = [UIColor whiteColor];
-			dateLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
 			dateLabel.textAlignment = NSTextAlignmentCenter;
 			dateLabel.font = [UIFont systemFontOfSize:12.0f weight:UIFontWeightSemibold];
 			dateLabel.adjustsFontSizeToFitWidth = YES;
@@ -418,8 +414,6 @@
 		label.adjustsFontSizeToFitWidth = YES;
 		label.textAlignment = NSTextAlignmentCenter;
 		label.textColor = [UIColor darkGrayColor];
-		label.shadowColor = [UIColor whiteColor];
-		label.shadowOffset = CGSizeMake(0, 1);
 		[self addSubview:label];
 	}
 	return self;
@@ -631,8 +625,6 @@
 		label.backgroundColor = [UIColor clearColor];
 		label.font = [UIFont systemFontOfSize:12.0f weight:UIFontWeightSemibold];
 		label.textColor = [UIColor darkGrayColor];
-		label.shadowColor = [UIColor whiteColor];
-		label.shadowOffset = CGSizeMake(0.0f, 1.0f);
 		label.textAlignment = NSTextAlignmentRight;
 		label.adjustsFontSizeToFitWidth = YES;
 		[self addSubview:label];

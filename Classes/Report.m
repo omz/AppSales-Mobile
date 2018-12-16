@@ -199,8 +199,10 @@
 										   @"F7": kProductPlatformMac,
 										   @"IA1": kProductPlatformInApp,
 										   @"IA9": kProductPlatformInApp,
-										   @"1-B": kProductPlatformAppBundle};
+										   @"1-B": kProductPlatformAppBundle,
+										   @"F1-B": kProductPlatformMacAppBundle};
 		}
+		
 		NSString *platform = platformsByTransactionType[rowDictionary[kReportColumnProductTypeIdentifier]];
 		if (platform) {
 			product.platform = platform;
@@ -529,24 +531,26 @@
 	if (!combinedPaidTransactionTypes) {
 		combinedPaidTransactionTypes = [[NSSet alloc] initWithObjects:
 							@"1",		//iPhone App
-							@"1. ",	 //iPhone App
-							@"1-B",	 //App Bundle
-							@"1-B. ",   //App Bundle
+							@"1. ",		//iPhone App
+							@"1-B",		//App Bundle
+							@"1-B. ",	//App Bundle
 							@"1F",		//Universal App
 							@"1F. ",	//Universal App
 							@"1T",		//iPad App
 							@"1T. ",	//iPad App
 							@"F1",		//Mac App
 							@"F1. ",	//Mac App
-							@"FI1",	 //Mac In-App Purchase
-							@"FI1. ",   //Mac In-App Purchase
+							@"F1-B",	//Mac App Bundle
+							@"F1-B. ",	//Mac App Bundle
+							@"FI1",		//Mac In-App Purchase
+							@"FI1. ",	//Mac In-App Purchase
 							@"IA1",		//In-App Purchase
-							@"IA1. ",   //In-App Purchase
+							@"IA1. ",	//In-App Purchase
 							@"IA9",		//In-App Subscription
 							@"IA9. ",	//In-App Subscription
 							@"IAY",		//In-App Renewable Subscription
 							@"IAY. ",	//In-App Renewable Subscription
-							@"IAC",	 //In-App Free Subscription
+							@"IAC",		//In-App Free Subscription
 							@"IAC. "	//In-App Free Subscription
 							@"1.GP",	//GP = Gift Purchase
 							@"1F.GP",
@@ -615,6 +619,7 @@
 										@"1EP.EDU",
 										@"1EU.EDU",
 										@"1-B.EDU",
+										@"F1-B.EDU",
 										nil];
 	}
 	return combinedEducationalTransactionTypes;
@@ -636,6 +641,7 @@
 										@"1EP.GP",
 										@"1EU.GP",
 										@"1-B.GP",
+										@"F1-B.GP",
 										nil];
 	}
 	return combinedGiftPurchaseTransactionTypes;
@@ -657,6 +663,7 @@
 												@"1EP.CR-RW",
 												@"1EU.CR-RW",
 												@"1-B.CR-RW",
+												@"F1-B.CR-RW",
 												nil];
 	}
 	return combinedPromoCodeTransactionTypes;
@@ -678,6 +685,7 @@
 								@"1EP",	 //Paid App (Custom iPad)
 								@"1EU",	 //Paid App (Custom Universal)
 								@"1-B",	 //App Bundle
+								@"F1-B", //Mac App Bundle
 								nil];
 	}
 	return paidTransactionTypes;
