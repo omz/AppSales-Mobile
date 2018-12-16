@@ -59,10 +59,9 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	markItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Circle"] style:UIBarButtonItemStylePlain target:self action:@selector(markReview)];
 	UIBarButtonItem *sendReviewButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)];
-	//UIBarButtonItem *replyButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyToReview)];
+	UIBarButtonItem *replyButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyToReview)];
 	
-    //self.toolbarItems = @[markItem, flexSpaceItem, sendReviewButtonItem, flexSpaceItem, replyButtonItem];
-    self.toolbarItems = @[markItem, flexSpaceItem, sendReviewButtonItem];
+	self.toolbarItems = @[markItem, flexSpaceItem, sendReviewButtonItem, flexSpaceItem, replyButtonItem];
 	
 	[self updateCurrentReview];
 }
