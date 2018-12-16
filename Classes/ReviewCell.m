@@ -151,7 +151,7 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		replyView.backgroundColor = [UIColor clearColor];
 		replyView.contentMode = UIViewContentModeScaleAspectFit;
 		replyView.tintColor = [UIColor grayColor];
-        replyView.image = [[UIImage imageNamed:@"Reply"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+		replyView.image = [[UIImage imageNamed:@"Reply"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 		[self.contentView addSubview:replyView];
 		
 		nicknameLabel = [[UILabel alloc] initWithFrame:CGRectMake(kReviewMarginHorizontal, CGRectGetMaxY(titleLabel.frame) + 4.0f, contentSize.width - kReviewMarginHorizontal - 4.0f - CGRectGetWidth(replyView.frame) - kReviewMarginHorizontal, kReviewNicknameFontSize + 3.0f)];

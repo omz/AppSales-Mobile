@@ -318,33 +318,32 @@
 	if (field.type != FieldSpecifierTypeButton && field.type != FieldSpecifierTypeSection && field.type != FieldSpecifierTypeCheck) {
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 	}
-    
-    //add app icons
-    if ([field.key containsString:@"product.section"]) {
-        NSString *productID = [field.key substringFromIndex:[@"product.section." length]];
-        UIImage *image = [[IconManager sharedManager] iconForAppID:productID];
-        
-        CGFloat iconSize = 30.0f;
-        CGFloat iconOriginY = (cell.imageView.frame.size.height - iconSize) / 2.0f;
-        cell.imageView.frame = CGRectMake(CGRectGetMaxX(cell.imageView.frame) + 12.0, iconOriginY, iconSize, iconSize);
-        
-        cell.imageView.image = image;
-        cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        cell.imageView.clipsToBounds = YES;
-        cell.imageView.layer.cornerRadius = roundf(7.0f / (30.0f / cell.imageView.frame.size.width));
-        cell.imageView.layer.borderColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
-        cell.imageView.layer.borderWidth = 0.5f;
-        
-        
-        CGSize itemSize = CGSizeMake(iconSize, iconSize);
-        UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
-        CGRect imageRect = CGRectMake(0.0, 0.0, itemSize.width, itemSize.height);
-        
-        [cell.imageView.image drawInRect:imageRect];
-        cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-    }
-    
+	
+	// Add app icons.
+	if ([field.key containsString:@"product.section"]) {
+		NSString *productID = [field.key substringFromIndex:[@"product.section." length]];
+		UIImage *image = [[IconManager sharedManager] iconForAppID:productID];
+		
+		CGFloat iconSize = 30.0f;
+		CGFloat iconOriginY = (cell.imageView.frame.size.height - iconSize) / 2.0f;
+		cell.imageView.frame = CGRectMake(CGRectGetMaxX(cell.imageView.frame) + 12.0, iconOriginY, iconSize, iconSize);
+		
+		cell.imageView.image = image;
+		cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
+		cell.imageView.clipsToBounds = YES;
+		cell.imageView.layer.cornerRadius = roundf(7.0f / (30.0f / cell.imageView.frame.size.width));
+		cell.imageView.layer.borderColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+		cell.imageView.layer.borderWidth = 0.5f;
+		
+		CGSize itemSize = CGSizeMake(iconSize, iconSize);
+		UIGraphicsBeginImageContextWithOptions(itemSize, NO, UIScreen.mainScreen.scale);
+		CGRect imageRect = CGRectMake(0.0, 0.0, itemSize.width, itemSize.height);
+		
+		[cell.imageView.image drawInRect:imageRect];
+		cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+		UIGraphicsEndImageContext();
+	}
+	
 	cell.textLabel.text = field.title;
 	return cell;
 }

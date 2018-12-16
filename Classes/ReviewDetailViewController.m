@@ -163,19 +163,16 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_FLAG]]]" withString:flagBase64];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[COUNTRY_NAME]]]" withString:countryName];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[CONTENT]]]" withString:reviewText];
-    
-    
-    //responses
-    DeveloperResponse *developerResponse = review.developerResponse;
-    if (developerResponse != nil) {
-        NSString *lastModified = [dateFormatter stringFromDate:developerResponse.lastModified];
-        NSString *text = developerResponse.text;
-        
-        template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_DATE]]]" withString:lastModified];
-        template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_CONTENT]]]" withString:text];
-    } else {
-        template = [template stringByReplacingOccurrencesOfString:developerResponseRegex withString:@"" options:NSRegularExpressionSearch range:NSMakeRange(0, [template length])];
-    }
+	
+	DeveloperResponse *developerResponse = review.developerResponse;
+	if (developerResponse != nil) {
+		NSString *lastModified = [dateFormatter stringFromDate:developerResponse.lastModified];
+		NSString *text = developerResponse.text;
+		template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_DATE]]]" withString:lastModified];
+		template = [template stringByReplacingOccurrencesOfString:@"[[[RESPONSE_CONTENT]]]" withString:text];
+	} else {
+		template = [template stringByReplacingOccurrencesOfString:developerResponseRegex withString:@"" options:NSRegularExpressionSearch range:NSMakeRange(0, [template length])];
+	}
 	
 	[webView loadHTMLString:template baseURL:nil];
 }

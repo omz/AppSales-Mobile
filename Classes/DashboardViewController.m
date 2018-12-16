@@ -221,7 +221,12 @@
 - (void)reloadData {
 	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 	NSArray *allProducts;
-	if ([productSortByValue isEqualToString:@"color"]) {
+	if ([productSortByValue isEqualToString:@"productName"]) {
+		// Sort products by name.
+		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+			return [product1.name caseInsensitiveCompare:product2.name];
+		}];
+	} else if ([productSortByValue isEqualToString:@"color"]) {
 		// Sort products by color.
 		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
 			if (product1.color.luminance < product2.color.luminance) {
@@ -231,15 +236,6 @@
 			}
 			return NSOrderedSame;
 		}];
-    } else if ([productSortByValue isEqualToString:@"productName"]) {
-        // Sort products by Name.
-        allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
-            NSString *productName1 = product1.name;
-            NSString *productName2 = product2.name;
-            
-            NSComparisonResult result = [productName1 caseInsensitiveCompare:productName2];
-            return result;
-        }];
 	} else {
 		// Sort products by ID (this will put the most recently released apps on top).
 		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
@@ -274,7 +270,7 @@
 	} else {
 		NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
 		[self.productsTableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
-  	}
+	}
 }
 
 - (void)changeColorAtIndexPath:(NSIndexPath *)indexPath {

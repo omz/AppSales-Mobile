@@ -45,6 +45,16 @@ NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-s
 	return iconDirectory;
 }
 
+- (UIImage *)resizeIcon:(UIImage *)icon {
+	CGFloat iconSize = 30.0f * [UIScreen mainScreen].scale;
+	CGSize newSize = CGSizeMake(iconSize, iconSize);
+	UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0f);
+	[icon drawInRect:CGRectMake(0.0f, 0.0f, newSize.width, newSize.height)];
+	UIImage *resizedIcon = UIGraphicsGetImageFromCurrentImageContext();
+	UIGraphicsEndImageContext();
+	return resizedIcon;
+}
+
 - (UIImage *)iconForAppID:(NSString *)appID {
 	if ([appID length] < 4) {
 		NSLog(@"Invalid app ID for icon download (%@)", appID);
@@ -71,13 +81,12 @@ NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-s
 	[downloadQueue removeObjectAtIndex:0];
 	
 	dispatch_async(queue, ^{
-        
-        NSURL *iTunesStoreLookupURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStoreLookupURLFormat, nextAppID]];
+		NSURL *iTunesStoreLookupURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStoreLookupURLFormat, nextAppID]];
 		NSURLRequest *iTunesStoreLookupRequest = [NSURLRequest requestWithURL:iTunesStoreLookupURL];
 		
 		NSHTTPURLResponse *response = nil;
 		NSData *iTunesStoreLookupData = [NSURLConnection sendSynchronousRequest:iTunesStoreLookupRequest returningResponse:&response error:nil];
-        
+		
 		void (^failureBlock)(NSString *) = ^void(NSString *appID) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				// There was a response, but the download was not successful, write the default icon, so that we won't try again and again...
@@ -96,67 +105,64 @@ NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-s
 			});
 		};
 		
-        //maybe the app is a bundle?
+		// Maybe the app is a bundle?
 		void (^retryAlternativePNG)(NSString *) = ^void(NSString *appID) {
-            
-            NSURL *iTunesStorePageURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStoreBundlePageURLFormat, appID]];
-            NSURLRequest *iTunesStorePageRequest = [NSURLRequest requestWithURL:iTunesStorePageURL];
-            
-            NSHTTPURLResponse *response = nil;
-            NSData *iTunesStorePageData = [NSURLConnection sendSynchronousRequest:iTunesStorePageRequest returningResponse:&response error:nil];
-            NSString *iTunesStorePage = [[NSString alloc] initWithData:iTunesStorePageData encoding:NSUTF8StringEncoding];
-            
-            if (iTunesStorePage != nil && iTunesStorePage.length > 0) {
-                NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
-                NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, iTunesStorePage.length-1)];
-                if (match.numberOfRanges > 0) {
-                    NSRange matchRange = [match rangeAtIndex:1];
-                    NSString *iTunesStoreThumbnailPath = [iTunesStorePage substringWithRange:matchRange];
-                    NSURL *iTunesStoreThumbnailURL = [NSURL URLWithString:iTunesStoreThumbnailPath];
-                    NSData *iconData = [[NSData alloc] initWithContentsOfURL:iTunesStoreThumbnailURL];
-                    UIImage *icon = [UIImage imageWithData:iconData];
-                    
-                    UIImage *resizedIcon = [self resizeIcon:icon];
-                    NSData *resizedIconData = UIImagePNGRepresentation(resizedIcon);
-                    
-                    if (resizedIcon != nil) {
-                        successBlock(resizedIcon, resizedIconData, nextAppID);
-                    } else {
-                        failureBlock(appID);
-                    }
-                } else {
-                    failureBlock(appID);
-                }
-            }
-            else {
-                failureBlock(appID);
-            }
+			NSURL *iTunesStorePageURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStoreBundlePageURLFormat, appID]];
+			NSURLRequest *iTunesStorePageRequest = [NSURLRequest requestWithURL:iTunesStorePageURL];
+			
+			NSHTTPURLResponse *response = nil;
+			NSData *iTunesStorePageData = [NSURLConnection sendSynchronousRequest:iTunesStorePageRequest returningResponse:&response error:nil];
+			NSString *iTunesStorePage = [[NSString alloc] initWithData:iTunesStorePageData encoding:NSUTF8StringEncoding];
+			
+			if ((iTunesStorePage != nil) && (iTunesStorePage.length > 0)) {
+				NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
+				NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, iTunesStorePage.length-1)];
+				if (match.numberOfRanges > 0) {
+					NSRange matchRange = [match rangeAtIndex:1];
+					NSString *iTunesStoreThumbnailPath = [iTunesStorePage substringWithRange:matchRange];
+					NSURL *iTunesStoreThumbnailURL = [NSURL URLWithString:iTunesStoreThumbnailPath];
+					NSData *iconData = [[NSData alloc] initWithContentsOfURL:iTunesStoreThumbnailURL];
+					UIImage *icon = [UIImage imageWithData:iconData];
+					
+					UIImage *resizedIcon = [self resizeIcon:icon];
+					NSData *resizedIconData = UIImagePNGRepresentation(resizedIcon);
+					
+					if (resizedIcon != nil) {
+						successBlock(resizedIcon, resizedIconData, nextAppID);
+					} else {
+						failureBlock(appID);
+					}
+				} else {
+					failureBlock(appID);
+				}
+			}
+			else {
+				failureBlock(appID);
+			}
 		};
 		
-		if (iTunesStoreLookupData != nil && iTunesStoreLookupData.length > 0) {
-            
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:iTunesStoreLookupData options:0 error:NULL];
-            NSArray *results = [dict objectForKey:@"results"];
-            if (!results || results.count == 0) {
-                retryAlternativePNG(nextAppID);
-            }
-            else {
-                NSDictionary *result = [results objectAtIndex:0];
-                NSString *imageUrlStr = [result objectForKey:@"artworkUrl512"];
-                
-                NSURL *artworkURL = [NSURL URLWithString:imageUrlStr];
-                NSData *imageData = [NSData dataWithContentsOfURL:artworkURL];
-                UIImage *icon = [UIImage imageWithData:imageData];
-                
-                UIImage *resizedIcon = [self resizeIcon:icon];
-                NSData *resizedIconData = UIImagePNGRepresentation(resizedIcon);
-                
-                if (resizedIcon != nil) {
-                    successBlock(resizedIcon, resizedIconData, nextAppID);
-                } else {
-                    retryAlternativePNG(nextAppID);
-                }
-            }
+		if ((iTunesStoreLookupData != nil) && (iTunesStoreLookupData.length > 0)) {
+			NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:iTunesStoreLookupData options:0 error:NULL];
+			NSArray *results = [dict objectForKey:@"results"];
+			if ((results == nil) || (results.count == 0)) {
+				retryAlternativePNG(nextAppID);
+			} else {
+				NSDictionary *result = [results objectAtIndex:0];
+				NSString *imageUrlStr = [result objectForKey:@"artworkUrl512"];
+				
+				NSURL *artworkURL = [NSURL URLWithString:imageUrlStr];
+				NSData *imageData = [NSData dataWithContentsOfURL:artworkURL];
+				UIImage *icon = [UIImage imageWithData:imageData];
+				
+				UIImage *resizedIcon = [self resizeIcon:icon];
+				NSData *resizedIconData = UIImagePNGRepresentation(resizedIcon);
+				
+				if (resizedIcon != nil) {
+					successBlock(resizedIcon, resizedIconData, nextAppID);
+				} else {
+					retryAlternativePNG(nextAppID);
+				}
+			}
 		} else {
 			retryAlternativePNG(nextAppID);
 		}
@@ -166,19 +172,6 @@ NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-s
 			[self dequeueDownload];
 		});
 	});
-}
-
-- (UIImage *)resizeIcon:(UIImage *)icon
-{
-    //resize icon
-    CGFloat iconSize = 30.0f * [UIScreen mainScreen].scale;
-    CGSize newSize = CGSizeMake(iconSize, iconSize);
-    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
-    [icon drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    UIImage *resizedIcon = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return resizedIcon;
 }
 
 - (void)clearIconForAppID:(NSString *)appID {
