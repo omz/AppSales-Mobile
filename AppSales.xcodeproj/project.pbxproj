@@ -116,6 +116,7 @@
 		DAD39BA71EEC9B3100CB3524 /* passcode_square_filled@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DAD39BA61EEC9B3100CB3524 /* passcode_square_filled@3x.png */; };
 		DAD53A531EFC87630038C925 /* ReviewFilterComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD53A521EFC87630038C925 /* ReviewFilterComparator.m */; };
 		DAD53A581EFCF6ED0038C925 /* ReviewListHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = DAD53A571EFCF6ED0038C925 /* ReviewListHeaderView.m */; };
+		DAF2D89D203B5F8100F3C0CF /* ASProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = DAF2D89C203B5F8100F3C0CF /* ASProgressHUD.m */; };
 		DAFC5F801C16B29D00261B16 /* ReviewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */; };
 		DAFC5F931C16BFAD00261B16 /* Review.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F921C16BFAD00261B16 /* Review.m */; };
 		DAFC5F961C16C07100261B16 /* Version.m in Sources */ = {isa = PBXBuildFile; fileRef = DAFC5F951C16C07100261B16 /* Version.m */; };
@@ -319,6 +320,8 @@
 		DAD53A521EFC87630038C925 /* ReviewFilterComparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewFilterComparator.m; sourceTree = "<group>"; };
 		DAD53A561EFCF6ED0038C925 /* ReviewListHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewListHeaderView.h; sourceTree = "<group>"; };
 		DAD53A571EFCF6ED0038C925 /* ReviewListHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewListHeaderView.m; sourceTree = "<group>"; };
+		DAF2D89B203B5F8100F3C0CF /* ASProgressHUD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASProgressHUD.h; sourceTree = "<group>"; };
+		DAF2D89C203B5F8100F3C0CF /* ASProgressHUD.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASProgressHUD.m; sourceTree = "<group>"; };
 		DAFC5F7E1C16B29D00261B16 /* ReviewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReviewsViewController.h; sourceTree = "<group>"; };
 		DAFC5F7F1C16B29D00261B16 /* ReviewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReviewsViewController.m; sourceTree = "<group>"; };
 		DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 4.xcdatamodel"; sourceTree = "<group>"; };
@@ -611,6 +614,8 @@
 		7FDF601C13DD2107005F1E2D /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				DAF2D89B203B5F8100F3C0CF /* ASProgressHUD.h */,
+				DAF2D89C203B5F8100F3C0CF /* ASProgressHUD.m */,
 				7F1499C813BE15F500D89064 /* NSData+Compression.h */,
 				7F1499C913BE15F500D89064 /* NSData+Compression.m */,
 				7F454F9E13D5C24F00AE47D1 /* UIColor+Extensions.h */,
@@ -840,7 +845,7 @@
 		7F709D1E13BC98860008DBAD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "omz:software";
 				TargetAttributes = {
 					7F709D2613BC98860008DBAD = {
@@ -968,6 +973,7 @@
 				DA4AC6B61EFB54D6003CAF4D /* ReviewDownloadOperation.m in Sources */,
 				7FA3EA9D13F77DF000C80C07 /* MultiOperation.m in Sources */,
 				7F0B8A6913F77F95006E9151 /* PromoCodeOperation.m in Sources */,
+				DAF2D89D203B5F8100F3C0CF /* ASProgressHUD.m in Sources */,
 				7F0B8A6E13F7B941006E9151 /* PromoCode.m in Sources */,
 				DA49843D1C129F95009BFC8F /* ZIPArchive.mm in Sources */,
 				DAFC5F801C16B29D00261B16 /* ReviewsViewController.m in Sources */,
@@ -994,12 +1000,18 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1037,12 +1049,18 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

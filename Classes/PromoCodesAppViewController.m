@@ -9,7 +9,6 @@
 #import "PromoCodesAppViewController.h"
 #import "Product.h"
 #import "ASAccount.h"
-#import "MBProgressHUD.h"
 #import "UIImage+Tinting.h"
 #import "PromoCodeOperation.h"
 #import "PromoCode.h"

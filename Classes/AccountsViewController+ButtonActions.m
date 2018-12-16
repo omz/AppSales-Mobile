@@ -7,7 +7,7 @@
 //
 
 #import "AccountsViewController+ButtonActions.h"
-#import "MBProgressHUD.h"
+#import "ASProgressHUD.h"
 
 @implementation AccountsViewController (AccountsViewController_ButtonActions)
 
@@ -109,23 +109,23 @@
 }
 
 - (void)loginFailed {
-	[MBProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
+	[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
 }
 
 - (void)finishedFetchingAccessToken:(NSString *)accessToken {
 	FieldEditorViewController *vc = self.currentViewController;
-	[MBProgressHUD hideHUDForView:vc.navigationController.view animated:YES];
+	[ASProgressHUD hideHUDForView:vc.navigationController.view animated:YES];
 	[vc.values setObject:accessToken forKey:kAccountAccessToken];
 	[vc.tableView reloadData];
 }
 
 - (void)failedToFetchAccessToken {
-	[MBProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
+	[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"The access token could not be fetched automatically. Please check your username and password or enter your access token manually. You'll find it in the Sales and Trends module, under the Reports section, by clicking on the (?) beside About Reports on itunesconnect.apple.com.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 }
 
 - (void)failedToGenerateCSRFToken {
-	[MBProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
+	[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Could not fetch CSRF token from server. Please try again later.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 }
 
@@ -160,7 +160,7 @@
 	}
 	
 	[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-		[MBProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
+		[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
 	}]];
 	
 	[self.currentViewController presentViewController:alertController animated:YES completion:nil];
@@ -168,13 +168,13 @@
 
 - (void)finishedLoadingVendorID:(NSString *)vendorID {
 	FieldEditorViewController *vc = self.currentViewController;
-	[MBProgressHUD hideHUDForView:vc.navigationController.view animated:YES];
+	[ASProgressHUD hideHUDForView:vc.navigationController.view animated:YES];
 	[vc.values setObject:vendorID forKey:kAccountVendorID];
 	[vc.tableView reloadData];
 }
 
 - (void)failedToLoadVendorIDs {
-	[MBProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
+	[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
 	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"The vendor ID could not be filled automatically. Please check your username and password or enter your vendor ID manually. You'll find it at the top of the Sales and Trends module on itunesconnect.apple.com.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
 }
 

@@ -18,6 +18,7 @@
 #import "KKPasscodeLock.h"
 #import "KKKeychain.h"
 #import "KKPasscodeViewController.h"
+#import "SAMKeychain.h"
 
 static KKPasscodeLock *sharedLock = nil;
 
@@ -45,6 +46,13 @@ static KKPasscodeLock *sharedLock = nil;
 	
 	if (![KKKeychain getStringForKey:@"erase_data_on"]) {
 		[KKKeychain setString:@"NO" forKey:@"erase_data_on"];
+	}
+	
+	NSString *unlockWithBiometrics = [KKKeychain getStringForKey:@"unlock_with_touch_id"];
+	if (unlockWithBiometrics != nil) {
+		[KKKeychain setString:unlockWithBiometrics forKey:@"unlock_with_biometrics"];
+		NSString *key = [NSString stringWithFormat:@"%@ - %@", KKKeychain.appName, @"unlock_with_touch_id"];
+		[SAMKeychain deletePasswordForService:@"service" account:key];
 	}
 }
 

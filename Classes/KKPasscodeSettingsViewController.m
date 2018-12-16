@@ -29,8 +29,8 @@
 	[super viewDidLoad];
 	self.navigationItem.title = @"Passcode Lock";
 	
-	unlockWithTouchIDSwitch = [[UISwitch alloc] init];
-	[unlockWithTouchIDSwitch addTarget:self action:@selector(unlockWithTouchIDSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+	unlockWithBiometricsSwitch = [[UISwitch alloc] init];
+	[unlockWithBiometricsSwitch addTarget:self action:@selector(unlockWithBiometricsSwitchChanged:) forControlEvents:UIControlEventValueChanged];
 	
 	eraseDataSwitch = [[UISwitch alloc] init];
 	[eraseDataSwitch addTarget:self action:@selector(eraseDataSwitchChanged:) forControlEvents:UIControlEventValueChanged];
@@ -39,8 +39,8 @@
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	passcodeLockOn = [[KKKeychain getStringForKey:@"passcode_on"] isEqualToString:@"YES"];
-	unlockWithTouchIDOn = [[KKKeychain getStringForKey:@"unlock_with_touch_id"] isEqualToString:@"YES"];
-	unlockWithTouchIDSwitch.on = unlockWithTouchIDOn;
+	unlockWithBiometricsOn = [[KKKeychain getStringForKey:@"unlock_with_biometrics"] isEqualToString:@"YES"];
+	unlockWithBiometricsSwitch.on = unlockWithBiometricsOn;
 	eraseDataOn = [[KKKeychain getStringForKey:@"erase_data_on"] isEqualToString:@"YES"];
 	eraseDataSwitch.on = eraseDataOn;
 }
@@ -75,16 +75,16 @@
 	}		 
 }
 
-- (void)unlockWithTouchIDSwitchChanged:(id)sender {
-	unlockWithTouchIDOn = unlockWithTouchIDSwitch.on;
-	[KKKeychain setString:(unlockWithTouchIDSwitch.on ? @"YES" : @"NO") forKey:@"unlock_with_touch_id"];
+- (void)unlockWithBiometricsSwitchChanged:(id)sender {
+	unlockWithBiometricsOn = unlockWithBiometricsSwitch.on;
+	[KKKeychain setString:(unlockWithBiometricsSwitch.on ? @"YES" : @"NO") forKey:@"unlock_with_biometrics"];
 }
 
 #pragma mark -
 #pragma mark Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	return 1 + KKPasscodeViewController.hasTouchID + [KKPasscodeLock sharedLock].eraseOption;
+	return 1 + KKPasscodeViewController.hasBiometricAuthentication + [KKPasscodeLock sharedLock].eraseOption;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -98,7 +98,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-	if (section == (1 + KKPasscodeViewController.hasTouchID)) {
+	if (section == (1 + KKPasscodeViewController.hasBiometricAuthentication)) {
 		return [NSString stringWithFormat:@"Erase all data in this app after %lu failed passcode attempts.", (unsigned long)[[KKPasscodeLock sharedLock] attemptsAllowed]];;
 	}
 	return nil;
@@ -135,18 +135,18 @@
 			cell.textLabel.textAlignment = NSTextAlignmentCenter;
 			cell.accessoryView = nil;
 		}
-	} else if (indexPath.section == KKPasscodeViewController.hasTouchID) {
-		cell.textLabel.text = @"Unlock with Touch ID";
+	} else if (indexPath.section == KKPasscodeViewController.hasBiometricAuthentication) {
+		cell.textLabel.text = [NSString stringWithFormat:@"Unlock with %@", KKPasscodeViewController.biometryTypeString];
 		cell.textLabel.textAlignment = NSTextAlignmentLeft;
-		cell.accessoryView = unlockWithTouchIDSwitch;
+		cell.accessoryView = unlockWithBiometricsSwitch;
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
-		unlockWithTouchIDSwitch.enabled = passcodeLockOn;
+		unlockWithBiometricsSwitch.enabled = passcodeLockOn;
 		if (passcodeLockOn) {
 			cell.textLabel.textColor = [UIColor blackColor];
 		} else {
 			cell.textLabel.textColor = [UIColor grayColor];
 		}
-	} else if (indexPath.section == (1 + KKPasscodeViewController.hasTouchID)) {
+	} else if (indexPath.section == (1 + KKPasscodeViewController.hasBiometricAuthentication)) {
 		cell.textLabel.text = @"Erase Data";
 		cell.textLabel.textAlignment = NSTextAlignmentLeft;
 		cell.accessoryView = eraseDataSwitch;
@@ -173,7 +173,7 @@
 			
 			if (passcodeLockOn) {
 				vc.mode = KKPasscodeModeDisabled;
-				vc.startTouchID = YES;
+				vc.startBiometricAuthentication = YES;
 			} else {
 				vc.mode = KKPasscodeModeSet;
 			}
@@ -219,8 +219,8 @@
 
 - (void)didSettingsChanged:(KKPasscodeViewController *)viewController  {
 	passcodeLockOn = [[KKKeychain getStringForKey:@"passcode_on"] isEqualToString:@"YES"];
-	unlockWithTouchIDOn = [[KKKeychain getStringForKey:@"unlock_with_touch_id"] isEqualToString:@"YES"];
-	unlockWithTouchIDSwitch.on = unlockWithTouchIDOn;
+	unlockWithBiometricsOn = [[KKKeychain getStringForKey:@"unlock_with_biometrics"] isEqualToString:@"YES"];
+	unlockWithBiometricsSwitch.on = unlockWithBiometricsOn;
 	eraseDataOn = [[KKKeychain getStringForKey:@"erase_data_on"] isEqualToString:@"YES"];
 	eraseDataSwitch.on = eraseDataOn;
 	

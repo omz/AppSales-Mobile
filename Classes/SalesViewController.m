@@ -110,6 +110,26 @@
 	[graphView setNumberOfBarsPerPage:iPad ? 14 : 7];
 	[self.topView addSubview:graphView];
 	
+	UIView *leftView = [[UIView alloc] initWithFrame:CGRectZero];
+	leftView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+	leftView.translatesAutoresizingMaskIntoConstraints = NO;
+	[self.topView addSubview:leftView];
+	[NSLayoutConstraint activateConstraints:@[[leftView.topAnchor constraintEqualToAnchor:self.topView.topAnchor],
+											  [leftView.bottomAnchor constraintEqualToAnchor:self.topView.bottomAnchor],
+											  [leftView.leftAnchor constraintEqualToAnchor:self.topView.leftAnchor],
+											  [leftView.rightAnchor constraintEqualToAnchor:self.graphView.leftAnchor],
+											  ]];
+	
+	UIView *rightView = [[UIView alloc] initWithFrame:CGRectZero];
+	rightView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+	rightView.translatesAutoresizingMaskIntoConstraints = NO;
+	[self.topView addSubview:rightView];
+	[NSLayoutConstraint activateConstraints:@[[rightView.topAnchor constraintEqualToAnchor:self.topView.topAnchor],
+											  [rightView.bottomAnchor constraintEqualToAnchor:self.topView.bottomAnchor],
+											  [rightView.leftAnchor constraintEqualToAnchor:self.graphView.rightAnchor],
+											  [rightView.rightAnchor constraintEqualToAnchor:self.topView.rightAnchor],
+											  ]];
+	
 	NSArray *segments;
 	if (iPad) {
 		segments = @[NSLocalizedString(@"Daily Reports", nil), NSLocalizedString(@"Weekly Reports", nil), NSLocalizedString(@"Calendar Months", nil), NSLocalizedString(@"Fiscal Months", nil)];
@@ -166,7 +186,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
-	if ([UIApplication sharedApplication].statusBarOrientation != previousOrientation) {
+	if (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) != UIInterfaceOrientationIsLandscape(previousOrientation)) {
 		[self adjustInterfaceForOrientation:[UIApplication sharedApplication].statusBarOrientation];
 	}
 }
@@ -199,7 +219,12 @@
 	}
 	
 	if (UIInterfaceOrientationIsLandscape(interfaceOrientation)) {
-		self.graphView.frame = self.view.bounds;
+		if (@available(iOS 11.0, *)) {
+			CGFloat safeAreaWidthInset = self.view.safeAreaInsets.left + self.view.safeAreaInsets.right;
+			self.graphView.frame = CGRectMake(self.view.safeAreaInsets.left, 0.0f, self.view.bounds.size.width - safeAreaWidthInset, self.view.bounds.size.height - self.view.safeAreaInsets.bottom);
+		} else {
+			self.graphView.frame = self.view.bounds;
+		}
 		self.topView.frame = self.view.bounds;
 		self.productsTableView.alpha = 0.0;
 		self.shadowView.hidden = YES;

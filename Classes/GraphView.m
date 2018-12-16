@@ -7,7 +7,7 @@
 //
 
 #import "GraphView.h"
-#import "MBProgressHUD.h"
+#import "ASProgressHUD.h"
 
 #define ANIMATION_DURATION	0.4
 
@@ -128,20 +128,20 @@
 - (void)lockScale:(UILongPressGestureRecognizer *)recognizer {
 	if (recognizer.state == UIGestureRecognizerStateBegan) {
 		maxLocked = !maxLocked;
-		[MBProgressHUD hideHUDForView:self animated:YES];
+		[ASProgressHUD hideHUDForView:self animated:YES];
 		
-		MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self];
+		ASProgressHUD *hud = [[ASProgressHUD alloc] initWithView:self];
 		hud.animationType = MBProgressHUDAnimationZoom;
 		hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(maxLocked ? @"Lock" : @"Unlock")]];
 		hud.mode = MBProgressHUDModeCustomView;
 		if (maxLocked) {
-			hud.labelText = NSLocalizedString(@"Scale locked", nil);
+			hud.label.text = NSLocalizedString(@"Scale locked", nil);
 		} else {
-			hud.labelText = NSLocalizedString(@"Scale unlocked", nil);
+			hud.label.text = NSLocalizedString(@"Scale unlocked", nil);
 		}
 		hud.userInteractionEnabled = NO;
 		[self addSubview:hud];
-		[hud show:YES];
+		[hud showAnimated:YES];
 		
 		lockIndicatorView.hidden = !maxLocked;
 		if (!maxLocked) {
@@ -154,7 +154,7 @@
 }
 
 - (void)hideHUD {
-	[MBProgressHUD hideHUDForView:self animated:YES];
+	[ASProgressHUD hideHUDForView:self animated:YES];
 }
 
 - (void)barSelected:(StackedBarView *)barView {

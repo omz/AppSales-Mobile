@@ -23,7 +23,7 @@
 @implementation ReportDetailViewController
 
 @synthesize selectedReport, selectedReportIndex, mapView, mapShadowView, shadowView, tableView;
-@synthesize prevItem, nextItem, toolbar;
+@synthesize prevItem, nextItem;
 @synthesize countryEntries, productEntries;
 @synthesize selectedCountry, selectedProduct;
 
@@ -75,6 +75,15 @@
 	headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	[self.view addSubview:headerView];
 	
+	if (@available(iOS 11.0, *)) {
+		headerView.contentView.translatesAutoresizingMaskIntoConstraints = NO;
+		[NSLayoutConstraint activateConstraints:@[[headerView.contentView.topAnchor constraintEqualToAnchor:headerView.topAnchor],
+												  [headerView.contentView.bottomAnchor constraintEqualToAnchor:headerView.bottomAnchor],
+												  [headerView.contentView.leftAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leftAnchor],
+												  [headerView.contentView.rightAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.rightAnchor],
+												  ]];
+	}
+	
 	headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(30.0f, 0.0f, headerView.bounds.size.width - 40.0f, 20.0f)];
 	headerLabel.backgroundColor = [UIColor clearColor];
 	headerLabel.font = [UIFont boldSystemFontOfSize:13.0f];
@@ -85,19 +94,16 @@
 	headerIconView.image = [UIImage imageNamed:@"AllApps"];
 	[headerView.contentView addSubview:headerIconView];
 	
-	CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) ? 32.0f : 44.0f;
-	
 	CGRect tableViewFrame = mapHidden ? CGRectMake(0.0f, 20.0f, self.view.bounds.size.width, self.view.bounds.size.height - 20.0f) : CGRectMake(0.0f, 208.0f, self.view.bounds.size.width, self.view.bounds.size.height - 208.0f);
 	self.tableView = [[UITableView alloc] initWithFrame:tableViewFrame style:UITableViewStylePlain];
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	tableView.backgroundColor = [UIColor clearColor];
-	tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, toolbarHeight, 0.0f);
 	tableView.dataSource = self;
 	tableView.delegate = self;
 	
 	self.tableView.tableHeaderView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowTop.png"]];
 	self.tableView.tableFooterView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
-	self.tableView.contentInset = UIEdgeInsetsMake(-20.0f, 0.0f, toolbarHeight - 20.0f, 0.0f);
+	self.tableView.contentInset = UIEdgeInsetsMake(-20.0f, 0.0f, -20.0f, 0.0f);
 	
 	[self.view addSubview:tableView];
 	
@@ -110,10 +116,6 @@
 	if (!UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
 		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap" : @"HideMap")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
 	}
-	
-	self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight)];
-	toolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-	[self.view addSubview:toolbar];
 	
 	CGFloat segmentWidth = 75.0f;
 	UISegmentedControl *modeControl = [[UISegmentedControl alloc] initWithItems:@[NSLocalizedString(@"Apps", nil), NSLocalizedString(@"Countries", nil)]];
@@ -134,10 +136,10 @@
 	
 	[self updateNavigationButtons];
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		toolbar.items = @[spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
+		self.toolbarItems = @[spaceItem, spaceItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
 	} else {
-		toolbar.items = @[prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
-		toolbar.translucent = YES;
+		self.toolbarItems = @[prevItem, nextItem, flexSpaceItem, modeItem, flexSpaceItem, spaceItem, csvItem];
+		self.navigationController.toolbar.translucent = YES;
 	}
 	
 	[self reloadData];
@@ -150,11 +152,7 @@
 		if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && !mapHidden) {
 			[self toggleMap:nil];
 		}
-		
-		CGFloat toolbarHeight = UIInterfaceOrientationIsLandscape(toInterfaceOrientation) ? 32.0f : 44.0f;
-		self.toolbar.frame = CGRectMake(0, self.view.bounds.size.height - toolbarHeight, self.view.bounds.size.width, toolbarHeight);
-		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0f, 0.0f, toolbarHeight, 0.0f);
-		self.tableView.contentInset = UIEdgeInsetsMake(-20.0f, 0.0f, toolbarHeight - 20.0f, 0.0f);
+		self.tableView.contentInset = UIEdgeInsetsMake(-20.0f, 0.0f, -20.0f, 0.0f);
 	} completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
 		if (!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
 			self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap" : @"HideMap")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
@@ -180,6 +178,16 @@
 
 - (void)viewDidUnload {
 	[super viewDidUnload];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	self.navigationController.toolbarHidden = NO;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	self.navigationController.toolbarHidden = YES;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {

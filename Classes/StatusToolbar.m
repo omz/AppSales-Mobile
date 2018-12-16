@@ -59,12 +59,19 @@
 	if (visible || (self.superview == nil)) { return; }
 	visible = YES;
 	[activityIndicator startAnimating];
-	self.frame = CGRectMake(0.0f, self.superview.bounds.size.height, self.superview.bounds.size.width, 44.0f);
+	
+	CGFloat statusHeight = 44.0f;
+	CGFloat statusOffsetY = statusHeight;
+	if (@available(iOS 11.0, *)) {
+		statusOffsetY += self.superview.safeAreaInsets.bottom;
+	}
+	
+	self.frame = CGRectMake(0.0f, self.superview.bounds.size.height, self.superview.bounds.size.width, statusHeight);
 	
 	[UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 		self.hidden = NO;
 		stopButtonItem.enabled = YES;
-		self.frame = CGRectMake(0.0f, self.superview.bounds.size.height - 44.0f, self.superview.bounds.size.width, 44.0f);
+		self.frame = CGRectMake(0.0f, self.superview.bounds.size.height - statusOffsetY, self.superview.bounds.size.width, statusHeight);
 	} completion:nil];
 }
 

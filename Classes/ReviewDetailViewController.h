@@ -15,7 +15,6 @@
 	NSArray<Review *> *reviews;
 	NSInteger index;
 	UIWebView *webView;
-	UIToolbar *toolbar;
 	UIBarButtonItem *previousItem;
 	UIBarButtonItem *nextItem;
 	UIBarButtonItem *markItem;

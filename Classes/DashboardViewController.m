@@ -75,6 +75,15 @@
 	return [NSSet setWithObjects:@"Product", nil];
 }
 
+- (CGRect)statusToolbarFrame {
+	CGFloat statusHeight = 44.0f;
+	CGFloat statusOffsetY = statusHeight;
+	if (@available(iOS 11.0, *)) {
+		statusOffsetY += self.view.safeAreaInsets.bottom;
+	}
+	return CGRectMake(0.0f, self.view.bounds.size.height - (statusVisible ? statusOffsetY : 0.0f), self.view.bounds.size.width, statusHeight);
+}
+
 - (void)loadView {
 	[super loadView];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
@@ -139,8 +148,7 @@
 	UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	self.stopButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopDownload:)];
 	
-	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - (statusVisible ? 44 : 0), self.view.bounds.size.width, 44);
-	self.statusToolbar = [[UIToolbar alloc] initWithFrame:statusToolbarFrame];
+	self.statusToolbar = [[UIToolbar alloc] initWithFrame:self.statusToolbarFrame];
 	statusToolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	statusToolbar.translucent = YES;
 	statusToolbar.barStyle = UIBarStyleBlackTranslucent;
@@ -156,6 +164,11 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	[self reloadData];
+}
+
+- (void)viewDidLayoutSubviews {
+	[super viewDidLayoutSubviews];
+	self.statusToolbar.frame = self.statusToolbarFrame;
 }
 
 - (void)viewDidUnload {
@@ -187,7 +200,7 @@
 	}
 	UIEdgeInsets productsTableContentInset = statusVisible ? UIEdgeInsetsMake(-20, 0, 24, 0) : UIEdgeInsetsMake(-20, 0, -20, 0);
 	UIEdgeInsets productsTableScrollIndicatorInset = statusVisible ? UIEdgeInsetsMake(0, 0, 44, 0) : UIEdgeInsetsMake(0, 0, 0, 0);
-	CGRect statusToolbarFrame = CGRectMake(0, self.view.bounds.size.height - (statusVisible ? 44 : 0), self.view.bounds.size.width, 44);
+	CGRect statusToolbarFrame = self.statusToolbarFrame;
 	if (statusVisible) {
 		self.statusToolbar.frame = statusToolbarFrame;
 		self.productsTableView.contentInset = productsTableContentInset;

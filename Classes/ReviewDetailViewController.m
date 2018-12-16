@@ -38,39 +38,40 @@
 - (void)loadView {
 	[super loadView];
 	
-	UIEdgeInsets contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 44.0f, 0.0f);
-	
 	webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.backgroundColor = [UIColor whiteColor];
 	webView.opaque = NO;
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
-	webView.scrollView.contentInset = contentInset;
-	webView.scrollView.scrollIndicatorInsets = contentInset;
 	self.view = webView;
-	
-	toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, self.view.bounds.size.height - contentInset.bottom, self.view.bounds.size.width, contentInset.bottom)];
-	toolbar.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth);
-	[self.view addSubview:toolbar];
+}
+
+- (void)viewDidLoad {
+	[super viewDidLoad];
 	
 	previousItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ChevronUp"] style:UIBarButtonItemStylePlain target:self action:@selector(previousReview)];
 	nextItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ChevronDown"] style:UIBarButtonItemStylePlain target:self action:@selector(nextReview)];
+	
+	self.navigationItem.rightBarButtonItems = @[nextItem, previousItem];
 	
 	UIBarButtonItem *flexSpaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 	markItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Circle"] style:UIBarButtonItemStylePlain target:self action:@selector(markReview)];
 	UIBarButtonItem *sendReviewButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReviewViaEmail)];
 	UIBarButtonItem *replyButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyToReview)];
 	
-	toolbar.items = @[markItem, flexSpaceItem, sendReviewButtonItem, flexSpaceItem, replyButtonItem];
-	toolbar.translucent = YES;
-}
-
-- (void)viewDidLoad {
-	[super viewDidLoad];
-	
-	self.navigationItem.rightBarButtonItems = @[nextItem, previousItem];
+	self.toolbarItems = @[markItem, flexSpaceItem, sendReviewButtonItem, flexSpaceItem, replyButtonItem];
 	
 	[self updateCurrentReview];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	self.navigationController.toolbarHidden = NO;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+	[super viewWillDisappear:animated];
+	self.navigationController.toolbarHidden = YES;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {

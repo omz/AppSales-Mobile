@@ -82,7 +82,7 @@
 		[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
 	}
 	
-	[self showPasscodeLockIfNeededWithTouchID:YES];
+	[self showPasscodeLockIfNeededWithBiometrics:YES];
 	if (iPad) {
 		//Restore previously-selected account:
 		NSString *accountIDURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kSettingSelectedAccountID];
@@ -224,23 +224,23 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
 	[self saveContext];
-	[self showPasscodeLockIfNeededWithTouchID:NO];
+	[self showPasscodeLockIfNeededWithBiometrics:NO];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
 	[[CurrencyManager sharedManager] refreshIfNeeded];
-	[self showPasscodeLockIfNeededWithTouchID:YES];
+	[self showPasscodeLockIfNeededWithBiometrics:YES];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
 	[[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
-- (void)showPasscodeLockIfNeededWithTouchID:(BOOL)useTouchID {
+- (void)showPasscodeLockIfNeededWithBiometrics:(BOOL)useBiometrics {
 	if ([[KKPasscodeLock sharedLock] isPasscodeRequired]) {
 		if (passcodeVC) {
-			if (useTouchID) {
-				[passcodeVC authenticateWithTouchID];
+			if (useBiometrics) {
+				[passcodeVC authenticateWithBiometrics];
 			}
 			return;
 		}
@@ -251,7 +251,7 @@
 		
 		passcodeVC = [[KKPasscodeViewController alloc] init];
 		passcodeVC.mode = KKPasscodeModeEnter;
-		passcodeVC.startTouchID = useTouchID;
+		passcodeVC.startBiometricAuthentication = useBiometrics;
 		passcodeVC.delegate = self;
 		
 		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:passcodeVC];

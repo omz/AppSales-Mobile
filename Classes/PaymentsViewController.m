@@ -51,10 +51,20 @@
 
 	[self.view addSubview:scrollView];
 
-	self.pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 15, self.view.bounds.size.width, 10)];
+	self.pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0.0f, self.view.bounds.size.height - 15.0f, self.view.bounds.size.width, 10.0f)];
 	pageControl.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
 	pageControl.userInteractionEnabled = NO;
 	[self.view addSubview:pageControl];
+}
+
+- (void)viewDidLayoutSubviews {
+	[super viewDidLayoutSubviews];
+	CGFloat bottomInset = 0.0f;
+	if (@available(iOS 11.0, *)) {
+		bottomInset += self.view.safeAreaInsets.bottom;
+	}
+	self.scrollView.frame = CGRectMake(0.0f, 0.0f, self.view.bounds.size.width, self.view.bounds.size.height - 5.0f - bottomInset);
+	self.pageControl.frame = CGRectMake(0.0f, self.view.bounds.size.height - 15.0f - bottomInset, self.view.bounds.size.width, 10.0f);
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {

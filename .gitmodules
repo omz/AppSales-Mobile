@@ -3,7 +3,7 @@
 	url = https://github.com/nicolasgomollon/ZIPArchive.git
 [submodule "Vendor/MBProgressHUD"]
 	path = Vendor/MBProgressHUD
-	url = https://github.com/jdg/MBProgressHUD.git
+	url = https://github.com/nicolasgomollon/MBProgressHUD.git
 [submodule "Vendor/SAMKeychain"]
 	path = Vendor/SAMKeychain
 	url = https://github.com/nicolasgomollon/SAMKeychain.git
