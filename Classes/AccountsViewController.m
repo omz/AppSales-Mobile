@@ -200,8 +200,7 @@
 	if ([self.accounts count] == 0) {
 		return 0;
 	}
-	//return 5;
-	return 4;
+	return 5;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -235,16 +234,11 @@
 		[unreadReviewsRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:[self managedObjectContext]]];
 		[unreadReviewsRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND unread == TRUE", account]];
 		cell.badgeCount = [[self managedObjectContext] countForFetchRequest:unreadReviewsRequest error:nil];
-	}/* else if (indexPath.row == 3) {
+	} else if (indexPath.row == 3) {
 		cell.textLabel.text = NSLocalizedString(@"Promo Codes", nil);
 		cell.imageName = @"PromoCodes";
 		cell.badgeCount = 0;
-	}else if (indexPath.row == 4) {
-		cell.textLabel.text = NSLocalizedString(@"Account", nil);
-		cell.imageName = @"Account";
-		cell.badgeCount = 0;
-	}*/
-	else if (indexPath.row == 3) {
+	} else if (indexPath.row == 4) {
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
 		cell.imageName = @"Account";
 		cell.badgeCount = 0;
@@ -295,10 +289,10 @@
 	} else if (indexPath.row == 2) {
 		ReviewsViewController *reviewsViewController = [[ReviewsViewController alloc] initWithAccount:account];
 		[self.navigationController pushViewController:reviewsViewController animated:YES];
-	}/* else if (indexPath.row == 3) {
+	} else if (indexPath.row == 3) {
 		PromoCodesViewController *promoCodesViewController = [[PromoCodesViewController alloc] initWithAccount:account];
 		[self.navigationController pushViewController:promoCodesViewController animated:YES];
-	}*/ else if (indexPath.row == 3) {
+	} else if (indexPath.row == 4) {
 		[self editAccount:account];
 	}
 }
