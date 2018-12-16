@@ -108,7 +108,7 @@ NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.
 			}
 		};
 		
-		if ([iTunesStorePage length] > 0) {
+		if ((iTunesStorePage != nil) && ([iTunesStorePage length] > 0)) {
 			NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
 			NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, 3500)];
 			if (match.numberOfRanges > 0) {
