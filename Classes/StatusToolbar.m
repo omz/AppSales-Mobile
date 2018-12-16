@@ -32,8 +32,6 @@
 		statusLabel.font = [UIFont boldSystemFontOfSize:14.0f];
 		statusLabel.backgroundColor = [UIColor clearColor];
 		statusLabel.textColor = [UIColor whiteColor];
-		statusLabel.shadowColor = [UIColor blackColor];
-		statusLabel.shadowOffset = CGSizeMake(0.0f, -1.0f);
 		statusLabel.textAlignment = NSTextAlignmentCenter;
 		statusLabel.text = NSLocalizedString(@"Loading...", nil);
 		

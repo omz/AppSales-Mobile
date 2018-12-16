@@ -523,8 +523,6 @@
 	headerLabel.backgroundColor = [UIColor clearColor];
 	headerLabel.textAlignment = NSTextAlignmentCenter;
 	headerLabel.font = [UIFont boldSystemFontOfSize:17.0];
-	headerLabel.shadowOffset = CGSizeMake(0, 1.0);
-	headerLabel.shadowColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0];
 	
 	if ([textField isEqual:setPasscodeTextField]) {
 		passcodeConfirmationWarningLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 146.5, self.view.bounds.size.width, 30.0)];
@@ -532,8 +530,6 @@
 		passcodeConfirmationWarningLabel.backgroundColor = [UIColor clearColor];
 		passcodeConfirmationWarningLabel.textAlignment = NSTextAlignmentCenter;
 		passcodeConfirmationWarningLabel.font = [UIFont systemFontOfSize:14.0];
-		passcodeConfirmationWarningLabel.shadowOffset = CGSizeMake(0, 1.0);
-		passcodeConfirmationWarningLabel.shadowColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0];
 		passcodeConfirmationWarningLabel.text = @"";
 		passcodeConfirmationWarningLabel.numberOfLines = 0;
 		passcodeConfirmationWarningLabel.lineBreakMode = NSLineBreakByWordWrapping;
@@ -550,8 +546,6 @@
 		failedAttemptsLabel.text = text;
 		failedAttemptsLabel.font = [UIFont boldSystemFontOfSize:14.0];
 		failedAttemptsLabel.textAlignment = NSTextAlignmentCenter;
-		failedAttemptsLabel.shadowOffset = CGSizeMake(0, -1.0);
-		failedAttemptsLabel.shadowColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:1.0];
 		failedAttemptsView.layer.cornerRadius = 14;
 		failedAttemptsView.layer.borderWidth = 1.0;
 		failedAttemptsView.layer.borderColor = [[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor];

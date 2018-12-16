@@ -200,7 +200,8 @@
 	if ([self.accounts count] == 0) {
 		return 0;
 	}
-	return 5;
+	//return 5;
+    return 4;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -234,15 +235,20 @@
 		[unreadReviewsRequest setEntity:[NSEntityDescription entityForName:@"Review" inManagedObjectContext:[self managedObjectContext]]];
 		[unreadReviewsRequest setPredicate:[NSPredicate predicateWithFormat:@"product.account == %@ AND unread == TRUE", account]];
 		cell.badgeCount = [[self managedObjectContext] countForFetchRequest:unreadReviewsRequest error:nil];
-	} else if (indexPath.row == 3) {
+	}/* else if (indexPath.row == 3) {
 		cell.textLabel.text = NSLocalizedString(@"Promo Codes", nil);
 		cell.imageName = @"PromoCodes";
 		cell.badgeCount = 0;
-	} else if (indexPath.row == 4) {
+	}else if (indexPath.row == 4) {
 		cell.textLabel.text = NSLocalizedString(@"Account", nil);
 		cell.imageName = @"Account";
 		cell.badgeCount = 0;
-	}	
+    }*/
+    else if (indexPath.row == 3) {
+        cell.textLabel.text = NSLocalizedString(@"Account", nil);
+        cell.imageName = @"Account";
+        cell.badgeCount = 0;
+    }
 	return cell;
 }
 
@@ -289,10 +295,10 @@
 	} else if (indexPath.row == 2) {
 		ReviewsViewController *reviewsViewController = [[ReviewsViewController alloc] initWithAccount:account];
 		[self.navigationController pushViewController:reviewsViewController animated:YES];
-	} else if (indexPath.row == 3) {
+	}/* else if (indexPath.row == 3) {
 		PromoCodesViewController *promoCodesViewController = [[PromoCodesViewController alloc] initWithAccount:account];
 		[self.navigationController pushViewController:promoCodesViewController animated:YES];
-	} else if (indexPath.row == 4) {
+	}*/ else if (indexPath.row == 3) {
 		[self editAccount:account];
 	}
 }
@@ -370,16 +376,31 @@
 	FieldSectionSpecifier *importExportSection = [FieldSectionSpecifier sectionWithFields:@[importButtonField, exportButtonField] title:nil description:nil];
 	
 	NSMutableArray *productFields = [[NSMutableArray alloc] init];
-	NSArray *allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
-		NSInteger productID1 = product1.productID.integerValue;
-		NSInteger productID2 = product2.productID.integerValue;
-		if (productID1 < productID2) {
-			return NSOrderedDescending;
-		} else if (productID1 > productID2) {
-			return NSOrderedAscending;
-		}
-		return NSOrderedSame;
-	}];
+    
+    NSArray *allProducts;
+    NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
+    if ([productSortByValue isEqualToString:@"productName"]) {
+        
+        // Sort products by Name.
+        allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+            NSString *productName1 = product1.name;
+            NSString *productName2 = product2.name;
+            
+            NSComparisonResult result = [productName1 caseInsensitiveCompare:productName2];
+            return result;
+        }];
+    } else {
+            allProducts = [[account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+            NSInteger productID1 = product1.productID.integerValue;
+            NSInteger productID2 = product2.productID.integerValue;
+            if (productID1 < productID2) {
+                return NSOrderedDescending;
+            } else if (productID1 > productID2) {
+                return NSOrderedAscending;
+            }
+            return NSOrderedSame;
+        }];
+    }
 	
 	for (Product *product in allProducts) {
 		NSMutableArray *sections = [[NSMutableArray alloc] init];
@@ -479,9 +500,11 @@
 	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
 	FieldSpecifier *productSortingByProductIdField = [FieldSpecifier checkFieldWithKey:@"sortby.productId" title:@"Product ID" 
 																			defaultValue:[productSortByValue isEqualToString:@"productId"]];
+    FieldSpecifier *productSortingByNameField = [FieldSpecifier checkFieldWithKey:@"sortby.productName" title:@"Name"
+                                                                     defaultValue:[productSortByValue isEqualToString:@"productName"]];
 	FieldSpecifier *productSortingByColorField = [FieldSpecifier checkFieldWithKey:@"sortby.color" title:@"Color" 
 																		defaultValue:[productSortByValue isEqualToString:@"color"]];
-	NSMutableArray *productSortingFields = [[NSMutableArray alloc] initWithArray:@[productSortingByProductIdField, productSortingByColorField]];
+	NSMutableArray *productSortingFields = [[NSMutableArray alloc] initWithArray:@[productSortingByProductIdField, productSortingByNameField, productSortingByColorField]];
 	
 	
 	FieldSectionSpecifier *productSortingSection = [FieldSectionSpecifier sectionWithFields:productSortingFields
@@ -622,8 +645,24 @@
 		[self doExport];
 	} else if ([key hasPrefix:@"product.appstore."]) {
 		NSString *productID = [key substringFromIndex:[@"product.appstore." length]];
-		NSString *appStoreURLString = [NSString stringWithFormat:@"http://itunes.apple.com/app/id%@", productID];
-		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreURLString]];
+		NSString *appStoreURLString = [NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", productID];
+        
+        //create product dict to check what kind of app were looking at
+        NSMutableDictionary *productsByID = [NSMutableDictionary dictionary];
+        for (Product *product in self.selectedAccount.products) {
+            [productsByID setObject:product forKey:product.productID];
+        }
+        
+        //check if app is a bundle
+        Product *product = productsByID[productID];
+        if ([product.platform.lowercaseString containsString:@"bundle"]) {
+            appStoreURLString = [NSString stringWithFormat:@"https://itunes.apple.com/app-bundle/id%@", productID];
+        }
+        
+        UIApplication *application = [UIApplication sharedApplication];
+        NSURL *URL = [NSURL URLWithString:appStoreURLString];
+        [application openURL:URL options:@{} completionHandler:nil];
+        
 	} else if ([key hasPrefix:@"product.reload."]) {
 		NSString *productID = [key substringFromIndex:[@"product.reload." length]];
 		IconManager *iconManager = [IconManager sharedManager];

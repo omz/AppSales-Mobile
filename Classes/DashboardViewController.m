@@ -134,8 +134,6 @@
 	statusLabel.font = [UIFont boldSystemFontOfSize:14.0];
 	statusLabel.backgroundColor = [UIColor clearColor];
 	statusLabel.textColor = [UIColor whiteColor];
-	statusLabel.shadowColor = [UIColor blackColor];
-	statusLabel.shadowOffset = CGSizeMake(0, -1);
 	statusLabel.textAlignment = NSTextAlignmentCenter;
 	
 	self.progressBar = [[UIProgressView alloc] initWithFrame:CGRectMake(0, 25, 200, 10)];
@@ -222,7 +220,6 @@
 
 - (void)reloadData {
 	NSString *productSortByValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"ProductSortby"];
-	
 	NSArray *allProducts;
 	if ([productSortByValue isEqualToString:@"color"]) {
 		// Sort products by color.
@@ -234,6 +231,15 @@
 			}
 			return NSOrderedSame;
 		}];
+    } else if ([productSortByValue isEqualToString:@"productName"]) {
+        // Sort products by Name.
+        allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {
+            NSString *productName1 = product1.name;
+            NSString *productName2 = product2.name;
+            
+            NSComparisonResult result = [productName1 caseInsensitiveCompare:productName2];
+            return result;
+        }];
 	} else {
 		// Sort products by ID (this will put the most recently released apps on top).
 		allProducts = [[self.account.products allObjects] sortedArrayUsingComparator:^NSComparisonResult(Product *product1, Product *product2) {

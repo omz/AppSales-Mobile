@@ -8,9 +8,9 @@
 
 #import "IconManager.h"
 
-NSString *const kITunesStorePageURLFormat             = @"https://itunes.apple.com/app/id%@";
-NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-ssl\\.mzstatic\\.com\\/image\\/thumb\\/[a-zA-Z0-9\\/\\.-]+\\/source(?:\\.icns)?\\/)1024x1024sr.\\w{3,4}";
-NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.com/icons/%@/%@_larger.png";
+NSString *const kITunesStoreLookupURLFormat           = @"https://itunes.apple.com/lookup?id=%@";
+NSString *const kITunesStoreBundlePageURLFormat       = @"https://itunes.apple.com/app-bundle/id%@";
+NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-ssl\\.mzstatic\\.com\\/image\\/thumb\\/[a-zA-Z0-9\\/\\.-]+690x0w.png)";
 
 @implementation IconManager
 
@@ -71,13 +71,13 @@ NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.
 	[downloadQueue removeObjectAtIndex:0];
 	
 	dispatch_async(queue, ^{
-		NSURL *iTunesStorePageURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStorePageURLFormat, nextAppID]];
-		NSURLRequest *iTunesStorePageRequest = [NSURLRequest requestWithURL:iTunesStorePageURL];
+        
+        NSURL *iTunesStoreLookupURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStoreLookupURLFormat, nextAppID]];
+		NSURLRequest *iTunesStoreLookupRequest = [NSURLRequest requestWithURL:iTunesStoreLookupURL];
 		
 		NSHTTPURLResponse *response = nil;
-		NSData *iTunesStorePageData = [NSURLConnection sendSynchronousRequest:iTunesStorePageRequest returningResponse:&response error:nil];
-		NSString *iTunesStorePage = [[NSString alloc] initWithData:iTunesStorePageData encoding:NSUTF8StringEncoding];
-		
+		NSData *iTunesStoreLookupData = [NSURLConnection sendSynchronousRequest:iTunesStoreLookupRequest returningResponse:&response error:nil];
+        
 		void (^failureBlock)(NSString *) = ^void(NSString *appID) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				// There was a response, but the download was not successful, write the default icon, so that we won't try again and again...
@@ -96,41 +96,68 @@ NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.
 			});
 		};
 		
+        //maybe the app is a bundle?
 		void (^retryAlternativePNG)(NSString *) = ^void(NSString *appID) {
-			NSString *iconThumbnailPath = [NSString stringWithFormat:kAppShopperThumbnailPathFormat, [appID substringToIndex:3], [appID substringFromIndex:3]];
-			NSURL *iconThumbnailURL = [NSURL URLWithString:iconThumbnailPath];
-			NSData *iconData = [[NSData alloc] initWithContentsOfURL:iconThumbnailURL];
-			UIImage *icon = [UIImage imageWithData:iconData];
-			if (icon != nil) {
-				successBlock(icon, iconData, appID);
-			} else {
-				failureBlock(appID);
-			}
+            
+            NSURL *iTunesStorePageURL = [NSURL URLWithString:[NSString stringWithFormat:kITunesStoreBundlePageURLFormat, appID]];
+            NSURLRequest *iTunesStorePageRequest = [NSURLRequest requestWithURL:iTunesStorePageURL];
+            
+            NSHTTPURLResponse *response = nil;
+            NSData *iTunesStorePageData = [NSURLConnection sendSynchronousRequest:iTunesStorePageRequest returningResponse:&response error:nil];
+            NSString *iTunesStorePage = [[NSString alloc] initWithData:iTunesStorePageData encoding:NSUTF8StringEncoding];
+            
+            if (iTunesStorePage != nil && iTunesStorePage.length > 0) {
+                NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
+                NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, iTunesStorePage.length-1)];
+                if (match.numberOfRanges > 0) {
+                    NSRange matchRange = [match rangeAtIndex:1];
+                    NSString *iTunesStoreThumbnailPath = [iTunesStorePage substringWithRange:matchRange];
+                    NSURL *iTunesStoreThumbnailURL = [NSURL URLWithString:iTunesStoreThumbnailPath];
+                    NSData *iconData = [[NSData alloc] initWithContentsOfURL:iTunesStoreThumbnailURL];
+                    UIImage *icon = [UIImage imageWithData:iconData];
+                    
+                    UIImage *resizedIcon = [self resizeIcon:icon];
+                    NSData *resizedIconData = UIImagePNGRepresentation(resizedIcon);
+                    
+                    if (resizedIcon != nil) {
+                        successBlock(resizedIcon, resizedIconData, nextAppID);
+                    } else {
+                        failureBlock(appID);
+                    }
+                } else {
+                    failureBlock(appID);
+                }
+            }
+            else {
+                failureBlock(appID);
+            }
 		};
 		
-		if ((iTunesStorePage != nil) && ([iTunesStorePage length] > 0)) {
-			NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
-			NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, 3500)];
-			if (match.numberOfRanges > 0) {
-				CGFloat iconSize = 30.0f * [UIScreen mainScreen].scale;
-				NSString *iconFile = [NSString stringWithFormat:@"%.0fx%.0f.png", iconSize, iconSize];
-				
-				NSRange matchRange = [match rangeAtIndex:1];
-				NSString *iTunesStoreThumbnailPath = [iTunesStorePage substringWithRange:matchRange];
-				iTunesStoreThumbnailPath = [iTunesStoreThumbnailPath stringByAppendingPathComponent:iconFile];
-				
-				NSURL *iTunesStoreThumbnailURL = [NSURL URLWithString:iTunesStoreThumbnailPath];
-				NSData *iconData = [[NSData alloc] initWithContentsOfURL:iTunesStoreThumbnailURL];
-				UIImage *icon = [UIImage imageWithData:iconData];
-				if (icon != nil) {
-					successBlock(icon, iconData, nextAppID);
-				} else {
-					retryAlternativePNG(nextAppID);
-				}
-			} else {
-				retryAlternativePNG(nextAppID);
-			}
-		} else if (response != nil) {
+		if (iTunesStoreLookupData != nil && iTunesStoreLookupData.length > 0) {
+            
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:iTunesStoreLookupData options:0 error:NULL];
+            NSArray *results = [dict objectForKey:@"results"];
+            if (!results || results.count == 0) {
+                retryAlternativePNG(nextAppID);
+            }
+            else {
+                NSDictionary *result = [results objectAtIndex:0];
+                NSString *imageUrlStr = [result objectForKey:@"artworkUrl512"];
+                
+                NSURL *artworkURL = [NSURL URLWithString:imageUrlStr];
+                NSData *imageData = [NSData dataWithContentsOfURL:artworkURL];
+                UIImage *icon = [UIImage imageWithData:imageData];
+                
+                UIImage *resizedIcon = [self resizeIcon:icon];
+                NSData *resizedIconData = UIImagePNGRepresentation(resizedIcon);
+                
+                if (resizedIcon != nil) {
+                    successBlock(resizedIcon, resizedIconData, nextAppID);
+                } else {
+                    retryAlternativePNG(nextAppID);
+                }
+            }
+		} else {
 			retryAlternativePNG(nextAppID);
 		}
 		
@@ -139,6 +166,19 @@ NSString *const kAppShopperThumbnailPathFormat        = @"http://cdn.appshopper.
 			[self dequeueDownload];
 		});
 	});
+}
+
+- (UIImage *)resizeIcon:(UIImage *)icon
+{
+    //resize icon
+    CGFloat iconSize = 30.0f * [UIScreen mainScreen].scale;
+    CGSize newSize = CGSizeMake(iconSize, iconSize);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [icon drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *resizedIcon = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return resizedIcon;
 }
 
 - (void)clearIconForAppID:(NSString *)appID {
