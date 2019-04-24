@@ -550,6 +550,7 @@
 							@"IA9. ",	//In-App Subscription
 							@"IAY",		//In-App Renewable Subscription
 							@"IAY. ",	//In-App Renewable Subscription
+                            @"IAY-M",   //Mac In-App Renewable Subscription
 							@"IAC",		//In-App Free Subscription
 							@"IAC. "	//In-App Free Subscription
 							@"1.GP",	//GP = Gift Purchase
