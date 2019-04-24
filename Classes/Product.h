@@ -9,13 +9,15 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-#define kProductPlatformiPhone			@"iPhone"
-#define kProductPlatformiPad			@"iPad"
-#define kProductPlatformUniversal		@"Universal"
-#define kProductPlatformMac				@"Mac"
-#define kProductPlatformInApp			@"In-App"
-#define kProductPlatformAppBundle		@"App Bundle"
-#define kProductPlatformMacAppBundle	@"Mac App Bundle"
+#define kProductPlatformiPhone			            @"iPhone"
+#define kProductPlatformiPad			            @"iPad"
+#define kProductPlatformUniversal		            @"Universal"
+#define kProductPlatformMac				            @"Mac"
+#define kProductPlatformInApp			            @"In-App"
+#define kProductPlatformAppBundle		            @"App Bundle"
+#define kProductPlatformMacAppBundle	            @"Mac App Bundle"
+#define kProductPlatformRenewableSubscription       @"Renewable Sub"
+#define kProductPlatformMacRenewableSubscription    @"Mac Renewable Sub"
 
 @class ASAccount, Version, Review;
 
