@@ -200,7 +200,9 @@
 										   @"IA1": kProductPlatformInApp,
 										   @"IA9": kProductPlatformInApp,
 										   @"1-B": kProductPlatformAppBundle,
-										   @"F1-B": kProductPlatformMacAppBundle};
+										   @"F1-B": kProductPlatformMacAppBundle,
+                                           @"IAY": kProductPlatformRenewableSubscription,
+                                           @"IAY-M": kProductPlatformMacRenewableSubscription};
 		}
 		
 		NSString *platform = platformsByTransactionType[rowDictionary[kReportColumnProductTypeIdentifier]];
@@ -550,6 +552,7 @@
 							@"IA9. ",	//In-App Subscription
 							@"IAY",		//In-App Renewable Subscription
 							@"IAY. ",	//In-App Renewable Subscription
+                            @"IAY-M",   //Mac In-App Renewable Subscription
 							@"IAC",		//In-App Free Subscription
 							@"IAC. "	//In-App Free Subscription
 							@"1.GP",	//GP = Gift Purchase
