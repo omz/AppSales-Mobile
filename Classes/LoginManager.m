@@ -33,7 +33,7 @@ NSString *const kITCAuthSessionAction = @"/v1/session";
 
 // iTunes Connect Reporter API
 NSString *const kITCRBaseURL                 = @"https://reportingitc2.apple.com";
-NSString *const kITCRGenerateCSRFTokenAction = @"/gsf/csrftoken";
+NSString *const kITCRGenerateCSRFTokenAction = @"/gsf/owasp/csrf-guard.js";
 NSString *const kITCRGetAccessKeyAction      = @"/gsf/salesTrendsApp/businessareas/InternetServices/subjectareas/iTunes/proxy/getAccessKey";
 NSString *const kITCRResetAccessKeyAction    = @"/gsf/salesTrendsApp/businessareas/InternetServices/subjectareas/iTunes/proxy/resetAccessKey";
 
@@ -409,14 +409,14 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	NSURL *generateCSRFTokenURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRGenerateCSRFTokenAction]];
 	NSMutableURLRequest *generateRequest = [NSMutableURLRequest requestWithURL:generateCSRFTokenURL];
 	[generateRequest setHTTPMethod:@"GET"];
-	[generateRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
 	NSHTTPURLResponse *generateResponse = nil;
 	NSData *generateData = [NSURLConnection sendSynchronousRequest:generateRequest returningResponse:&generateResponse error:nil];
-	NSDictionary *generateDict = [NSJSONSerialization JSONObjectWithData:generateData options:0 error:nil];
-	NSString *status = generateDict[@"status"];
-	if ((status != nil) && [status isEqualToString:@"success"]) {
-		return generateDict[@"result"];
-	}
+    NSString *generateString = [[NSString alloc] initWithData:generateData encoding:NSUTF8StringEncoding];
+    if ([generateString containsString:@"this.setRequestHeader(\"CSRF\", \""])
+    {
+        NSString *result = [generateString substringWithRange:NSMakeRange([generateString rangeOfString:@"this.setRequestHeader(\"CSRF\", \""].location + 31, 159)];
+        return result;
+    }
 	return nil;
 }
 
