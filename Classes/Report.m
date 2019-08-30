@@ -546,6 +546,7 @@
 							@"F1-B. ",	//Mac App Bundle
 							@"FI1",		//Mac In-App Purchase
 							@"FI1. ",	//Mac In-App Purchase
+                            @"IA1-M",   //Mac In-App Purchase
 							@"IA1",		//In-App Purchase
 							@"IA1. ",	//In-App Purchase
 							@"IA9",		//In-App Subscription
@@ -684,6 +685,7 @@
 								@"IA9",		//In-App Subscription
 								@"IAY",	 //In-App Auto-Renewable Subscription
 								@"FI1",	 //Mac In-App Purchase
+                                @"IA1-M",   //Mac In-App Purchase
 								@"1E",	  //Paid App (Custom iPhone)
 								@"1EP",	 //Paid App (Custom iPad)
 								@"1EU",	 //Paid App (Custom Universal)
