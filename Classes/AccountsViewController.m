@@ -760,7 +760,9 @@
 			
 			@synchronized(exportedReports) {
 				exportedReports = @(exportedReports.unsignedIntegerValue + 1);
-				hud.progress = ((CGFloat)exportedReports.unsignedIntegerValue / (CGFloat)totalReports);
+				dispatch_async(dispatch_get_main_queue(), ^{
+					hud.progress = ((CGFloat)exportedReports.unsignedIntegerValue / (CGFloat)totalReports);
+				});
 			}
 		};
 		
@@ -782,8 +784,10 @@
 		
 		[reportExportQueue waitUntilAllOperationsAreFinished];
 		
-		hud.mode = MBProgressHUDModeIndeterminate;
-		hud.label.text = NSLocalizedString(@"Compressing", nil);
+		dispatch_async(dispatch_get_main_queue(), ^{
+			hud.mode = MBProgressHUDModeIndeterminate;
+			hud.label.text = NSLocalizedString(@"Compressing", nil);
+		});
 		
 		ZIPArchive *zipArchive = [[ZIPArchive alloc] initWithFileURL:exportedReportsZipFileURL];
 		[zipArchive addDirectoryToArchive:exportURL];
