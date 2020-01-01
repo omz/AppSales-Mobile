@@ -1,4 +1,4 @@
-#AppSales
+# AppSales
 
 ---
 
@@ -12,7 +12,7 @@
 
 AppSales allows iOS and Mac App Store developers to download and analyze their sales reports from iTunes Connect on the iPhone.
 
-##Features
+## Features
 * Automatic download of daily and weekly sales reports from iTunes Connect
 * Stacked bar graphs to see all your sales at a glance
 * Show your sales on a world map
@@ -21,10 +21,10 @@ AppSales allows iOS and Mac App Store developers to download and analyze their s
 * Import reports that you downloaded elsewhere (for example with [AppViz](http://www.ideaswarm.com) on your Mac) via iTunes File Sharing
 * Optional push notifications when new reports are available via Boxcar
 
-##Requirements
+## Requirements
 AppSales requires the iOS 7.0 SDK or later.
 
-##Push Notifications
+## Push Notifications
 Because sales reports are not always available at the same time, I run a web service to send out push notifications when the daily reports have been generated.
 
 You can get a notification when new reports are available with the free [Boxcar](http://itunes.apple.com/us/app/boxcar/id321493542) app. Boxcar can also be installed directly from the settings in AppSales.
@@ -33,7 +33,7 @@ If AppSales is installed, opening the push notification will automatically trigg
 
 Except for the total number of subscribers, I don't collect any data with the push service. You can stop receiving notifications at any time by simply removing AppSales from Boxcar.
 
-##About
+## About
 You can follow me on Twitter for updates on the development: [@olemoritz](http://twitter.com/olemoritz)
 
 If you'd like to support this effort, please consider a donation via PayPal or Flattr:
@@ -41,7 +41,7 @@ If you'd like to support this effort, please consider a donation via PayPal or F
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YDQN4S3WVRCBU&lc=US&item_name=AppSales&no_note=1&currency_code=USD"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a> <a href="http://flattr.com/thing/366574/AppSales" target="_blank">
 <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
 
-##License
+## License
 In addition to the BSD-2 license below, I ask that you do not publicly distribute the app as a whole in binary form (e.g. on the App Store).
 
     Copyright (c) 2011, Ole Zorn
