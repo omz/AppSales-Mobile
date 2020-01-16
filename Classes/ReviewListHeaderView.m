@@ -70,63 +70,63 @@
 		totalReviewsLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%@ Reviews", nil), [formatter stringFromNumber:@(0)]];
 		[self addSubview:totalReviewsLabel];
 		
-		UILabel *starLabel5 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 12.0f - 90.0f - 10.0f - 42.0f - 18.0f, 23.0f, 42.0f, 9.0f)];
+		UILabel *starLabel5 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 12.0f - 90.0f - 10.0f - 52.0f - 18.0f, 23.0f, 52.0f, 9.0f)];
 		starLabel5.text = [@"" stringByPaddingToLength:5 withString:@"\u2605" startingAtIndex:0];
 		[self addSubview:starLabel5];
 		
-		reviewLabel5 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 18.0f, 23.0f, 42.0f, 9.0f)];
+		reviewLabel5 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 18.0f, 23.0f, 52.0f, 9.0f)];
 		reviewLabel5.text = @"0";
 		[self addSubview:reviewLabel5];
 		
-		progressView5 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 42.0f - 18.0f, 26.0f, 90.0f, 3.0f)];
+		progressView5 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 52.0f - 18.0f, 26.0f, 90.0f, 3.0f)];
 		progressView5.progress = 0.29f;
 		[self addSubview:progressView5];
 		
-		UILabel *starLabel4 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 12.0f - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(starLabel5.frame), 42.0f, 9.0f)];
+		UILabel *starLabel4 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 12.0f - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(starLabel5.frame), 52.0f, 9.0f)];
 		starLabel4.text = [@"" stringByPaddingToLength:4 withString:@"\u2605" startingAtIndex:0];
 		[self addSubview:starLabel4];
 		
-		reviewLabel4 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 18.0f, CGRectGetMaxY(reviewLabel5.frame), 42.0f, 9.0f)];
+		reviewLabel4 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 18.0f, CGRectGetMaxY(reviewLabel5.frame), 52.0f, 9.0f)];
 		reviewLabel4.text = @"0";
 		[self addSubview:reviewLabel4];
 		
-		progressView4 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(progressView5.frame) + 6.0f, 90.0f, 3.0f)];
+		progressView4 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(progressView5.frame) + 6.0f, 90.0f, 3.0f)];
 		progressView4.progress = 0.1f;
 		[self addSubview:progressView4];
 		
-		UILabel *starLabel3 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 12.0f - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(starLabel4.frame), 42.0f, 9.0f)];
+		UILabel *starLabel3 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 12.0f - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(starLabel4.frame), 52.0f, 9.0f)];
 		starLabel3.text = [@"" stringByPaddingToLength:3 withString:@"\u2605" startingAtIndex:0];
 		[self addSubview:starLabel3];
 		
-		reviewLabel3 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 18.0f, CGRectGetMaxY(reviewLabel4.frame), 42.0f, 9.0f)];
+		reviewLabel3 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 18.0f, CGRectGetMaxY(reviewLabel4.frame), 52.0f, 9.0f)];
 		reviewLabel3.text = @"0";
 		[self addSubview:reviewLabel3];
 		
-		progressView3 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(progressView4.frame) + 6.0f, 90.0f, 3.0f)];
+		progressView3 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(progressView4.frame) + 6.0f, 90.0f, 3.0f)];
 		progressView3.progress = 0.12f;
 		[self addSubview:progressView3];
 		
-		UILabel *starLabel2 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 12.0f - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(starLabel3.frame), 42.0f, 9.0f)];
+		UILabel *starLabel2 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 12.0f - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(starLabel3.frame), 52.0f, 9.0f)];
 		starLabel2.text = [@"" stringByPaddingToLength:2 withString:@"\u2605" startingAtIndex:0];
 		[self addSubview:starLabel2];
 		
-		reviewLabel2 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 18.0f, CGRectGetMaxY(reviewLabel3.frame), 42.0f, 9.0f)];
+		reviewLabel2 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 18.0f, CGRectGetMaxY(reviewLabel3.frame), 52.0f, 9.0f)];
 		reviewLabel2.text = @"0";
 		[self addSubview:reviewLabel2];
 		
-		progressView2 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(progressView3.frame) + 6.0f, 90.0f, 3.0f)];
+		progressView2 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(progressView3.frame) + 6.0f, 90.0f, 3.0f)];
 		progressView2.progress = 0.13f;
 		[self addSubview:progressView2];
 		
-		UILabel *starLabel1 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 12.0f - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(starLabel2.frame), 42.0f, 9.0f)];
+		UILabel *starLabel1 = [self newStarLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 12.0f - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(starLabel2.frame), 52.0f, 9.0f)];
 		starLabel1.text = [@"" stringByPaddingToLength:1 withString:@"\u2605" startingAtIndex:0];
 		[self addSubview:starLabel1];
 		
-		reviewLabel1 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 42.0f - 18.0f, CGRectGetMaxY(reviewLabel2.frame), 42.0f, 9.0f)];
+		reviewLabel1 = [self newReviewLabelWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 52.0f - 18.0f, CGRectGetMaxY(reviewLabel2.frame), 52.0f, 9.0f)];
 		reviewLabel1.text = @"0";
 		[self addSubview:reviewLabel1];
 		
-		progressView1 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 42.0f - 18.0f, CGRectGetMaxY(progressView2.frame) + 6.0f, 90.0f, 3.0f)];
+		progressView1 = [self newProgressViewWithFrame:CGRectMake(CGRectGetWidth(self.frame) - 90.0f - 10.0f - 52.0f - 18.0f, CGRectGetMaxY(progressView2.frame) + 6.0f, 90.0f, 3.0f)];
 		progressView1.progress = 0.36f;
 		[self addSubview:progressView1];
 		
