@@ -1,0 +1,23 @@
+body {
+    color: #212121;
+    background-color: transparent;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table,
+th,
+td {
+    border: none;
+}
+
+tr:first-child {
+    font-weight: bold;
+    background-color: #e0e2f0;
+}
+
+tr {
+    border-bottom: 1px solid #212121;
+}

@@ -7,17 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 #import <MessageUI/MessageUI.h>
 
 @class Report;
 
-@interface ReportCSVViewController : UIViewController <MFMailComposeViewControllerDelegate> {
+@interface ReportCSVViewController : UIViewController <MFMailComposeViewControllerDelegate,WKNavigationDelegate> {
 
 	Report *report;
-	UIWebView *webView;
+	WKWebView *webView;
 }
 
-@property (nonatomic, strong) UIWebView *webView;
+@property (nonatomic, strong) WKWebView *webView;
 
 - (instancetype)initWithReport:(Report *)selectedReport;
 

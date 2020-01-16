@@ -1,0 +1,23 @@
+body {
+    color: #e0e2f0;
+    background-color: #2c2c2e;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table,
+th,
+td {
+    border: none;
+}
+
+tr:first-child {
+    font-weight: bold;
+    background-color: #212121;
+}
+
+tr {
+    border-bottom: 1px solid #e0e2f0;
+}
