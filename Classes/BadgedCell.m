@@ -156,7 +156,13 @@ CGFloat const kBadgePadding = 6.0f;
 
 - (void)setImageName:(NSString *)_imageName {
 	imageName = _imageName;
-	self.imageView.image = (imageName != nil) ? [UIImage imageNamed:imageName] : nil;
+    
+    if (@available(iOS 13.0, *)) {
+        self.imageView.image = (imageName != nil) ? [UIImage as_tintedImageNamed:imageName color:[[UIColor labelColor] colorWithAlphaComponent:0.4]] : nil;
+    } else {
+        self.imageView.image = (imageName != nil) ? [UIImage imageNamed:imageName] : nil;
+    }
+	
 	self.imageView.highlightedImage = (imageName != nil) ? [UIImage as_tintedImageNamed:imageName color:[UIColor whiteColor]] : nil;
 	[self.contentView removeConstraints:@[textLabelLeftConstraint, textLabelLeftMarginConstraint]];
 	[self.contentView addConstraint:(imageName == nil) ? textLabelLeftMarginConstraint : textLabelLeftConstraint];

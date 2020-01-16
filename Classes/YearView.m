@@ -7,6 +7,7 @@
 //
 
 #import "YearView.h"
+#import "DarkModeCheck.h"
 
 @implementation YearView
 
@@ -27,7 +28,13 @@
 
 	CGFloat margin = 10.0;
 	CGContextSetShadowWithColor(c, CGSizeMake(0, 1.0), 6.0, [[UIColor blackColor] CGColor]);
-	CGContextSetRGBFillColor(c, 1.0, 1.0, 1.0, 1.0);
+    
+    if ([DarkModeCheck deviceIsInDarkMode] == YES) {
+        CGContextSetRGBFillColor(c, 28/255.0, 28/255.0, 30/255.0, 1.0);
+    } else {
+        CGContextSetRGBFillColor(c, 1.0, 1.0, 1.0, 1.0);
+    }
+    
 	CGContextFillRect(c, CGRectInset(self.bounds, margin, margin));
 
 	CGContextRestoreGState(c);
@@ -37,7 +44,13 @@
 	CGFloat monthsHeight = self.bounds.size.height - 2 * margin - headerHeight - footerHeight;
 	CGFloat singleMonthHeight = monthsHeight / 4;
 	CGFloat singleMonthWidth = (self.bounds.size.width - 2 * margin) / 3.0;
-	CGContextSetRGBFillColor(c, 0.8, 0.8, 0.8, 1.0);
+	
+    if ([DarkModeCheck deviceIsInDarkMode] == YES) {
+        CGContextSetRGBFillColor(c, 0.75, 0.75, 0.75, 0.2);
+    } else {
+        CGContextSetRGBFillColor(c, 0.8, 0.8, 0.8, 1.0);
+    }
+
 	for (int i=0; i<5; i++) {
 		CGFloat y = margin + headerHeight + i * (monthsHeight / 4.0);
 		CGContextFillRect(c, CGRectMake(margin, (int)y, self.bounds.size.width - 2 * margin, 1));
@@ -47,15 +60,33 @@
 		CGContextFillRect(c, CGRectMake((int)x, margin + headerHeight, 1, self.bounds.size.height - 2 * margin - headerHeight - footerHeight));
 	}
 	CGRect yearRect = CGRectMake(margin, margin, self.bounds.size.width - 2 * margin, headerHeight);
-	[[UIColor colorWithWhite:0.95 alpha:1.0] set];
+    
+    if (@available(iOS 13.0, *)) {
+        [[UIColor secondarySystemBackgroundColor] set];
+    } else {
+        // Fallback on earlier versions
+        [[UIColor colorWithWhite:0.95 alpha:1.0] set];
+    }
+    
+    
 	CGContextFillRect(c, yearRect);
 	yearRect.origin.y += 10;
-	[[UIColor darkGrayColor] set];
+    [[UIColor darkGrayColor] set];
 	UIFont *yearFont = [UIFont boldSystemFontOfSize:27];
 	NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
 	[style setAlignment:NSTextAlignmentCenter];
-	[[NSString stringWithFormat:@"%li", (long)year] drawInRect:yearRect withAttributes:@{NSFontAttributeName : yearFont,
-																				  NSParagraphStyleAttributeName : style}];
+    
+    if (@available(iOS 13.0, *)) {
+        [[NSString stringWithFormat:@"%li", (long)year] drawInRect:yearRect withAttributes:@{
+            NSFontAttributeName : yearFont,
+            NSParagraphStyleAttributeName : style,
+            NSForegroundColorAttributeName : [UIColor labelColor]}];
+    } else {
+        // Fallback on earlier versions
+        [[NSString stringWithFormat:@"%li", (long)year] drawInRect:yearRect withAttributes:@{
+            NSFontAttributeName : yearFont,
+            NSParagraphStyleAttributeName : style}];
+    }
 
 	NSDateFormatter *monthFormatter = [[NSDateFormatter alloc] init];
 	[monthFormatter setDateFormat:@"MMMM"];
@@ -85,8 +116,17 @@
 		NSString *month = [monthFormatter stringFromDate:monthDate];
 		NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
 		style.alignment = NSTextAlignmentLeft;
-		[month drawInRect:monthRect withAttributes:@{NSFontAttributeName: monthFont,
-													 NSParagraphStyleAttributeName: style}];
+        
+        if (@available(iOS 13.0, *)) {
+            [month drawInRect:monthRect withAttributes:@{
+            NSFontAttributeName: monthFont,
+            NSParagraphStyleAttributeName: style,
+            NSForegroundColorAttributeName: [UIColor secondaryLabelColor]}];
+        } else {
+            [month drawInRect:monthRect withAttributes:@{
+                NSFontAttributeName: monthFont,
+                NSParagraphStyleAttributeName: style}];
+        }
 
 		NSMutableAttributedString *label = labelsByMonth[@(i + 1)];
 		if (label) {
@@ -103,6 +143,14 @@
 			labelStyle.alignment = NSTextAlignmentCenter;
 			[label addAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:fontSize],
 			NSParagraphStyleAttributeName: labelStyle} range:NSMakeRange(0, label.length)];
+            
+            if (@available(iOS 13.0, *)) {
+                NSDictionary *currentAttrs = [label attributesAtIndex:0 effectiveRange:nil];
+                if (currentAttrs[NSForegroundColorAttributeName] == [UIColor labelColor]) {
+                    [label addAttributes:@{NSForegroundColorAttributeName: [UIColor labelColor]} range:NSMakeRange(0, label.length)];
+                }
+            }
+            
 			[label drawInRect:labelRect];
 		}
 	}
@@ -110,9 +158,17 @@
 	CGRect footerRect = CGRectMake(margin, self.bounds.size.height - footerHeight + 3, self.bounds.size.width - 2 * margin, 20);
 	NSMutableParagraphStyle *style2 = [NSMutableParagraphStyle new];
 	style2.alignment = NSTextAlignmentCenter;
-	[self.footerText drawInRect:footerRect withAttributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:14.0],
-															NSParagraphStyleAttributeName: style2}];
-
+    
+    if (@available(iOS 13.0, *)) {
+        [self.footerText drawInRect:footerRect withAttributes:@{
+            NSFontAttributeName: [UIFont boldSystemFontOfSize:14.0],
+            NSParagraphStyleAttributeName: style2,
+            NSForegroundColorAttributeName: [UIColor labelColor]}];
+    } else {
+        [self.footerText drawInRect:footerRect withAttributes:@{
+                   NSFontAttributeName: [UIFont boldSystemFontOfSize:14.0],
+                   NSParagraphStyleAttributeName: style2}];
+    }
 }
 
 

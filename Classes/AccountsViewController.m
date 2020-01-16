@@ -220,6 +220,7 @@
 		cell.textLabel.text = NSLocalizedString(@"Sales and Trends", nil);
 		cell.badgeCount = badge;
 		cell.imageName = @"Sales";
+        
 	} else if (indexPath.row == 1) {
 		NSInteger badge = [[self.accounts[indexPath.section] paymentsBadge] integerValue];
 		cell.textLabel.text = NSLocalizedString(@"Payments", nil);

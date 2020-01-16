@@ -26,9 +26,21 @@
 	self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
+    
+    if (@available(iOS 13.0, *)) {
+        webView.backgroundColor = [UIColor systemBackgroundColor];
+    }
+    
 	self.view = webView;
 	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReport:)];
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    NSString *cssString = @"body { color: #e0e2f0; background-color: #2c2c2e; }";
+    NSString *javascriptString = @"var style = document.createElement('style'); style.innerHTML = '%@'; document.head.appendChild(style)";
+    NSString *javascriptWithCSSString = [NSString stringWithFormat:javascriptString, cssString];
+    [webView stringByEvaluatingJavaScriptFromString:javascriptWithCSSString];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -48,6 +60,10 @@
 	NSString *tempPath = [tempDir stringByAppendingPathComponent:@"temp.csv"];
 	[csv writeToFile:tempPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
 	[self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:tempPath]]];
+    
+    if (@available(iOS 13.0, *)) {
+        [self webViewDidFinishLoad:self.webView];
+    }
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {

@@ -26,7 +26,13 @@
 	self = [super initWithFrame:CGRectMake(0.0f, 0.0f, 320.0f, 108.0f)];
 	if (self) {
 		// Initialization code
-		self.backgroundColor = [UIColor clearColor];
+        
+        if (@available(iOS 13.0, *)) {
+            self.backgroundColor = [UIColor secondarySystemBackgroundColor];
+        } else {
+            self.backgroundColor = [UIColor clearColor];
+        }
+		
 		
 		formatter = [[NSNumberFormatter alloc] init];
 		formatter.locale = [NSLocale currentLocale];

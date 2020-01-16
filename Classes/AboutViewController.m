@@ -7,6 +7,7 @@
 //
 
 #import "AboutViewController.h"
+#import "DarkModeCheck.h"
 
 NSString *const kAppGitHubRepoInfoPLIST = @"https://gitcdn.xyz/repo/nicolasgomollon/AppSales-Mobile/master/Support/AppSales-Info.plist";
 
@@ -29,7 +30,8 @@ NSString *const kAppGitHubRepoInfoPLIST = @"https://gitcdn.xyz/repo/nicolasgomol
 }
 
 + (NSString *)aboutHTML {
-	NSString *webpagePath = [[NSBundle mainBundle] pathForResource:@"About" ofType:@"html"];
+    NSString *htmlName = [DarkModeCheck checkForDarkModeHtml:@"About"];
+	NSString *webpagePath = [[NSBundle mainBundle] pathForResource:htmlName ofType:@"html"];
 	NSString *fileHTML = [[NSString alloc] initWithContentsOfFile:webpagePath encoding:NSUTF8StringEncoding error:nil];
 	fileHTML = [fileHTML stringByReplacingOccurrencesOfString:@"[[APP_VERSION_BUILD]]" withString:AboutViewController.appVersion];
 	return fileHTML;
@@ -39,7 +41,14 @@ NSString *const kAppGitHubRepoInfoPLIST = @"https://gitcdn.xyz/repo/nicolasgomol
 	self.title = NSLocalizedString(@"About", nil);
 	
 	webView = [[UIWebView alloc] initWithFrame:CGRectZero];
-	webView.backgroundColor = [UIColor colorWithRed:197.0f/255.0f green:204.0f/255.0f blue:212.0f/255.0f alpha:1.0f];
+    
+    if (@available(iOS 13.0, *)) {
+        webView.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        // Fallback on earlier versions
+        webView.backgroundColor = [UIColor colorWithRed:197.0f/255.0f green:204.0f/255.0f blue:212.0f/255.0f alpha:1.0f];
+    }
+    
 	webView.opaque = NO;
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;

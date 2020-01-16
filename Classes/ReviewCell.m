@@ -137,7 +137,13 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		titleLabel.editable = NO;
 		titleLabel.textAlignment = NSTextAlignmentLeft;
 		titleLabel.font = [UIFont boldSystemFontOfSize:kReviewTitleFontSize];
-		titleLabel.textColor = [UIColor blackColor];
+		
+        if (@available(iOS 13.0, *)) {
+            titleLabel.textColor = [UIColor labelColor];
+        } else {
+            titleLabel.textColor = [UIColor blackColor];
+        }
+        
 		titleLabel.text = NSLocalizedString(@"Untitled", nil);
 		[self.contentView addSubview:titleLabel];
 		
@@ -168,7 +174,14 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		reviewLabel.backgroundColor = [UIColor clearColor];
 		reviewLabel.textAlignment = NSTextAlignmentLeft;
 		reviewLabel.font = [UIFont systemFontOfSize:kReviewTextFontSize];
-		reviewLabel.textColor = [UIColor blackColor];
+        
+        if (@available(iOS 13.0, *)) {
+            reviewLabel.tintColor = [UIColor labelColor];
+        } else {
+            reviewLabel.tintColor = [UIColor blackColor];
+        }
+        
+        
 		reviewLabel.numberOfLines = 0;
 		reviewLabel.text = NSLocalizedString(@"Lorem ipsum dolor sit amet.", nil);
 		[self.contentView addSubview:reviewLabel];
