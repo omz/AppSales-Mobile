@@ -28,8 +28,8 @@ NSString *const kAppleAuthLocationKey      = @"Location";
 NSString *const kAppleAuthSetCookieKey     = @"Set-Cookie";
 
 // iTunes Connect Auth API
-NSString *const kITCAuthBaseURL       = @"https://olympus.itunes.apple.com";
-NSString *const kITCAuthSessionAction = @"/v1/session";
+NSString *const kITCAuthBaseURL       = @"https://appstoreconnect.apple.com";
+NSString *const kITCAuthSessionAction = @"/olympus/v1/session";
 
 // iTunes Connect Reporter API
 NSString *const kITCRBaseURL                 = @"https://reportingitc2.apple.com";
@@ -40,6 +40,8 @@ NSString *const kITCRResetAccessKeyAction    = @"/gsf/salesTrendsApp/businessare
 // iTunes Connect Reporter API Headers
 NSString *const kITCRXRequestedWithKey   = @"X-Requested-With";
 NSString *const kITCRXRequestedWithValue = @"XMLHttpRequest";
+NSString *const kITCRFetchCSRFTokenKey   = @"FETCH-CSRF-TOKEN";
+NSString *const kITCRFetchCSRFTokenValue = @"1";
 NSString *const kITCRCSRFKey             = @"CSRF";
 
 // iTunes Connect Payments API
@@ -408,15 +410,19 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	[self resetITCReporterAPI];
 	NSURL *generateCSRFTokenURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRGenerateCSRFTokenAction]];
 	NSMutableURLRequest *generateRequest = [NSMutableURLRequest requestWithURL:generateCSRFTokenURL];
-	[generateRequest setHTTPMethod:@"GET"];
+	[generateRequest setHTTPMethod:@"POST"];
+	[generateRequest setValue:kITCRFetchCSRFTokenValue forHTTPHeaderField:kITCRFetchCSRFTokenKey];
+	[generateRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
 	NSHTTPURLResponse *generateResponse = nil;
 	NSData *generateData = [NSURLConnection sendSynchronousRequest:generateRequest returningResponse:&generateResponse error:nil];
-    NSString *generateString = [[NSString alloc] initWithData:generateData encoding:NSUTF8StringEncoding];
-    if ([generateString containsString:@"this.setRequestHeader(\"CSRF\", \""])
-    {
-        NSString *result = [generateString substringWithRange:NSMakeRange([generateString rangeOfString:@"this.setRequestHeader(\"CSRF\", \""].location + 31, 159)];
-        return result;
-    }
+	NSString *generateString = [[NSString alloc] initWithData:generateData encoding:NSUTF8StringEncoding];
+	if (generateString != nil) {
+		NSRange csrfRange = [generateString rangeOfString:@"CSRF:"];
+		if (csrfRange.location != NSNotFound) {
+			NSUInteger csrfStart = csrfRange.location + csrfRange.length;
+			return [generateString substringFromIndex:csrfStart];
+		}
+	}
 	return nil;
 }
 
