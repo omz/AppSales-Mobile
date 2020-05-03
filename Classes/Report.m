@@ -201,8 +201,8 @@
 										   @"IA9": kProductPlatformInApp,
 										   @"1-B": kProductPlatformAppBundle,
 										   @"F1-B": kProductPlatformMacAppBundle,
-                                           @"IAY": kProductPlatformRenewableSubscription,
-                                           @"IAY-M": kProductPlatformMacRenewableSubscription};
+										   @"IAY": kProductPlatformRenewableSubscription,
+										   @"IAY-M": kProductPlatformMacRenewableSubscription};
 		}
 		
 		NSString *platform = platformsByTransactionType[rowDictionary[kReportColumnProductTypeIdentifier]];
@@ -546,14 +546,14 @@
 							@"F1-B. ",	//Mac App Bundle
 							@"FI1",		//Mac In-App Purchase
 							@"FI1. ",	//Mac In-App Purchase
-                            @"IA1-M",   //Mac In-App Purchase
+							@"IA1-M",	//Mac In-App Purchase
 							@"IA1",		//In-App Purchase
 							@"IA1. ",	//In-App Purchase
 							@"IA9",		//In-App Subscription
 							@"IA9. ",	//In-App Subscription
 							@"IAY",		//In-App Renewable Subscription
 							@"IAY. ",	//In-App Renewable Subscription
-                            @"IAY-M",   //Mac In-App Renewable Subscription
+							@"IAY-M",	//Mac In-App Renewable Subscription
 							@"IAC",		//In-App Free Subscription
 							@"IAC. "	//In-App Free Subscription
 							@"1.GP",	//GP = Gift Purchase
@@ -683,14 +683,14 @@
 								@"F1",		//Mac App
 								@"IA1",		//In-App Purchase
 								@"IA9",		//In-App Subscription
-								@"IAY",	 //In-App Auto-Renewable Subscription
-								@"FI1",	 //Mac In-App Purchase
-                                @"IA1-M",   //Mac In-App Purchase
-								@"1E",	  //Paid App (Custom iPhone)
-								@"1EP",	 //Paid App (Custom iPad)
-								@"1EU",	 //Paid App (Custom Universal)
-								@"1-B",	 //App Bundle
-								@"F1-B", //Mac App Bundle
+								@"IAY",		//In-App Auto-Renewable Subscription
+								@"FI1",		//Mac In-App Purchase
+								@"IA1-M",	//Mac In-App Purchase
+								@"1E",		//Paid App (Custom iPhone)
+								@"1EP",		//Paid App (Custom iPad)
+								@"1EU",		//Paid App (Custom Universal)
+								@"1-B",		//App Bundle
+								@"F1-B",	//Mac App Bundle
 								nil];
 	}
 	return paidTransactionTypes;
