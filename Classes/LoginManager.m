@@ -7,6 +7,7 @@
 //
 
 #import "LoginManager.h"
+#import "AccountsViewController.h"
 
 // Apple Auth API
 NSString *const kAppleAuthBaseURL      = @"https://idmsa.apple.com/appleauth/auth";
@@ -46,7 +47,6 @@ NSString *const kITCRCSRFKey             = @"CSRF";
 
 // iTunes Connect Payments API
 NSString *const kITCBaseURL                     = @"https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa";
-NSString *const kITCUserDetailAction            = @"/ra/user/detail";
 NSString *const kITCPaymentVendorsAction        = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers";
 NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/providers/%@/sapVendorNumbers/%@?year=%ld&month=%ld";
 
@@ -78,6 +78,10 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		dateFormatter.dateFormat = @"MMM dd, yyyy";
 	}
 	return self;
+}
+
+- (NSString *)providerID {
+	return account.providerID ?: providerID;
 }
 
 - (BOOL)isLoggedIn {
@@ -133,8 +137,8 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		[trustedDevices removeAllObjects];
 	}
 	
-	NSDictionary *bodyDict = @{@"accountName": account.username ?: loginInfo[@"username"],
-							   @"password": account.password ?: loginInfo[@"password"],
+	NSDictionary *bodyDict = @{@"accountName": account.username ?: loginInfo[kAccountUsername],
+							   @"password": account.password ?: loginInfo[kAccountPassword],
 							   @"rememberMe": @(YES)};
 	NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
 	
@@ -154,19 +158,14 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	
 	if ((appleAuthSessionId.length == 0) || (appleAuthScnt.length == 0)) {
 		// Wrong credentials?
-		if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+		if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[self.delegate loginFailed];
+				[self.delegate loginFailed:self];
 			});
 		}
 	} else if (location.length == 0) {
 		// We're in!
 		[self fetchRemainingCookies];
-		if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self.delegate loginSucceeded];
-			});
-		}
 	} else {
 		// This account has either Two-Step Verification or Two-Factor Authentication enabled.
 		NSURL *authURL = [NSURL URLWithString:kAppleAuthBaseURL];
@@ -191,16 +190,16 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 			[trustedDevices addObjectsFromArray:authDict[@"trustedDevices"] ?: @[]];
 			if (accountLocked.boolValue || recoveryKeyLocked.boolValue || securityCodeLocked.boolValue) {
 				// User is temporarily locked out of account, and is unable to sign in at the moment. Try again later?
-				if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+				if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
 					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.delegate loginFailed];
+						[self.delegate loginFailed:self];
 					});
 				}
 			} else if (trustedDevices.count == 0) {
 				// Account has no trusted devices.
-				if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+				if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
 					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.delegate loginFailed];
+						[self.delegate loginFailed:self];
 					});
 				}
 			} else {
@@ -216,9 +215,9 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 			NSNumber *securityCodeLocked = securityCodeDict[@"securityCodeLocked"];
 			if (tooManyCodesSent.boolValue || tooManyCodesValidated.boolValue || securityCodeLocked.boolValue) {
 				// User is temporarily locked out of account, and is unable to sign in at the moment. Try again later?
-				if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+				if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
 					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.delegate loginFailed];
+						[self.delegate loginFailed:self];
 					});
 				}
 			} else {
@@ -231,9 +230,9 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 			}
 		} else {
 			// Something else went wrong.
-			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+			if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginFailed];
+					[self.delegate loginFailed:self];
 				});
 			}
 		}
@@ -251,7 +250,142 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	[NSURLConnection sendSynchronousRequest:trustRequest returningResponse:nil error:nil];
 	
 	NSURL *authSessionURL = [NSURL URLWithString:[kITCAuthBaseURL stringByAppendingString:kITCAuthSessionAction]];
-	[NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:authSessionURL] returningResponse:nil error:nil];
+	NSHTTPURLResponse *authSessionResponse = nil;
+	NSData *authSessionData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:authSessionURL] returningResponse:&authSessionResponse error:nil];
+	NSDictionary *authSessionDict = [NSJSONSerialization JSONObjectWithData:authSessionData options:0 error:nil];
+	
+	provider = authSessionDict[@"provider"];
+	availableProviders = authSessionDict[@"availableProviders"];
+	
+	providerID = [(NSNumber *)provider[@"providerId"] description];
+	
+	if ((providerID == nil) || (providerID.length == 0) || (availableProviders == nil) || (availableProviders.count == 0)) {
+		// Failed to fetch available providers.
+		if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.delegate loginFailed:self];
+			});
+		}
+	} else if (availableProviders.count > 1) {
+		// Multiple providers available.
+		if (account != nil) {
+			// Logging in with an existing account.
+			if ((account.providerID == nil) || (account.providerID.length == 0)) {
+				// Provider ID missing for account.
+				if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginFailed:self];
+					});
+				}
+			} else if (providerID != account.providerID) {
+				// Current provider ID does not match preferred account provider ID.
+				for (NSDictionary *provider in availableProviders) {
+					if (loginInfo[kAccountProviderID] == [(NSNumber *)provider[@"providerId"] description]) {
+						[self changeToProvider:provider];
+						return;
+					}
+				}
+				// Failed to find preferred account provider ID.
+				if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginFailed:self];
+					});
+				}
+			} else {
+				// Preferred provider ID for account already selected.
+				if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginSucceeded:self];
+					});
+				}
+			}
+		} else {
+			// Auto-Fill Wizard
+			if (loginInfo[kAccountProviderID] == nil) {
+				// No preferred provider ID.
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self chooseProvider];
+				});
+			} else if (providerID != loginInfo[kAccountProviderID]) {
+				// Current provider ID does not match preferred provider ID.
+				for (NSDictionary *provider in availableProviders) {
+					if (loginInfo[kAccountProviderID] == [(NSNumber *)provider[@"providerId"] description]) {
+						[self changeToProvider:provider];
+						return;
+					}
+				}
+				// Failed to find preferred provider ID.
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[self chooseProvider];
+				});
+			} else {
+				// Preferred provider ID for account already selected.
+				if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginSucceeded:self];
+					});
+				}
+			}
+		}
+	} else {
+		// One provider available.
+		if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.delegate loginSucceeded:self];
+			});
+		}
+	}
+}
+
+- (void)chooseProvider {
+	UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Select Your Primary Provider", nil)
+																			 message:nil
+																	  preferredStyle:UIAlertControllerStyleActionSheet];
+	
+	for (NSDictionary *provider in availableProviders) {
+		NSString *providerName = provider[@"name"];
+		NSString *providerID = [(NSNumber *)provider[@"providerId"] description];
+		NSString *buttonTitle = [NSString stringWithFormat:@"%@ (%@)", providerName, providerID];
+		[alertController addAction:[UIAlertAction actionWithTitle:buttonTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+				[self changeToProvider:provider];
+			});
+		}]];
+	}
+	
+	[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+		if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
+			// User canceled the provider selection, so we're unable to log in.
+			[self.delegate loginFailed:self];
+		}
+	}]];
+	
+	UIViewController *viewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+	while (viewController.presentedViewController != nil) {
+		viewController = viewController.presentedViewController;
+	}
+	[viewController presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)changeToProvider:(NSDictionary *)_provider {
+	provider = _provider;
+	providerID = [(NSNumber *)_provider[@"providerId"] description];
+	
+	NSDictionary *bodyDict = @{@"provider": _provider};
+	NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
+	
+	NSURL *authSessionURL = [NSURL URLWithString:[kITCAuthBaseURL stringByAppendingString:kITCAuthSessionAction]];
+	NSMutableURLRequest *authSessionRequest = [NSMutableURLRequest requestWithURL:authSessionURL];
+	[authSessionRequest setHTTPMethod:@"POST"];
+	[authSessionRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
+	[authSessionRequest setHTTPBody:bodyData];
+	[NSURLConnection sendSynchronousRequest:authSessionRequest returningResponse:nil error:nil];
+	
+	if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self.delegate loginSucceeded:self];
+		});
+	}
 }
 
 - (void)generateCode:(NSString *)_appleAuthTrustedDeviceId {
@@ -280,9 +414,9 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 			});
 		} else {
 			// Authentication is requesting a security code with an unsupported number of digits.
-			if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+			if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
 				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginFailed];
+					[self.delegate loginFailed:self];
 				});
 			}
 		}
@@ -323,11 +457,6 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		if (([setCookie rangeOfString:@"myacinfo"].location != NSNotFound) || self.isLoggedIn) {
 			// We're in!
 			[self fetchRemainingCookies];
-			if ([self.delegate respondsToSelector:@selector(loginSucceeded)]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self.delegate loginSucceeded];
-				});
-			}
 		} else {
 			// Incorrect verification code. Retry?
 			switch (authType) {
@@ -372,9 +501,9 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	}
 	
 	[alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-		if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
+		if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
 			// User canceled the verification, so we're unable to log in.
-			[self.delegate loginFailed];
+			[self.delegate loginFailed:self];
 		}
 	}]];
 	
@@ -391,23 +520,12 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 
 - (void)securityCodeInputCanceled {
 	// User canceled the verification, so we're unable to log in.
-	if ([self.delegate respondsToSelector:@selector(loginFailed)]) {
-		[self.delegate loginFailed];
-	}
-}
-
-- (void)resetITCReporterAPI {
-	NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-	NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:@"https://reportingitc2.apple.com"]];
-	for (NSHTTPCookie *cookie in cookies) {
-		if ([cookie.name isEqualToString:@"JSESSIONID"]) {
-			[cookieStorage deleteCookie:cookie];
-		}
+	if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
+		[self.delegate loginFailed:self];
 	}
 }
 
 - (NSString *)generateCSRFToken {
-	[self resetITCReporterAPI];
 	NSURL *generateCSRFTokenURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRGenerateCSRFTokenAction]];
 	NSMutableURLRequest *generateRequest = [NSMutableURLRequest requestWithURL:generateCSRFTokenURL];
 	[generateRequest setHTTPMethod:@"POST"];

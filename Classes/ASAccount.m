@@ -14,7 +14,7 @@
 
 @implementation ASAccount
 
-@dynamic username, vendorID, title, sortIndex, dailyReports, weeklyReports, products, payments, paymentReports, reportsBadge, paymentsBadge;
+@dynamic username, providerID, vendorID, title, sortIndex, dailyReports, weeklyReports, products, payments, paymentReports, reportsBadge, paymentsBadge;
 @synthesize isDownloadingReports, downloadStatus, downloadProgress;
 
 - (NSString *)password {
