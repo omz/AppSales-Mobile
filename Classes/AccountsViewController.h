@@ -12,14 +12,16 @@
 
 #define kAccountUsername                    @"username"
 #define kAccountPassword                    @"password"
+#define kAccountProviderID                  @"providerID"
 #define kAccountAccessToken                 @"accessToken"
 #define kAccountVendorID                    @"vendorID"
 #define ASViewSettingsDidChangeNotification @"ASViewSettingsDidChangeNotification"
 
 typedef NS_ENUM(NSInteger, AccountButtonType) {
+	AccountButtonTypeAutoFillWizard,
+	AccountButtonTypeSelectProviderID,
 	AccountButtonTypeSelectVendorID,
-	AccountButtonTypeGetAccessToken,
-	AccountButtonTypeGenerateAccessToken
+	AccountButtonTypeGetAccessToken
 };
 
 @class ASAccount;
@@ -36,6 +38,7 @@ typedef NS_ENUM(NSInteger, AccountButtonType) {
 	UINavigationController *settingsNavController;
 	UIDocumentInteractionController *documentInteractionController;
 	AccountButtonType pressedAccountButton;
+	NSMutableDictionary *providers;
 	NSMutableDictionary *vendors;
 }
 

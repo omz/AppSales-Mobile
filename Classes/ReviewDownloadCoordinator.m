@@ -33,7 +33,7 @@
 		NSLog(@"Login details not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", account.displayName);
 		[self showAlertWithTitle:NSLocalizedString(@"Missing Login Credentials", nil)
 						 message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered complete login credentials for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
-		[self loginFailed];
+		[self loginFailed:nil];
 		return;
 	}
 	
@@ -49,7 +49,7 @@
 	});
 }
 
-- (void)loginSucceeded {
+- (void)loginSucceeded:(LoginManager *)loginManager {
 	for (Product *product in products) {
 		ReviewDownloadOperation *operation = [[ReviewDownloadOperation alloc] initWithProduct:product];
 		operation.delegate = self;
@@ -57,7 +57,7 @@
 	}
 }
 
-- (void)loginFailed {
+- (void)loginFailed:(LoginManager *)loginManager {
 	[self completeDownloadWithStatus:NSLocalizedString(@"Finished", nil)];
 }
 

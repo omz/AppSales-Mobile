@@ -257,6 +257,7 @@
 		7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportCollection.m; sourceTree = "<group>"; };
 		7FED633913DB69EA00DF33B1 /* GlobalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalSettings.h; sourceTree = "<group>"; };
 		AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 5.xcdatamodel"; sourceTree = "<group>"; };
+		DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 7.xcdatamodel"; sourceTree = "<group>"; };
 		DA2231A01DB318C7009071A3 /* SAMKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychain.h; path = Vendor/SAMKeychain/Sources/SAMKeychain.h; sourceTree = SOURCE_ROOT; };
 		DA2231A11DB318C7009071A3 /* SAMKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychain.m; path = Vendor/SAMKeychain/Sources/SAMKeychain.m; sourceTree = SOURCE_ROOT; };
 		DA2231A21DB318C7009071A3 /* SAMKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychainQuery.h; path = Vendor/SAMKeychain/Sources/SAMKeychainQuery.h; sourceTree = SOURCE_ROOT; };
@@ -850,6 +851,7 @@
 				TargetAttributes = {
 					7F709D2613BC98860008DBAD = {
 						CreatedOnToolsVersion = 7.1;
+						DevelopmentTeam = 32E8LZUD4E;
 					};
 				};
 			};
@@ -858,6 +860,7 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -1093,6 +1096,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				DEVELOPMENT_TEAM = 32E8LZUD4E;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
@@ -1113,6 +1117,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				DEVELOPMENT_TEAM = 32E8LZUD4E;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
@@ -1153,6 +1158,7 @@
 		7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */,
 				DA3DF5F01EF1D6CA00CBEF87 /* AppSales 6.xcdatamodel */,
 				AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */,
 				DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */,
@@ -1160,7 +1166,7 @@
 				7F0B8A6B13F7B776006E9151 /* AppSales 2.xcdatamodel */,
 				7F709D4013BC98860008DBAD /* AppSales.xcdatamodel */,
 			);
-			currentVersion = DA3DF5F01EF1D6CA00CBEF87 /* AppSales 6.xcdatamodel */;
+			currentVersion = DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */;
 			path = AppSales.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
