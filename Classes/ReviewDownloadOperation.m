@@ -231,7 +231,7 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 			}
 			
 			NSDictionary *devResp = reviewData[@"developerResponse"];
-			if (devResp != nil) {
+			if (devResp != nil && devResp != (id)[NSNull null]) {
 				// Developer response was posted.
 				NSNumber *identifier = devResp[@"responseId"];
 				NSTimeInterval timeInterval = [devResp[@"lastModified"] doubleValue];
