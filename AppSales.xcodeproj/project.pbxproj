@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4509175323CF7E990028AF83 /* About_dark.html in Resources */ = {isa = PBXBuildFile; fileRef = 4509175223CF7E990028AF83 /* About_dark.html */; };
-		4509175523CFBD1A0028AF83 /* ReviewTemplate_dark.html in Resources */ = {isa = PBXBuildFile; fileRef = 4509175423CFBD1A0028AF83 /* ReviewTemplate_dark.html */; };
-		4509175A23D030130028AF83 /* DarkModeCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 4509175923D030130028AF83 /* DarkModeCheck.m */; };
+        4509175323CF7E990028AF83 /* About_dark.html in Resources */ = {isa = PBXBuildFile; fileRef = 4509175223CF7E990028AF83 /* About_dark.html */; };
+        4509175523CFBD1A0028AF83 /* ReviewTemplate_dark.html in Resources */ = {isa = PBXBuildFile; fileRef = 4509175423CFBD1A0028AF83 /* ReviewTemplate_dark.html */; };
+        4509175A23D030130028AF83 /* DarkModeCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 4509175923D030130028AF83 /* DarkModeCheck.m */; };
+        45C2B2222460296200C84374 /* csv_dark.css in Resources */ = {isa = PBXBuildFile; fileRef = 45C2B2202460296200C84374 /* csv_dark.css */; };
+        45C2B2232460296200C84374 /* csv.css in Resources */ = {isa = PBXBuildFile; fileRef = 45C2B2212460296200C84374 /* csv.css */; };
 		62E09F1B19E693F3002917FE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62E09F1A19E693F3002917FE /* Images.xcassets */; };
 		6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574914CB3C2B005E8F3F /* KKKeychain.m */; };
 		6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */; };
@@ -126,10 +128,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4509175223CF7E990028AF83 /* About_dark.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = About_dark.html; sourceTree = "<group>"; };
-		4509175423CFBD1A0028AF83 /* ReviewTemplate_dark.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ReviewTemplate_dark.html; sourceTree = "<group>"; };
-		4509175823D030130028AF83 /* DarkModeCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DarkModeCheck.h; sourceTree = "<group>"; };
-		4509175923D030130028AF83 /* DarkModeCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DarkModeCheck.m; sourceTree = "<group>"; };
+        4509175223CF7E990028AF83 /* About_dark.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = About_dark.html; sourceTree = "<group>"; };
+        4509175423CFBD1A0028AF83 /* ReviewTemplate_dark.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = ReviewTemplate_dark.html; sourceTree = "<group>"; };
+        4509175823D030130028AF83 /* DarkModeCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DarkModeCheck.h; sourceTree = "<group>"; };
+        4509175923D030130028AF83 /* DarkModeCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DarkModeCheck.m; sourceTree = "<group>"; };
+        45C2B2202460296200C84374 /* csv_dark.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = csv_dark.css; sourceTree = "<group>"; };
+        45C2B2212460296200C84374 /* csv.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = csv.css; sourceTree = "<group>"; };
 		62E09F1A19E693F3002917FE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = AppSales/Images.xcassets; sourceTree = "<group>"; };
 		6D81574814CB3C2B005E8F3F /* KKKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKKeychain.h; sourceTree = "<group>"; };
 		6D81574914CB3C2B005E8F3F /* KKKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKKeychain.m; sourceTree = "<group>"; };
@@ -264,7 +268,7 @@
 		7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportCollection.m; sourceTree = "<group>"; };
 		7FED633913DB69EA00DF33B1 /* GlobalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalSettings.h; sourceTree = "<group>"; };
 		AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 5.xcdatamodel"; sourceTree = "<group>"; };
-        DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 7.xcdatamodel"; sourceTree = "<group>"; };
+		DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 7.xcdatamodel"; sourceTree = "<group>"; };
 		DA2231A01DB318C7009071A3 /* SAMKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychain.h; path = Vendor/SAMKeychain/Sources/SAMKeychain.h; sourceTree = SOURCE_ROOT; };
 		DA2231A11DB318C7009071A3 /* SAMKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychain.m; path = Vendor/SAMKeychain/Sources/SAMKeychain.m; sourceTree = SOURCE_ROOT; };
 		DA2231A21DB318C7009071A3 /* SAMKeychainQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychainQuery.h; path = Vendor/SAMKeychain/Sources/SAMKeychainQuery.h; sourceTree = SOURCE_ROOT; };
@@ -487,8 +491,10 @@
 				7FDF6E8213D89B1000B8CC4E /* countries_simple.plist */,
 				7F26DF9313E1358B001D0F33 /* ReviewTemplate.html */,
 				4509175423CFBD1A0028AF83 /* ReviewTemplate_dark.html */,
-				7FAEB68E13E75AFF00750788 /* About.html */,
-				4509175223CF7E990028AF83 /* About_dark.html */,
+                7FAEB68E13E75AFF00750788 /* About.html */,
+                4509175223CF7E990028AF83 /* About_dark.html */,
+                45C2B2202460296200C84374 /* csv_dark.css */,
+                45C2B2212460296200C84374 /* csv.css */,
 			);
 			name = "Supporting Files";
 			path = Support;
@@ -632,8 +638,8 @@
 				7F454F9F13D5C24F00AE47D1 /* UIColor+Extensions.m */,
 				7FAEB66F13E6D3AB00750788 /* UIImage+Tinting.h */,
 				7FAEB67013E6D3AB00750788 /* UIImage+Tinting.m */,
-				4509175823D030130028AF83 /* DarkModeCheck.h */,
-				4509175923D030130028AF83 /* DarkModeCheck.m */,
+                4509175823D030130028AF83 /* DarkModeCheck.h */,
+                4509175923D030130028AF83 /* DarkModeCheck.m */,
 				DA4984451C12C85F009BFC8F /* UIViewController+Orientation.h */,
 				DA4984461C12C85F009BFC8F /* UIViewController+Orientation.m */,
 			);
@@ -862,6 +868,7 @@
 				TargetAttributes = {
 					7F709D2613BC98860008DBAD = {
 						CreatedOnToolsVersion = 7.1;
+						DevelopmentTeam = 32E8LZUD4E;
 					};
 				};
 			};
@@ -872,7 +879,7 @@
 			knownRegions = (
 				English,
 				en,
-                Base,
+				Base,
 			);
 			mainGroup = 7F709D1C13BC98860008DBAD;
 			productRefGroup = 7F709D2813BC98860008DBAD /* Products */;
@@ -891,21 +898,23 @@
 			files = (
 				7F0BF5D413D3154F0063A6B0 /* TopBackground.png in Resources */,
 				7F0BF5DA13D3317D0063A6B0 /* ShadowTop.png in Resources */,
-				4509175523CFBD1A0028AF83 /* ReviewTemplate_dark.html in Resources */,
+                4509175523CFBD1A0028AF83 /* ReviewTemplate_dark.html in Resources */,
 				7F0BF5DB13D3317D0063A6B0 /* ShadowBottom.png in Resources */,
 				7FDF6E8113D8962500B8CC4E /* countries.plist in Resources */,
 				DAD39BA71EEC9B3100CB3524 /* passcode_square_filled@3x.png in Resources */,
 				7FDF6E8313D89B1000B8CC4E /* countries_simple.plist in Resources */,
 				DA9DB1B91C101FB2007B0178 /* LaunchScreen.storyboard in Resources */,
 				DA2995CD1C120E4C0009D4F1 /* Icon216.png in Resources */,
-				4509175323CF7E990028AF83 /* About_dark.html in Resources */,
+                4509175323CF7E990028AF83 /* About_dark.html in Resources */,
 				62E09F1B19E693F3002917FE /* Images.xcassets in Resources */,
 				7FAB533413DD0F9A0027274F /* country_names.plist in Resources */,
 				DAD39BA51EEC9B2D00CB3524 /* passcode_square_empty@3x.png in Resources */,
+                45C2B2222460296200C84374 /* csv_dark.css in Resources */,
 				DA2231A71DB318CC009071A3 /* SAMKeychain.bundle in Resources */,
 				DA7B08E11C154CFB00BEAB57 /* FlagKit.xcassets in Resources */,
 				7F89BCE313DFB4F1001C607F /* stores.plist in Resources */,
 				7F26DF9413E1358B001D0F33 /* ReviewTemplate.html in Resources */,
+                45C2B2232460296200C84374 /* csv.css in Resources */,
 				7FAEB68F13E75B0000750788 /* About.html in Resources */,
 				6D81576514CB44BE005E8F3F /* passcode_square_empty.png in Resources */,
 				6D81576614CB44BE005E8F3F /* passcode_square_empty@2x.png in Resources */,
@@ -939,7 +948,7 @@
 				7F1499E113BE544F00D89064 /* ReportDownloadCoordinator.m in Sources */,
 				DA4AC6A31EF9CBB4003CAF4D /* ReviewFilter.m in Sources */,
 				7F06B6BF13BF73C8004DB170 /* Report.m in Sources */,
-				4509175A23D030130028AF83 /* DarkModeCheck.m in Sources */,
+                4509175A23D030130028AF83 /* DarkModeCheck.m in Sources */,
 				7F1B14F313C51ACA00243AA3 /* CurrencyManager.m in Sources */,
 				7F1B153713C8029700243AA3 /* ReportImportOperation.m in Sources */,
 				7F6BC9AB13CB64DB00286A1E /* GraphView.m in Sources */,
@@ -1109,7 +1118,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 32E8LZUD4E;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
@@ -1130,7 +1139,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_OBJC_ARC = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 32E8LZUD4E;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OtherSources/AppSales-Prefix.pch";
 				HEADER_SEARCH_PATHS = "";
@@ -1171,7 +1180,7 @@
 		7F709D3F13BC98860008DBAD /* AppSales.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-                DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */,
+				DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */,
 				DA3DF5F01EF1D6CA00CBEF87 /* AppSales 6.xcdatamodel */,
 				AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */,
 				DAFC5F841C16B89F00261B16 /* AppSales 4.xcdatamodel */,
@@ -1179,7 +1188,7 @@
 				7F0B8A6B13F7B776006E9151 /* AppSales 2.xcdatamodel */,
 				7F709D4013BC98860008DBAD /* AppSales.xcdatamodel */,
 			);
-            currentVersion = DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */;
+			currentVersion = DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */;
 			path = AppSales.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
