@@ -39,8 +39,6 @@ git submodule update --recursive
 
 Original _(now obsolete)_ project by [@olemoritz](https://twitter.com/olemoritz) at [omz/AppSales-Mobile](https://github.com/omz/AppSales-Mobile). Continued maintenance and development by [Nicolas Gomollon](https://nicolas.gomollon.me/).
 
-If you'd like to support this effort, please consider a donation via Square Cash [$gomollon](https://cash.me/$gomollon).
-
 ![AppSales Screenshot](Screenshot.png?raw=true)
 
 ## License

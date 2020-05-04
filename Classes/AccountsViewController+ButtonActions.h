@@ -11,8 +11,9 @@
 
 @interface AccountsViewController (AccountsViewController_ButtonActions) <LoginManagerDelegate>
 
+- (void)autoFillWizardWithLogin:(NSDictionary *)loginInfo;
+- (void)findProviderIDWithLogin:(NSDictionary *)loginInfo;
 - (void)getAccessTokenWithLogin:(NSDictionary *)loginInfo;
-- (void)generateAccessTokenWithLogin:(NSDictionary *)loginInfo;
 - (void)findVendorIDsWithLogin:(NSDictionary *)loginInfo;
 
 @end
