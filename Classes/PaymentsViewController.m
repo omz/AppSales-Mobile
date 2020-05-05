@@ -40,7 +40,12 @@
 	[super loadView];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
 
-	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        // Fallback on earlier versions
+        self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
+    }
 
 	self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
 	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -156,7 +161,12 @@
 				if (isExpected) {
 					textColor = [UIColor redColor];
 				} else {
-					textColor = [UIColor blackColor];
+					if (@available(iOS 13.0, *)) {
+                        textColor = [UIColor labelColor];
+                    } else {
+                        // Fallback on earlier versions
+                        textColor = [UIColor blackColor];
+                    }
 				}
 				[nextAmountAttributed addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, nextAmountAttributed.length)];
 				[label appendAttributedString:nextAmountAttributed];

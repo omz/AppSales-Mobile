@@ -13,6 +13,7 @@
 #import "Version.h"
 #import "Review.h"
 #import "DeveloperResponse.h"
+#import "DarkModeCheck.h"
 
 NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*(</div>)";
 
@@ -41,7 +42,14 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	[super loadView];
 	
 	webView = [[UIWebView alloc] initWithFrame:CGRectZero];
-	webView.backgroundColor = [UIColor whiteColor];
+    
+    if (@available(iOS 13.0, *)) {
+        webView.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+        // Fallback on earlier versions
+        webView.backgroundColor = [UIColor whiteColor];
+    }
+    
 	webView.opaque = NO;
 	webView.scalesPageToFit = YES;
 	webView.dataDetectorTypes = UIDataDetectorTypeNone;
@@ -154,7 +162,9 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	NSString *flagBase64 = [flagData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
 	NSString *countryName = [[CountryDictionary sharedDictionary] nameForCountryCode:review.countryCode.uppercaseString];
 	
-	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
+    NSString *htmlName = [DarkModeCheck checkForDarkModeHtml:@"ReviewTemplate"];
+	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:htmlName ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
+    
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:reviewTitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[RATING]]]" withString:ratingString];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[NICKNAME]]]" withString:review.nickname];

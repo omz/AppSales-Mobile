@@ -19,6 +19,7 @@
 #import "KKKeychain.h"
 #import "KKPasscodeViewController.h"
 #import "KKPasscodeLock.h"
+#import "DarkModeCheck.h"
 
 @implementation KKPasscodeSettingsViewController
 
@@ -119,17 +120,29 @@
 			} else {
 				cell.textLabel.text = @"Turn Passcode On";
 			}
-			cell.textLabel.textColor = [UIColor blackColor];
+            if (@available(iOS 13.0, *)) {
+                cell.textLabel.textColor = [UIColor labelColor];
+            } else {
+                cell.textLabel.textColor = [UIColor blackColor];
+            }
 			cell.textLabel.textAlignment = NSTextAlignmentCenter;
 			cell.accessoryView = nil;
 			cell.selectionStyle = UITableViewCellSelectionStyleDefault;
 		} else if (indexPath.row == 1) {
 			cell.textLabel.text = @"Change Passcode";
 			if (passcodeLockOn) {
-				cell.textLabel.textColor = [UIColor blackColor];
+				if (@available(iOS 13.0, *)) {
+                    cell.textLabel.textColor = [UIColor labelColor];
+                } else {
+                    cell.textLabel.textColor = [UIColor blackColor];
+                }
 				cell.selectionStyle = UITableViewCellSelectionStyleDefault;
 			} else {
-				cell.textLabel.textColor = [UIColor grayColor];
+				if (@available(iOS 13.0, *)) {
+                    cell.textLabel.textColor = [UIColor secondaryLabelColor];
+                } else {
+                    cell.textLabel.textColor = [UIColor grayColor];
+                }
 				cell.selectionStyle = UITableViewCellSelectionStyleNone;
 			}
 			cell.textLabel.textAlignment = NSTextAlignmentCenter;
@@ -142,9 +155,17 @@
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		unlockWithBiometricsSwitch.enabled = passcodeLockOn;
 		if (passcodeLockOn) {
-			cell.textLabel.textColor = [UIColor blackColor];
+			if (@available(iOS 13.0, *)) {
+                cell.textLabel.textColor = [UIColor labelColor];
+            } else {
+                cell.textLabel.textColor = [UIColor blackColor];
+            }
 		} else {
-			cell.textLabel.textColor = [UIColor grayColor];
+			if (@available(iOS 13.0, *)) {
+                cell.textLabel.textColor = [UIColor labelColor];
+            } else {
+                cell.textLabel.textColor = [UIColor grayColor];
+            }
 		}
 	} else if (indexPath.section == (1 + KKPasscodeViewController.hasBiometricAuthentication)) {
 		cell.textLabel.text = @"Erase Data";
@@ -153,10 +174,18 @@
 		cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		eraseDataSwitch.enabled = passcodeLockOn;
 		if (passcodeLockOn) {
-			cell.textLabel.textColor = [UIColor blackColor];
-		} else {
-			cell.textLabel.textColor = [UIColor grayColor];
-		}
+            if (@available(iOS 13.0, *)) {
+                cell.textLabel.textColor = [UIColor labelColor];
+            } else {
+                cell.textLabel.textColor = [UIColor blackColor];
+            }
+        } else {
+            if (@available(iOS 13.0, *)) {
+                cell.textLabel.textColor = [UIColor labelColor];
+            } else {
+                cell.textLabel.textColor = [UIColor grayColor];
+            }
+        }
 	}
 	
 	return cell;

@@ -32,7 +32,13 @@
 		revenueLabel.backgroundColor = [UIColor clearColor];
 		revenueLabel.font = [UIFont systemFontOfSize:17.0f weight:UIFontWeightRegular];
 		revenueLabel.textAlignment = NSTextAlignmentRight;
-		revenueLabel.textColor = [UIColor blackColor];
+        
+        if (@available(iOS 13.0, *)) {
+            revenueLabel.textColor = [UIColor labelColor];
+        } else {
+            revenueLabel.textColor = [UIColor blackColor];
+        }
+        
 		revenueLabel.adjustsFontSizeToFitWidth = YES;
 		[self.contentView addSubview:revenueLabel];
 		
@@ -53,7 +59,13 @@
 		percentageLabel.backgroundColor = [UIColor clearColor];
 		percentageLabel.font = [UIFont systemFontOfSize:11.0f weight:UIFontWeightMedium];
 		percentageLabel.textAlignment = NSTextAlignmentRight;
-		percentageLabel.textColor = [UIColor whiteColor];
+        
+        if (@available(iOS 13.0, *)) {
+            percentageLabel.textColor = [UIColor systemBackgroundColor];
+        } else {
+            percentageLabel.textColor = [UIColor whiteColor];
+        }
+        
 		[barBackgroundView addSubview:percentageLabel];
 		
 		subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(barOriginX, CGRectGetMaxY(barBackgroundView.frame), CGRectGetWidth(barBackgroundView.frame), contentSize.height - CGRectGetMaxY(barBackgroundView.frame))];
@@ -61,7 +73,13 @@
 		subtitleLabel.backgroundColor = [UIColor clearColor];
 		subtitleLabel.font = [UIFont systemFontOfSize:11.0f weight:UIFontWeightRegular];
 		subtitleLabel.textAlignment = NSTextAlignmentLeft;
-		subtitleLabel.textColor = [UIColor darkGrayColor];
+        
+        if (@available(iOS 13.0, *)) {
+            subtitleLabel.textColor = [UIColor secondaryLabelColor];
+        } else {
+            subtitleLabel.textColor = [UIColor darkGrayColor];
+        }
+        
 		[self.contentView addSubview:subtitleLabel];
 		
 		revenueFormatter = [[NSNumberFormatter alloc] init];

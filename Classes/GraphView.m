@@ -8,6 +8,7 @@
 
 #import "GraphView.h"
 #import "ASProgressHUD.h"
+#import "DarkModeCheck.h"
 
 #define ANIMATION_DURATION	0.4
 
@@ -20,12 +21,25 @@
 	self = [super initWithFrame:frameRect];
 	if (self) {
 		self.clipsToBounds = YES;
-		self.backgroundColor = [UIColor clearColor];
+        
+        if (@available(iOS 13.0, *)) {
+            self.backgroundColor = [UIColor systemBackgroundColor];
+        } else {
+            self.backgroundColor = [UIColor clearColor];
+        }
+		
 		
 		cachedValues = [NSMutableDictionary new];
 		
 		UIView *scaleBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 46.0f, self.bounds.size.height - 30.0f)];
-		scaleBackgroundView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+        
+        if (@available(iOS 13.0, *)) {
+            scaleBackgroundView.backgroundColor = [UIColor systemBackgroundColor];
+        } else {
+            // Fallback on earlier versions
+            scaleBackgroundView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+        }
+        
 		[self addSubview:scaleBackgroundView];
 		
 		UIView *bottomLineView = [[UIView alloc] initWithFrame:CGRectMake(46.0f, self.bounds.size.height - 30.0f, self.bounds.size.width - 46.0f, 1.0f)];
@@ -59,17 +73,24 @@
 		titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 4.0f, self.bounds.size.width, 12.0f)];
 		titleLabel.font = [UIFont systemFontOfSize:11.0f weight:UIFontWeightSemibold];
 		titleLabel.textAlignment = NSTextAlignmentCenter;
-		titleLabel.textColor = [UIColor grayColor];
+        titleLabel.textColor = [UIColor grayColor];
 		titleLabel.backgroundColor = [UIColor clearColor];
 		[self addSubview:titleLabel];
 		
 		self.sectionLabelButton = [UIButton buttonWithType:UIButtonTypeCustom];
 		sectionLabelButton.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-		[self.sectionLabelButton setBackgroundImage:[UIImage imageNamed:@"DateButton"] forState:UIControlStateNormal];
+        [self.sectionLabelButton setBackgroundImage:[DarkModeCheck checkForDarkModeImage:@"DateButton"] forState:UIControlStateNormal];
 		self.sectionLabelButton.frame = CGRectMake(0.0f, self.bounds.size.height - 30.0f - 16.0f, 46.0f, 32.0f);
 		self.sectionLabelButton.titleLabel.font = [UIFont systemFontOfSize:10.0f weight:UIFontWeightSemibold];
 		self.sectionLabelButton.titleLabel.adjustsFontSizeToFitWidth = YES;
-		[self.sectionLabelButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+        
+        
+        if (@available(iOS 13.0, *)) {
+            [self.sectionLabelButton setTitleColor:[UIColor secondaryLabelColor] forState:UIControlStateNormal];
+        } else {
+            [self.sectionLabelButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+        }
+		
 		[self addSubview:self.sectionLabelButton];
 		
 		visibleRange = NSMakeRange(NSNotFound, 0);
@@ -413,7 +434,13 @@
 		label.font = [UIFont systemFontOfSize:12.0f weight:UIFontWeightSemibold];
 		label.adjustsFontSizeToFitWidth = YES;
 		label.textAlignment = NSTextAlignmentCenter;
-		label.textColor = [UIColor darkGrayColor];
+        
+        if (@available(iOS 13.0, *)) {
+            label.textColor = [UIColor secondaryLabelColor];
+        } else {
+            label.textColor = [UIColor darkGrayColor];
+        }
+        
 		[self addSubview:label];
 	}
 	return self;
@@ -620,7 +647,13 @@
 - (instancetype)initWithFrame:(CGRect)frameRect {
 	self = [super initWithFrame:frameRect];
 	if (self) {
-		self.backgroundColor = [UIColor colorWithWhite:0.75f alpha:1.0f];
+		
+        if ([DarkModeCheck deviceIsInDarkMode] == YES) {
+            self.backgroundColor = [UIColor colorWithWhite:0.75f alpha:0.2f];
+        } else {
+            self.backgroundColor = [UIColor colorWithWhite:0.75f alpha:1.0f];
+        }
+        
 		label = [[UILabel alloc] initWithFrame:CGRectMake(-40.0f, -8.0f, 40.0f, 16.0f)];
 		label.backgroundColor = [UIColor clearColor];
 		label.font = [UIFont systemFontOfSize:12.0f weight:UIFontWeightSemibold];

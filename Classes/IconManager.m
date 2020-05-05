@@ -9,8 +9,8 @@
 #import "IconManager.h"
 
 NSString *const kITunesStoreLookupURLFormat           = @"https://itunes.apple.com/lookup?id=%@";
-NSString *const kITunesStoreBundlePageURLFormat       = @"https://itunes.apple.com/app-bundle/id%@";
-NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-ssl\\.mzstatic\\.com\\/image\\/thumb\\/[a-zA-Z0-9\\/\\.-]+690x0w.png)";
+NSString *const kITunesStoreBundlePageURLFormat       = @"https://apps.apple.com/app-bundle/id%@";
+NSString *const kITunesStoreBundleThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-ssl\\.mzstatic\\.com\\/image\\/thumb\\/[a-zA-Z0-9\\/\\.-]+246x0w.png)";
 
 @implementation IconManager
 
@@ -115,7 +115,7 @@ NSString *const kITunesStoreThumbnailPathRegexPattern = @"(https:\\/\\/is[0-9]-s
 			NSString *iTunesStorePage = [[NSString alloc] initWithData:iTunesStorePageData encoding:NSUTF8StringEncoding];
 			
 			if ((iTunesStorePage != nil) && (iTunesStorePage.length > 0)) {
-				NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreThumbnailPathRegexPattern options:0 error:nil];
+				NSRegularExpression *iTunesStoreThumbnailPathRegex = [NSRegularExpression regularExpressionWithPattern:kITunesStoreBundleThumbnailPathRegexPattern options:0 error:nil];
 				NSTextCheckingResult *match = [iTunesStoreThumbnailPathRegex firstMatchInString:iTunesStorePage options:0 range:NSMakeRange(0, iTunesStorePage.length-1)];
 				if (match.numberOfRanges > 0) {
 					NSRange matchRange = [match rangeAtIndex:1];

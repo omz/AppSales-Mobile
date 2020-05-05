@@ -25,6 +25,10 @@ CGFloat const kLabelPadding = 10.0f;
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
 		CGSize contentSize = self.contentView.bounds.size;
+        
+        if (@available(iOS 13.0, *)) {
+            self.backgroundColor = [UIColor secondarySystemBackgroundColor];
+        }
 		
 		colorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, kColorWidth, contentSize.height)];
 		colorView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
@@ -41,7 +45,13 @@ CGFloat const kLabelPadding = 10.0f;
 		nameLabel.backgroundColor = [UIColor clearColor];
 		nameLabel.font = [UIFont systemFontOfSize:17.0f];
 		nameLabel.textAlignment = NSTextAlignmentLeft;
-		nameLabel.textColor = [UIColor blackColor];
+        
+        if (@available(iOS 13.0, *)) {
+            nameLabel.textColor = [UIColor labelColor];
+        } else {
+            // Fallback on earlier versions
+            nameLabel.textColor = [UIColor blackColor];
+        }
 		[self.contentView addSubview:nameLabel];
 	}
 	return self;

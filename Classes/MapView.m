@@ -10,6 +10,7 @@
 #import "Report.h"
 #import "Product.h"
 #import "UIColor+Extensions.h"
+#import "DarkModeCheck.h"
 
 @implementation MapView
 
@@ -18,7 +19,13 @@
 - (instancetype)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
-		self.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:1.0];
+        
+        if ([DarkModeCheck deviceIsInDarkMode] == YES) {
+            self.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.2];
+        } else {
+            self.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:1.0];
+        }
+        
 		pinView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Pin"]];
 		pinView.alpha = 0.0;
 		[self addSubview:pinView];
@@ -51,7 +58,7 @@
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	CGContextSaveGState(c);
 	CGContextSetShadowWithColor(c, CGSizeMake(0, 1), 0.0, [[UIColor colorWithWhite:0.0 alpha:0.5] CGColor]);
-	[[UIImage imageNamed:@"countries"] drawInRect:self.bounds];
+    [[DarkModeCheck checkForDarkModeImage:@"countries"] drawInRect:self.bounds];
 	CGContextRestoreGState(c);
 	
 	float width = self.bounds.size.width;

@@ -211,18 +211,39 @@
 	
 	if (indexPath.section == 0) {
 		cell.textLabel.text = NSLocalizedString(@"Request New Codes...", nil);
-		cell.imageView.image = [UIImage imageNamed:@"RequestPromoCode"];
+        
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage as_tintedImageNamed:@"RequestPromoCode" color:[[UIColor labelColor] colorWithAlphaComponent:0.4]];
+        } else {
+            cell.imageView.image = [UIImage imageNamed:@"RequestPromoCode"];
+        }
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"RequestPromoCode" color:[UIColor whiteColor]];
-		cell.textLabel.textColor = [UIColor blackColor];
+		
+        if (@available(iOS 13.0, *)) {
+            cell.textLabel.textColor = [UIColor labelColor];
+        } else {
+            cell.textLabel.textColor = [UIColor blackColor];
+        }
+        
 	} else {
 		PromoCode *promoCode = self.promoCodes[indexPath.row];
 		BOOL used = [promoCode.used boolValue];
 		cell.textLabel.text = promoCode.code;
 		NSString *dateString = [dateFormatter stringFromDate:promoCode.requestDate];
 		cell.detailTextLabel.text = used ? [NSString stringWithFormat:@"(used)  %@", dateString] : dateString;
-		cell.imageView.image = used ? [UIImage as_tintedImageNamed:@"PromoCodes" color:[UIColor grayColor]] : [UIImage imageNamed:@"PromoCodes"];
+        
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = used ? [UIImage as_tintedImageNamed:@"PromoCodes" color:[[UIColor labelColor] colorWithAlphaComponent:0.4]] : [UIImage imageNamed:@"PromoCodes"];
+        } else {
+            cell.imageView.image = used ? [UIImage as_tintedImageNamed:@"PromoCodes" color:[UIColor grayColor]] : [UIImage imageNamed:@"PromoCodes"];
+        }
 		cell.imageView.highlightedImage = [UIImage as_tintedImageNamed:@"PromoCodes" color:[UIColor whiteColor]];
-		cell.textLabel.textColor = used ? [UIColor grayColor] : [UIColor blackColor];
+        
+        if (@available(iOS 13.0, *)) {
+            cell.textLabel.textColor = [UIColor labelColor];
+        } else {
+            cell.textLabel.textColor = [UIColor blackColor];
+        }
 	}
 	
 	return cell;

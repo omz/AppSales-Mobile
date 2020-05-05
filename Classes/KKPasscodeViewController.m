@@ -21,6 +21,7 @@
 #import "KKPasscodeLock.h"
 #import <QuartzCore/QuartzCore.h>
 #import <LocalAuthentication/LocalAuthentication.h>
+#import "DarkModeCheck.h"
 
 @implementation KKPasscodeViewController
 
@@ -259,7 +260,7 @@
 - (void)incrementAndShowFailedAttemptsLabel {
 	enterPasscodeTextField.text = @"";
 	for (int i = 0; i < 4; i++) {
-		[squares[tableIndex][i] setImage:[UIImage imageNamed:@"passcode_square_empty.png"]];
+        [squares[tableIndex][i] setImage:[DarkModeCheck checkForDarkModeImage:@"passcode_square_empty.png"]];
 	}		 
 	
 	failedAttemptsCount += 1;
@@ -314,7 +315,7 @@
 	newTableView.frame = CGRectMake(oldTableView.frame.origin.x + self.view.bounds.size.width, oldTableView.frame.origin.y, oldTableView.frame.size.width, oldTableView.frame.size.height);
 	
 	for (int i = 0; i < 4; i++) {
-		[squares[tableIndex][i] setImage:[UIImage imageNamed:@"passcode_square_empty.png"]];
+		[squares[tableIndex][i] setImage:[DarkModeCheck checkForDarkModeImage:@"passcode_square_empty.png"]];
 	}
 	
 	[UIView beginAnimations:@"" context:nil];
@@ -335,7 +336,7 @@
 	newTableView.frame = CGRectMake(oldTableView.frame.origin.x - self.view.bounds.size.width, oldTableView.frame.origin.y, oldTableView.frame.size.width, oldTableView.frame.size.height);
 	
 	for (int i = 0; i < 4; i++) {
-		[squares[tableIndex][i] setImage:[UIImage imageNamed:@"passcode_square_empty.png"]];
+		[squares[tableIndex][i] setImage:[DarkModeCheck checkForDarkModeImage:@"passcode_square_empty.png"]];
 	}
 	
 	[UIView beginAnimations:@"" context:nil];
@@ -519,7 +520,12 @@
 	
 	UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.bounds.size.width, 70.0)];
 	UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 27.5, self.view.bounds.size.width, 30.0)];
-	headerLabel.textColor = [UIColor colorWithRed:0.298 green:0.337 blue:0.424 alpha:1.0];
+    
+    if (@available(iOS 13.0, *)) {
+        headerLabel.textColor = [UIColor secondaryLabelColor];
+    } else {
+        headerLabel.textColor = [UIColor colorWithRed:0.298 green:0.337 blue:0.424 alpha:1.0];
+    }
 	headerLabel.backgroundColor = [UIColor clearColor];
 	headerLabel.textAlignment = NSTextAlignmentCenter;
 	headerLabel.font = [UIFont boldSystemFontOfSize:17.0];
@@ -616,7 +622,7 @@
 	CGFloat squareX = 0.0;
 	
 	for (int i = 0; i < 4; i++) {
-		UIImageView *square = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"passcode_square_empty.png"]];
+		UIImageView *square = [[UIImageView alloc] initWithImage:[DarkModeCheck checkForDarkModeImage:@"passcode_square_empty.png"]];
 		square.frame = CGRectMake(squareX, 74.0, 61.0, 53.0);
 		[squareViews addObject:square];
 		squareX += 71.0;
@@ -677,9 +683,9 @@
 	for (int i = 0; i < 4; i++) {
 		UIImageView *square = squares[tableIndex][i];
 		if (i < [result length]) {
-			square.image = [UIImage imageNamed:@"passcode_square_filled.png"];
+			square.image = [DarkModeCheck checkForDarkModeImage:@"passcode_square_filled.png"];
 		} else {
-			square.image = [UIImage imageNamed:@"passcode_square_empty.png"];
+			square.image = [DarkModeCheck checkForDarkModeImage:@"passcode_square_empty.png"];
 		}
 	}
 	
@@ -730,7 +736,7 @@
 				if ([passcode isEqualToString:setPasscodeTextField.text]) {
 					setPasscodeTextField.text = @"";
 					for (int i = 0; i < 4; i++) {
-						[squares[tableIndex][i] setImage:[UIImage imageNamed:@"passcode_square_empty.png"]];
+						[squares[tableIndex][i] setImage:[DarkModeCheck checkForDarkModeImage:@"passcode_square_empty.png"]];
 					}		 
 					passcodeConfirmationWarningLabel.text = @"Enter a different passcode. Cannot re-use the same passcode.";
 					passcodeConfirmationWarningLabel.frame = CGRectMake(0.0, 131.5, self.view.bounds.size.width, 60.0);

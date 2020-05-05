@@ -88,6 +88,10 @@
 - (void)loadView {
 	[super loadView];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
+    
+    if (@available(iOS 13.0, *)) {
+        self.view.backgroundColor = [UIColor systemBackgroundColor];
+    }
 	
 	self.viewMode = [[NSUserDefaults standardUserDefaults] integerForKey:kSettingDashboardViewMode];
 	if ((self.viewMode == DashboardViewModeTotalRevenue) || (self.viewMode == DashboardViewModeTotalSales)) {
