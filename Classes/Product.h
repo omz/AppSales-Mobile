@@ -14,6 +14,7 @@
 #define kProductPlatformUniversal		            @"Universal"
 #define kProductPlatformMac				            @"Mac"
 #define kProductPlatformInApp			            @"In-App"
+#define kProductPlatformMacInApp                    @"Mac In-App"
 #define kProductPlatformAppBundle		            @"App Bundle"
 #define kProductPlatformMacAppBundle	            @"Mac App Bundle"
 #define kProductPlatformRenewableSubscription       @"Renewable Sub"

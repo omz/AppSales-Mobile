@@ -172,112 +172,112 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 }
 
 - (void)processReviewsPage:(NSDictionary *)reviewsPage {
-    [self downloadProgress:(2.0f/3.0f) withStatus:NSLocalizedString(@"Processing reviews...", nil)];
-    @synchronized(moc) {
-        Product *product = (Product *)[moc objectWithID:productObjectID];
-        
-        reviewsPage = reviewsPage[@"data"];
-        NSArray *reviews = reviewsPage[@"reviews"];
-        for (__strong NSDictionary *reviewData in reviews) {
-            reviewData = reviewData[@"value"];
-            
-            NSNumber *identifier = reviewData[@"id"];
-            NSTimeInterval timeInterval = [reviewData[@"lastModified"] doubleValue];
-            timeInterval /= 1000.0;
-            NSDate *lastModified = [NSDate dateWithTimeIntervalSince1970:timeInterval];
-            NSString *nickname = reviewData[@"nickname"];
-            NSNumber *rating = reviewData[@"rating"];
-            NSString *title = reviewData[@"title"];
-            NSString *text = reviewData[@"review"];
-            NSNumber *helpfulViews = reviewData[@"helpfulViews"];
-            NSNumber *totalViews = reviewData[@"totalViews"];
-            NSNumber *edited = reviewData[@"edited"];
-            NSString *countryCode = reviewData[@"storeFront"];
-            NSString *versionNumber = reviewData[@"appVersionString"];
-            Version *version = productVersions[versionNumber];
-            
-            BOOL updateReview = NO;
-            Review *review = existingReviews[identifier];
-            if (review == nil) {
-                review = (Review *)[NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
-                review.identifier = identifier;
-                review.product = product;
-                review.countryCode = countryCode;
-                updateReview = YES;
-            } else if (([lastModified compare:review.lastModified] != NSOrderedSame) ||
-                       ![version.identifier isEqualToString:review.version.identifier] ||
-                       ![nickname isEqualToString:review.nickname] ||
-                       (rating.intValue != review.rating.intValue) ||
-                       ![title isEqualToString:review.title] ||
-                       ![text isEqualToString:review.text] ||
-                       (helpfulViews.intValue != review.helpfulViews.intValue) ||
-                       (totalViews.intValue != review.totalViews.intValue) ||
-                       (edited.boolValue != review.edited.boolValue)) {
-                updateReview = YES;
-            }
-            if (updateReview) {
-                review.lastModified = lastModified;
-                review.version = version;
-                review.nickname = nickname;
-                review.rating = rating;
-                review.title = title;
-                review.text = text;
-                review.helpfulViews = helpfulViews;
-                review.totalViews = totalViews;
-                review.edited = edited;
-                review.unread = @(YES);
-                [[version mutableSetValueForKey:@"reviews"] addObject:review];
-                [[product mutableSetValueForKey:@"reviews"] addObject:review];
-            }
-            
-            id devResp = reviewData[@"developerResponse"];
-            if (devResp != [NSNull null] && devResp != nil) {
-                // Developer response was posted.
-                NSNumber *identifier = devResp[@"responseId"];
-                NSTimeInterval timeInterval = [devResp[@"lastModified"] doubleValue];
-                timeInterval /= 1000.0;
-                NSDate *lastModified = [NSDate dateWithTimeIntervalSince1970:timeInterval];
-                NSString *text = devResp[@"response"];
-                NSString *pendingState = devResp[@"pendingState"];
-                
-                DeveloperResponse *developerResponse = review.developerResponse;
-                if (developerResponse == nil) {
-                    developerResponse = (DeveloperResponse *)[NSEntityDescription insertNewObjectForEntityForName:@"DeveloperResponse" inManagedObjectContext:moc];
-                    developerResponse.identifier = identifier;
-                    developerResponse.lastModified = lastModified;
-                    developerResponse.text = text;
-                    developerResponse.pendingState = pendingState;
-                } else {
-                    if ([lastModified compare:developerResponse.lastModified] != NSOrderedSame) {
-                        developerResponse.lastModified = lastModified;
-                    }
-                    if (![text isEqualToString:developerResponse.text]) {
-                        developerResponse.text = text;
-                    }
-                    if (![pendingState isEqualToString:developerResponse.pendingState]) {
-                        developerResponse.pendingState = pendingState;
-                    }
-                }
-                developerResponse.review = review;
-                review.developerResponse = developerResponse;
-            } else {
-                // Developer response was deleted.
-                DeveloperResponse *developerResponse = review.developerResponse;
-                if (developerResponse != nil) {
-                    [moc deleteObject:developerResponse];
-                }
-            }
-        }
-        
-        [moc.persistentStoreCoordinator performBlockAndWait:^{
-            NSError *saveError = nil;
-            [moc save:&saveError];
-            if (saveError) {
-                NSLog(@"Could not save context: %@", saveError);
-            }
-        }];
-    }
-    [self completeDownload];
+	[self downloadProgress:(2.0f/3.0f) withStatus:NSLocalizedString(@"Processing reviews...", nil)];
+	@synchronized(moc) {
+		Product *product = (Product *)[moc objectWithID:productObjectID];
+		
+		reviewsPage = reviewsPage[@"data"];
+		NSArray *reviews = reviewsPage[@"reviews"];
+		for (__strong NSDictionary *reviewData in reviews) {
+			reviewData = reviewData[@"value"];
+			
+			NSNumber *identifier = reviewData[@"id"];
+			NSTimeInterval timeInterval = [reviewData[@"lastModified"] doubleValue];
+			timeInterval /= 1000.0;
+			NSDate *lastModified = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+			NSString *nickname = reviewData[@"nickname"];
+			NSNumber *rating = reviewData[@"rating"];
+			NSString *title = reviewData[@"title"];
+			NSString *text = reviewData[@"review"];
+			NSNumber *helpfulViews = reviewData[@"helpfulViews"];
+			NSNumber *totalViews = reviewData[@"totalViews"];
+			NSNumber *edited = reviewData[@"edited"];
+			NSString *countryCode = reviewData[@"storeFront"];
+			NSString *versionNumber = reviewData[@"appVersionString"];
+			Version *version = productVersions[versionNumber];
+			
+			BOOL updateReview = NO;
+			Review *review = existingReviews[identifier];
+			if (review == nil) {
+				review = (Review *)[NSEntityDescription insertNewObjectForEntityForName:@"Review" inManagedObjectContext:moc];
+				review.identifier = identifier;
+				review.product = product;
+				review.countryCode = countryCode;
+				updateReview = YES;
+			} else if (([lastModified compare:review.lastModified] != NSOrderedSame) ||
+					   ![version.identifier isEqualToString:review.version.identifier] ||
+					   ![nickname isEqualToString:review.nickname] ||
+					   (rating.intValue != review.rating.intValue) ||
+					   ![title isEqualToString:review.title] ||
+					   ![text isEqualToString:review.text] ||
+					   (helpfulViews.intValue != review.helpfulViews.intValue) ||
+					   (totalViews.intValue != review.totalViews.intValue) ||
+					   (edited.boolValue != review.edited.boolValue)) {
+				updateReview = YES;
+			}
+			if (updateReview) {
+				review.lastModified = lastModified;
+				review.version = version;
+				review.nickname = nickname;
+				review.rating = rating;
+				review.title = title;
+				review.text = text;
+				review.helpfulViews = helpfulViews;
+				review.totalViews = totalViews;
+				review.edited = edited;
+				review.unread = @(YES);
+				[[version mutableSetValueForKey:@"reviews"] addObject:review];
+				[[product mutableSetValueForKey:@"reviews"] addObject:review];
+			}
+			
+			NSDictionary *devResp = reviewData[@"developerResponse"];
+			if (devResp != nil && devResp != (id)[NSNull null]) {
+				// Developer response was posted.
+				NSNumber *identifier = devResp[@"responseId"];
+				NSTimeInterval timeInterval = [devResp[@"lastModified"] doubleValue];
+				timeInterval /= 1000.0;
+				NSDate *lastModified = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+				NSString *text = devResp[@"response"];
+				NSString *pendingState = devResp[@"pendingState"];
+				
+				DeveloperResponse *developerResponse = review.developerResponse;
+				if (developerResponse == nil) {
+					developerResponse = (DeveloperResponse *)[NSEntityDescription insertNewObjectForEntityForName:@"DeveloperResponse" inManagedObjectContext:moc];
+					developerResponse.identifier = identifier;
+					developerResponse.lastModified = lastModified;
+					developerResponse.text = text;
+					developerResponse.pendingState = pendingState;
+				} else {
+					if ([lastModified compare:developerResponse.lastModified] != NSOrderedSame) {
+						developerResponse.lastModified = lastModified;
+					}
+					if (![text isEqualToString:developerResponse.text]) {
+						developerResponse.text = text;
+					}
+					if (![pendingState isEqualToString:developerResponse.pendingState]) {
+						developerResponse.pendingState = pendingState;
+					}
+				}
+				developerResponse.review = review;
+				review.developerResponse = developerResponse;
+			} else {
+				// Developer response was deleted.
+				DeveloperResponse *developerResponse = review.developerResponse;
+				if (developerResponse != nil) {
+					[moc deleteObject:developerResponse];
+				}
+			}
+		}
+		
+		[moc.persistentStoreCoordinator performBlockAndWait:^{
+			NSError *saveError = nil;
+			[moc save:&saveError];
+			if (saveError) {
+				NSLog(@"Could not save context: %@", saveError);
+			}
+		}];
+	}
+	[self completeDownload];
 }
 
 #pragma mark - Alert Helper Methods
