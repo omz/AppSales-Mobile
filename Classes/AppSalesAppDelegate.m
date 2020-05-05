@@ -255,8 +255,8 @@
 		passcodeVC.delegate = self;
 		
 		UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:passcodeVC];
+		nav.modalPresentationStyle = UIModalPresentationFullScreen;
 		if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-			nav.modalPresentationStyle = UIModalPresentationFullScreen;
 			nav.navigationBar.barStyle = UIBarStyleBlack;
 			nav.navigationBar.opaque = NO;
 		} else {

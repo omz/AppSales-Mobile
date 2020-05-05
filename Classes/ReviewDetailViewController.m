@@ -162,9 +162,7 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	NSString *flagBase64 = [flagData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
 	NSString *countryName = [[CountryDictionary sharedDictionary] nameForCountryCode:review.countryCode.uppercaseString];
 	
-    NSString *htmlName = [DarkModeCheck checkForDarkModeHtml:@"ReviewTemplate"];
-	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:htmlName ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
-    
+	NSString *template = [[NSString alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ReviewTemplate" ofType:@"html"] encoding:NSUTF8StringEncoding error:nil];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[TITLE]]]" withString:reviewTitle];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[RATING]]]" withString:ratingString];
 	template = [template stringByReplacingOccurrencesOfString:@"[[[NICKNAME]]]" withString:review.nickname];

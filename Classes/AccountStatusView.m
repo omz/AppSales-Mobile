@@ -17,7 +17,11 @@
 		account = anAccount;
 		self.backgroundColor = [UIColor clearColor];
 		activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(20, 5, 16, 16)];
-		activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+		if (@available(iOS 13.0, *)) {
+			activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
+		} else {
+			activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+		}
 		activityIndicator.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
 		[self addSubview:activityIndicator];
 		
@@ -25,7 +29,18 @@
 		statusLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 		statusLabel.backgroundColor = [UIColor clearColor];
 		statusLabel.font = [UIFont systemFontOfSize:14.0];
-		statusLabel.textColor = [UIColor colorWithRed:0.322 green:0.357 blue:0.443 alpha:1.0];
+		if (@available(iOS 13.0, *)) {
+			statusLabel.textColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+				switch (traitCollection.userInterfaceStyle) {
+					case UIUserInterfaceStyleDark:
+						return [UIColor colorWithRed:142.0f/255.0f green:142.0f/255.0f blue:147.0f/255.0f alpha:1.0f];
+					default:
+						return [UIColor colorWithRed:109.0f/255.0f green:109.0f/255.0f blue:114.0f/255.0f alpha:1.0f];
+				}
+			}];
+		} else {
+			statusLabel.textColor = [UIColor colorWithRed:109.0f/255.0f green:109.0f/255.0f blue:114.0f/255.0f alpha:1.0f];
+		}
 		statusLabel.textAlignment = NSTextAlignmentCenter;
 		[self addSubview:statusLabel];
 		

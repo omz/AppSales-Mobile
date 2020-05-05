@@ -1,23 +1,43 @@
+@charset "utf-8";
+
+:root {
+	color-scheme: light dark;
+}
+
 body {
-    color: #212121;
-    background-color: transparent;
+	color: #000000;
+	background-color: #ffffff;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+	body {
+		color: #ffffff;
+		background-color: #1c1c1e;
+	}
+}
+
+table, th, td, tr {
+	border: 1px solid #cccccc;
+	font-family: -apple-system, -apple-system-font, sans-serif;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+	table, th, td, tr {
+		border: 1px solid #49494b;
+	}
 }
 
 table {
-    border-collapse: collapse;
-}
-
-table,
-th,
-td {
-    border: none;
+	border-collapse: collapse;
 }
 
 tr:first-child {
-    font-weight: bold;
-    background-color: #e0e2f0;
+	font-weight: bold;
+	background-color: #f2f2f7;
 }
 
-tr {
-    border-bottom: 1px solid #212121;
+@media screen and (prefers-color-scheme: dark) {
+	tr:first-child {
+		background-color: #2c2c2e;
+	}
 }

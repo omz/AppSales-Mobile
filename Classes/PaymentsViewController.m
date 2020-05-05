@@ -39,14 +39,20 @@
 - (void)loadView {
 	[super loadView];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
-
-    if (@available(iOS 13.0, *)) {
-        self.view.backgroundColor = [UIColor systemBackgroundColor];
-    } else {
-        // Fallback on earlier versions
-        self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
-    }
-
+	
+	if (@available(iOS 13.0, *)) {
+		self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:28.0f/255.0f green:28.0f/255.0f blue:30.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithRed:197.0f/255.0f green:204.0f/255.0f blue:212.0f/255.0f alpha:1.0f];
+			}
+		}];
+	} else {
+		self.view.backgroundColor = [UIColor colorWithRed:197.0f/255.0f green:204.0f/255.0f blue:212.0f/255.0f alpha:1.0f];
+	}
+	
 	self.scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
 	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	scrollView.alwaysBounceHorizontal = YES;
@@ -162,11 +168,10 @@
 					textColor = [UIColor redColor];
 				} else {
 					if (@available(iOS 13.0, *)) {
-                        textColor = [UIColor labelColor];
-                    } else {
-                        // Fallback on earlier versions
-                        textColor = [UIColor blackColor];
-                    }
+						textColor = [UIColor labelColor];
+					} else {
+						textColor = [UIColor blackColor];
+					}
 				}
 				[nextAmountAttributed addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, nextAmountAttributed.length)];
 				[label appendAttributedString:nextAmountAttributed];
@@ -216,28 +221,32 @@
 }
 
 - (void)sortPayments {
-	NSString *monthEarned = NSLocalizedString(@"Month Earned", nil);
-	NSString *monthPaid = NSLocalizedString(@"Month Paid", nil);
-
-	if (self.sortByMonthPaid) {
-		monthPaid = [monthPaid stringByAppendingString:@" ✓"];
-	} else {
-		monthEarned = [monthEarned stringByAppendingString:@" ✓"];
-	}
-
-	UIActionSheet *deletePaymentsSheet =
-		[[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Sort By", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:nil otherButtonTitles:monthEarned, monthPaid, nil];
-	[deletePaymentsSheet showInView:self.view];
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
-	if (buttonIndex == 0) {
+	UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Sort By", nil)
+																			 message:nil
+																	  preferredStyle:UIAlertControllerStyleActionSheet];
+	
+	UIAlertAction *monthEarnedAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Month Earned", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
 		self.sortByMonthPaid = false;
 		[self reloadData];
-	} else if (buttonIndex == 1) {
+	}];
+	if (!self.sortByMonthPaid) {
+		[monthEarnedAction setValue:@YES forKey:@"checked"];
+	}
+	[alertController addAction:monthEarnedAction];
+	
+	UIAlertAction *monthPaidAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Month Paid", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
 		self.sortByMonthPaid = true;
 		[self reloadData];
+	}];
+	if (self.sortByMonthPaid) {
+		[monthPaidAction setValue:@YES forKey:@"checked"];
 	}
+	[alertController addAction:monthPaidAction];
+	
+	UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil];
+	[alertController addAction:cancelAction];
+	
+	[self presentViewController:alertController animated:true completion:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

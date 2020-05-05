@@ -19,13 +19,18 @@
 - (instancetype)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {
-        
-        if ([DarkModeCheck deviceIsInDarkMode] == YES) {
-            self.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.2];
-        } else {
-            self.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:1.0];
-        }
-        
+		if (@available(iOS 13.0, *)) {
+			self.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+				switch (traitCollection.userInterfaceStyle) {
+					case UIUserInterfaceStyleDark:
+						return [UIColor colorWithRed:55.0f/255.0f green:67.0f/255.0f blue:100.0f/255.0f alpha:1.0f];
+					default:
+						return [UIColor colorWithRed:184.0f/255.0f green:223.0f/255.0f blue:242.0f/255.0f alpha:1.0f];
+				}
+			}];
+		} else {
+			self.backgroundColor = [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:1.0];
+		}
 		pinView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Pin"]];
 		pinView.alpha = 0.0;
 		[self addSubview:pinView];
@@ -57,8 +62,8 @@
 	
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	CGContextSaveGState(c);
-	CGContextSetShadowWithColor(c, CGSizeMake(0, 1), 0.0, [[UIColor colorWithWhite:0.0 alpha:0.5] CGColor]);
-    [[DarkModeCheck checkForDarkModeImage:@"countries"] drawInRect:self.bounds];
+	CGContextSetShadowWithColor(c, CGSizeMake(0, 1), 2.0, [[UIColor colorWithWhite:0.0 alpha:0.25] CGColor]);
+	[[DarkModeCheck checkForDarkModeImage:@"countries"] drawInRect:self.bounds];
 	CGContextRestoreGState(c);
 	
 	float width = self.bounds.size.width;

@@ -29,11 +29,11 @@
 	CGFloat margin = 10.0;
 	CGContextSetShadowWithColor(c, CGSizeMake(0, 1.0), 6.0, [[UIColor blackColor] CGColor]);
     
-    if ([DarkModeCheck deviceIsInDarkMode] == YES) {
-        CGContextSetRGBFillColor(c, 28/255.0, 28/255.0, 30/255.0, 1.0);
-    } else {
-        CGContextSetRGBFillColor(c, 1.0, 1.0, 1.0, 1.0);
-    }
+	if ([DarkModeCheck deviceIsInDarkMode]) {
+		[[UIColor colorWithRed:44.0f/255.0f green:44.0f/255.0f blue:46.0f/255.0f alpha:1.0f] set];
+	} else {
+		[[UIColor colorWithRed:255.0f/255.0f green:255.0f/255.0f blue:255.0f/255.0f alpha:1.0f] set];
+	}
     
 	CGContextFillRect(c, CGRectInset(self.bounds, margin, margin));
 
@@ -45,12 +45,12 @@
 	CGFloat singleMonthHeight = monthsHeight / 4;
 	CGFloat singleMonthWidth = (self.bounds.size.width - 2 * margin) / 3.0;
 	
-    if ([DarkModeCheck deviceIsInDarkMode] == YES) {
+    if ([DarkModeCheck deviceIsInDarkMode]) {
         CGContextSetRGBFillColor(c, 0.75, 0.75, 0.75, 0.2);
     } else {
         CGContextSetRGBFillColor(c, 0.8, 0.8, 0.8, 1.0);
     }
-
+	
 	for (int i=0; i<5; i++) {
 		CGFloat y = margin + headerHeight + i * (monthsHeight / 4.0);
 		CGContextFillRect(c, CGRectMake(margin, (int)y, self.bounds.size.width - 2 * margin, 1));
@@ -64,10 +64,8 @@
     if (@available(iOS 13.0, *)) {
         [[UIColor secondarySystemBackgroundColor] set];
     } else {
-        // Fallback on earlier versions
         [[UIColor colorWithWhite:0.95 alpha:1.0] set];
     }
-    
     
 	CGContextFillRect(c, yearRect);
 	yearRect.origin.y += 10;
@@ -82,7 +80,6 @@
             NSParagraphStyleAttributeName : style,
             NSForegroundColorAttributeName : [UIColor labelColor]}];
     } else {
-        // Fallback on earlier versions
         [[NSString stringWithFormat:@"%li", (long)year] drawInRect:yearRect withAttributes:@{
             NSFontAttributeName : yearFont,
             NSParagraphStyleAttributeName : style}];
@@ -106,7 +103,18 @@
 												  singleMonthWidth,
 												  singleMonthHeight), 7, 5);
 		if (currentYear == year && currentMonth == i + 1) {
-			[[UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:0.3] set];
+			if (@available(iOS 13.0, *)) {
+				[[UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+					switch (traitCollection.userInterfaceStyle) {
+						case UIUserInterfaceStyleDark:
+							return [[UIColor systemGray2Color] colorWithAlphaComponent:0.3];
+						default:
+							return [UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:0.3];
+					}
+				}] set];
+			} else {
+				[[UIColor colorWithRed:0.698 green:0.804 blue:0.871 alpha:0.3] set];
+			}
 			CGContextFillRect(c, CGRectInset(monthRect, -7, -5));
 			[[UIColor darkGrayColor] set];
 		}
@@ -119,9 +127,9 @@
         
         if (@available(iOS 13.0, *)) {
             [month drawInRect:monthRect withAttributes:@{
-            NSFontAttributeName: monthFont,
-            NSParagraphStyleAttributeName: style,
-            NSForegroundColorAttributeName: [UIColor secondaryLabelColor]}];
+				NSFontAttributeName: monthFont,
+				NSParagraphStyleAttributeName: style,
+				NSForegroundColorAttributeName: [UIColor secondaryLabelColor]}];
         } else {
             [month drawInRect:monthRect withAttributes:@{
                 NSFontAttributeName: monthFont,
@@ -166,8 +174,8 @@
             NSForegroundColorAttributeName: [UIColor labelColor]}];
     } else {
         [self.footerText drawInRect:footerRect withAttributes:@{
-                   NSFontAttributeName: [UIFont boldSystemFontOfSize:14.0],
-                   NSParagraphStyleAttributeName: style2}];
+			NSFontAttributeName: [UIFont boldSystemFontOfSize:14.0],
+			NSParagraphStyleAttributeName: style2}];
     }
 }
 

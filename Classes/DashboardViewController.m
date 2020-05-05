@@ -11,6 +11,7 @@
 #import "UIColor+Extensions.h"
 #import "ASAccount.h"
 #import "Product.h"
+#import "DarkModeCheck.h"
 
 @implementation DashboardViewController
 
@@ -91,11 +92,60 @@
 	BOOL iPad = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad);
 	
 	statusVisible = [self shouldShowStatusBar];
-	self.topView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopBackground.png"]];
+	
+	self.topView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450.0 : self.view.bounds.size.height * 0.5f)];
 	topView.userInteractionEnabled = YES;
 	topView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	topView.frame = CGRectMake(0, 0, self.view.bounds.size.width, iPad ? 450.0 : self.view.bounds.size.height * 0.5f);
 	[self.view addSubview:topView];
+	
+	gradientLayer = [CAGradientLayer layer];
+	gradientLayer.frame = topView.bounds;
+	gradientLayer.startPoint = CGPointMake(0.5, 0.0);
+	gradientLayer.endPoint = CGPointMake(0.5, 1.0);
+	if ([DarkModeCheck deviceIsInDarkMode]) {
+		gradientLayer.colors = @[
+			(id)[UIColor blackColor].CGColor,
+			(id)[UIColor colorWithRed:28.0f/255.0f green:28.0f/255.0f blue:30.0f/255.0f alpha:1.0f].CGColor
+		];
+	} else {
+		gradientLayer.colors = @[
+			(id)[UIColor colorWithRed:243.0f/255.0f green:243.0f/255.0f blue:243.0f/255.0f alpha:1.0f].CGColor,
+			(id)[UIColor colorWithRed:231.0f/255.0f green:231.0f/255.0f blue:231.0f/255.0f alpha:1.0f].CGColor
+		];
+	}
+	[topView.layer insertSublayer:gradientLayer atIndex:0];
+	
+	topHighlight = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMinY(topView.frame), topView.frame.size.width, 1.0f)];
+	topHighlight.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	if (@available(iOS 13.0, *)) {
+		topHighlight.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:28.0f/255.0f green:28.0f/255.0f blue:30.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithWhite:1.0f alpha:1.0f];
+			}
+		}];
+	} else {
+		topHighlight.backgroundColor = [UIColor colorWithWhite:1.0f alpha:1.0f];
+	}
+	[topView addSubview:topHighlight];
+	
+	bottomHighlight = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(topView.frame) - 1.0f, topView.frame.size.width, 1.0f)];
+	bottomHighlight.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	if (@available(iOS 13.0, *)) {
+		bottomHighlight.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:44.0f/255.0f green:44.0f/255.0f blue:46.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithRed:204.0f/255.0f green:204.0f/255.0f blue:204.0f/255.0f alpha:1.0f];
+			}
+		}];
+	} else {
+		bottomHighlight.backgroundColor = [UIColor colorWithRed:204.0f/255.0f green:204.0f/255.0f blue:204.0f/255.0f alpha:1.0f];
+	}
+	[topView addSubview:bottomHighlight];
 	
 	UIImageView *graphShadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
 	graphShadowView.frame = CGRectMake(0, CGRectGetMaxY(topView.bounds), topView.bounds.size.width, 20);
@@ -116,7 +166,18 @@
 	productsTableView.scrollIndicatorInsets = productsTableScrollIndicatorInset;
 	productsTableView.allowsMultipleSelection = YES;
 	
-	self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
+	if (@available(iOS 13.0, *)) {
+		self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:14.0f/255.0f green:14.0f/255.0f blue:15.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
+			}
+		}];
+	} else {
+		self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
+	}
 	[self.view addSubview:self.productsTableView];
 	
 	self.shadowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ShadowBottom.png"]];
@@ -177,6 +238,21 @@
 	self.activityIndicator = nil;
 	self.statusLabel = nil;
 	self.progressBar = nil;
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+	[super traitCollectionDidChange:previousTraitCollection];
+	if ([DarkModeCheck deviceIsInDarkMode]) {
+		gradientLayer.colors = @[
+			(id)[UIColor blackColor].CGColor,
+			(id)[UIColor colorWithRed:28.0f/255.0f green:28.0f/255.0f blue:30.0f/255.0f alpha:1.0f].CGColor
+		];
+	} else {
+		gradientLayer.colors = @[
+			(id)[UIColor colorWithRed:243.0f/255.0f green:243.0f/255.0f blue:243.0f/255.0f alpha:1.0f].CGColor,
+			(id)[UIColor colorWithRed:231.0f/255.0f green:231.0f/255.0f blue:231.0f/255.0f alpha:1.0f].CGColor
+		];
+	}
 }
 
 - (BOOL)shouldShowStatusBar {

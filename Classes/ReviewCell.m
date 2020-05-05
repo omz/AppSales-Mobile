@@ -137,13 +137,11 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		titleLabel.editable = NO;
 		titleLabel.textAlignment = NSTextAlignmentLeft;
 		titleLabel.font = [UIFont boldSystemFontOfSize:kReviewTitleFontSize];
-		
-        if (@available(iOS 13.0, *)) {
-            titleLabel.textColor = [UIColor labelColor];
-        } else {
-            titleLabel.textColor = [UIColor blackColor];
-        }
-        
+		if (@available(iOS 13.0, *)) {
+			titleLabel.textColor = [UIColor labelColor];
+		} else {
+			titleLabel.textColor = [UIColor blackColor];
+		}
 		titleLabel.text = NSLocalizedString(@"Untitled", nil);
 		[self.contentView addSubview:titleLabel];
 		
@@ -156,7 +154,11 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		replyView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin;
 		replyView.backgroundColor = [UIColor clearColor];
 		replyView.contentMode = UIViewContentModeScaleAspectFit;
-		replyView.tintColor = [UIColor grayColor];
+		if (@available(iOS 13.0, *)) {
+			replyView.tintColor = [UIColor secondaryLabelColor];
+		} else {
+			replyView.tintColor = [UIColor grayColor];
+		}
 		replyView.image = [[UIImage imageNamed:@"Reply"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 		[self.contentView addSubview:replyView];
 		
@@ -165,7 +167,11 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		nicknameLabel.backgroundColor = [UIColor clearColor];
 		nicknameLabel.textAlignment = NSTextAlignmentLeft;
 		nicknameLabel.font = [UIFont systemFontOfSize:kReviewNicknameFontSize];
-		nicknameLabel.textColor = [UIColor grayColor];
+		if (@available(iOS 13.0, *)) {
+			nicknameLabel.textColor = [UIColor secondaryLabelColor];
+		} else {
+			nicknameLabel.textColor = [UIColor grayColor];
+		}
 		nicknameLabel.text = NSLocalizedString(@"by Username - Jun 29, 2007", nil);
 		[self.contentView addSubview:nicknameLabel];
 		
@@ -174,14 +180,11 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		reviewLabel.backgroundColor = [UIColor clearColor];
 		reviewLabel.textAlignment = NSTextAlignmentLeft;
 		reviewLabel.font = [UIFont systemFontOfSize:kReviewTextFontSize];
-        
-        if (@available(iOS 13.0, *)) {
-            reviewLabel.tintColor = [UIColor labelColor];
-        } else {
-            reviewLabel.tintColor = [UIColor blackColor];
-        }
-        
-        
+		if (@available(iOS 13.0, *)) {
+			reviewLabel.tintColor = [UIColor labelColor];
+		} else {
+			reviewLabel.tintColor = [UIColor blackColor];
+		}
 		reviewLabel.numberOfLines = 0;
 		reviewLabel.text = NSLocalizedString(@"Lorem ipsum dolor sit amet.", nil);
 		[self.contentView addSubview:reviewLabel];
@@ -191,7 +194,11 @@ CGFloat const kReviewDetailsFontSize = 13.0f;
 		detailsLabel.backgroundColor = [UIColor clearColor];
 		detailsLabel.textAlignment = NSTextAlignmentLeft;
 		detailsLabel.font = [UIFont systemFontOfSize:kReviewDetailsFontSize];
-		detailsLabel.textColor = [UIColor grayColor];
+		if (@available(iOS 13.0, *)) {
+			detailsLabel.textColor = [UIColor secondaryLabelColor];
+		} else {
+			detailsLabel.textColor = [UIColor grayColor];
+		}
 		detailsLabel.text = NSLocalizedString(@"Version 1.0  |  United States", nil);
 		[self.contentView addSubview:detailsLabel];
 	}

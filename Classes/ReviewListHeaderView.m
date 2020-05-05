@@ -26,13 +26,7 @@
 	self = [super initWithFrame:CGRectMake(0.0f, 0.0f, 320.0f, 108.0f)];
 	if (self) {
 		// Initialization code
-        
-        if (@available(iOS 13.0, *)) {
-            self.backgroundColor = [UIColor secondarySystemBackgroundColor];
-        } else {
-            self.backgroundColor = [UIColor clearColor];
-        }
-		
+		self.backgroundColor = [UIColor clearColor];
 		
 		formatter = [[NSNumberFormatter alloc] init];
 		formatter.locale = [NSLocale currentLocale];
@@ -47,7 +41,18 @@
 		averageLabel.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
 		averageLabel.backgroundColor = [UIColor clearColor];
 		averageLabel.textAlignment = NSTextAlignmentCenter;
-		averageLabel.textColor = [UIColor colorWithRed:92.0f/255.0f green:92.0f/255.0f blue:98.0f/255.0f alpha:1.0f];
+		if (@available(iOS 13.0, *)) {
+			averageLabel.textColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+				switch (traitCollection.userInterfaceStyle) {
+					case UIUserInterfaceStyleDark:
+						return [UIColor colorWithRed:235.0f/255.0f green:235.0f/255.0f blue:244.0f/255.0f alpha:1.0f];
+					default:
+						return [UIColor colorWithRed:74.0f/255.0f green:74.0f/255.0f blue:78.0f/255.0f alpha:1.0f];
+				}
+			}];
+		} else {
+			averageLabel.textColor = [UIColor colorWithRed:92.0f/255.0f green:92.0f/255.0f blue:98.0f/255.0f alpha:1.0f];
+		}
 		averageLabel.font = [UIFont systemFontOfSize:60.0f weight:UIFontWeightBold];
 		averageLabel.text = @"0.0";
 		[self addSubview:averageLabel];
@@ -56,7 +61,11 @@
 		outOfLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin;
 		outOfLabel.backgroundColor = [UIColor clearColor];
 		outOfLabel.textAlignment = NSTextAlignmentCenter;
-		outOfLabel.textColor = [UIColor colorWithRed:146.0f/255.0f green:146.0f/255.0f blue:146.0f/255.0f alpha:1.0f];
+		if (@available(iOS 13.0, *)) {
+			outOfLabel.textColor = [UIColor secondaryLabelColor];
+		} else {
+			outOfLabel.textColor = [UIColor colorWithRed:146.0f/255.0f green:146.0f/255.0f blue:146.0f/255.0f alpha:1.0f];
+		}
 		outOfLabel.font = [UIFont systemFontOfSize:15.0f weight:UIFontWeightBold];
 		outOfLabel.text = NSLocalizedString(@"out of 5", nil);
 		[self addSubview:outOfLabel];
@@ -65,7 +74,11 @@
 		totalReviewsLabel.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
 		totalReviewsLabel.backgroundColor = [UIColor clearColor];
 		totalReviewsLabel.textAlignment = NSTextAlignmentRight;
-		totalReviewsLabel.textColor = [UIColor colorWithRed:146.0f/255.0f green:146.0f/255.0f blue:146.0f/255.0f alpha:1.0f];
+		if (@available(iOS 13.0, *)) {
+			totalReviewsLabel.textColor = [UIColor secondaryLabelColor];
+		} else {
+			totalReviewsLabel.textColor = [UIColor colorWithRed:146.0f/255.0f green:146.0f/255.0f blue:146.0f/255.0f alpha:1.0f];
+		}
 		totalReviewsLabel.font = [UIFont systemFontOfSize:15.0f];
 		totalReviewsLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%@ Reviews", nil), [formatter stringFromNumber:@(0)]];
 		[self addSubview:totalReviewsLabel];
@@ -132,7 +145,11 @@
 		
 		separator = [[UIView alloc] initWithFrame:CGRectMake(18.0f, CGRectGetHeight(self.frame) - 0.5f, CGRectGetWidth(self.frame) - (18.0f * 2.0f), 0.5f)];
 		separator.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-		separator.backgroundColor = [UIColor colorWithRed:200.0f/255.0f green:199.0f/255.0f blue:204.0f/255.0f alpha:1.0f];
+		if (@available(iOS 13.0, *)) {
+			separator.backgroundColor = [UIColor separatorColor];
+		} else {
+			separator.backgroundColor = [UIColor colorWithRed:200.0f/255.0f green:199.0f/255.0f blue:204.0f/255.0f alpha:1.0f];
+		}
 		[self addSubview:separator];
 	}
 	return self;
@@ -149,7 +166,18 @@
 	starLabel.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin;
 	starLabel.backgroundColor = [UIColor clearColor];
 	starLabel.textAlignment = NSTextAlignmentRight;
-	starLabel.textColor = [UIColor colorWithRed:153.0f/255.0f green:153.0f/255.0f blue:158.0f/255.0f alpha:1.0f];
+	if (@available(iOS 13.0, *)) {
+		starLabel.textColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:158.0f/255.0f green:158.0f/255.0f blue:165.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithRed:127.0f/255.0f green:127.0f/255.0f blue:131.0f/255.0f alpha:1.0f];
+			}
+		}];
+	} else {
+		starLabel.textColor = [UIColor colorWithRed:153.0f/255.0f green:153.0f/255.0f blue:158.0f/255.0f alpha:1.0f];
+	}
 	starLabel.font = [UIFont systemFontOfSize:9.0f];
 	return starLabel;
 }
@@ -158,8 +186,27 @@
 	StarRatingProgressView *progressView = [[StarRatingProgressView alloc] initWithFrame:frame];
 	progressView.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin;
 	progressView.backgroundColor = [UIColor clearColor];
-	progressView.progressTintColor = [UIColor colorWithRed:153.0f/255.0f green:153.0f/255.0f blue:158.0f/255.0f alpha:1.0f];
-	progressView.trackTintColor = [UIColor colorWithRed:239.0f/255.0f green:239.0f/255.0f blue:241.0f/255.0f alpha:1.0f];
+	if (@available(iOS 13.0, *)) {
+		progressView.progressTintColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:158.0f/255.0f green:158.0f/255.0f blue:165.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithRed:127.0f/255.0f green:127.0f/255.0f blue:131.0f/255.0f alpha:1.0f];
+			}
+		}];
+		progressView.trackTintColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:43.0f/255.0f green:43.0f/255.0f blue:46.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithRed:228.0f/255.0f green:228.0f/255.0f blue:229.0f/255.0f alpha:1.0f];
+			}
+		}];
+	} else {
+		progressView.progressTintColor = [UIColor colorWithRed:153.0f/255.0f green:153.0f/255.0f blue:158.0f/255.0f alpha:1.0f];
+		progressView.trackTintColor = [UIColor colorWithRed:239.0f/255.0f green:239.0f/255.0f blue:241.0f/255.0f alpha:1.0f];
+	}
 	return progressView;
 }
 

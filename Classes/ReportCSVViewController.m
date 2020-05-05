@@ -24,35 +24,26 @@
 }
 
 - (void)loadView {
-    WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
-    self.webView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:theConfiguration];
-    self.webView.navigationDelegate = self;
-    [self.webView setOpaque:NO];
-    
-    
-    if (@available(iOS 13.0, *)) {
-        [self.webView setBackgroundColor:[UIColor systemBackgroundColor]];
-    }
-    
+	WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
+	self.webView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:theConfiguration];
+	self.webView.navigationDelegate = self;
+	[self.webView setOpaque:NO];
+	if (@available(iOS 13.0, *)) {
+		[self.webView setBackgroundColor:[UIColor systemBackgroundColor]];
+	}
+	
 	self.view = webView;
 	self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
 	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(sendReport:)];
 }
 
--(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    
-    if (@available(iOS 13.0, *)) {
-        NSURL *cssUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"csv" ofType:@"css"]];
-        if ([DarkModeCheck deviceIsInDarkMode] == YES) {
-            cssUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"csv_dark" ofType:@"css"]];
-        }
-        
-        NSString *cssString = [NSString stringWithContentsOfURL:cssUrl encoding:NSUTF8StringEncoding error:nil];
-        cssString = [cssString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-        NSString *javascriptString = @"var style = document.createElement('style'); style.innerHTML = '%@'; document.head.appendChild(style)";
-        NSString *javascriptWithCSSString = [NSString stringWithFormat:javascriptString, cssString];
-        [self.webView evaluateJavaScript:javascriptWithCSSString completionHandler:nil];
-    }
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+	NSURL *cssUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"csv" ofType:@"css"]];
+	NSString *cssString = [NSString stringWithContentsOfURL:cssUrl encoding:NSUTF8StringEncoding error:nil];
+	cssString = [cssString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+	NSString *javascriptString = @"var style = document.createElement('style'); style.innerHTML = '%@'; document.head.appendChild(style)";
+	NSString *javascriptWithCSSString = [NSString stringWithFormat:javascriptString, cssString];
+	[self.webView evaluateJavaScript:javascriptWithCSSString completionHandler:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

@@ -18,6 +18,9 @@
 	ASAccount *account;
 	UITableView *productsTableView;
 	UIView *topView;
+	CAGradientLayer *gradientLayer;
+	UIView *topHighlight;
+	UIView *bottomHighlight;
 	UIImageView *shadowView;
 	
 	NSArray *products;

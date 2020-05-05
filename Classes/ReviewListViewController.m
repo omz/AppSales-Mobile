@@ -231,10 +231,6 @@
 	// Configure the cell...
 	Review *review = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	cell.review = review;
-    
-    if (@available(iOS 13.0, *)) {
-        cell.backgroundColor = [UIColor secondarySystemBackgroundColor];
-    }
 	
 	return cell;
 }

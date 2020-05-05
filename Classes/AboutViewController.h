@@ -10,6 +10,7 @@
 
 @interface AboutViewController : UIViewController <UIWebViewDelegate> {
 	UIWebView *webView;
+	BOOL didCheckForUpdates;
 }
 
 + (NSString *)appVersion;

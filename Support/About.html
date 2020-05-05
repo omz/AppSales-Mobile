@@ -7,6 +7,10 @@
 	<style type="text/css" media="screen">
 		@charset "utf-8";
 		
+		:root {
+			color-scheme: light dark;
+		}
+		
 		* {
 			-webkit-text-size-adjust: none;
 		}
@@ -20,7 +24,14 @@
 			font-family: -apple-system, -apple-system-font, sans-serif;
 			font-size: 11pt;
 			font-weight: 400;
+			color: #000000;
 			background-color: transparent;
+		}
+		
+		@media screen and (prefers-color-scheme: dark) {
+			body {
+				color: #ffffff;
+			}
 		}
 		
 		h1, h2, h3, h4 {
@@ -33,6 +44,12 @@
 			background-color: #ffffff;
 			-webkit-border-radius: 5pt;
 			-webkit-box-shadow: 0pt 1pt 2pt rgba(0, 0, 0, 0.5);
+		}
+		
+		@media screen and (prefers-color-scheme: dark) {
+			#content {
+				background-color: #2c2c2e;
+			}
 		}
 		
 		.icon {

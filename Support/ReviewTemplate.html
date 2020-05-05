@@ -6,6 +6,10 @@
 	<style type="text/css" media="screen">
 		@charset "utf-8";
 		
+		:root {
+			color-scheme: light dark;
+		}
+		
 		* {
 			-webkit-text-size-adjust: none;
 		}
@@ -41,11 +45,17 @@
 			display: block;
 			background: -webkit-gradient(linear, left top, left bottom, from(#e0e4e7), to(#b4bec6));
 			-webkit-background-origin: padding-box;
-			color: #111111;
 			font-size: 12pt;
 			border: solid #8999a5;
 			border-width: 0 0 1px 0;
 			word-wrap: break-word;
+		}
+		
+		@media screen and (prefers-color-scheme: dark) {
+			.review-title {
+				background: -webkit-gradient(linear, left top, left bottom, from(#2c2c2e), to(#1c1c1e));
+				border-color: #38383a;
+			}
 		}
 		
 		.review-subtitle {
@@ -59,6 +69,14 @@
 			font-size: 11pt;
 			border: solid #aec2d1;
 			border-width: 0 0 1px 0;
+		}
+		
+		@media screen and (prefers-color-scheme: dark) {
+			.review-subtitle {
+				background-color: #2c2c2e;
+				color: #8d8d93;
+				border-color: #38383a;
+			}
 		}
 		
 		.rating-text {
@@ -79,6 +97,14 @@
 			border-width: 0 0 1px 0;
 			line-height: 1em;
 			text-align: center;
+		}
+		
+		@media screen and (prefers-color-scheme: dark) {
+			.review-country {
+				background-color: #1c1c1e;
+				color: #8d8d93;
+				border-color: #252526;
+			}
 		}
 		
 		.flag-icon {
@@ -102,7 +128,6 @@
 			padding-right: 12px;
 			padding-bottom: 0;
 			display: block;
-			color: #111111;
 			font-size: 12pt;
 			word-wrap: break-word;
 		}
@@ -113,6 +138,12 @@
 			color: #8999a5;
 			font-size: 11pt;
 			font-weight: normal;
+		}
+		
+		@media screen and (prefers-color-scheme: dark) {
+			.response-date {
+				color: #8d8d93;
+			}
 		}
 		
 		a, a:visited {

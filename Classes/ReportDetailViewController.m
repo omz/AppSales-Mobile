@@ -43,11 +43,18 @@
 	[super loadView];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
 	
-    if (@available(iOS 13.0, *)) {
-        self.view.backgroundColor = [UIColor systemBackgroundColor];
-    } else {
-        self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
-    }
+	if (@available(iOS 13.0, *)) {
+		self.view.backgroundColor = [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			switch (traitCollection.userInterfaceStyle) {
+				case UIUserInterfaceStyleDark:
+					return [UIColor colorWithRed:14.0f/255.0f green:14.0f/255.0f blue:15.0f/255.0f alpha:1.0f];
+				default:
+					return [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
+			}
+		}];
+	} else {
+		self.view.backgroundColor = [UIColor colorWithRed:111.0f/255.0f green:113.0f/255.0f blue:121.0f/255.0f alpha:1.0f];
+	}
 	
 	numberFormatter = [[NSNumberFormatter alloc] init];
 	numberFormatter.locale = [NSLocale currentLocale];

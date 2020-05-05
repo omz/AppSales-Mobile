@@ -161,8 +161,6 @@
 	UINavigationController *aboutNavController = [[UINavigationController alloc] initWithRootViewController:aboutViewController];
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		aboutNavController.modalPresentationStyle = UIModalPresentationFormSheet;
-	} else {
-		aboutNavController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
 	}
 	[self presentViewController:aboutNavController animated:YES completion:nil];
 }

@@ -11,6 +11,7 @@
 #import "AppIconView.h"
 #import "Product.h"
 #import "UIImage+Tinting.h"
+#import "DarkModeCheck.h"
 
 CGFloat const kBadgePadding = 6.0f;
 
@@ -21,6 +22,10 @@ CGFloat const kBadgePadding = 6.0f;
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
+		if (@available(iOS 13.0, *)) {
+			self.backgroundColor = [UIColor secondarySystemGroupedBackgroundColor];
+		}
+		
 		self.textLabel.backgroundColor = [UIColor clearColor];
 		self.textLabel.translatesAutoresizingMaskIntoConstraints = NO;
 		
@@ -48,7 +53,7 @@ CGFloat const kBadgePadding = 6.0f;
 		[self.contentView addConstraint:textLabelLeftMarginConstraint];
 		
 		badgeView = [[UIImageView alloc] init];
-		badgeView.image = [[UIImage imageNamed:@"Badge"] resizableImageWithCapInsets:UIEdgeInsetsMake(9.0f, 9.0f, 9.0f, 9.0f) resizingMode:UIImageResizingModeTile];
+		[self updateBadgeImage];
 		badgeView.highlightedImage = [[UIImage as_tintedImageNamed:@"Badge" color:[UIColor whiteColor]] resizableImageWithCapInsets:UIEdgeInsetsMake(9.0f, 9.0f, 9.0f, 9.0f) resizingMode:UIImageResizingModeTile];
 		badgeView.translatesAutoresizingMaskIntoConstraints = NO;
 		badgeView.hidden = YES;
@@ -84,7 +89,7 @@ CGFloat const kBadgePadding = 6.0f;
 																   toItem:self.contentView
 																attribute:NSLayoutAttributeRight
 															   multiplier:1.0f
-																 constant:0.0f];
+																 constant:-8.0f];
 		
 		badgeViewRightMarginConstraint = [NSLayoutConstraint constraintWithItem:badgeView
 																	  attribute:NSLayoutAttributeRight
@@ -134,6 +139,12 @@ CGFloat const kBadgePadding = 6.0f;
 	return self;
 }
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+	[super traitCollectionDidChange:previousTraitCollection];
+	self.imageName = imageName;
+	[self updateBadgeImage];
+}
+
 - (void)setAccessoryType:(UITableViewCellAccessoryType)accessoryType {
 	[super setAccessoryType:accessoryType];
 	[self.contentView removeConstraints:@[badgeViewRightConstraint, badgeViewRightMarginConstraint]];
@@ -156,16 +167,26 @@ CGFloat const kBadgePadding = 6.0f;
 
 - (void)setImageName:(NSString *)_imageName {
 	imageName = _imageName;
-    
-    if (@available(iOS 13.0, *)) {
-        self.imageView.image = (imageName != nil) ? [UIImage as_tintedImageNamed:imageName color:[[UIColor labelColor] colorWithAlphaComponent:0.4]] : nil;
-    } else {
-        self.imageView.image = (imageName != nil) ? [UIImage imageNamed:imageName] : nil;
-    }
-	
+	if (imageName != nil) {
+		if ([DarkModeCheck deviceIsInDarkMode]) {
+			self.imageView.image = [UIImage as_tintedImageNamed:imageName color:[UIColor colorWithWhite:1.0 alpha:0.4]];
+		} else {
+			self.imageView.image = [UIImage imageNamed:imageName];
+		}
+	} else {
+		self.imageView.image = nil;
+	}
 	self.imageView.highlightedImage = (imageName != nil) ? [UIImage as_tintedImageNamed:imageName color:[UIColor whiteColor]] : nil;
 	[self.contentView removeConstraints:@[textLabelLeftConstraint, textLabelLeftMarginConstraint]];
 	[self.contentView addConstraint:(imageName == nil) ? textLabelLeftMarginConstraint : textLabelLeftConstraint];
+}
+
+- (void)updateBadgeImage {
+	if ([DarkModeCheck deviceIsInDarkMode]) {
+		badgeView.image = [[UIImage as_tintedImageNamed:@"Badge" color:[UIColor colorWithWhite:0.0 alpha:0.5]] resizableImageWithCapInsets:UIEdgeInsetsMake(9.0f, 9.0f, 9.0f, 9.0f) resizingMode:UIImageResizingModeTile];
+	} else {
+		badgeView.image = [[UIImage imageNamed:@"Badge"] resizableImageWithCapInsets:UIEdgeInsetsMake(9.0f, 9.0f, 9.0f, 9.0f) resizingMode:UIImageResizingModeTile];
+	}
 }
 
 - (void)setBadgeCount:(NSInteger)_badgeCount {
