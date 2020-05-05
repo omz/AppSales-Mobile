@@ -198,9 +198,9 @@
 										   @"F3": kProductPlatformMac,
 										   @"F7": kProductPlatformMac,
 										   @"IA1": kProductPlatformInApp,
-                                           @"IA1-M": kProductPlatformMacInApp,
+										   @"IA1-M": kProductPlatformMacInApp,
 										   @"IA9": kProductPlatformInApp,
-                                           @"IA9-M": kProductPlatformMacInApp,
+										   @"IA9-M": kProductPlatformMacInApp,
 										   @"1-B": kProductPlatformAppBundle,
 										   @"F1-B": kProductPlatformMacAppBundle,
 										   @"IAY": kProductPlatformRenewableSubscription,
@@ -538,12 +538,12 @@
 							@"1. ",		//iPhone App
 							@"1-B",		//App Bundle
 							@"1-B. ",	//App Bundle
-                            @"1E",      //Custom iPhone App
-                            @"1E. ",    //Custom iPhone App
-                            @"1EP",     //Custom iPad App
-                            @"1EP. ",   //Custom iPad App
-                            @"1EU",     //Custom Universal App
-                            @"1EU. ",   //Custom Universal App
+							@"1E",		//Custom iPhone App
+							@"1E. ",	//Custom iPhone App
+							@"1EP",		//Custom iPad App
+							@"1EP. ",	//Custom iPad App
+							@"1EU",		//Custom Universal App
+							@"1EU. ",	//Custom Universal App
 							@"1F",		//Universal App
 							@"1F. ",	//Universal App
 							@"1T",		//iPad App
@@ -555,17 +555,17 @@
 							@"FI1",		//Mac In-App Purchase
 							@"FI1. ",	//Mac In-App Purchase
 							@"IA1-M",	//Mac In-App Purchase
-                            @"IA1-M. ",    //Mac In-App Purchase
+							@"IA1-M. ",	//Mac In-App Purchase
 							@"IA1",		//In-App Purchase
 							@"IA1. ",	//In-App Purchase
 							@"IA9",		//In-App Subscription
 							@"IA9. ",	//In-App Subscription
-                            @"IA9-M",   //In-App Subscription Mac
-                            @"IA9-M. ", //In-App Subscription Mac
+							@"IA9-M",	//In-App Subscription Mac
+							@"IA9-M. ",	//In-App Subscription Mac
 							@"IAY",		//In-App Renewable Subscription
 							@"IAY. ",	//In-App Renewable Subscription
 							@"IAY-M",	//Mac In-App Renewable Subscription
-                            @"IAY-M. ", //Mac In-App Renewable Subscription
+							@"IAY-M. ",	//Mac In-App Renewable Subscription
 							@"IAC",		//In-App Free Subscription
 							@"IAC. "	//In-App Free Subscription
 							@"1.GP",	//GP = Gift Purchase
@@ -695,9 +695,9 @@
 								@"F1",		//Mac App
 								@"IA1",		//In-App Purchase
 								@"IA9",		//In-App Subscription
-                                @"IA9-M",   //In-App Subscription (Mac)
+								@"IA9-M",	//In-App Subscription (Mac)
 								@"IAY",		//In-App Auto-Renewable Subscription
-                                @"IAY-M",   //In-App Auto-Renewable Subscription (Mac)
+								@"IAY-M",	//In-App Auto-Renewable Subscription (Mac)
 								@"FI1",		//Mac In-App Purchase
 								@"IA1-M",	//Mac In-App Purchase
 								@"1E",		//Paid App (Custom iPhone)
