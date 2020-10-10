@@ -168,9 +168,9 @@
 	self.window.rootViewController = tabController;
 }
 
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-	[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
-	return YES;
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+    [self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
+    return YES;
 }
 
 - (BOOL)migrateDataIfNeeded {
