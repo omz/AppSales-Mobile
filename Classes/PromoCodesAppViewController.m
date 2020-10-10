@@ -154,8 +154,8 @@
         
         [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
         if (![MFMailComposeViewController canSendMail]) {
-            [self displayAlertWithTitle:NSLocalizedString(@"No Email Account", nil)
-                                message:NSLocalizedString(@"You have not configured this device for sending email.", nil)];
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"No Email Account", nil)
+                                                                message:NSLocalizedString(@"You have not configured this device for sending email.", nil)];
             return;
         }
         MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
@@ -198,13 +198,13 @@
 - (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues {
 	NSInteger numberOfCodes = [returnValues[@"numberOfCodes"] integerValue];
 	if (numberOfCodes <= 0) {
-        [self displayAlertWithTitle:nil
-                            message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil)];
-		return;
-	} else if (numberOfCodes > 50) {
-        [self displayAlertWithTitle:nil
-                            message:NSLocalizedString(@"Please enter a smaller number. You have a maximum of 50 promo codes per version of your app.", nil)];
-		return;
+        [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                            message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil)];
+        return;
+    } else if (numberOfCodes > 50) {
+        [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                            message:NSLocalizedString(@"Please enter a smaller number. You have a maximum of 50 promo codes per version of your app.", nil)];
+        return;
 	}
 	[self dismissViewControllerAnimated:YES completion:nil];
 	
@@ -321,8 +321,8 @@
             [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
             //email
             if (![MFMailComposeViewController canSendMail]) {
-                [self displayAlertWithTitle:NSLocalizedString(@"No Email Account", nil)
-                                    message:NSLocalizedString(@"You have not configured this device for sending email.", nil)];
+                [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"No Email Account", nil)
+                                                                    message:NSLocalizedString(@"You have not configured this device for sending email.", nil)];
                 return;
             }
             MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];

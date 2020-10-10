@@ -131,19 +131,19 @@
 }
 
 - (void)downloadReports:(id)sender {
-	for (ASAccount *account in self.accounts) {
-		if ((account.providerID == nil) || (account.providerID.length == 0)) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Provider ID Missing", nil)
-                                message:[NSString stringWithFormat:NSLocalizedString(@"Provider ID not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
-		} else if ((account.accessToken == nil) || (account.accessToken.length == 0)) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Access Token Missing", nil)
-                                message:[NSString stringWithFormat:NSLocalizedString(@"Access token not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
-		} else if ((account.vendorID == nil) || (account.vendorID.length == 0)) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Vendor ID Missing", nil)
-                                message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
-		} else {
-			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
-		}
+    for (ASAccount *account in self.accounts) {
+        if ((account.providerID == nil) || (account.providerID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Provider ID Missing", nil)
+                                                                message:[NSString stringWithFormat:NSLocalizedString(@"Provider ID not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
+        } else if ((account.accessToken == nil) || (account.accessToken.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Access Token Missing", nil)
+                                                                message:[NSString stringWithFormat:NSLocalizedString(@"Access token not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
+        } else if ((account.vendorID == nil) || (account.vendorID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Vendor ID Missing", nil)
+                                                                message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
+        } else {
+            [[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
+        }
 	}
 }
 
@@ -520,34 +520,34 @@
 		NSString *username = returnValues[kAccountUsername];
 		NSString *password = returnValues[kAccountPassword];
 		NSString *providerID = returnValues[kAccountProviderID];
-		NSString *accessToken = returnValues[kAccountAccessToken];
-		NSString *vendorID = returnValues[kAccountVendorID];
-		NSString *title = returnValues[kAccountTitle];
-		if ((username.length == 0) && (title.length == 0)) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
-                                message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nAll fields are required if you want to download reports and payments from iTunes Connect, otherwise you can just enter a description.", nil)];
-			return;
-		}
-		if ((password.length > 0) && (providerID.length == 0)) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
-                                message:NSLocalizedString(@"You need to enter a provider ID in order to download reports from iTunes Connect.", nil)];
-			return;
-		}
-		if ((password.length > 0) && (accessToken.length == 0)) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
-                                message:NSLocalizedString(@"You need to enter an access token in order to download reports from iTunes Connect.", nil)];
-			return;
-		}
-		if ((password.length > 0) && (vendorID.length == 0)) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
-                                message:NSLocalizedString(@"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".", nil)];
-			return;
-		}
-		if (password.length == 0) {
-            [self displayAlertWithTitle:NSLocalizedString(@"Notice", nil)
-                                message:NSLocalizedString(@"Payments will not be downloaded from iTunes Connect without your account password.", nil)];
-		}
-		if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
+        NSString *accessToken = returnValues[kAccountAccessToken];
+        NSString *vendorID = returnValues[kAccountVendorID];
+        NSString *title = returnValues[kAccountTitle];
+        if ((username.length == 0) && (title.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nAll fields are required if you want to download reports and payments from iTunes Connect, otherwise you can just enter a description.", nil)];
+            return;
+        }
+        if ((password.length > 0) && (providerID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter a provider ID in order to download reports from iTunes Connect.", nil)];
+            return;
+        }
+        if ((password.length > 0) && (accessToken.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter an access token in order to download reports from iTunes Connect.", nil)];
+            return;
+        }
+        if ((password.length > 0) && (vendorID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".", nil)];
+            return;
+        }
+        if (password.length == 0) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Notice", nil)
+                                                                message:NSLocalizedString(@"Payments will not be downloaded from iTunes Connect without your account password.", nil)];
+        }
+        if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
 			ASAccount *account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:self.managedObjectContext];
 			account.title = title;
 			account.username = username;
@@ -620,17 +620,17 @@
 		[settingsNavController pushViewController:vc animated:YES];
 	} else if ([key isEqualToString:kUpdateExchangeRatesButton]) {
 		[[CurrencyManager sharedManager] forceRefresh];
-	} else if ([key isEqualToString:kImportReportsButton]) {
-		ASAccount *account = (ASAccount *)editor.context;
-		if (account.isDownloadingReports) {
-            [self displayAlertWithTitle:nil
-                                message:NSLocalizedString(@"AppSales is already importing reports for this account. Please wait until the current import has finished.", nil)];
-		} else {
-			BOOL canStartImport = [ReportImportOperation filesAvailableToImport];
-			if (!canStartImport) {
-                [self displayAlertWithTitle:NSLocalizedString(@"No Files Found", nil)
-                                    message:NSLocalizedString(@"The Documents directory does not contain any .txt files. Please use iTunes File Sharing to transfer report files to your device.", nil)];
-			} else {
+    } else if ([key isEqualToString:kImportReportsButton]) {
+        ASAccount *account = (ASAccount *)editor.context;
+        if (account.isDownloadingReports) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"AppSales is already importing reports for this account. Please wait until the current import has finished.", nil)];
+        } else {
+            BOOL canStartImport = [ReportImportOperation filesAvailableToImport];
+            if (!canStartImport) {
+                [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"No Files Found", nil)
+                                                                    message:NSLocalizedString(@"The Documents directory does not contain any .txt files. Please use iTunes File Sharing to transfer report files to your device.", nil)];
+            } else {
                 UIAlertController *confirmImportAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Begin Import?", nil)
                                                                                             message:NSLocalizedString(@"Do you want to start importing all report files in the Documents directory into this account?", nil)
                                                                                      preferredStyle:UIAlertControllerStyleAlert];
@@ -704,9 +704,10 @@
 		NSString *password = vc.values[kAccountPassword];
 		
 		if ((username.length == 0) || (password.length == 0)) {
-            [self displayAlertWithTitle:nil
-                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
-			return;
+            
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
+            return;
 		}
 		[vc dismissKeyboard];
 		
@@ -729,9 +730,9 @@
 		NSString *username = vc.values[kAccountUsername];
 		NSString *password = vc.values[kAccountPassword];
 
-		if ((username.length == 0) || (password.length == 0)) {
-            [self displayAlertWithTitle:nil
-                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
+        if ((username.length == 0) || (password.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
 			return;
 		}
 		[vc dismissKeyboard];
@@ -755,15 +756,15 @@
 		NSString *username = vc.values[kAccountUsername];
 		NSString *password = vc.values[kAccountPassword];
 		NSString *providerID = vc.values[kAccountProviderID];
-		
-		if ((username.length == 0) || (password.length == 0)) {
-            [self displayAlertWithTitle:nil
-                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
-			return;
-		} else if (providerID.length == 0) {
-            [self displayAlertWithTitle:nil
-                                message:NSLocalizedString(@"Please fill in your provider ID first.", nil)];
-			return;
+        
+        if ((username.length == 0) || (password.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
+            return;
+        } else if (providerID.length == 0) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please fill in your provider ID first.", nil)];
+            return;
 		}
 		[vc dismissKeyboard];
 		
@@ -789,14 +790,14 @@
 		NSString *providerID = vc.values[kAccountProviderID];
 		
 		if ((username.length == 0) || (password.length == 0)) {
-            [self displayAlertWithTitle:nil
-                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
-			return;
-		} else if (providerID.length == 0) {
-            [self displayAlertWithTitle:nil
-                                message:NSLocalizedString(@"Please fill in your provider ID first.", nil)];
-			return;
-		}
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
+            return;
+        } else if (providerID.length == 0) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please fill in your provider ID first.", nil)];
+            return;
+        }
 		[vc dismissKeyboard];
 		
 		NSDictionary *loginInfo = @{
