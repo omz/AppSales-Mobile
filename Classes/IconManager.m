@@ -100,7 +100,7 @@ NSString *const kITunesStoreBundleThumbnailPathRegexPattern = @"(https:\\/\\/is[
 				// Download was successful, write icon to file.
 				NSString *iconPath = [self.iconDirectory stringByAppendingPathComponent:appID];
 				[iconData writeToFile:iconPath atomically:YES];
-				[iconCache setObject:icon forKey:appID];
+                [self->iconCache setObject:icon forKey:appID];
 				[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerDownloadedIconNotification object:self userInfo:@{kIconManagerDownloadedIconNotificationAppID: appID}];
 			});
 		};
@@ -168,7 +168,7 @@ NSString *const kITunesStoreBundleThumbnailPathRegexPattern = @"(https:\\/\\/is[
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			isDownloading = NO;
+            self->isDownloading = NO;
 			[self dequeueDownload];
 		});
 	});
@@ -178,7 +178,7 @@ NSString *const kITunesStoreBundleThumbnailPathRegexPattern = @"(https:\\/\\/is[
 	dispatch_async(dispatch_get_main_queue(), ^{
 		NSString *iconPath = [[self iconDirectory] stringByAppendingPathComponent:appID];
 		[[NSFileManager defaultManager] removeItemAtPath:iconPath error:nil];
-		[iconCache removeObjectForKey:appID];
+        [self->iconCache removeObjectForKey:appID];
 		[[NSNotificationCenter defaultCenter] postNotificationName:IconManagerClearedIconNotification object:self userInfo:@{kIconManagerClearedIconNotificationAppID: appID}];
 	});
 }

@@ -38,11 +38,11 @@
 	}
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		account.downloadStatus = NSLocalizedString(@"Logging in...", nil);
+        self->account.downloadStatus = NSLocalizedString(@"Logging in...", nil);
 	});
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-		LoginManager *loginManager = [[LoginManager alloc] initWithAccount:account];
+        LoginManager *loginManager = [[LoginManager alloc] initWithAccount:self->account];
 		loginManager.shouldDeleteCookies = [[NSUserDefaults standardUserDefaults] boolForKey:kSettingDeleteCookies];
 		loginManager.delegate = self;
 		[loginManager logIn];
@@ -76,26 +76,26 @@
 - (void)downloadProgress:(CGFloat)progress withStatus:(NSString *)status {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		if (status != nil) {
-			account.downloadStatus = status;
+            self->account.downloadStatus = status;
 		}
-		CGFloat p = (1.0f / (CGFloat)products.count);
-		CGFloat completed = (CGFloat)(products.count - downloadQueue.operationCount);
-		account.downloadProgress = (p * completed) + (p * progress);
+        CGFloat p = (1.0f / (CGFloat)self->products.count);
+        CGFloat completed = (CGFloat)(self->products.count - self->downloadQueue.operationCount);
+        self->account.downloadProgress = (p * completed) + (p * progress);
 	});
 }
 
 - (void)completeDownloadWithStatus:(NSString *)status {
     dispatch_async(dispatch_get_main_queue(), ^{
-		CGFloat completed = (CGFloat)(products.count - downloadQueue.operationCount);
-		CGFloat progress = completed / (CGFloat)products.count;
-		account.downloadStatus = status;
-		account.downloadProgress = progress;
-		if (downloadQueue.operationCount == 0) {
-			account.isDownloadingReports = NO;
+        CGFloat completed = (CGFloat)(self->products.count - self->downloadQueue.operationCount);
+        CGFloat progress = completed / (CGFloat)self->products.count;
+        self->account.downloadStatus = status;
+        self->account.downloadProgress = progress;
+        if (self->downloadQueue.operationCount == 0) {
+            self->account.isDownloadingReports = NO;
 			[UIApplication sharedApplication].idleTimerDisabled = NO;
-			if (backgroundTaskID != UIBackgroundTaskInvalid) {
-				[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
-                backgroundTaskID = UIBackgroundTaskInvalid;
+            if (self->backgroundTaskID != UIBackgroundTaskInvalid) {
+                [[UIApplication sharedApplication] endBackgroundTask:self->backgroundTaskID];
+                self->backgroundTaskID = UIBackgroundTaskInvalid;
 			}
 		}
 	});

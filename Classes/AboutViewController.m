@@ -90,7 +90,7 @@ NSString *const kAppGitHubRepoInfoPLIST = @"https://gitcdn.xyz/repo/nicolasgomol
 			}
 		}
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[webView loadHTMLString:aboutHTML baseURL:[NSBundle mainBundle].bundleURL];
+            [self->webView loadHTMLString:aboutHTML baseURL:[NSBundle mainBundle].bundleURL];
 			[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 		});
 	});

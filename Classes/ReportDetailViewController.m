@@ -160,13 +160,13 @@
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
 	UIInterfaceOrientation toInterfaceOrientation = [self relativeOrientationFromTransform:coordinator.targetTransform];
 	[coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-		if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && !mapHidden) {
+        if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && !self->mapHidden) {
 			[self toggleMap:nil];
 		}
 		self.tableView.contentInset = UIEdgeInsetsMake(-20.0f, 0.0f, -20.0f, 0.0f);
 	} completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
 		if (!UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-			self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(mapHidden ? @"ShowMap" : @"HideMap")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:(self->mapHidden ? @"ShowMap" : @"HideMap")] style:UIBarButtonItemStylePlain target:self action:@selector(toggleMap:)];
 		} else {
 			self.navigationItem.rightBarButtonItem = nil;
 		}

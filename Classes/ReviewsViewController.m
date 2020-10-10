@@ -115,7 +115,7 @@
 		dispatch_async(dispatch_get_main_queue(), ^{
 			ReportDownloadCoordinator *coordinator = [ReportDownloadCoordinator sharedReportDownloadCoordinator];
 			if (!coordinator.isBusy) {
-				[statusToolbar hide];
+                [self->statusToolbar hide];
 				[self.tableView reloadData];
 				self.navigationItem.rightBarButtonItem.enabled = YES;
 			}

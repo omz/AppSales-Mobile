@@ -60,7 +60,7 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
 	[self storeValue:loginManager.providerID forKey:kAccountProviderID];
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
-			switch (pressedAccountButton) {
+            switch (self->pressedAccountButton) {
 				case AccountButtonTypeAutoFillWizard:
 				case AccountButtonTypeGetAccessToken: {
 					NSString *csrfToken = [loginManager generateCSRFToken];
@@ -68,7 +68,7 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
 						[self chooseAccessToken:loginManager csrfToken:csrfToken action:AccessTokenActionGet successHandler:^(NSString *accessToken) {
 							dispatch_async(dispatch_get_main_queue(), ^{
 								[self storeValue:accessToken forKey:kAccountAccessToken];
-								if (pressedAccountButton == AccountButtonTypeAutoFillWizard) {
+                                if (self->pressedAccountButton == AccountButtonTypeAutoFillWizard) {
 									dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 										@autoreleasepool {
 											[self chooseVendor:loginManager.providerID];

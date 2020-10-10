@@ -396,8 +396,8 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		NSMutableURLRequest *deviceRequest = [NSMutableURLRequest requestWithURL:deviceURL];
 		[deviceRequest setHTTPMethod:@"PUT"];
 		[deviceRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
-		[deviceRequest setValue:appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
-		[deviceRequest setValue:appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+        [deviceRequest setValue:self->appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+        [deviceRequest setValue:self->appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
 		[deviceRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
 		NSHTTPURLResponse *deviceResponse = nil;
 		NSData *deviceData = [NSURLConnection sendSynchronousRequest:deviceRequest returningResponse:&deviceResponse error:nil];
@@ -426,7 +426,7 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 - (void)validateCode:(NSString *)securityCode {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSDictionary *bodyDict = nil;
-		switch (authType) {
+        switch (self->authType) {
 			case SCInputTypeTwoStepVerificationCode:
 				bodyDict = @{@"code": securityCode};
 				break;
@@ -440,14 +440,14 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
 		
 		NSURL *verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthCodeAction]];
-		if (authType == SCInputTypeTwoStepVerificationCode) {
-			verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, appleAuthTrustedDeviceId]];
+        if (self->authType == SCInputTypeTwoStepVerificationCode) {
+            verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, self->appleAuthTrustedDeviceId]];
 		}
 		NSMutableURLRequest *verifyRequest = [NSMutableURLRequest requestWithURL:verifyURL];
 		[verifyRequest setHTTPMethod:@"POST"];
 		[verifyRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
-		[verifyRequest setValue:appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
-		[verifyRequest setValue:appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+        [verifyRequest setValue:self->appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+        [verifyRequest setValue:self->appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
 		[verifyRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
 		[verifyRequest setHTTPBody:bodyData];
 		NSHTTPURLResponse *verifyResponse = nil;
@@ -459,7 +459,7 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 			[self fetchRemainingCookies];
 		} else {
 			// Incorrect verification code. Retry?
-			switch (authType) {
+            switch (self->authType) {
 				case SCInputTypeTwoStepVerificationCode: {
 					[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
 					break;

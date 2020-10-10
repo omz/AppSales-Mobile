@@ -41,8 +41,8 @@
 	@autoreleasepool {
 	
 		dispatch_async(dispatch_get_main_queue(), ^{
-			_account.downloadStatus = NSLocalizedString(@"Starting import", nil);
-			_account.downloadProgress = 0.0;
+            self->_account.downloadStatus = NSLocalizedString(@"Starting import", nil);
+            self->_account.downloadProgress = 0.0;
 		});
 		
 		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
@@ -79,8 +79,8 @@
 		NSArray *fileNames = [fm contentsOfDirectoryAtPath:docPath error:nil];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-            _account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (0/%lu)...", nil), (unsigned long)[fileNames count]];
-			_account.downloadProgress = 0.0;
+            self->_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (0/%lu)...", nil), (unsigned long)[fileNames count]];
+            self->_account.downloadProgress = 0.0;
 		});
 		
 		for (NSString *fileName in fileNames) {
@@ -142,8 +142,8 @@
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					float progress = (float)i / (float)[fileNames count];
-                    _account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (%li/%lu)...", nil), (long)i, (unsigned long)[fileNames count]];
-					_account.downloadProgress = progress;
+                    self->_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (%li/%lu)...", nil), (long)i, (unsigned long)[fileNames count]];
+                    self->_account.downloadProgress = progress;
 				});
 			
 			}
@@ -151,8 +151,8 @@
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-            _account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Finished (%li imported)", nil), (long)numberOfReportsImported];
-			_account.downloadProgress = 1.0;
+            self->_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Finished (%li imported)", nil), (long)numberOfReportsImported];
+            self->_account.downloadProgress = 1.0;
 		});
 	}
 }
