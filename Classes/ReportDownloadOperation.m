@@ -23,7 +23,7 @@ NSString *const kITCReporterServiceTypeFinance = @"finance";
 NSString *const kITCReporterServiceBody        = @"[p=Reporter.properties, m=Robot.XML, %@]";
 
 static NSString *NSStringPercentEscaped(NSString *string) {
-	return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
+    return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
 }
 
 @implementation ReportDownloadOperation
