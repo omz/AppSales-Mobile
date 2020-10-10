@@ -19,6 +19,7 @@
 #import "PaymentsViewController.h"
 #import "PromoCodesViewController.h"
 #import "PromoCodesLicenseViewController.h"
+#import "UIViewController+Alert.h"
 
 @implementation AppSalesAppDelegate
 
@@ -214,11 +215,8 @@
 	[self saveContext];
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:account fromDirectory:legacyReportDirectory deleteAfterImport:YES];
 	
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Update Notice", nil) 
-								 message:NSLocalizedString(@"You have updated from an older version of AppSales. Your sales reports are currently being imported. You can start using the app while the import is running.", nil)
-								delegate:nil 
-					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-					   otherButtonTitles:nil] show];
+    [UIViewController displayAlertWithTitle:NSLocalizedString(@"Update Notice", nil)
+                                    message:NSLocalizedString(@"You have updated from an older version of AppSales. Your sales reports are currently being imported. You can start using the app while the import is running.", nil)];
 	return YES;
 }
 
@@ -366,11 +364,8 @@
 - (void)promoCodeDownloadFailed:(NSNotification *)notification {
 	NSString *errorDescription = notification.userInfo[kASPromoCodeDownloadFailedErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:@"An error occured while downloading the promo codes (%@).", errorDescription];
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
-								 message:alertMessage 
-								delegate:nil 
-					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-					   otherButtonTitles:nil] show];
+    [UIViewController displayAlertWithTitle:NSLocalizedString(@"Error", nil)
+                                    message:alertMessage];
 }
 
 - (void)dealloc {
