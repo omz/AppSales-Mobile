@@ -230,16 +230,6 @@
 	self.statusToolbar.frame = self.statusToolbarFrame;
 }
 
-- (void)viewDidUnload {
-	[super viewDidUnload];
-	self.productsTableView = nil;
-	self.shadowView = nil;
-	self.statusToolbar = nil;
-	self.activityIndicator = nil;
-	self.statusLabel = nil;
-	self.progressBar = nil;
-}
-
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
 	[super traitCollectionDidChange:previousTraitCollection];
 	if ([DarkModeCheck deviceIsInDarkMode]) {

@@ -187,10 +187,6 @@
 	[super viewDidLoad];
 }
 
-- (void)viewDidUnload {
-	[super viewDidUnload];
-}
-
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	self.navigationController.toolbarHidden = NO;

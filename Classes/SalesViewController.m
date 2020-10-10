@@ -176,11 +176,6 @@
 	self.navigationItem.backBarButtonItem = backButton;
 }
 
-- (void)viewDidUnload {
-	[super viewDidUnload];
-	self.graphView = nil;
-}
-
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	if (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) != UIInterfaceOrientationIsLandscape(previousOrientation)) {
