@@ -147,11 +147,11 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				} else {
 					if ([dateType isEqualToString:@"Daily"]) {
 						CGFloat progress = 0.5f * ((CGFloat)i / (CGFloat)numberOfReportsAvailable);
-						NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %i", nil), i + 1, numberOfReportsAvailable];
+                        NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %lu", nil), i + 1, (unsigned long)numberOfReportsAvailable];
 						[self downloadProgress:progress withStatus:status];
 					} else {
 						CGFloat progress = 0.5f + 0.4f * ((CGFloat)i / (CGFloat)numberOfReportsAvailable);
-						NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %i", nil), i + 1, numberOfReportsAvailable];
+                        NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %lu", nil), i + 1, (unsigned long)numberOfReportsAvailable];
 						[self downloadProgress:progress withStatus:status];
 					}
 				}

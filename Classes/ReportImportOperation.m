@@ -79,7 +79,7 @@
 		NSArray *fileNames = [fm contentsOfDirectoryAtPath:docPath error:nil];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (0/%i)...", nil), [fileNames count]];
+            _account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (0/%lu)...", nil), (unsigned long)[fileNames count]];
 			_account.downloadProgress = 0.0;
 		});
 		
@@ -142,7 +142,7 @@
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					float progress = (float)i / (float)[fileNames count];
-					_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (%i/%i)...", nil), i, [fileNames count]];
+                    _account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Processing files (%li/%lu)...", nil), (long)i, (unsigned long)[fileNames count]];
 					_account.downloadProgress = progress;
 				});
 			
@@ -151,7 +151,7 @@
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			_account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Finished (%i imported)", nil), numberOfReportsImported];
+            _account.downloadStatus = [NSString stringWithFormat:NSLocalizedString(@"Finished (%li imported)", nil), (long)numberOfReportsImported];
 			_account.downloadProgress = 1.0;
 		});
 	}
