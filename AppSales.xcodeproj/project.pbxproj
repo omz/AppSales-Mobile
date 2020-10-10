@@ -83,6 +83,7 @@
 		7FDF6E8313D89B1000B8CC4E /* countries_simple.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7FDF6E8213D89B1000B8CC4E /* countries_simple.plist */; };
 		7FDF727513D8E64D00B8CC4E /* ReportCSVViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727413D8E64D00B8CC4E /* ReportCSVViewController.m */; };
 		7FDF727D13DAAF2900B8CC4E /* ReportCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */; };
+		AEF5636A2531C9670012548E /* PaymentDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AEF563692531C9670012548E /* PaymentDetailsViewController.m */; };
 		DA2231A41DB318C7009071A3 /* SAMKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2231A11DB318C7009071A3 /* SAMKeychain.m */; };
 		DA2231A51DB318C7009071A3 /* SAMKeychainQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2231A31DB318C7009071A3 /* SAMKeychainQuery.m */; };
 		DA2231A71DB318CC009071A3 /* SAMKeychain.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA2231A61DB318CC009071A3 /* SAMKeychain.bundle */; };
@@ -260,6 +261,8 @@
 		7FDF727C13DAAF2900B8CC4E /* ReportCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReportCollection.m; sourceTree = "<group>"; };
 		7FED633913DB69EA00DF33B1 /* GlobalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalSettings.h; sourceTree = "<group>"; };
 		AE778A141E2EB6F200DAA6B7 /* AppSales 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 5.xcdatamodel"; sourceTree = "<group>"; };
+		AEF563682531C9670012548E /* PaymentDetailsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PaymentDetailsViewController.h; sourceTree = "<group>"; };
+		AEF563692531C9670012548E /* PaymentDetailsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PaymentDetailsViewController.m; sourceTree = "<group>"; };
 		DA1BC9E62456123100A36B92 /* AppSales 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "AppSales 7.xcdatamodel"; sourceTree = "<group>"; };
 		DA2231A01DB318C7009071A3 /* SAMKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SAMKeychain.h; path = Vendor/SAMKeychain/Sources/SAMKeychain.h; sourceTree = SOURCE_ROOT; };
 		DA2231A11DB318C7009071A3 /* SAMKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SAMKeychain.m; path = Vendor/SAMKeychain/Sources/SAMKeychain.m; sourceTree = SOURCE_ROOT; };
@@ -573,6 +576,8 @@
 				7F7F4A3E13E50A52006C6651 /* PaymentsViewController.m */,
 				7F7F4A4013E51A99006C6651 /* YearView.h */,
 				7F7F4A4113E51A99006C6651 /* YearView.m */,
+				AEF563682531C9670012548E /* PaymentDetailsViewController.h */,
+				AEF563692531C9670012548E /* PaymentDetailsViewController.m */,
 			);
 			name = Payments;
 			sourceTree = "<group>";
@@ -952,6 +957,7 @@
 				DA2231A51DB318C7009071A3 /* SAMKeychainQuery.m in Sources */,
 				DA4AC6A91EFAF7A6003CAF4D /* ReviewFilterDetailViewController.m in Sources */,
 				7FD4ECDC13DAFF120054FE6D /* AppleFiscalCalendar.m in Sources */,
+				AEF5636A2531C9670012548E /* PaymentDetailsViewController.m in Sources */,
 				DA4AC6991EF7A1E2003CAF4D /* StarRatingView.m in Sources */,
 				7FAB532C13DCFA7E0027274F /* AppIconView.m in Sources */,
 				7F4065CA13DD379B006148AA /* ReportDetailEntryCell.m in Sources */,

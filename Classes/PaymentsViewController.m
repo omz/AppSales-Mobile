@@ -7,7 +7,7 @@
 //
 
 #import "PaymentsViewController.h"
-#import "YearView.h"
+#import "PaymentDetailsViewController.h"
 #import "ASAccount.h"
 #import "CurrencyManager.h"
 
@@ -19,12 +19,13 @@
 
 @implementation PaymentsViewController
 
-@synthesize scrollView, pageControl;
+@synthesize scrollView, pageControl, delegate;
 
 - (instancetype)initWithAccount:(ASAccount *)paymentAccount {
 	self = [super init];
 	if (self) {
 		account = paymentAccount;
+		dateFormatter = [[NSDateFormatter alloc] init];
 		self.title = NSLocalizedString(@"Payments", nil);
 		self.tabBarItem.image = [UIImage imageNamed:@"Payments"];
 		self.hidesBottomBarWhenPushed = [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
@@ -92,7 +93,7 @@
 
 	NSString *paymentCurrencyCode = nil;
 
-	NSMutableDictionary *paymentsByYear = [NSMutableDictionary dictionary];
+	paymentsByYear = [NSMutableDictionary dictionary];
 	NSMutableDictionary *sumsByYear = [NSMutableDictionary dictionary];
 	NSSet *allPaymentReports = account.paymentReports;
 	for (NSManagedObject *paymentReport in allPaymentReports) {
@@ -197,6 +198,7 @@
 	CGFloat x = 0.0;
 	for (NSNumber *year in sortedYears) {
 		YearView *yearView = [[YearView alloc] initWithFrame:CGRectMake(x, 0, scrollView.bounds.size.width, scrollView.bounds.size.height - 10)];
+		yearView.delegate = self;
 		yearView.year = [year integerValue];
 		yearView.labelsByMonth = labelsByYear[year];
 		if ([allPaymentReports count] > 0) {
@@ -217,7 +219,10 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-	[self reloadData];
+	// Only load initially and not when shown again
+	if (!paymentsByYear) {
+		[self reloadData];
+	}
 }
 
 - (void)sortPayments {
@@ -276,6 +281,33 @@
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
 	return UIInterfaceOrientationMaskPortrait;
+}
+
+#pragma mark - YearViewDelegate
+
+- (void)yearView:(YearView *)yearView didSelectMonth:(int)month {
+	if (paymentsByYear) {
+		NSDictionary *yearPayments = [paymentsByYear objectForKey:@(yearView.year)];
+		if (yearPayments) {
+			NSDictionary *monthPayments = [yearPayments objectForKey:@(month)];
+			PaymentDetailsViewController *viewController = [[PaymentDetailsViewController alloc] initWithPaymentDetails:[monthPayments allValues]];
+			viewController.delegate = self;
+			viewController.title = [dateFormatter monthSymbols][month - 1];
+			[self.navigationController pushViewController:viewController animated:YES];
+		}
+	}
+}
+
+#pragma mark - PaymentDetailsViewControllerDelegate
+
+- (void)paymentDetailsViewController:(PaymentDetailsViewController *)paymentDetailsViewController didDeletePaymentDetails:(NSManagedObject *)paymentDetails {
+	// Try to maintain year page
+	CGPoint contentOffset = self.scrollView.contentOffset;
+	
+	[delegate paymentViewController:self didDeletePaymentDetail:paymentDetails];
+	
+	[self reloadData];
+	[self.scrollView setContentOffset:contentOffset];
 }
 
 @end

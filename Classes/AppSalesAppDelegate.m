@@ -152,6 +152,7 @@
 	UINavigationController *reviewsNavController = [[UINavigationController alloc] initWithRootViewController:reviewsVC];
 	
 	PaymentsViewController *paymentsVC = [[PaymentsViewController alloc] initWithAccount:account];
+	paymentsVC.delegate = self;
 	paymentsVC.navigationItem.leftBarButtonItem = selectAccountButtonItem3;
 	UINavigationController *paymentsNavController = [[UINavigationController alloc] initWithRootViewController:paymentsVC];
 	
@@ -285,6 +286,14 @@
 	PromoCodesLicenseViewController *vc = [[PromoCodesLicenseViewController alloc] initWithLicenseAgreement:licenseAgreement operation:[notification object]];
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
 	[self.window.rootViewController presentViewController:navController animated:YES completion:nil];
+}
+
+#pragma mark - PaymentViewControllerDelegate
+
+- (void)paymentViewController:(PaymentsViewController *)paymentViewController didDeletePaymentDetail:(NSManagedObject *)paymentDetail {
+	NSManagedObjectContext *moc = self.managedObjectContext;
+	[moc deleteObject:paymentDetail];
+	[self saveContext];
 }
 
 #pragma mark - Core Data

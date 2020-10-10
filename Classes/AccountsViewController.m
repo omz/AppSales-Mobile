@@ -222,7 +222,7 @@
 		cell.textLabel.text = NSLocalizedString(@"Sales and Trends", nil);
 		cell.badgeCount = badge;
 		cell.imageName = @"Sales";
-        
+		
 	} else if (indexPath.row == 1) {
 		NSInteger badge = [[self.accounts[indexPath.section] paymentsBadge] integerValue];
 		cell.textLabel.text = NSLocalizedString(@"Payments", nil);
@@ -288,6 +288,7 @@
 		[self.navigationController pushViewController:salesViewController animated:YES];
 	} else if (indexPath.row == 1) {
 		PaymentsViewController *paymentsViewController = [[PaymentsViewController alloc] initWithAccount:account];
+		paymentsViewController.delegate = self;
 		[self.navigationController pushViewController:paymentsViewController animated:YES];
 	} else if (indexPath.row == 2) {
 		ReviewsViewController *reviewsViewController = [[ReviewsViewController alloc] initWithAccount:account];
@@ -298,6 +299,14 @@
 	} else if (indexPath.row == 4) {
 		[self editAccount:account];
 	}
+}
+
+#pragma mark - PaymentViewControllerDelegate
+
+- (void)paymentViewController:(PaymentsViewController *)paymentViewController didDeletePaymentDetail:(NSManagedObject *)paymentDetail {
+	NSManagedObjectContext *context = self.managedObjectContext;
+	[context deleteObject:paymentDetail];
+	[self saveContext];
 }
 
 #pragma mark -

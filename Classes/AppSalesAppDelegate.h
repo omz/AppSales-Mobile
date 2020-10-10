@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "AccountsViewController.h"
+#import "PaymentsViewController.h"
 #import "KKPasscodeLock.h"
 
 @class ASAccount;
 
-@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate, UIActionSheetDelegate, AccountsViewControllerDelegate, KKPasscodeViewControllerDelegate> {
+@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate, UIActionSheetDelegate, AccountsViewControllerDelegate, KKPasscodeViewControllerDelegate, PaymentViewControllerDelegate> {
 	UIWindow *window;
 	
 	AccountsViewController *accountsViewController;

@@ -7,13 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PaymentDetailsViewController.h"
+#import "YearView.h"
 
 @class ASAccount;
+@protocol PaymentViewControllerDelegate;
 
-@interface PaymentsViewController : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate> {
+@interface PaymentsViewController : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate, YearViewDelegate, PaymentDetailsViewController> {
 	ASAccount *account;
+	NSMutableDictionary *paymentsByYear;
 	UIScrollView *scrollView;
 	UIPageControl *pageControl;
+	NSDateFormatter *dateFormatter;
+	id<PaymentViewControllerDelegate> __weak delegate;
 }
 
 - (instancetype)initWithAccount:(ASAccount *)paymentAccount;
@@ -21,5 +27,12 @@
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIPageControl *pageControl;
+@property (nonatomic, weak) id<PaymentViewControllerDelegate> delegate;
+
+@end
+
+@protocol PaymentViewControllerDelegate <NSObject>
+
+- (void)paymentViewController:(PaymentsViewController *)paymentViewController didDeletePaymentDetail:(NSManagedObject *)paymentDetail;
 
 @end
