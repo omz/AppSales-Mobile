@@ -31,7 +31,7 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 		_product = product;
 		productObjectID = [product.objectID copy];
 		
-		moc = [[NSManagedObjectContext alloc] init];
+        moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		moc.persistentStoreCoordinator = product.account.managedObjectContext.persistentStoreCoordinator;
 		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 		

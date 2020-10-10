@@ -100,7 +100,7 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	
 	markItem.image = review.unread.boolValue ? [UIImage imageNamed:@"CircleFilled"] : [UIImage imageNamed:@"Circle"];
 	
-	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 	moc.persistentStoreCoordinator = review.managedObjectContext.persistentStoreCoordinator;
 	moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 	

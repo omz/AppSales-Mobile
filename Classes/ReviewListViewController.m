@@ -147,7 +147,7 @@
 }
 
 - (void)markAllReviewsUnread:(BOOL)unread {
-	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 	moc.persistentStoreCoordinator = self.fetchedResultsController.managedObjectContext.persistentStoreCoordinator;
 	moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 	

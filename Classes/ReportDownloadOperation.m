@@ -52,8 +52,8 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 		NSInteger numberOfReportsDownloaded = 0;
 		[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Starting download", nil)];
-
-		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+        
+        NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		moc.persistentStoreCoordinator = psc;
 		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 
@@ -361,7 +361,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
 
-			NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+            NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
             [moc setPersistentStoreCoordinator:self->psc];
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 

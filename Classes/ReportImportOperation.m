@@ -45,7 +45,7 @@
             self->_account.downloadProgress = 0.0;
 		});
 		
-		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+        NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		[moc setPersistentStoreCoordinator:psc];
 		[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 		
