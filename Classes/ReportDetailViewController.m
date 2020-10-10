@@ -197,8 +197,8 @@
 	self.navigationController.toolbarHidden = YES;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	return (interfaceOrientation == UIInterfaceOrientationPortrait || UIInterfaceOrientationIsLandscape(interfaceOrientation));
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return  UIInterfaceOrientationMaskAll;
 }
 
 - (void)toggleMap:(id)sender {
