@@ -35,7 +35,6 @@ extern NSString *const kITCPaymentVendorsPaymentAction;
 	NSString *appleAuthSessionId;
 	NSString *appleAuthScnt;
 	NSString *appleAuthTrustedDeviceId;
-	UIActionSheet *verifyActionSheet;
 	SCInputType authType;
 	NSDateFormatter *dateFormatter;
 }

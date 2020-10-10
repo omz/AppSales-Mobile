@@ -27,7 +27,7 @@
 
 @end
 
-@interface KKPasscodeSettingsViewController : UITableViewController <UIActionSheetDelegate, KKPasscodeViewControllerDelegate> {
+@interface KKPasscodeSettingsViewController : UITableViewController <KKPasscodeViewControllerDelegate> {
 	UISwitch *unlockWithBiometricsSwitch;
 	UISwitch *eraseDataSwitch;
 	

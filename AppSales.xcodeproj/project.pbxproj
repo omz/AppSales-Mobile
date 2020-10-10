@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4509175A23D030130028AF83 /* DarkModeCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 4509175923D030130028AF83 /* DarkModeCheck.m */; };
 		45C2B2232460296200C84374 /* csv.css in Resources */ = {isa = PBXBuildFile; fileRef = 45C2B2212460296200C84374 /* csv.css */; };
+		621D32432531C98C00D0EE97 /* UIViewController+Alert.m in Sources */ = {isa = PBXBuildFile; fileRef = 621D32422531C98C00D0EE97 /* UIViewController+Alert.m */; };
 		62E09F1B19E693F3002917FE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62E09F1A19E693F3002917FE /* Images.xcassets */; };
 		6D81575414CB3C2B005E8F3F /* KKKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574914CB3C2B005E8F3F /* KKKeychain.m */; };
 		6D81575514CB3C2B005E8F3F /* KKPasscodeLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D81574B14CB3C2B005E8F3F /* KKPasscodeLock.m */; };
@@ -127,6 +128,8 @@
 		4509175823D030130028AF83 /* DarkModeCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DarkModeCheck.h; sourceTree = "<group>"; };
 		4509175923D030130028AF83 /* DarkModeCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DarkModeCheck.m; sourceTree = "<group>"; };
 		45C2B2212460296200C84374 /* csv.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = csv.css; sourceTree = "<group>"; };
+		621D32412531C98C00D0EE97 /* UIViewController+Alert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Alert.h"; sourceTree = "<group>"; };
+		621D32422531C98C00D0EE97 /* UIViewController+Alert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Alert.m"; sourceTree = "<group>"; };
 		62E09F1A19E693F3002917FE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = AppSales/Images.xcassets; sourceTree = "<group>"; };
 		6D81574814CB3C2B005E8F3F /* KKKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KKKeychain.h; sourceTree = "<group>"; };
 		6D81574914CB3C2B005E8F3F /* KKKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KKKeychain.m; sourceTree = "<group>"; };
@@ -630,6 +633,8 @@
 				7FAEB67013E6D3AB00750788 /* UIImage+Tinting.m */,
 				DA4984451C12C85F009BFC8F /* UIViewController+Orientation.h */,
 				DA4984461C12C85F009BFC8F /* UIViewController+Orientation.m */,
+				621D32412531C98C00D0EE97 /* UIViewController+Alert.h */,
+				621D32422531C98C00D0EE97 /* UIViewController+Alert.m */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -921,6 +926,7 @@
 				7F709D6713BCB6500008DBAD /* FieldEditorViewController.m in Sources */,
 				DAD53A581EFCF6ED0038C925 /* ReviewListHeaderView.m in Sources */,
 				7F709D8C13BD03D40008DBAD /* SalesViewController.m in Sources */,
+				621D32432531C98C00D0EE97 /* UIViewController+Alert.m in Sources */,
 				DA4984411C12A884009BFC8F /* MBProgressHUD.m in Sources */,
 				7F709D8F13BD064E0008DBAD /* ASAccount.m in Sources */,
 				7F1499CA13BE15F500D89064 /* NSData+Compression.m in Sources */,

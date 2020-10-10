@@ -187,7 +187,13 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 - (void)sendReviewViaEmail {
 	Review *review = reviews[index];
 	if (![MFMailComposeViewController canSendMail]) {
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Email Account", nil)
+                                                                       message:NSLocalizedString(@"You have not configured this device for sending email.", nil)
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                  style:UIAlertActionStyleCancel
+                                                handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
 		return;
 	}
 	MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];

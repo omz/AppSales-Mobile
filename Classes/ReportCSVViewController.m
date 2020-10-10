@@ -80,8 +80,14 @@
 		filename = [filename substringToIndex:filename.length - 3];
 	}
 	
-	if (![MFMailComposeViewController canSendMail]) {
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+    if (![MFMailComposeViewController canSendMail]) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Email Account", nil)
+                                                                       message:NSLocalizedString(@"You have not configured this device for sending email.", nil)
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                  style:UIAlertActionStyleCancel
+                                                handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
 	} else {
 		MFMailComposeViewController *vc = [[MFMailComposeViewController alloc] init];
 		[vc setSubject:filename];

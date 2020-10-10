@@ -8,6 +8,7 @@
 
 #import "AccountsViewController+ButtonActions.h"
 #import "ASProgressHUD.h"
+#import "UIViewController+Alert.h"
 
 @implementation AccountsViewController (AccountsViewController_ButtonActions)
 
@@ -111,7 +112,8 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
 
 - (void)failedToGenerateCSRFToken {
 	[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"Could not fetch CSRF token from server. Please try again later.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+    [self displayAlertWithTitle:NSLocalizedString(@"Error", nil)
+                        message:NSLocalizedString(@"Could not fetch CSRF token from server. Please try again later.", nil)];
 }
 
 - (void)chooseAccessToken:(LoginManager *)loginManager csrfToken:(NSString *)csrfToken action:(AccessTokenAction)action successHandler:(void (^)(NSString *accessToken))successHandler {
@@ -178,7 +180,8 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
 
 - (void)failedToFetchAccessToken {
 	[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"The access token could not be fetched automatically. Please check your username and password or enter your access token manually. You'll find it in the Sales and Trends module, under the Reports section, by clicking on the (?) beside About Reports on itunesconnect.apple.com.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+    [self displayAlertWithTitle:NSLocalizedString(@"Error", nil)
+                        message:NSLocalizedString(@"The access token could not be fetched automatically. Please check your username and password or enter your access token manually. You'll find it in the Sales and Trends module, under the Reports section, by clicking on the (?) beside About Reports on itunesconnect.apple.com.", nil)];
 }
 
 - (void)chooseVendor:(NSString *)providerID {
@@ -243,7 +246,8 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
 
 - (void)failedToLoadVendorIDs {
 	[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:NSLocalizedString(@"The vendor ID could not be filled automatically. Please check your username and password or enter your vendor ID manually. You'll find it at the top of the Sales and Trends module on itunesconnect.apple.com.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+    [self displayAlertWithTitle:NSLocalizedString(@"Error", nil)
+                        message:NSLocalizedString(@"The vendor ID could not be filled automatically. Please check your username and password or enter your vendor ID manually. You'll find it at the top of the Sales and Trends module on itunesconnect.apple.com.", nil)];
 }
 
 - (FieldEditorViewController *)currentViewController {

@@ -17,7 +17,7 @@
 
 @synthesize account, products, visibleProducts, selectedProducts;
 @synthesize productsTableView, topView, shadowView, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
-@synthesize activeSheet;
+@synthesize activeAlertSheet;
 
 - (instancetype)initWithAccount:(ASAccount *)anAccount {
 	self = [super init];
@@ -32,8 +32,8 @@
 }
 
 - (void)willShowPasscodeLock:(NSNotification *)notification {
-	if (self.activeSheet.visible) {
-		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
+	if (self.activeAlertSheet) {
+        [self.activeAlertSheet dismissViewControllerAnimated:NO completion:nil];
 	}
 }
 
