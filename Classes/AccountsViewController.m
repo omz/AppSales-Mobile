@@ -95,6 +95,8 @@
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] addObserver:self forKeyPath:@"isBusy" options:NSKeyValueObservingOptionNew context:nil];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconReloadFailed:) name:IconManagerReloadFailedIconNotification object:nil];
 	
 	[self reloadAccounts];
 }
@@ -929,6 +931,41 @@
 		// Reload icon.
 		[[IconManager sharedManager] iconForAppID:productID];
 	}
+}
+
+- (void)iconReloadFailed:(NSNotification *)notification {
+    NSString *productID = notification.userInfo[kIconManagerReloadFailedIconNotificationAppID];
+    if (productID) {
+        [self promptForCountryCodeForAppID:productID];
+    }
+}
+
+- (void)promptForCountryCodeForAppID:(NSString *)appId {
+    UIAlertController *prompt = [UIAlertController alertControllerWithTitle:@"Icon not found"
+                                                                    message:@"Would you like to try again with a specific country code?"
+                                                             preferredStyle:UIAlertControllerStyleAlert];
+    
+    [prompt addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"2 letter country code";
+    }];
+    
+    [prompt addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                               style:UIAlertActionStyleCancel
+                                             handler:nil]];
+    
+    [prompt addAction:[UIAlertAction actionWithTitle:@"Retry"
+                                               style:UIAlertActionStyleDefault
+                                             handler:^(UIAlertAction * _Nonnull action) {
+        UITextField *countryField = prompt.textFields.firstObject;
+        if (![countryField.text isEqualToString:@""] && countryField.text.length == 2) {
+            
+            // Retry with a different country code
+            [[IconManager sharedManager] setCountryCode:countryField.text];
+            [[IconManager sharedManager] clearIconForAppID:appId];
+        }
+    }]];
+    
+    [self presentViewController:prompt animated:YES completion:nil];
 }
 
 #pragma mark -

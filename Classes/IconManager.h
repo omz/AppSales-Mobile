@@ -8,10 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-#define kIconManagerDownloadedIconNotificationAppID @"appID"
-#define IconManagerDownloadedIconNotification       @"IconManagerDownloadedIconNotification"
-#define kIconManagerClearedIconNotificationAppID    @"appID"
-#define IconManagerClearedIconNotification          @"IconManagerClearedIconNotification"
+#define kIconManagerDownloadedIconNotificationAppID     @"appID"
+#define IconManagerDownloadedIconNotification           @"IconManagerDownloadedIconNotification"
+#define kIconManagerClearedIconNotificationAppID        @"appID"
+#define IconManagerClearedIconNotification              @"IconManagerClearedIconNotification"
+#define kIconManagerReloadFailedIconNotificationAppID   @"appID"
+#define IconManagerReloadFailedIconNotification         @"IconManagerReloadFailedIconNotification"
 
 @interface IconManager : NSObject {
 	dispatch_queue_t queue;
@@ -21,6 +23,8 @@
 }
 
 + (instancetype)sharedManager;
+
+@property (nonatomic, strong) NSString *countryCode;
 
 - (NSString *)iconDirectory;
 - (UIImage *)resizeIcon:(UIImage *)icon;
