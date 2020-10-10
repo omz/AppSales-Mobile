@@ -324,28 +324,31 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
             } else if (self->providerID.length > 0) {
                 NSURL *paymentVendorsURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsAction, self->providerID]];
-				NSData *paymentVendorsData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentVendorsURL] returningResponse:nil error:nil];
-				NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:paymentVendorsData options:0 error:nil];
-				NSArray *sapVendors = paymentVendors[@"data"];
+                [[NSURLSession.sharedSession dataTaskWithRequest:[NSURLRequest requestWithURL:paymentVendorsURL]
+                                               completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                    
+                    NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                    NSArray *sapVendors = paymentVendors[@"data"];
 
-				if (self.isCancelled) {
-					[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
-				} else if ((sapVendors != nil) && ![sapVendors isEqual:[NSNull null]] && (sapVendors.count > 0)) {
-                    if (self->downloadedVendors == nil) {
-                        self->downloadedVendors = [[NSMutableDictionary alloc] init];
-					} else {
-                        [self->downloadedVendors removeAllObjects];
-					}
-					for (NSDictionary *vendor in sapVendors) {
-						NSNumber *vendorID = vendor[@"sapVendorNumber"];
-                        self->downloadedVendors[vendorID.description] = @(0);
-					}
-                    for (NSString *vendorID in self->downloadedVendors.allKeys) {
-						[self fetchPaymentsForVendorID:vendorID];
-					}
-				} else {
-					[self completeDownload];
-				}
+                    if (self.isCancelled) {
+                        [self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
+                    } else if ((sapVendors != nil) && ![sapVendors isEqual:[NSNull null]] && (sapVendors.count > 0)) {
+                        if (self->downloadedVendors == nil) {
+                            self->downloadedVendors = [[NSMutableDictionary alloc] init];
+                        } else {
+                            [self->downloadedVendors removeAllObjects];
+                        }
+                        for (NSDictionary *vendor in sapVendors) {
+                            NSNumber *vendorID = vendor[@"sapVendorNumber"];
+                            self->downloadedVendors[vendorID.description] = @(0);
+                        }
+                        for (NSString *vendorID in self->downloadedVendors.allKeys) {
+                            [self fetchPaymentsForVendorID:vendorID];
+                        }
+                    } else {
+                        [self completeDownload];
+                    }
+                }] resume];
 			}
 
 			//==== /Payments

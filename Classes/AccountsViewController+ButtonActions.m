@@ -64,25 +64,26 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
             switch (self->pressedAccountButton) {
 				case AccountButtonTypeAutoFillWizard:
 				case AccountButtonTypeGetAccessToken: {
-					NSString *csrfToken = [loginManager generateCSRFToken];
-					if (csrfToken != nil) {
-						[self chooseAccessToken:loginManager csrfToken:csrfToken action:AccessTokenActionGet successHandler:^(NSString *accessToken) {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[self storeValue:accessToken forKey:kAccountAccessToken];
-                                if (self->pressedAccountButton == AccountButtonTypeAutoFillWizard) {
-									dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
-										@autoreleasepool {
-											[self chooseVendor:loginManager.providerID];
-										}
-									});
-								} else {
-									[ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
-								}
-							});
-						}];
-					} else {
-						[self performSelectorOnMainThread:@selector(failedToGenerateCSRFToken) withObject:nil waitUntilDone:YES];
-					}
+                    [loginManager generateCSRFTokenWithCompletionBlock:^(NSString *csrfToken) {
+                        if (csrfToken != nil) {
+                            [self chooseAccessToken:loginManager csrfToken:csrfToken action:AccessTokenActionGet successHandler:^(NSString *accessToken) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [self storeValue:accessToken forKey:kAccountAccessToken];
+                                    if (self->pressedAccountButton == AccountButtonTypeAutoFillWizard) {
+                                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
+                                            @autoreleasepool {
+                                                [self chooseVendor:loginManager.providerID];
+                                            }
+                                        });
+                                    } else {
+                                        [ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
+                                    }
+                                });
+                            }];
+                        } else {
+                            [self performSelectorOnMainThread:@selector(failedToGenerateCSRFToken) withObject:nil waitUntilDone:YES];
+                        }
+                    }];
 					break;
 				}
 				case AccountButtonTypeSelectProviderID: {
@@ -191,19 +192,22 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
 		[vendors removeAllObjects];
 	}
 	NSURL *paymentVendorsURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsAction, providerID]];
-	NSData *paymentVendorsData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentVendorsURL] returningResponse:nil error:nil];
-	NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:paymentVendorsData options:0 error:nil];
-	NSArray *sapVendors = paymentVendors[@"data"];
-	if ((sapVendors != nil) && ![sapVendors isEqual:[NSNull null]] && (sapVendors.count > 0)) {
-		for (NSDictionary *vendor in sapVendors) {
-			NSNumber *vendorID = vendor[@"sapVendorNumber"];
-			NSString *vendorName = vendor[@"vendorName"];
-			vendors[vendorID.description] = vendorName;
-		}
-		[self performSelectorOnMainThread:@selector(finishedLoadingVendors) withObject:nil waitUntilDone:YES];
-	} else {
-		[self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
-	}
+    [[NSURLSession.sharedSession dataTaskWithRequest:[NSURLRequest requestWithURL:paymentVendorsURL]
+                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+        NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        NSArray *sapVendors = paymentVendors[@"data"];
+        if ((sapVendors != nil) && ![sapVendors isEqual:[NSNull null]] && (sapVendors.count > 0)) {
+            for (NSDictionary *vendor in sapVendors) {
+                NSNumber *vendorID = vendor[@"sapVendorNumber"];
+                NSString *vendorName = vendor[@"vendorName"];
+                self->vendors[vendorID.description] = vendorName;
+            }
+            [self performSelectorOnMainThread:@selector(finishedLoadingVendors) withObject:nil waitUntilDone:YES];
+        } else {
+            [self performSelectorOnMainThread:@selector(failedToLoadVendorIDs) withObject:nil waitUntilDone:YES];
+        }
+    }] resume];
 }
 
 - (void)finishedLoadingVendors {
