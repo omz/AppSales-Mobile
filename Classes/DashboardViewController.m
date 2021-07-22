@@ -17,7 +17,7 @@
 
 @synthesize account, products, visibleProducts, selectedProducts;
 @synthesize productsTableView, topView, shadowView, statusToolbar, stopButtonItem, activityIndicator, statusLabel, progressBar;
-@synthesize activeSheet;
+@synthesize activeAlertSheet;
 
 - (instancetype)initWithAccount:(ASAccount *)anAccount {
 	self = [super init];
@@ -32,8 +32,8 @@
 }
 
 - (void)willShowPasscodeLock:(NSNotification *)notification {
-	if (self.activeSheet.visible) {
-		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
+	if (self.activeAlertSheet) {
+        [self.activeAlertSheet dismissViewControllerAnimated:NO completion:nil];
 	}
 }
 
@@ -228,16 +228,6 @@
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
 	self.statusToolbar.frame = self.statusToolbarFrame;
-}
-
-- (void)viewDidUnload {
-	[super viewDidUnload];
-	self.productsTableView = nil;
-	self.shadowView = nil;
-	self.statusToolbar = nil;
-	self.activityIndicator = nil;
-	self.statusLabel = nil;
-	self.progressBar = nil;
 }
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
@@ -507,8 +497,11 @@
 	self.shadowView.alpha = MAX(0.0, MIN(1.0, (scrollView.contentOffset.y - 20) / 20.0));
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	return (interfaceOrientation == UIInterfaceOrientationPortrait);
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)dealloc {

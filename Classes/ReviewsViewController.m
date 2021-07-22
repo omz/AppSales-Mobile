@@ -115,7 +115,7 @@
 		dispatch_async(dispatch_get_main_queue(), ^{
 			ReportDownloadCoordinator *coordinator = [ReportDownloadCoordinator sharedReportDownloadCoordinator];
 			if (!coordinator.isBusy) {
-				[statusToolbar hide];
+                [self->statusToolbar hide];
 				[self.tableView reloadData];
 				self.navigationItem.rightBarButtonItem.enabled = YES;
 			}
@@ -170,15 +170,11 @@
 	}
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		return YES;
-	}
-	return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

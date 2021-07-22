@@ -25,7 +25,7 @@ typedef NS_ENUM(NSInteger, DashboardViewMode) {
 	DashboardViewModeTotalSales
 };
 
-@interface SalesViewController : DashboardViewController <UIActionSheetDelegate, GraphViewDelegate, GraphViewDataSource> {
+@interface SalesViewController : DashboardViewController <GraphViewDelegate, GraphViewDataSource> {
 	NSCalendar *calendar;
 	NSDateFormatter *dateFormatter;
 	NSNumberFormatter *numberFormatter;

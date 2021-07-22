@@ -20,10 +20,7 @@
 #import "ReportDetailViewController.h"
 #import "AppleFiscalCalendar.h"
 #import "AccountsViewController.h"
-
-#define kSheetTagDailyGraphOptions   1
-#define kSheetTagMonthlyGraphOptions 2
-#define kSheetTagAdvancedViewMode    3
+#import "UIViewController+Alert.h"
 
 @interface SalesViewController ()
 
@@ -179,11 +176,6 @@
 	self.navigationItem.backBarButtonItem = backButton;
 }
 
-- (void)viewDidUnload {
-	[super viewDidUnload];
-	self.graphView = nil;
-}
-
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	if (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) != UIInterfaceOrientationIsLandscape(previousOrientation)) {
@@ -199,11 +191,8 @@
 	}
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		return YES;
-	}
-	return UIInterfaceOrientationIsLandscape(interfaceOrientation) || interfaceOrientation == UIInterfaceOrientationPortrait;
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -341,23 +330,14 @@
 
 - (void)downloadReports:(id)sender {
 	if ((account.providerID == nil) || (account.providerID.length == 0)) {
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Provider ID Missing", nil)
-									message:NSLocalizedString(@"Provider ID not set for this account. Please go to the account's settings and fill in the missing information.", nil)
-								   delegate:nil
-						  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-						  otherButtonTitles:nil] show];
+        [self displayAlertWithTitle:NSLocalizedString(@"Provider ID Missing", nil)
+                            message:NSLocalizedString(@"Provider ID not set for this account. Please go to the account's settings and fill in the missing information.", nil)];
 	} else if ((account.accessToken == nil) || (account.accessToken.length == 0)) {
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Access Token Missing", nil)
-									message:NSLocalizedString(@"Access token not set for this account. Please go to the account's settings and fill in the missing information.", nil)
-								   delegate:nil
-						  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-						  otherButtonTitles:nil] show];
+        [self displayAlertWithTitle:NSLocalizedString(@"Access Token Missing", nil)
+                            message:NSLocalizedString(@"Access token not set for this account. Please go to the account's settings and fill in the missing information.", nil)];
 	} else if ((account.vendorID == nil) || (account.vendorID.length == 0)) {
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil)
-									message:NSLocalizedString(@"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.", nil)
-								   delegate:nil
-						  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-						  otherButtonTitles:nil] show];
+        [self displayAlertWithTitle:NSLocalizedString(@"Vendor ID Missing", nil)
+                            message:NSLocalizedString(@"You have not entered a vendor ID for this account. Please go to the account's settings and fill in the missing information.", nil)];
 	} else {
 		[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
 	}
@@ -394,78 +374,59 @@
 }
 
 - (void)showGraphOptions:(id)sender {
+    self.activeAlertSheet = [UIAlertController alertControllerWithTitle:nil
+                                                                message:nil
+                                                         preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                              style:UIAlertActionStyleCancel
+                                                            handler:^(UIAlertAction * _Nonnull action) {
+        self.activeAlertSheet = nil;
+    }]];
+    
 	if (selectedTab == 0) {
-		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
-											 delegate:self 
-									cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-							   destructiveButtonTitle:nil 
-									otherButtonTitles:NSLocalizedString(@"Daily Reports", nil), NSLocalizedString(@"Weekly Reports", nil), nil];
-		self.activeSheet.tag = kSheetTagDailyGraphOptions;
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Daily Reports", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self->showWeeks = NO;
+            [self.graphView reloadData];
+            [self reloadTableView];
+            [[NSUserDefaults standardUserDefaults] setBool:self->showWeeks forKey:kSettingDashboardShowWeeks];
+            self.activeAlertSheet = nil;
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Weekly Reports", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self->showWeeks = YES;
+            [self.graphView reloadData];
+            [self reloadTableView];
+            [[NSUserDefaults standardUserDefaults] setBool:self->showWeeks forKey:kSettingDashboardShowWeeks];
+            self.activeAlertSheet = nil;
+        }]];
 	} else {
-		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil 
-											 delegate:self 
-									cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-							   destructiveButtonTitle:nil 
-									otherButtonTitles:NSLocalizedString(@"Calendar Months", nil), NSLocalizedString(@"Fiscal Months", nil), nil];
-		self.activeSheet.tag = kSheetTagMonthlyGraphOptions;
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Calendar Months", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self->showFiscalMonths = NO;
+            [self.graphView reloadData];
+            [self reloadTableView];
+            [[NSUserDefaults standardUserDefaults] setBool:self->showFiscalMonths forKey:kSettingShowFiscalMonths];
+            self.activeAlertSheet = nil;
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Fiscal Months", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self->showFiscalMonths = YES;
+            [self.graphView reloadData];
+            [self reloadTableView];
+            [[NSUserDefaults standardUserDefaults] setBool:self->showFiscalMonths forKey:kSettingShowFiscalMonths];
+            self.activeAlertSheet = nil;
+        }]];
 	}
-	[self.activeSheet showInView:self.view];
+    [self presentViewController:self.activeAlertSheet animated:YES completion:nil];
 }
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-	if (buttonIndex != [actionSheet cancelButtonIndex]) {
-		if (actionSheet.tag == kSheetTagDailyGraphOptions) {
-			if (buttonIndex == 0) {
-				showWeeks = NO;
-				[self.graphView reloadData];
-				[self reloadTableView];
-			} else if (buttonIndex == 1) {
-				showWeeks = YES;
-				[self.graphView reloadData];
-				[self reloadTableView];
-			}
-			[[NSUserDefaults standardUserDefaults] setBool:showWeeks forKey:kSettingDashboardShowWeeks];
-		} else if (actionSheet.tag == kSheetTagMonthlyGraphOptions) {
-			if (buttonIndex == 0) {
-				showFiscalMonths = NO;
-				[self.graphView reloadData];
-				[self reloadTableView];
-			} else if (buttonIndex == 1) {
-				showFiscalMonths = YES;
-				[self.graphView reloadData];
-				[self reloadTableView];
-			}
-			[[NSUserDefaults standardUserDefaults] setBool:showFiscalMonths forKey:kSettingShowFiscalMonths];
-		} else if (actionSheet.tag == kSheetTagAdvancedViewMode) {
-			if (buttonIndex == 0) {
-				self.viewMode = DashboardViewModeRevenue;
-			} else if (buttonIndex == 1) {
-				self.viewMode = DashboardViewModeSales;
-			} else if (buttonIndex == 2) {
-				self.viewMode = DashboardViewModeUpdates;
-			} else if (buttonIndex == 3) {
-				self.viewMode = DashboardViewModeRedownloads;
-			} else if (buttonIndex == 4) {
-				self.viewMode = DashboardViewModeEducationalSales;
-			} else if (buttonIndex == 5) {
-				self.viewMode = DashboardViewModeGiftPurchases;
-			} else if (buttonIndex == 6) {
-				self.viewMode = DashboardViewModePromoCodes;
-			} else if (buttonIndex == 7) {
-				self.viewMode = DashboardViewModeTotalRevenue;
-			}
-			[[NSUserDefaults standardUserDefaults] setInteger:viewMode forKey:kSettingDashboardViewMode];
-			if ((viewMode == DashboardViewModeRevenue) || (viewMode == DashboardViewModeTotalRevenue)) {
-				[self.graphView setUnit:[[CurrencyManager sharedManager] baseCurrencyDescription]];
-			} else {
-				[self.graphView setUnit:@""];
-			}
-			[self.graphView reloadValuesAnimated:YES];
-			[self reloadTableView];
-		}
-	}
-}
-
 
 - (void)switchGraphMode:(id)sender {
 	if (viewMode == DashboardViewModeRevenue) {
@@ -843,22 +804,85 @@
 
 - (void)selectAdvancedViewMode:(UILongPressGestureRecognizer *)gestureRecognizer {
 	if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-		self.activeSheet = [[UIActionSheet alloc] initWithTitle:nil
-													   delegate:self
-											  cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-										 destructiveButtonTitle:nil
-											  otherButtonTitles:
-							NSLocalizedString(@"Revenue", nil),
-							NSLocalizedString(@"Sales", nil),
-							NSLocalizedString(@"Updates", nil),
-							NSLocalizedString(@"Redownloads", nil),
-							NSLocalizedString(@"Educational Sales", nil),
-							NSLocalizedString(@"Gift Purchases", nil),
-							NSLocalizedString(@"Promo Codes", nil),
-							NSLocalizedString(@"Total", nil), nil];
-		self.activeSheet.tag = kSheetTagAdvancedViewMode;
-		[self.activeSheet showInView:self.navigationController.view];
+        self.activeAlertSheet = [UIAlertController alertControllerWithTitle:nil
+                                                                    message:nil
+                                                             preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                                  style:UIAlertActionStyleCancel
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.activeAlertSheet = nil;
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Revenue", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModeRevenue;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Sales", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModeSales;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Updates", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModeUpdates;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Redownloads", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModeRedownloads;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Educational Sales", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModeEducationalSales;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Gift Purchases", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModeGiftPurchases;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Promo Codes", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModePromoCodes;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self.activeAlertSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Total", nil)
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * _Nonnull action) {
+            self.viewMode = DashboardViewModeTotalRevenue;
+            [self switchAdvancedViewMode];
+        }]];
+        
+        [self presentViewController:self.activeAlertSheet animated:YES completion:nil];
 	}
+}
+
+- (void)switchAdvancedViewMode {
+    [[NSUserDefaults standardUserDefaults] setInteger:viewMode forKey:kSettingDashboardViewMode];
+    if ((viewMode == DashboardViewModeRevenue) || (viewMode == DashboardViewModeTotalRevenue)) {
+        [self.graphView setUnit:[[CurrencyManager sharedManager] baseCurrencyDescription]];
+    } else {
+        [self.graphView setUnit:@""];
+    }
+    [self.graphView reloadValuesAnimated:YES];
+    [self reloadTableView];
 }
 
 #pragma mark - Table view delegate

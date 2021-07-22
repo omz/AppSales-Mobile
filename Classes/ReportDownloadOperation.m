@@ -23,7 +23,7 @@ NSString *const kITCReporterServiceTypeFinance = @"finance";
 NSString *const kITCReporterServiceBody        = @"[p=Reporter.properties, m=Robot.XML, %@]";
 
 static NSString *NSStringPercentEscaped(NSString *string) {
-	return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)string, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8));
+    return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
 }
 
 @implementation ReportDownloadOperation
@@ -52,8 +52,8 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 		NSInteger numberOfReportsDownloaded = 0;
 		[self downloadProgress:0.0f withStatus:NSLocalizedString(@"Starting download", nil)];
-
-		NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+        
+        NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		moc.persistentStoreCoordinator = psc;
 		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 
@@ -147,11 +147,11 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				} else {
 					if ([dateType isEqualToString:@"Daily"]) {
 						CGFloat progress = 0.5f * ((CGFloat)i / (CGFloat)numberOfReportsAvailable);
-						NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %i", nil), i + 1, numberOfReportsAvailable];
+                        NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading daily report %i / %lu", nil), i + 1, (unsigned long)numberOfReportsAvailable];
 						[self downloadProgress:progress withStatus:status];
 					} else {
 						CGFloat progress = 0.5f + 0.4f * ((CGFloat)i / (CGFloat)numberOfReportsAvailable);
-						NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %i", nil), i + 1, numberOfReportsAvailable];
+                        NSString *status = [NSString stringWithFormat:NSLocalizedString(@"Loading weekly report %i / %lu", nil), i + 1, (unsigned long)numberOfReportsAvailable];
 						[self downloadProgress:progress withStatus:status];
 					}
 				}
@@ -322,30 +322,33 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 			if (self.isCancelled) {
 				[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
-			} else if (providerID.length > 0) {
-				NSURL *paymentVendorsURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsAction, providerID]];
-				NSData *paymentVendorsData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentVendorsURL] returningResponse:nil error:nil];
-				NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:paymentVendorsData options:0 error:nil];
-				NSArray *sapVendors = paymentVendors[@"data"];
+            } else if (self->providerID.length > 0) {
+                NSURL *paymentVendorsURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsAction, self->providerID]];
+                [[NSURLSession.sharedSession dataTaskWithRequest:[NSURLRequest requestWithURL:paymentVendorsURL]
+                                               completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                    
+                    NSDictionary *paymentVendors = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                    NSArray *sapVendors = paymentVendors[@"data"];
 
-				if (self.isCancelled) {
-					[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
-				} else if ((sapVendors != nil) && ![sapVendors isEqual:[NSNull null]] && (sapVendors.count > 0)) {
-					if (downloadedVendors == nil) {
-						downloadedVendors = [[NSMutableDictionary alloc] init];
-					} else {
-						[downloadedVendors removeAllObjects];
-					}
-					for (NSDictionary *vendor in sapVendors) {
-						NSNumber *vendorID = vendor[@"sapVendorNumber"];
-						downloadedVendors[vendorID.description] = @(0);
-					}
-					for (NSString *vendorID in downloadedVendors.allKeys) {
-						[self fetchPaymentsForVendorID:vendorID];
-					}
-				} else {
-					[self completeDownload];
-				}
+                    if (self.isCancelled) {
+                        [self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
+                    } else if ((sapVendors != nil) && ![sapVendors isEqual:[NSNull null]] && (sapVendors.count > 0)) {
+                        if (self->downloadedVendors == nil) {
+                            self->downloadedVendors = [[NSMutableDictionary alloc] init];
+                        } else {
+                            [self->downloadedVendors removeAllObjects];
+                        }
+                        for (NSDictionary *vendor in sapVendors) {
+                            NSNumber *vendorID = vendor[@"sapVendorNumber"];
+                            self->downloadedVendors[vendorID.description] = @(0);
+                        }
+                        for (NSString *vendorID in self->downloadedVendors.allKeys) {
+                            [self fetchPaymentsForVendorID:vendorID];
+                        }
+                    } else {
+                        [self completeDownload];
+                    }
+                }] resume];
 			}
 
 			//==== /Payments
@@ -361,11 +364,11 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		@autoreleasepool {
 
-			NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-			[moc setPersistentStoreCoordinator:psc];
+            NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+            [moc setPersistentStoreCoordinator:self->psc];
 			[moc setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 
-			ASAccount *account = (ASAccount *)[moc objectWithID:accountObjectID];
+            ASAccount *account = (ASAccount *)[moc objectWithID:self->accountObjectID];
 
 			NSMutableArray *reportsToDelete = [NSMutableArray array];
 			NSMutableSet *allExistingPaymentReports = [NSMutableSet setWithSet:account.paymentReports];
@@ -422,7 +425,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					break;
 				}
 
-				NSURL *paymentURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsPaymentAction, providerID, vendorID, year, month]];
+                NSURL *paymentURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingFormat:kITCPaymentVendorsPaymentAction, self->providerID, vendorID, year, month]];
 				NSData *paymentData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:paymentURL] returningResponse:nil error:nil];
 				NSDictionary *payment = [NSJSONSerialization JSONObjectWithData:paymentData options:0 error:nil];
 				payment = payment[@"data"];
@@ -433,16 +436,16 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					[self completeDownloadWithStatus:NSLocalizedString(@"Canceled", nil)];
 					break;
 				} else if ((paymentSummaries == nil) || [paymentSummaries isEqual:[NSNull null]] || (paymentSummaries.count == 0)) {
-					@synchronized(downloadedVendors) {
-						NSInteger count = [downloadedVendors[vendorID] integerValue];
+                    @synchronized(self->downloadedVendors) {
+                        NSInteger count = [self->downloadedVendors[vendorID] integerValue];
 						count++;
-						downloadedVendors[vendorID] = @(count);
+                        self->downloadedVendors[vendorID] = @(count);
 						// Bail out if there are no payments for over 12 consecutive months.
 						if (count > 12) { break; }
 					}
 				} else {
-					@synchronized(downloadedVendors) {
-						downloadedVendors[vendorID] = @(0);
+                    @synchronized(self->downloadedVendors) {
+                        self->downloadedVendors[vendorID] = @(0);
 					}
 					NSManagedObject *paymentReport = [NSEntityDescription insertNewObjectForEntityForName:@"PaymentReport" inManagedObjectContext:moc];
 					[paymentReport setValue:paymentReportDate forKey:@"reportDate"];
@@ -477,7 +480,7 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 					account.paymentsBadge = @(account.paymentsBadge.integerValue + 1);
 
 					if ([moc hasChanges]) {
-						[psc performBlockAndWait:^{
+                        [self->psc performBlockAndWait:^{
 							NSError *saveError = nil;
 							[moc save:&saveError];
 							if (saveError) {
@@ -488,9 +491,9 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 				}
 			}
 
-			@synchronized(downloadedVendors) {
-				[downloadedVendors removeObjectForKey:vendorID];
-				if (downloadedVendors.count == 0) {
+            @synchronized(self->downloadedVendors) {
+                [self->downloadedVendors removeObjectForKey:vendorID];
+                if (self->downloadedVendors.count == 0) {
 					[self completeDownload];
 				}
 			}
@@ -513,9 +516,9 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 - (void)downloadProgress:(CGFloat)progress withStatus:(NSString *)status {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		if (status != nil) {
-			_account.downloadStatus = status;
+            self->_account.downloadStatus = status;
 		}
-		_account.downloadProgress = progress;
+        self->_account.downloadProgress = progress;
 	});
 }
 
@@ -525,12 +528,12 @@ static NSString *NSStringPercentEscaped(NSString *string) {
 
 - (void)completeDownloadWithStatus:(NSString *)status {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		_account.downloadStatus = status;
-		_account.downloadProgress = 1.0f;
-		_account.isDownloadingReports = NO;
+        self->_account.downloadStatus = status;
+        self->_account.downloadProgress = 1.0f;
+        self->_account.isDownloadingReports = NO;
 		[UIApplication sharedApplication].idleTimerDisabled = NO;
-		if (backgroundTaskID != UIBackgroundTaskInvalid) {
-			[[UIApplication sharedApplication] endBackgroundTask:backgroundTaskID];
+        if (self->backgroundTaskID != UIBackgroundTaskInvalid) {
+            [[UIApplication sharedApplication] endBackgroundTask:self->backgroundTaskID];
 		}
 	});
 }

@@ -13,14 +13,11 @@
 #import "PromoCodeOperation.h"
 #import "PromoCode.h"
 #import "ReportDownloadCoordinator.h"
-
-#define kActionsSheetTag         1
-#define kDeleteCodesSheetTag     2
-#define kActionsAllCodesSheetTag 3
+#import "UIViewController+Alert.h"
 
 @implementation PromoCodesAppViewController
 
-@synthesize promoCodes, selectedPromoCode, activeSheet;
+@synthesize promoCodes, selectedPromoCode;
 
 - (instancetype)initWithProduct:(Product *)aProduct {
 	self = [super initWithStyle:UITableViewStyleGrouped];
@@ -107,47 +104,107 @@
 }
 
 - (void)deletePromoCodes:(id)sender {
-	if (self.activeSheet.visible) {
-		[self.activeSheet dismissWithClickedButtonIndex:activeSheet.cancelButtonIndex animated:NO];
-	}
-	UIActionSheet *deleteSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Delete Promo Codes", nil) otherButtonTitles:nil];
-	deleteSheet.tag = kDeleteCodesSheetTag;
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		self.activeSheet = deleteSheet;
-		[deleteSheet showFromBarButtonItem:sender animated:YES];
-	} else {
-		[deleteSheet showFromToolbar:self.navigationController.toolbar];
-	}
+    UIAlertController *deleteSheet = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Do you want to delete all promo codes for this app? You can reload them later from your history.", nil)
+                                                                         message:nil
+                                                                  preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    [deleteSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                    style:UIAlertActionStyleCancel
+                                                  handler:^(UIAlertAction * _Nonnull action) {
+        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    }]];
+    
+    [deleteSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Delete Promo Codes", nil)
+                                                    style:UIAlertActionStyleDestructive
+                                                  handler:^(UIAlertAction * _Nonnull action) {
+        
+        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+        self->product.promoCodes = [NSSet set];
+        [self.navigationController popViewControllerAnimated:YES];
+    }]];
+    
+	
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        deleteSheet.popoverPresentationController.barButtonItem = sender;
+    } else {
+        UIPopoverPresentationController *popover = deleteSheet.popoverPresentationController;
+        if (popover) {
+            popover.sourceView = self.navigationController.toolbar;
+            popover.sourceRect = self.navigationController.toolbar.bounds;
+            popover.permittedArrowDirections = UIPopoverArrowDirectionAny;
+        }
+    }
+    [self presentViewController:deleteSheet animated:YES completion:nil];
 }
 
 - (void)shareCodes:(id)sender {
-	if (self.activeSheet.visible) {
-		[self.activeSheet dismissWithClickedButtonIndex:self.activeSheet.cancelButtonIndex animated:NO];
-	}
-	UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil
-														delegate:self 
-											   cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-										  destructiveButtonTitle:nil
-											   otherButtonTitles:
-							 NSLocalizedString(@"Email All Codes", nil), 
-							 NSLocalizedString(@"Copy All Codes", nil), nil];
-	sheet.tag = kActionsAllCodesSheetTag;
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		[sheet showFromBarButtonItem:sender animated:YES];
-		self.activeSheet = sheet;
-	} else {
-		[sheet showFromToolbar:self.navigationController.toolbar];
-	}
+    UIAlertController *shareCodesSheet = [UIAlertController alertControllerWithTitle:nil
+                                                                             message:nil
+                                                                      preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    [shareCodesSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                        style:UIAlertActionStyleCancel
+                                                      handler:^(UIAlertAction * _Nonnull action) {
+        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    }]];
+    
+    [shareCodesSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Email All Codes", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * _Nonnull action) {
+        
+        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+        if (![MFMailComposeViewController canSendMail]) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"No Email Account", nil)
+                                                                message:NSLocalizedString(@"You have not configured this device for sending email.", nil)];
+            return;
+        }
+        MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
+        mailComposeViewController.mailComposeDelegate = self;
+        NSMutableString *body = [NSMutableString stringWithString:@"\n"];
+        for (PromoCode *promoCode in self.promoCodes) {
+            [body appendFormat:@"%@\n", promoCode.code];
+        }
+        NSString *subject = [NSString stringWithFormat:@"Promo Codes for %@", [self->product displayName]];
+        [mailComposeViewController setMessageBody:body isHTML:NO];
+        [mailComposeViewController setSubject:subject];
+        [self presentViewController:mailComposeViewController animated:YES completion:nil];
+    }]];
+    
+    [shareCodesSheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Copy All Codes", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * _Nonnull action) {
+        
+        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+        NSMutableString *allCodes = [NSMutableString string];
+        for (PromoCode *promoCode in self.promoCodes) {
+            [allCodes appendFormat:@"%@\n", promoCode.code];
+        }
+        [[UIPasteboard generalPasteboard] setString:allCodes];
+    }]];
+    
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        shareCodesSheet.popoverPresentationController.barButtonItem = sender;
+    } else {
+        UIPopoverPresentationController *popover = shareCodesSheet.popoverPresentationController;
+        if (popover) {
+            popover.sourceView = self.navigationController.toolbar;
+            popover.sourceRect = self.navigationController.toolbar.bounds;
+            popover.permittedArrowDirections = UIPopoverArrowDirectionAny;
+        }
+    }
+    [self presentViewController:shareCodesSheet animated:YES completion:nil];
 }
 
 - (void)fieldEditor:(FieldEditorViewController *)editor didFinishEditingWithValues:(NSDictionary *)returnValues {
 	NSInteger numberOfCodes = [returnValues[@"numberOfCodes"] integerValue];
 	if (numberOfCodes <= 0) {
-		[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-		return;
-	} else if (numberOfCodes > 50) {
-		[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter a smaller number. You have a maximum of 50 promo codes per version of your app.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-		return;
+        [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                            message:NSLocalizedString(@"Please enter the number of codes you want to request.", nil)];
+        return;
+    } else if (numberOfCodes > 50) {
+        [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                            message:NSLocalizedString(@"Please enter a smaller number. You have a maximum of 50 promo codes per version of your app.", nil)];
+        return;
 	}
 	[self dismissViewControllerAnimated:YES completion:nil];
 	
@@ -160,13 +217,6 @@
 
 - (void)refreshHistory:(id)sender {
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadPromoCodesForProduct:product numberOfCodes:0];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		return YES;
-	}
-	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -253,81 +303,79 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (indexPath.section == 1) {
 		self.selectedPromoCode = self.promoCodes[indexPath.row];
-		BOOL used = [selectedPromoCode.used boolValue];
-		UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil
-														   delegate:self
-												  cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-											 destructiveButtonTitle:nil
-												  otherButtonTitles:
-								NSLocalizedString(@"Email Code", nil),
-								NSLocalizedString(@"Copy", nil),
-								used ? NSLocalizedString(@"Mark as Unused", nil) : NSLocalizedString(@"Mark as Used", nil) , nil];
-		sheet.tag = kActionsSheetTag;
-		[sheet showFromToolbar:self.navigationController.toolbar];
-	} else {
-		[tableView deselectRowAtIndexPath:indexPath animated:YES];
-		[self requestNewCodes:self];
-	}
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-	[self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
-	
-	if (actionSheet.tag == kActionsSheetTag) {
-		if (buttonIndex != actionSheet.cancelButtonIndex) {
-			if (buttonIndex == 0) {
-				//email
-				if (![MFMailComposeViewController canSendMail]) {
-					[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-					return;
-				}
-				MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
-				mailComposeViewController.mailComposeDelegate = self;
-				NSString *body = [NSString stringWithFormat:@"<br/><a href=\"https://phobos.apple.com/WebObjects/MZFinance.woa/wa/freeProductCodeWizard?code=%@\">Redeem Promo Code for %@ (%@)</a>", self.selectedPromoCode.code, [self.selectedPromoCode.product displayName], self.selectedPromoCode.code];
-				NSString *subject = [NSString stringWithFormat:@"Promo Code for %@", [product displayName]];
-				[mailComposeViewController setMessageBody:body isHTML:YES];
-				[mailComposeViewController setSubject:subject];
-				[self presentViewController:mailComposeViewController animated:YES completion:nil];
-			} else if (buttonIndex == 1) {
-				//copy
-				[[UIPasteboard generalPasteboard] setString:self.selectedPromoCode.code];
-			} else if (buttonIndex == 2) {
-				//toggle used
-				self.selectedPromoCode.used = @(![self.selectedPromoCode.used boolValue]);
-				[self.tableView reloadData];
-			}
-		}
-	} else if (actionSheet.tag == kActionsAllCodesSheetTag) {
-		if (buttonIndex != actionSheet.cancelButtonIndex) {
-			if (buttonIndex == 0) {
-				if (![MFMailComposeViewController canSendMail]) {
-					[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-					return;
-				}
-				MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
-				mailComposeViewController.mailComposeDelegate = self;
-				NSMutableString *body = [NSMutableString stringWithString:@"\n"];
-				for (PromoCode *promoCode in self.promoCodes) {
-					[body appendFormat:@"%@\n", promoCode.code];
-				}
-				NSString *subject = [NSString stringWithFormat:@"Promo Codes for %@", [product displayName]];
-				[mailComposeViewController setMessageBody:body isHTML:NO];
-				[mailComposeViewController setSubject:subject];
-				[self presentViewController:mailComposeViewController animated:YES completion:nil];
-			} else if (buttonIndex == 1) {
-				NSMutableString *allCodes = [NSMutableString string];
-				for (PromoCode *promoCode in self.promoCodes) {
-					[allCodes appendFormat:@"%@\n", promoCode.code];
-				}
-				[[UIPasteboard generalPasteboard] setString:allCodes];
-			}
-		}
-	} else if (actionSheet.tag == kDeleteCodesSheetTag) {
-		if (buttonIndex != actionSheet.cancelButtonIndex) {
-			product.promoCodes = [NSSet set];
-			[self.navigationController popViewControllerAnimated:YES];
-		}
-	}
+        BOOL used = [selectedPromoCode.used boolValue];
+        UIAlertController *sheet = [UIAlertController alertControllerWithTitle:nil
+                                                                       message:nil
+                                                                preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                  style:UIAlertActionStyleCancel
+                                                handler:^(UIAlertAction * _Nonnull action) {
+            [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+        }]];
+        
+        [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Email Code", nil)
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction * _Nonnull action) {
+            
+            [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+            //email
+            if (![MFMailComposeViewController canSendMail]) {
+                [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"No Email Account", nil)
+                                                                    message:NSLocalizedString(@"You have not configured this device for sending email.", nil)];
+                return;
+            }
+            MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];
+            mailComposeViewController.mailComposeDelegate = self;
+            NSString *body = [NSString stringWithFormat:@"<br/><a href=\"https://phobos.apple.com/WebObjects/MZFinance.woa/wa/freeProductCodeWizard?code=%@\">Redeem Promo Code for %@ (%@)</a>", self.selectedPromoCode.code, [self.selectedPromoCode.product displayName], self.selectedPromoCode.code];
+            NSString *subject = [NSString stringWithFormat:@"Promo Code for %@", [self->product displayName]];
+            [mailComposeViewController setMessageBody:body isHTML:YES];
+            [mailComposeViewController setSubject:subject];
+            [self presentViewController:mailComposeViewController animated:YES completion:nil];
+        }]];
+        
+        [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Copy", nil)
+                                                  style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction * _Nonnull action) {
+            
+            [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+            //copy
+            [[UIPasteboard generalPasteboard] setString:self.selectedPromoCode.code];
+        }]];
+        
+        if (used) {
+            [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Mark as Unused", nil)
+                                                      style:UIAlertActionStyleDefault
+                                                    handler:^(UIAlertAction * _Nonnull action) {
+                
+                [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+                //toggle used
+                self.selectedPromoCode.used = @(![self.selectedPromoCode.used boolValue]);
+                [self.tableView reloadData];
+            }]];
+        } else {
+            [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Mark as Used", nil)
+                                                      style:UIAlertActionStyleDefault
+                                                    handler:^(UIAlertAction * _Nonnull action) {
+                
+                [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+                //toggle used
+                self.selectedPromoCode.used = @(![self.selectedPromoCode.used boolValue]);
+                [self.tableView reloadData];
+            }]];
+        }
+        
+        UIPopoverPresentationController *popover = sheet.popoverPresentationController;
+        if (popover) {
+            popover.sourceView = self.navigationController.toolbar;
+            popover.sourceRect = self.navigationController.toolbar.bounds;
+            popover.permittedArrowDirections = UIPopoverArrowDirectionAny;
+        }
+        [self presentViewController:sheet animated:YES completion:nil];
+    } else {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [self requestNewCodes:self];
+    }
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
@@ -344,7 +392,10 @@
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

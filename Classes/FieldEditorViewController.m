@@ -106,13 +106,6 @@
 	}
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		return YES;
-	}
-	return toInterfaceOrientation == UIInterfaceOrientationPortrait;
-}
-
 - (void)done {
 	if (self.delegate && [self.delegate respondsToSelector:@selector(fieldEditor:didFinishEditingWithValues:)]) {
 		[delegate fieldEditor:self didFinishEditingWithValues:self.values];
@@ -438,7 +431,10 @@
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

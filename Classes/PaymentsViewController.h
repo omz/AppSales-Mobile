@@ -13,7 +13,7 @@
 @class ASAccount;
 @protocol PaymentViewControllerDelegate;
 
-@interface PaymentsViewController : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate, YearViewDelegate, PaymentDetailsViewController> {
+@interface PaymentsViewController : UIViewController <UIScrollViewDelegate, YearViewDelegate, PaymentDetailsViewController> {
 	ASAccount *account;
 	NSMutableDictionary *paymentsByYear;
 	UIScrollView *scrollView;

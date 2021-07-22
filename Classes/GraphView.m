@@ -603,12 +603,12 @@
 	
 	[UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState animations:^{
 		// Don't attempt to do a transition animation if there were no lines visible before.
-		BOOL wasEmpty = [lineViews count] == 0;
+        BOOL wasEmpty = [self->lineViews count] == 0;
 		
 		// Calculate which lines should be visible.
 		CGFloat totalHeight = self.bounds.size.height;
 		NSInteger pickedUnit = 0;
-		for (NSNumber *possibleUnit in possibleUnits) {
+        for (NSNumber *possibleUnit in self->possibleUnits) {
 			NSInteger unitCount = (NSInteger)newMax / possibleUnit.integerValue;
 			CGFloat unitHeight = totalHeight / unitCount;
 			if (unitHeight >= 25.0f) {
@@ -624,8 +624,8 @@
 		}
 		
 		// Remove lines that should not be visible anymore and animate the others to their new position.
-		for (NSNumber *existingStep in [lineViews allKeys]) {
-			LineView *lineView = lineViews[existingStep];
+        for (NSNumber *existingStep in [self->lineViews allKeys]) {
+            LineView *lineView = self->lineViews[existingStep];
 			if (![steps containsObject:existingStep]) {
 				CGFloat y = totalHeight - (totalHeight * (existingStep.floatValue / newMax));
 				CGRect lineFrame = CGRectMake(40.0f, (NSInteger)y, self.superview.bounds.size.width, 1.0f);
@@ -633,7 +633,7 @@
 					lineView.frame = lineFrame;
 				}
 				lineView.alpha = 0.0f;
-				[lineViews removeObjectForKey:existingStep];
+                [self->lineViews removeObjectForKey:existingStep];
 			} else {
 				CGFloat y = totalHeight - (totalHeight * (existingStep.floatValue / newMax));
 				CGRect lineFrame = CGRectMake(40.0f, (NSInteger)y, self.superview.bounds.size.width, 1.0f);
@@ -643,9 +643,9 @@
 		
 		// Add new lines, animating them from their hypothetical previous position (relative to the previous max value).
 		for (NSNumber *step in steps) {
-			LineView *lineView = lineViews[step];
+            LineView *lineView = self->lineViews[step];
 			if (!lineView) {
-				CGFloat oldY = totalHeight - (totalHeight * (step.floatValue / max));
+                CGFloat oldY = totalHeight - (totalHeight * (step.floatValue / self->max));
 				CGFloat newY = totalHeight - (totalHeight * (step.floatValue / newMax));
 				CGRect toLineFrame = CGRectMake(40.0f, (NSInteger)newY, self.superview.bounds.size.width, 1.0f);
 				CGRect fromLineFrame = CGRectMake(40.0f, (NSInteger)oldY, self.superview.bounds.size.width, 1.0f);
@@ -655,7 +655,7 @@
 				[self addSubview:lineView];
 				lineView.frame = toLineFrame;
 				lineView.alpha = 1.0f;
-				lineViews[step] = lineView;
+                self->lineViews[step] = lineView;
 			}
 		}
 	

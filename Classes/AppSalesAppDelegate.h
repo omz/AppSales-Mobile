@@ -13,7 +13,7 @@
 
 @class ASAccount;
 
-@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate, UIActionSheetDelegate, AccountsViewControllerDelegate, KKPasscodeViewControllerDelegate, PaymentViewControllerDelegate> {
+@interface AppSalesAppDelegate : NSObject <UIApplicationDelegate, AccountsViewControllerDelegate, KKPasscodeViewControllerDelegate, PaymentViewControllerDelegate> {
 	UIWindow *window;
 	
 	AccountsViewController *accountsViewController;
