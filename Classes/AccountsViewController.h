@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PaymentsViewController.h"
 #import "FieldEditorViewController.h"
 #import "KKPasscodeSettingsViewController.h"
 
@@ -27,7 +28,7 @@ typedef NS_ENUM(NSInteger, AccountButtonType) {
 @class ASAccount;
 @protocol AccountsViewControllerDelegate;
 
-@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate> {
+@interface AccountsViewController : UITableViewController <NSFetchedResultsControllerDelegate, FieldEditorViewControllerDelegate, KKPasscodeSettingsViewControllerDelegate, UIDocumentInteractionControllerDelegate, PaymentViewControllerDelegate> {
 	id<AccountsViewControllerDelegate> __weak delegate;
 	NSArray *accounts;
 	NSManagedObjectContext *managedObjectContext;

@@ -8,15 +8,27 @@
 
 #import <UIKit/UIKit.h>
 
-@interface YearView : UIView {
+@protocol YearViewDelegate;
+
+@interface YearView : UIView <UIGestureRecognizerDelegate> {
 
 	NSInteger year;
 	NSDictionary *labelsByMonth;
 	NSString *footerText;
+	NSMutableArray* monthRects;
+	NSNumber* selectedMonth;
+	id<YearViewDelegate> __weak delegate;
 }
 
 @property (nonatomic, assign) NSInteger year;
 @property (nonatomic, strong) NSDictionary *labelsByMonth;
 @property (nonatomic, strong) NSString *footerText;
+@property (nonatomic, weak) id<YearViewDelegate> delegate;
+
+@end
+
+@protocol YearViewDelegate <NSObject>
+
+- (void)yearView:(YearView *)yearView didSelectMonth:(int)month;
 
 @end
