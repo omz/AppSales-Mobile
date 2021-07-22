@@ -72,10 +72,6 @@
 	confirmPasscodeTableView.contentInset = UIEdgeInsetsMake(topInset, 0.0f, 0.0f, 0.0f);
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-	return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || (toInterfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
 - (void)viewDidLoad {
 	[super viewDidLoad];	
 	
@@ -786,7 +782,10 @@
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

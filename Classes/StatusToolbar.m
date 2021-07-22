@@ -68,7 +68,7 @@
 	
 	[UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 		self.hidden = NO;
-		stopButtonItem.enabled = YES;
+        self->stopButtonItem.enabled = YES;
 		self.frame = CGRectMake(0.0f, self.superview.bounds.size.height - statusOffsetY, self.superview.bounds.size.width, statusHeight);
 	} completion:nil];
 }

@@ -28,6 +28,7 @@
 #import "KKPasscodeLock.h"
 #import "IconManager.h"
 #import "ZIPArchive.h"
+#import "UIViewController+Alert.h"
 
 #define kAddNewAccountEditorIdentifier		@"AddNewAccountEditorIdentifier"
 #define kEditAccountEditorIdentifier		@"EditAccountEditorIdentifier"
@@ -37,9 +38,6 @@
 #define kImportReportsButton				@"ImportReportsButton"
 #define kExportReportsButton				@"ExportReportsButton"
 #define	kDeleteAccountButton				@"DeleteAccount"
-#define kAlertTagConfirmImport				1
-#define kAlertTagExportCompleted			2
-#define kAlertTagConfirmDelete				3
 #define kAccountTitle						@"title"
 #define kKeychainServiceIdentifier			@"iTunesConnect"
 
@@ -97,6 +95,8 @@
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] addObserver:self forKeyPath:@"isBusy" options:NSKeyValueObservingOptionNew context:nil];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconCleared:) name:IconManagerClearedIconNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iconReloadFailed:) name:IconManagerReloadFailedIconNotification object:nil];
 	
 	[self reloadAccounts];
 }
@@ -131,28 +131,19 @@
 }
 
 - (void)downloadReports:(id)sender {
-	for (ASAccount *account in self.accounts) {
-		if ((account.providerID == nil) || (account.providerID.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Provider ID Missing", nil)
-										message:[NSString stringWithFormat:NSLocalizedString(@"Provider ID not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]
-									   delegate:nil
-							  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-							  otherButtonTitles:nil] show];
-		} else if ((account.accessToken == nil) || (account.accessToken.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Access Token Missing", nil)
-										message:[NSString stringWithFormat:NSLocalizedString(@"Access token not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]
-									   delegate:nil
-							  cancelButtonTitle:NSLocalizedString(@"OK", nil)
-							  otherButtonTitles:nil] show];
-		} else if ((account.vendorID == nil) || (account.vendorID.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Vendor ID Missing", nil)
-										 message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]
-										delegate:nil
-							   cancelButtonTitle:NSLocalizedString(@"OK", nil)
-							   otherButtonTitles:nil] show];
-		} else {
-			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
-		}
+    for (ASAccount *account in self.accounts) {
+        if ((account.providerID == nil) || (account.providerID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Provider ID Missing", nil)
+                                                                message:[NSString stringWithFormat:NSLocalizedString(@"Provider ID not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
+        } else if ((account.accessToken == nil) || (account.accessToken.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Access Token Missing", nil)
+                                                                message:[NSString stringWithFormat:NSLocalizedString(@"Access token not set for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
+        } else if ((account.vendorID == nil) || (account.vendorID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Vendor ID Missing", nil)
+                                                                message:[NSString stringWithFormat:NSLocalizedString(@"You have not entered a vendor ID for the account \"%@\". Please go to the account's settings and fill in the missing information.", nil), account.displayName]];
+        } else {
+            [[ReportDownloadCoordinator sharedReportDownloadCoordinator] downloadReportsForAccount:account];
+        }
 	}
 }
 
@@ -163,11 +154,6 @@
 		aboutNavController.modalPresentationStyle = UIModalPresentationFormSheet;
 	}
 	[self presentViewController:aboutNavController animated:YES completion:nil];
-}
-
-
-- (void)viewDidUnload {
-	[super viewDidUnload];
 }
 
 
@@ -534,29 +520,34 @@
 		NSString *username = returnValues[kAccountUsername];
 		NSString *password = returnValues[kAccountPassword];
 		NSString *providerID = returnValues[kAccountProviderID];
-		NSString *accessToken = returnValues[kAccountAccessToken];
-		NSString *vendorID = returnValues[kAccountVendorID];
-		NSString *title = returnValues[kAccountTitle];
-		if ((username.length == 0) && (title.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nAll fields are required if you want to download reports and payments from iTunes Connect, otherwise you can just enter a description.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
-		}
-		if ((password.length > 0) && (providerID.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter a provider ID in order to download reports from iTunes Connect.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
-		}
-		if ((password.length > 0) && (accessToken.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter an access token in order to download reports from iTunes Connect.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
-		}
-		if ((password.length > 0) && (vendorID.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Missing Information", nil) message:NSLocalizedString(@"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
-		}
-		if (password.length == 0) {
-			[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Notice", nil) message:NSLocalizedString(@"Payments will not be downloaded from iTunes Connect without your account password.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-		}
-		if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
+        NSString *accessToken = returnValues[kAccountAccessToken];
+        NSString *vendorID = returnValues[kAccountVendorID];
+        NSString *title = returnValues[kAccountTitle];
+        if ((username.length == 0) && (title.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter at least a username or a description.\n\nAll fields are required if you want to download reports and payments from iTunes Connect, otherwise you can just enter a description.", nil)];
+            return;
+        }
+        if ((password.length > 0) && (providerID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter a provider ID in order to download reports from iTunes Connect.", nil)];
+            return;
+        }
+        if ((password.length > 0) && (accessToken.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter an access token in order to download reports from iTunes Connect.", nil)];
+            return;
+        }
+        if ((password.length > 0) && (vendorID.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Missing Information", nil)
+                                                                message:NSLocalizedString(@"You need to enter a vendor ID. If you don't know your vendor ID, tap \"Auto-Fill Vendor ID\".", nil)];
+            return;
+        }
+        if (password.length == 0) {
+            [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Notice", nil)
+                                                                message:NSLocalizedString(@"Payments will not be downloaded from iTunes Connect without your account password.", nil)];
+        }
+        if ([editor.editorIdentifier isEqualToString:kAddNewAccountEditorIdentifier]) {
 			ASAccount *account = (ASAccount *)[NSEntityDescription insertNewObjectForEntityForName:@"Account" inManagedObjectContext:self.managedObjectContext];
 			account.title = title;
 			account.username = username;
@@ -629,22 +620,34 @@
 		[settingsNavController pushViewController:vc animated:YES];
 	} else if ([key isEqualToString:kUpdateExchangeRatesButton]) {
 		[[CurrencyManager sharedManager] forceRefresh];
-	} else if ([key isEqualToString:kImportReportsButton]) {
-		ASAccount *account = (ASAccount *)editor.context;
-		if (account.isDownloadingReports) {
-			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"AppSales is already importing reports for this account. Please wait until the current import has finished.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-		} else {
-			BOOL canStartImport = [ReportImportOperation filesAvailableToImport];
-			if (!canStartImport) {
-				[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Files Found", nil) message:NSLocalizedString(@"The Documents directory does not contain any .txt files. Please use iTunes File Sharing to transfer report files to your device.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			} else {
-				UIAlertView *confirmImportAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Begin Import?", nil) 
-																			  message:NSLocalizedString(@"Do you want to start importing all report files in the Documents directory into this account?", nil) 
-																			 delegate:self 
-																	cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-																	otherButtonTitles:NSLocalizedString(@"Start Import", nil), nil];
-				confirmImportAlert.tag = kAlertTagConfirmImport;
-				[confirmImportAlert show];
+    } else if ([key isEqualToString:kImportReportsButton]) {
+        ASAccount *account = (ASAccount *)editor.context;
+        if (account.isDownloadingReports) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"AppSales is already importing reports for this account. Please wait until the current import has finished.", nil)];
+        } else {
+            BOOL canStartImport = [ReportImportOperation filesAvailableToImport];
+            if (!canStartImport) {
+                [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"No Files Found", nil)
+                                                                    message:NSLocalizedString(@"The Documents directory does not contain any .txt files. Please use iTunes File Sharing to transfer report files to your device.", nil)];
+            } else {
+                UIAlertController *confirmImportAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Begin Import?", nil)
+                                                                                            message:NSLocalizedString(@"Do you want to start importing all report files in the Documents directory into this account?", nil)
+                                                                                     preferredStyle:UIAlertControllerStyleAlert];
+                
+                [confirmImportAlert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                                       style:UIAlertActionStyleCancel
+                                                                     handler:nil]];
+                
+                [confirmImportAlert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Start Import", nil)
+                                                                       style:UIAlertActionStyleDefault
+                                                                     handler:^(UIAlertAction * _Nonnull action) {
+                    
+                    [[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:self.selectedAccount];
+                    [self.navigationController popViewControllerAnimated:YES];
+                }]];
+                
+                [self presentViewController:confirmImportAlert animated:YES completion:nil];
 			}
 		}
 	} else if ([key isEqualToString:kExportReportsButton]) {
@@ -669,13 +672,26 @@
 		IconManager *iconManager = [IconManager sharedManager];
 		[iconManager clearIconForAppID:productID];
 	} else if ([key isEqualToString:kDeleteAccountButton]) {
-		UIAlertView *confirmDeleteAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Delete Account?", nil) 
-																	  message:NSLocalizedString(@"Do you really want to delete this account and all of its data?", nil) 
-																	 delegate:self 
-															cancelButtonTitle:NSLocalizedString(@"Cancel", nil) 
-															otherButtonTitles:NSLocalizedString(@"Delete", nil), nil];
-		confirmDeleteAlert.tag = kAlertTagConfirmDelete;
-		[confirmDeleteAlert show];
+        UIAlertController *confirmImportAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Delete Account?", nil)
+                                                                                    message:NSLocalizedString(@"Do you really want to delete this account and all of its data?", nil)
+                                                                             preferredStyle:UIAlertControllerStyleAlert];
+        
+        [confirmImportAlert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:nil]];
+        
+        [confirmImportAlert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Delete", nil)
+                                                               style:UIAlertActionStyleDestructive
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+            
+            ASProgressHUD *hud = [ASProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+            hud.label.text = NSLocalizedString(@"Deleting Account...", nil);
+            
+            ASAccount *account = self.selectedAccount;
+            [self performSelector:@selector(deleteAccount:) withObject:account afterDelay:0.1];
+        }]];
+        
+        [self presentViewController:confirmImportAlert animated:YES completion:nil];
 	} else if ([key isEqualToString:@"AutoFillWizardButton"]) {
 		FieldEditorViewController *vc = nil;
 		if (self.presentedViewController) {
@@ -688,8 +704,10 @@
 		NSString *password = vc.values[kAccountPassword];
 		
 		if ((username.length == 0) || (password.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter your username and password first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
+            
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
+            return;
 		}
 		[vc dismissKeyboard];
 		
@@ -712,8 +730,9 @@
 		NSString *username = vc.values[kAccountUsername];
 		NSString *password = vc.values[kAccountPassword];
 
-		if ((username.length == 0) || (password.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter your username and password first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+        if ((username.length == 0) || (password.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
 			return;
 		}
 		[vc dismissKeyboard];
@@ -737,13 +756,15 @@
 		NSString *username = vc.values[kAccountUsername];
 		NSString *password = vc.values[kAccountPassword];
 		NSString *providerID = vc.values[kAccountProviderID];
-		
-		if ((username.length == 0) || (password.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter your username and password first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
-		} else if (providerID.length == 0) {
-			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please fill in your provider ID first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
+        
+        if ((username.length == 0) || (password.length == 0)) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
+            return;
+        } else if (providerID.length == 0) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please fill in your provider ID first.", nil)];
+            return;
 		}
 		[vc dismissKeyboard];
 		
@@ -769,12 +790,14 @@
 		NSString *providerID = vc.values[kAccountProviderID];
 		
 		if ((username.length == 0) || (password.length == 0)) {
-			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please enter your username and password first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
-		} else if (providerID.length == 0) {
-			[[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"Please fill in your provider ID first.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
-			return;
-		}
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please enter your username and password first.", nil)];
+            return;
+        } else if (providerID.length == 0) {
+            [[UIViewController topViewController] displayAlertWithTitle:nil
+                                                                message:NSLocalizedString(@"Please fill in your provider ID first.", nil)];
+            return;
+        }
 		[vc dismissKeyboard];
 		
 		NSDictionary *loginInfo = @{
@@ -884,23 +907,6 @@
 	return folder;
 }
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-	if (alertView.tag == kAlertTagConfirmImport) {
-		if (buttonIndex != [alertView cancelButtonIndex]) {
-			[[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:self.selectedAccount];
-			[self.navigationController popViewControllerAnimated:YES];
-		}
-	} else if (alertView.tag == kAlertTagConfirmDelete) {
-		if (buttonIndex != [alertView cancelButtonIndex]) {
-			ASProgressHUD *hud = [ASProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-			hud.label.text = NSLocalizedString(@"Deleting Account...", nil);
-			
-			ASAccount *account = self.selectedAccount;
-			[self performSelector:@selector(deleteAccount:) withObject:account afterDelay:0.1];
-		}
-	}
-}
-
 - (void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller {
 	self.documentInteractionController = nil;
 }
@@ -928,6 +934,41 @@
 	}
 }
 
+- (void)iconReloadFailed:(NSNotification *)notification {
+    NSString *productID = notification.userInfo[kIconManagerReloadFailedIconNotificationAppID];
+    if (productID) {
+        [self promptForCountryCodeForAppID:productID];
+    }
+}
+
+- (void)promptForCountryCodeForAppID:(NSString *)appId {
+    UIAlertController *prompt = [UIAlertController alertControllerWithTitle:@"Icon not found"
+                                                                    message:@"Would you like to try again with a specific country code?"
+                                                             preferredStyle:UIAlertControllerStyleAlert];
+    
+    [prompt addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"2 letter country code";
+    }];
+    
+    [prompt addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                               style:UIAlertActionStyleCancel
+                                             handler:nil]];
+    
+    [prompt addAction:[UIAlertAction actionWithTitle:@"Retry"
+                                               style:UIAlertActionStyleDefault
+                                             handler:^(UIAlertAction * _Nonnull action) {
+        UITextField *countryField = prompt.textFields.firstObject;
+        if (![countryField.text isEqualToString:@""] && countryField.text.length == 2) {
+            
+            // Retry with a different country code
+            [[IconManager sharedManager] setCountryCode:countryField.text];
+            [[IconManager sharedManager] clearIconForAppID:appId];
+        }
+    }]];
+    
+    [self presentViewController:prompt animated:YES completion:nil];
+}
+
 #pragma mark -
 
 - (void)saveContext {
@@ -939,7 +980,10 @@
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

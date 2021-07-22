@@ -213,7 +213,7 @@
 	[securityCodeField resignFirstResponder];
 	[self dismissViewControllerAnimated:YES completion:^{
 		if ([self.delegate respondsToSelector:@selector(securityCodeInputSubmitted:)]) {
-			[self.delegate securityCodeInputSubmitted:securityCodeField.text];
+            [self.delegate securityCodeInputSubmitted:self->securityCodeField.text];
 		}
 	}];
 }

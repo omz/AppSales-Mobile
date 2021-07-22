@@ -31,7 +31,7 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 		_product = product;
 		productObjectID = [product.objectID copy];
 		
-		moc = [[NSManagedObjectContext alloc] init];
+        moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		moc.persistentStoreCoordinator = product.account.managedObjectContext.persistentStoreCoordinator;
 		moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 		
@@ -88,27 +88,29 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 	NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
 	NSString *refPagePath = [NSString stringWithFormat:kITCReviewAPIRefPageAction, _product.productID, platform];
 	NSURL *refPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:refPagePath]];
-	NSData *refPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:refPageURL] returningResponse:nil error:nil];
-	
-	if (refPageData) {
-		NSDictionary *refPage = [NSJSONSerialization JSONObjectWithData:refPageData options:0 error:nil];
-		NSString *statusCode = refPage[@"statusCode"];
-		if (![statusCode isEqualToString:@"SUCCESS"]) {
-			
-			//add product name to refPage message then continue processing other apps
-			NSMutableDictionary *errDict = [[NSMutableDictionary alloc] initWithDictionary:refPage[@"messages"]];
-			[errDict setObject:_product.name forKey:@"product"];
-			
-			[self showAlert:statusCode withMessages:errDict];
-			[self failDownload];
-		} else {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self processRefPage:refPage];
-			});
-		}
-	} else {
-		[self failDownload];
-	}
+    [[NSURLSession.sharedSession dataTaskWithRequest:[NSURLRequest requestWithURL:refPageURL]
+                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+        if (data) {
+            NSDictionary *refPage = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            NSString *statusCode = refPage[@"statusCode"];
+            if (![statusCode isEqualToString:@"SUCCESS"]) {
+                
+                //add product name to refPage message then continue processing other apps
+                NSMutableDictionary *errDict = [[NSMutableDictionary alloc] initWithDictionary:refPage[@"messages"]];
+                [errDict setObject:self->_product.name forKey:@"product"];
+                
+                [self showAlert:statusCode withMessages:errDict];
+                [self failDownload];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self processRefPage:refPage];
+                });
+            }
+        } else {
+            [self failDownload];
+        }
+    }] resume];
 }
 
 - (void)processRefPage:(NSDictionary *)refPage {
@@ -148,27 +150,29 @@ NSString *const kITCReviewAPIPlatformMac = @"osx";
 	NSString *platform = [_product.platform isEqualToString:kProductPlatformMac] ? kITCReviewAPIPlatformMac : kITCReviewAPIPlatformiOS;
 	NSString *reviewsPagePath = [NSString stringWithFormat:kITCReviewAPIReviewsPageAction, _product.productID, platform];
 	NSURL *reviewsPageURL = [NSURL URLWithString:[kITCBaseURL stringByAppendingString:reviewsPagePath]];
-	NSData *reviewsPageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:reviewsPageURL] returningResponse:nil error:nil];
-	
-	if (reviewsPageData) {
-		NSDictionary *reviewsPage = [NSJSONSerialization JSONObjectWithData:reviewsPageData options:0 error:nil];
-		NSString *statusCode = reviewsPage[@"statusCode"];
-		if (![statusCode isEqualToString:@"SUCCESS"]) {
-			
-			//add product name to refPage message then continue processing other apps
-			NSMutableDictionary *errDict = [[NSMutableDictionary alloc] initWithDictionary:reviewsPage[@"messages"]];
-			[errDict setObject:_product.name forKey:@"product"];
-			
-			[self showAlert:statusCode withMessages:reviewsPage[@"messages"]];
-			[self failDownload];
-		} else {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self processReviewsPage:reviewsPage];
-			});
-		}
-	} else {
-		[self failDownload];
-	}
+    [[NSURLSession.sharedSession dataTaskWithRequest:[NSURLRequest requestWithURL:reviewsPageURL]
+                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
+        if (data) {
+            NSDictionary *reviewsPage = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            NSString *statusCode = reviewsPage[@"statusCode"];
+            if (![statusCode isEqualToString:@"SUCCESS"]) {
+                
+                //add product name to refPage message then continue processing other apps
+                NSMutableDictionary *errDict = [[NSMutableDictionary alloc] initWithDictionary:reviewsPage[@"messages"]];
+                [errDict setObject:self->_product.name forKey:@"product"];
+                
+                [self showAlert:statusCode withMessages:reviewsPage[@"messages"]];
+                [self failDownload];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self processReviewsPage:reviewsPage];
+                });
+            }
+        } else {
+            [self failDownload];
+        }
+    }] resume];
 }
 
 - (void)processReviewsPage:(NSDictionary *)reviewsPage {

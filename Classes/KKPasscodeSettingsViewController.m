@@ -46,34 +46,37 @@
 	eraseDataSwitch.on = eraseDataOn;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-	return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || (toInterfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
 #pragma mark -
-#pragma mark UIActionSheetDelegate
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-	if (buttonIndex == 0) {
-		eraseDataOn = YES;
-		[KKKeychain setString:@"YES" forKey:@"erase_data_on"];
-	} else {
-		eraseDataOn = NO;
-		[KKKeychain setString:@"NO" forKey:@"erase_data_on"];
-	}
-	[eraseDataSwitch setOn:eraseDataOn animated:YES];
-}
 
 - (void)eraseDataSwitchChanged:(id)sender {
-	if (eraseDataSwitch.on) {
-		NSString *title = [NSString stringWithFormat:@"All data in this app will be erased after %lu failed passcode attempts.", (unsigned long)[[KKPasscodeLock sharedLock] attemptsAllowed]];
-		
-		UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Enable" otherButtonTitles:nil];
-		[sheet showInView:self.view];
-	} else {
-		eraseDataOn = NO;
-		[KKKeychain setString:@"NO" forKey:@"erase_data_on"];
-	}		 
+    if (eraseDataSwitch.on) {
+        NSString *title = [NSString stringWithFormat:@"All data in this app will be erased after %lu failed passcode attempts.", (unsigned long)[[KKPasscodeLock sharedLock] attemptsAllowed]];
+        
+        UIAlertController *sheet = [UIAlertController alertControllerWithTitle:title
+                                                                       message:nil
+                                                                preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                  style:UIAlertActionStyleCancel
+                                                handler:^(UIAlertAction * _Nonnull action) {
+            self->eraseDataOn = NO;
+            [KKKeychain setString:@"NO" forKey:@"erase_data_on"];
+            [self->eraseDataSwitch setOn:self->eraseDataOn animated:YES];
+        }]];
+        
+        [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Enable", nil)
+                                                  style:UIAlertActionStyleDestructive
+                                                handler:^(UIAlertAction * _Nonnull action) {
+            self->eraseDataOn = YES;
+            [KKKeychain setString:@"YES" forKey:@"erase_data_on"];
+            [self->eraseDataSwitch setOn:self->eraseDataOn animated:YES];
+        }]];
+        
+        [self presentViewController:sheet animated:YES completion:nil];
+    } else {
+        eraseDataOn = NO;
+        [KKKeychain setString:@"NO" forKey:@"erase_data_on"];
+    }
 }
 
 - (void)unlockWithBiometricsSwitchChanged:(id)sender {
@@ -262,7 +265,10 @@
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

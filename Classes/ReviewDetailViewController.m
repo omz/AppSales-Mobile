@@ -84,8 +84,11 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	self.navigationController.toolbarHidden = YES;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	return (interfaceOrientation == UIInterfaceOrientationPortrait);
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)updateToolbarButtons {
@@ -100,7 +103,7 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 	
 	markItem.image = review.unread.boolValue ? [UIImage imageNamed:@"CircleFilled"] : [UIImage imageNamed:@"Circle"];
 	
-	NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 	moc.persistentStoreCoordinator = review.managedObjectContext.persistentStoreCoordinator;
 	moc.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 	
@@ -187,7 +190,13 @@ NSString *const developerResponseRegex = @"(?s)(<h2 class=\"response-title\">).*
 - (void)sendReviewViaEmail {
 	Review *review = reviews[index];
 	if (![MFMailComposeViewController canSendMail]) {
-		[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Email Account", nil) message:NSLocalizedString(@"You have not configured this device for sending email.", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", nil) otherButtonTitles:nil] show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Email Account", nil)
+                                                                       message:NSLocalizedString(@"You have not configured this device for sending email.", nil)
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                  style:UIAlertActionStyleCancel
+                                                handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
 		return;
 	}
 	MFMailComposeViewController *mailComposeViewController = [[MFMailComposeViewController alloc] init];

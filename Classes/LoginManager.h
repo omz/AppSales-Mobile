@@ -35,7 +35,6 @@ extern NSString *const kITCPaymentVendorsPaymentAction;
 	NSString *appleAuthSessionId;
 	NSString *appleAuthScnt;
 	NSString *appleAuthTrustedDeviceId;
-	UIActionSheet *verifyActionSheet;
 	SCInputType authType;
 	NSDateFormatter *dateFormatter;
 }
@@ -49,7 +48,7 @@ extern NSString *const kITCPaymentVendorsPaymentAction;
 - (void)logOut;
 
 - (NSString *)providerID;
-- (NSString *)generateCSRFToken;
+- (void)generateCSRFTokenWithCompletionBlock:(void(^)(NSString *csrfToken))completionBlock;
 - (NSDictionary *)getAccessKey:(NSString *)csrfToken;
 - (NSDictionary *)resetAccessKey:(NSString *)csrfToken;
 

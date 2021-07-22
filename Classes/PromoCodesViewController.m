@@ -113,13 +113,6 @@
 	[self.tableView reloadData];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-		return YES;
-	}
-	return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-
 - (NSInteger)unusedCount:(Product *)product {
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	fetchRequest.entity = [NSEntityDescription entityForName:@"PromoCode" inManagedObjectContext:product.managedObjectContext];
@@ -162,7 +155,10 @@
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-	return UIInterfaceOrientationMaskPortrait;
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 @end

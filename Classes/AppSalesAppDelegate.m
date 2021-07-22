@@ -19,6 +19,7 @@
 #import "PaymentsViewController.h"
 #import "PromoCodesViewController.h"
 #import "PromoCodesLicenseViewController.h"
+#import "UIViewController+Alert.h"
 
 @implementation AppSalesAppDelegate
 
@@ -167,9 +168,9 @@
 	self.window.rootViewController = tabController;
 }
 
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-	[self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
-	return YES;
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+    [self.accountsViewController performSelector:@selector(downloadReports:) withObject:nil afterDelay:0.0];
+    return YES;
 }
 
 - (BOOL)migrateDataIfNeeded {
@@ -214,11 +215,8 @@
 	[self saveContext];
 	[[ReportDownloadCoordinator sharedReportDownloadCoordinator] importReportsIntoAccount:account fromDirectory:legacyReportDirectory deleteAfterImport:YES];
 	
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Update Notice", nil) 
-								 message:NSLocalizedString(@"You have updated from an older version of AppSales. Your sales reports are currently being imported. You can start using the app while the import is running.", nil)
-								delegate:nil 
-					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-					   otherButtonTitles:nil] show];
+    [UIViewController displayAlertWithTitle:NSLocalizedString(@"Update Notice", nil)
+                                    message:NSLocalizedString(@"You have updated from an older version of AppSales. Your sales reports are currently being imported. You can start using the app while the import is running.", nil)];
 	return YES;
 }
 
@@ -308,7 +306,7 @@
 	}
 	NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
 	if (coordinator != nil) {
-		managedObjectContext = [[NSManagedObjectContext alloc] init];
+        managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		[managedObjectContext setPersistentStoreCoordinator:coordinator];
 		[managedObjectContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChanges:) name:NSManagedObjectContextDidSaveNotification object:nil];
@@ -366,11 +364,8 @@
 - (void)promoCodeDownloadFailed:(NSNotification *)notification {
 	NSString *errorDescription = notification.userInfo[kASPromoCodeDownloadFailedErrorDescription];
 	NSString *alertMessage = [NSString stringWithFormat:@"An error occured while downloading the promo codes (%@).", errorDescription];
-	[[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) 
-								 message:alertMessage 
-								delegate:nil 
-					   cancelButtonTitle:NSLocalizedString(@"OK", nil) 
-					   otherButtonTitles:nil] show];
+    [UIViewController displayAlertWithTitle:NSLocalizedString(@"Error", nil)
+                                    message:alertMessage];
 }
 
 - (void)dealloc {

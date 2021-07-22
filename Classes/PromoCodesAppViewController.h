@@ -12,7 +12,7 @@
 
 @class Product, PromoCode;
 
-@interface PromoCodesAppViewController : UITableViewController <UIActionSheetDelegate, FieldEditorViewControllerDelegate, MFMailComposeViewControllerDelegate> {
+@interface PromoCodesAppViewController : UITableViewController <FieldEditorViewControllerDelegate, MFMailComposeViewControllerDelegate> {
 	Product *product;
 	NSOperationQueue *queue;
 	NSArray *promoCodes;
@@ -22,12 +22,10 @@
 	NSArray *busyToolbarItems;
 	
 	PromoCode *selectedPromoCode;
-	UIActionSheet *activeSheet;
 }
 
 @property (nonatomic, strong) NSArray *promoCodes;
 @property (nonatomic, strong) PromoCode *selectedPromoCode;
-@property (nonatomic, strong) UIActionSheet *activeSheet;
 
 - (instancetype)initWithProduct:(Product *)aProduct;
 - (void)reloadPromoCodes;
