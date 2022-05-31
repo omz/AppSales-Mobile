@@ -182,7 +182,7 @@ typedef NS_ENUM(NSInteger, AccessTokenAction) {
 - (void)failedToFetchAccessToken {
     [ASProgressHUD hideHUDForView:self.currentViewController.navigationController.view animated:YES];
     [[UIViewController topViewController] displayAlertWithTitle:NSLocalizedString(@"Error", nil)
-                                                        message:NSLocalizedString(@"The access token could not be fetched automatically. Please check your username and password or enter your access token manually. You'll find it in the Sales and Trends module, under the Reports section, by clicking on the (?) beside About Reports on itunesconnect.apple.com.", nil)];
+                                                        message:NSLocalizedString(@"The access token could not be fetched automatically. Please check your username and password or enter your access token manually.\n\nYou can find your access token here:\nApp Store Connect → Sales and Trends → Sales and Trends Reports (in the left-hand sidebar) → About Reports (?) (in the top right) → Generate Reporter Token\n\nYou can also visit this URL:\nhttps://appstoreconnect.apple.com/trends/reports", nil)];
 }
 
 - (void)chooseVendor:(NSString *)providerID {
