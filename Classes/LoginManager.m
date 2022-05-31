@@ -28,19 +28,21 @@ NSString *const kAppleAuthContentTypeValue = @"application/json;charset=UTF-8";
 NSString *const kAppleAuthLocationKey      = @"Location";
 NSString *const kAppleAuthSetCookieKey     = @"Set-Cookie";
 
+// iTunes Connect API
+NSString *const kITCAuthBaseURL = @"https://appstoreconnect.apple.com";
+
 // iTunes Connect Auth API
-NSString *const kITCAuthBaseURL       = @"https://appstoreconnect.apple.com";
 NSString *const kITCAuthSessionAction = @"/olympus/v1/session";
+NSString *const kITCAuthAccessAction  = @"/access/dc";
 
 // iTunes Connect Reporter API
-NSString *const kITCRBaseURL                 = @"https://reportingitc2.apple.com";
-NSString *const kITCRGenerateCSRFTokenAction = @"/gsf/owasp/csrf-guard.js";
-NSString *const kITCRGetAccessKeyAction      = @"/gsf/salesTrendsApp/businessareas/InternetServices/subjectareas/iTunes/proxy/getAccessKey";
-NSString *const kITCRResetAccessKeyAction    = @"/gsf/salesTrendsApp/businessareas/InternetServices/subjectareas/iTunes/proxy/resetAccessKey";
+NSString *const kITCRGenerateCSRFTokenAction = @"/trends/gsf/owasp/csrf-guard.js";
+NSString *const kITCRGetAccessKeyAction      = @"/trends/gsf/salesTrendsApp/businessareas/InternetServices/subjectareas/iTunes/proxy/getAccessKey";
+NSString *const kITCRResetAccessKeyAction    = @"/trends/gsf/salesTrendsApp/businessareas/InternetServices/subjectareas/iTunes/proxy/resetAccessKey";
 
 // iTunes Connect Reporter API Headers
 NSString *const kITCRXRequestedWithKey   = @"X-Requested-With";
-NSString *const kITCRXRequestedWithValue = @"XMLHttpRequest";
+NSString *const kITCRXRequestedWithValue = @"OWASP CSRFGuard Project";
 NSString *const kITCRFetchCSRFTokenKey   = @"FETCH-CSRF-TOKEN";
 NSString *const kITCRFetchCSRFTokenValue = @"1";
 NSString *const kITCRCSRFKey             = @"CSRF";
@@ -293,11 +295,7 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 				}
 			} else {
 				// Preferred provider ID for account already selected.
-				if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.delegate loginSucceeded:self];
-					});
-				}
+				[self loginSucceeded];
 			}
 		} else {
 			// Auto-Fill Wizard
@@ -320,18 +318,29 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 				});
 			} else {
 				// Preferred provider ID for account already selected.
-				if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.delegate loginSucceeded:self];
-					});
-				}
+				[self loginSucceeded];
 			}
 		}
 	} else {
 		// One provider available.
+		[self loginSucceeded];
+	}
+}
+
+- (void)loginSucceeded {
+	NSURL *authAccessURL = [NSURL URLWithString:[kITCAuthBaseURL stringByAppendingString:kITCAuthAccessAction]];
+	NSHTTPURLResponse *authAccessResponse = nil;
+	NSData *authAccessData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:authAccessURL] returningResponse:&authAccessResponse error:nil];
+	if (authAccessData != nil) {
 		if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self.delegate loginSucceeded:self];
+			});
+		}
+	} else {
+		if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.delegate loginFailed:self];
 			});
 		}
 	}
@@ -379,15 +388,10 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	[authSessionRequest setHTTPMethod:@"POST"];
 	[authSessionRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
 	[authSessionRequest setHTTPBody:bodyData];
-    [[NSURLSession.sharedSession dataTaskWithRequest:authSessionRequest
-                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-        if ([self.delegate respondsToSelector:@selector(loginSucceeded:)]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.delegate loginSucceeded:self];
-            });
-        }
-    }] resume];
+	[[NSURLSession.sharedSession dataTaskWithRequest:authSessionRequest
+								   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+		[self loginSucceeded];
+	}] resume];
 }
 
 - (void)generateCode:(NSString *)_appleAuthTrustedDeviceId {
@@ -398,39 +402,39 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		NSMutableURLRequest *deviceRequest = [NSMutableURLRequest requestWithURL:deviceURL];
 		[deviceRequest setHTTPMethod:@"PUT"];
 		[deviceRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
-        [deviceRequest setValue:self->appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
-        [deviceRequest setValue:self->appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+		[deviceRequest setValue:self->appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+		[deviceRequest setValue:self->appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
 		[deviceRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
-        [[NSURLSession.sharedSession dataTaskWithRequest:deviceRequest
-                                       completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-            
-            NSDictionary *deviceDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            
-            NSDictionary *securityCode = deviceDict[@"securityCode"];
-            NSNumber *securityCodeLength = securityCode[@"length"];
-            if (securityCodeLength.integerValue == 4) {
-                // Display security code input controller.
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] initWithType:SCInputTypeTwoStepVerificationCode];
-                    securityCodeInput.delegate = self;
-                    [securityCodeInput show];
-                });
-            } else {
-                // Authentication is requesting a security code with an unsupported number of digits.
-                if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.delegate loginFailed:self];
-                    });
-                }
-            }
-        }] resume];
+		[[NSURLSession.sharedSession dataTaskWithRequest:deviceRequest
+									   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+			
+			NSDictionary *deviceDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+			
+			NSDictionary *securityCode = deviceDict[@"securityCode"];
+			NSNumber *securityCodeLength = securityCode[@"length"];
+			if (securityCodeLength.integerValue == 4) {
+				// Display security code input controller.
+				dispatch_async(dispatch_get_main_queue(), ^{
+					SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] initWithType:SCInputTypeTwoStepVerificationCode];
+					securityCodeInput.delegate = self;
+					[securityCodeInput show];
+				});
+			} else {
+				// Authentication is requesting a security code with an unsupported number of digits.
+				if ([self.delegate respondsToSelector:@selector(loginFailed:)]) {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self.delegate loginFailed:self];
+					});
+				}
+			}
+		}] resume];
 	});
 }
 
 - (void)validateCode:(NSString *)securityCode {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul), ^{
 		NSDictionary *bodyDict = nil;
-        switch (self->authType) {
+		switch (self->authType) {
 			case SCInputTypeTwoStepVerificationCode:
 				bodyDict = @{@"code": securityCode};
 				break;
@@ -444,44 +448,44 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 		NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyDict options:0 error:nil];
 		
 		NSURL *verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthCodeAction]];
-        if (self->authType == SCInputTypeTwoStepVerificationCode) {
-            verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, self->appleAuthTrustedDeviceId]];
+		if (self->authType == SCInputTypeTwoStepVerificationCode) {
+			verifyURL = [NSURL URLWithString:[kAppleAuthBaseURL stringByAppendingFormat:kAppleAuthDeviceAction, self->appleAuthTrustedDeviceId]];
 		}
 		NSMutableURLRequest *verifyRequest = [NSMutableURLRequest requestWithURL:verifyURL];
 		[verifyRequest setHTTPMethod:@"POST"];
 		[verifyRequest setValue:kAppleAuthWidgetValue forHTTPHeaderField:kAppleAuthWidgetKey];
-        [verifyRequest setValue:self->appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
-        [verifyRequest setValue:self->appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
+		[verifyRequest setValue:self->appleAuthSessionId forHTTPHeaderField:kAppleAuthSessionIdKey];
+		[verifyRequest setValue:self->appleAuthScnt forHTTPHeaderField:kAppleAuthScntKey];
 		[verifyRequest setValue:kAppleAuthContentTypeValue forHTTPHeaderField:kAppleAuthContentTypeKey];
 		[verifyRequest setHTTPBody:bodyData];
-        [[NSURLSession.sharedSession dataTaskWithRequest:verifyRequest
-                                       completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-            
-            NSString *setCookie = ((NSHTTPURLResponse*)response).allHeaderFields[kAppleAuthSetCookieKey];
-            if (([setCookie rangeOfString:@"myacinfo"].location != NSNotFound) || self.isLoggedIn) {
-                // We're in!
-                [self fetchRemainingCookies];
-            } else {
-                // Incorrect verification code. Retry?
-                switch (self->authType) {
-                    case SCInputTypeTwoStepVerificationCode: {
-                        [self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
-                        break;
-                    }
-                    case SCInputTypeTwoFactorAuthenticationCode: {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] initWithType:SCInputTypeTwoFactorAuthenticationCode];
-                            securityCodeInput.delegate = self;
-                            [securityCodeInput show];
-                        });
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
-            }
-        }] resume];
+		[[NSURLSession.sharedSession dataTaskWithRequest:verifyRequest
+									   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+			
+			NSString *setCookie = ((NSHTTPURLResponse*)response).allHeaderFields[kAppleAuthSetCookieKey];
+			if (([setCookie rangeOfString:@"myacinfo"].location != NSNotFound) || self.isLoggedIn) {
+				// We're in!
+				[self fetchRemainingCookies];
+			} else {
+				// Incorrect verification code. Retry?
+				switch (self->authType) {
+					case SCInputTypeTwoStepVerificationCode: {
+						[self performSelectorOnMainThread:@selector(chooseTrustedDevice) withObject:nil waitUntilDone:NO];
+						break;
+					}
+					case SCInputTypeTwoFactorAuthenticationCode: {
+						dispatch_async(dispatch_get_main_queue(), ^{
+							SecurityCodeInputController *securityCodeInput = [[SecurityCodeInputController alloc] initWithType:SCInputTypeTwoFactorAuthenticationCode];
+							securityCodeInput.delegate = self;
+							[securityCodeInput show];
+						});
+						break;
+					}
+					default: {
+						break;
+					}
+				}
+			}
+		}] resume];
 	});
 }
 
@@ -531,29 +535,43 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 }
 
 - (void)generateCSRFTokenWithCompletionBlock:(void(^)(NSString *csrfToken))completionBlock {
-	NSURL *generateCSRFTokenURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRGenerateCSRFTokenAction]];
+	NSURL *generateCSRFTokenURL = [NSURL URLWithString:[kITCAuthBaseURL stringByAppendingString:kITCRGenerateCSRFTokenAction]];
 	NSMutableURLRequest *generateRequest = [NSMutableURLRequest requestWithURL:generateCSRFTokenURL];
 	[generateRequest setHTTPMethod:@"POST"];
 	[generateRequest setValue:kITCRFetchCSRFTokenValue forHTTPHeaderField:kITCRFetchCSRFTokenKey];
 	[generateRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
-    [[NSURLSession.sharedSession dataTaskWithRequest:generateRequest
-                                   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-        NSString *generateString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if (generateString != nil) {
-            NSRange csrfRange = [generateString rangeOfString:@"CSRF:"];
-            if (csrfRange.location != NSNotFound) {
-                NSUInteger csrfStart = csrfRange.location + csrfRange.length;
-                completionBlock([generateString substringFromIndex:csrfStart]);
-                return;
-            }
-        }
-        completionBlock(nil);
-    }] resume];
+	[[NSURLSession.sharedSession dataTaskWithRequest:generateRequest
+								   completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+		NSString *generateString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+		if (generateString != nil) {
+			NSRange csrfRange = [generateString rangeOfString:@"CSRF:"];
+			if (csrfRange.location != NSNotFound) {
+				NSUInteger csrfStart = csrfRange.location + csrfRange.length;
+				completionBlock([generateString substringFromIndex:csrfStart]);
+				return;
+			}
+		}
+		completionBlock(nil);
+	}] resume];
+}
+
+- (NSDictionary *)parseAccessKeyResultDict:(NSDictionary *)dict {
+	if (dict[@"result"] != nil) {
+		NSDictionary *result = dict[@"result"];
+		if (result[@"data"] != nil) {
+			NSDictionary *data = result[@"data"];
+			NSMutableDictionary *resultDict = [[NSMutableDictionary alloc] init];
+			resultDict[@"accessKey"] = data[@"accessKey"];
+			resultDict[@"createdDate"] = [dateFormatter dateFromString:data[@"createdDate"]];
+			resultDict[@"expiryDate"] = [dateFormatter dateFromString:data[@"expiryDate"]];
+			return resultDict;
+		}
+	}
+	return nil;
 }
 
 - (NSDictionary *)getAccessKey:(NSString *)csrfToken {
-	NSURL *getAccessKeyURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRGetAccessKeyAction]];
+	NSURL *getAccessKeyURL = [NSURL URLWithString:[kITCAuthBaseURL stringByAppendingString:kITCRGetAccessKeyAction]];
 	NSMutableURLRequest *getRequest = [NSMutableURLRequest requestWithURL:getAccessKeyURL];
 	[getRequest setHTTPMethod:@"GET"];
 	[getRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
@@ -561,25 +579,36 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	NSHTTPURLResponse *getResponse = nil;
 	NSData *getData = [NSURLConnection sendSynchronousRequest:getRequest returningResponse:&getResponse error:nil];
 	NSDictionary *getDict = [NSJSONSerialization JSONObjectWithData:getData options:0 error:nil];
-    NSString *status = getDict[@"status"];
-    if ((status != nil) && [status isEqualToString:@"success"]) {
-        if (getDict[@"result"]) {
-            NSDictionary *result = getDict[@"result"];
-            if (result[@"data"]) {
-                NSDictionary *data = result[@"data"];
-                NSMutableDictionary *resultDict = [[NSMutableDictionary alloc] init];
-                resultDict[@"accessKey"] = data[@"accessKey"];
-                resultDict[@"createdDate"] = [dateFormatter dateFromString:data[@"createdDate"]];
-                resultDict[@"expiryDate"] = [dateFormatter dateFromString:data[@"expiryDate"]];
-                return resultDict;
-            }
-        }
-    }
+	NSString *status = getDict[@"status"];
+	if (status != nil) {
+		if ([status isEqualToString:@"success"]) {
+			return [self parseAccessKeyResultDict:getDict];
+		} else if ([status isEqualToString:@"error"]) {
+			if (getDict[@"error"] != nil) {
+				NSDictionary *error = getDict[@"error"];
+				if (error[@"code"] != nil) {
+					NSString *errorCode = error[@"code"];
+					if ([errorCode isEqualToString:@"702"]) {
+						return [self resetAccessKey:csrfToken];
+					} else if (error[@"message"] != nil) {
+						NSString *errorMessage = error[@"message"];
+						NSLog(@"Error fetching access token: Code: %@, Message: %@", errorCode, errorMessage);
+					} else {
+						NSLog(@"Error fetching access token: Code: %@", errorCode);
+					}
+				} else {
+					NSLog(@"Error fetching access token.");
+				}
+			} else {
+				NSLog(@"Error fetching access token.");
+			}
+		}
+	}
 	return nil;
 }
 
 - (NSDictionary *)resetAccessKey:(NSString *)csrfToken {
-	NSURL *resetAccessKeyURL = [NSURL URLWithString:[kITCRBaseURL stringByAppendingString:kITCRResetAccessKeyAction]];
+	NSURL *resetAccessKeyURL = [NSURL URLWithString:[kITCAuthBaseURL stringByAppendingString:kITCRResetAccessKeyAction]];
 	NSMutableURLRequest *resetRequest = [NSMutableURLRequest requestWithURL:resetAccessKeyURL];
 	[resetRequest setHTTPMethod:@"GET"];
 	[resetRequest setValue:kITCRXRequestedWithValue forHTTPHeaderField:kITCRXRequestedWithKey];
@@ -587,21 +616,11 @@ NSString *const kITCPaymentVendorsPaymentAction = @"/ra/paymentConsolidation/pro
 	NSHTTPURLResponse *resetResponse = nil;
 	NSData *resetData = [NSURLConnection sendSynchronousRequest:resetRequest returningResponse:&resetResponse error:nil];
 	NSDictionary *resetDict = [NSJSONSerialization JSONObjectWithData:resetData options:0 error:nil];
-    NSString *status = resetDict[@"status"];
-    if ((status != nil) && [status isEqualToString:@"success"]) {
-        if (resetDict[@"result"]) {
-            NSDictionary *result = resetDict[@"result"];
-            if (result[@"data"]) {
-                NSDictionary *data = result[@"data"];
-                NSMutableDictionary *resultDict = [[NSMutableDictionary alloc] init];
-                resultDict[@"accessKey"] = data[@"accessKey"];
-                resultDict[@"createdDate"] = [dateFormatter dateFromString:data[@"createdDate"]];
-                resultDict[@"expiryDate"] = [dateFormatter dateFromString:data[@"expiryDate"]];
-                return resultDict;
-            }
-        }
-    }
-    return nil;
+	NSString *status = resetDict[@"status"];
+	if ((status != nil) && [status isEqualToString:@"success"]) {
+		return [self parseAccessKeyResultDict:resetDict];
+	}
+	return nil;
 }
 
 @end
